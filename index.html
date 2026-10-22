@@ -38,6 +38,12 @@
     .lesson-row:has(input:checked) .lesson-title { color: #aeb9cd; }
     dialog { padding: 0; overflow: hidden; border: 1px solid #37354f; border-radius: 22px; background: #141824; color: #edf0fa; width: min(790px, calc(100vw - 24px)); max-height: calc(100dvh - 40px); margin: auto; box-shadow: 0 30px 130px #0009; }
     dialog::backdrop { background: #03060dcc; backdrop-filter: blur(9px); }
+    dialog.lesson-reader { width: min(1040px, calc(100vw - 24px)); }
+    .reader-prose { max-width: 76ch; margin-inline: auto; }
+    .reader-prose p { line-height: 1.85; }
+    .reader-section[aria-selected="true"] { background: #8b5cf625; color: #ddd6fe; border-color: #a78bfa80; }
+    details > summary { cursor: pointer; }
+    details[open] > summary { margin-bottom: 1rem; }
     dialog[open] { animation: enter .18s ease-out; }
     @keyframes enter { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: none; } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
@@ -119,7 +125,7 @@
           <div class="relative z-10 max-w-xl md:max-w-[65%]">
             <span class="inline-flex items-center gap-2 text-[10px] font-bold tracking-[.18em] text-violet-300"><svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-bolt"/></svg>DO PRIMEIRO CÓDIGO À INTELIGÊNCIA ARTIFICIAL</span>
             <h2 class="mt-3 font-display text-3xl font-bold leading-[1.18] tracking-tight sm:text-[36px]">Conhecimento que vira<br><span class="text-violet-300">possibilidade.</span></h2>
-            <p class="mt-3 max-w-md text-sm leading-relaxed text-slate-400">Uma jornada, muitas possibilidades. Aprenda com boas fontes, construa projetos e acompanhe cada passo.</p>
+            <p class="mt-3 max-w-md text-sm leading-relaxed text-slate-400">Aprenda com aulas passo a passo, pratique com dicas e soluções e confira o que você entendeu.</p>
             <div class="mt-6 flex flex-wrap items-center gap-4"><button id="resume" data-action="resume" class="inline-flex items-center gap-2 rounded-xl bg-violet-500 px-4 py-3 text-xs font-bold text-white shadow-lg shadow-violet-600/20 transition hover:-translate-y-0.5 hover:bg-violet-400"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8"><use href="#i-play"/></svg><span id="resume-label">Começar minha jornada</span><svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8"><use href="#i-arrow"/></svg></button><span id="resume-meta" class="text-[11px] text-slate-400"></span></div>
           </div>
           <div class="absolute right-7 top-1/2 hidden w-[28%] -translate-y-1/2 xl:right-12 md:block" aria-hidden="true">
@@ -162,6 +168,7 @@
   <dialog id="study-dialog" aria-labelledby="dialog-title">
     <div class="flex max-h-[calc(100dvh-42px)] flex-col">
       <header class="flex shrink-0 items-start justify-between gap-4 border-b border-white/8 px-5 py-5 sm:px-7"><div class="min-w-0"><p id="dialog-eyebrow" class="mb-2 text-[10px] font-bold uppercase tracking-[.16em] text-violet-300"></p><h2 id="dialog-title" class="font-display text-xl font-bold leading-snug sm:text-2xl"></h2></div><button id="close-dialog" aria-label="Fechar janela de estudo" class="shrink-0 rounded-lg border border-white/10 p-2 text-slate-400 transition hover:bg-white/10 hover:text-white"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-close"/></svg></button></header>
+      <nav id="lesson-sections" role="tablist" aria-label="Etapas da aula" class="hidden shrink-0 gap-2 overflow-x-auto border-b border-white/8 px-5 py-3 sm:px-7"></nav>
       <div id="dialog-body" class="min-h-0 overflow-y-auto overscroll-contain px-5 py-6 sm:px-7"></div>
       <footer id="dialog-footer" class="shrink-0 border-t border-white/8 px-5 py-4 sm:px-7"></footer>
     </div>
@@ -776,7 +783,7 @@
     let startupNotice = '';
 
     function sanitizeState(candidate) {
-      const clean = { version: 1, completed: {}, activeTrack: 'html', lastLesson: null };
+      const clean = { version: 1, completed: {}, activeTrack: 'html', lastLesson: null, notes: {}, quizAttempts: {} };
       if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return clean;
       if (candidate.completed && typeof candidate.completed === 'object') {
         for (const id of lessonIndex.keys()) {
@@ -785,6 +792,18 @@
       }
       if (tracks.some((track) => track.id === candidate.activeTrack)) clean.activeTrack = candidate.activeTrack;
       if (lessonIndex.has(candidate.lastLesson)) clean.lastLesson = candidate.lastLesson;
+      for (const { lesson } of lessonIndex.values()) {
+        if (!lesson.guide) continue;
+        lesson.guide.exercises.forEach((_, i) => {
+          const key = `${lesson.id}:${i}`;
+          if (typeof candidate.notes?.[key] === 'string') clean.notes[key] = candidate.notes[key].slice(0, 10000);
+        });
+        const attempt = candidate.quizAttempts?.[lesson.id];
+        if (attempt && Array.isArray(attempt.answers)) {
+          const answers = lesson.guide.quiz.map((question, i) => Number.isInteger(attempt.answers[i]) && attempt.answers[i] >= 0 && attempt.answers[i] < question.options.length ? attempt.answers[i] : null);
+          clean.quizAttempts[lesson.id] = { answers, checked: attempt.checked === true && answers.every(Number.isInteger) };
+        }
+      }
       return clean;
     }
 
@@ -914,7 +933,7 @@
             </button>
             <div class="mx-5 mb-4 flex items-center gap-3"><div class="min-w-0 flex-1">${bar(percent, current.color, `Progresso do módulo ${module.title}`)}</div><span class="text-[10px] text-slate-500">${done}/${total}</span></div>
             <div class="px-1">${visible.map((lesson) => lessonRow(lesson, 'main')).join('')}</div>
-            <div class="flex items-center justify-between gap-3 border-t border-white/7 bg-white/[.015] px-5 py-3"><span class="flex items-center gap-1.5 text-[10px] text-slate-500">${icon('book', 'h-3 w-3')}Leituras + vídeos + prática</span><button data-module="${module.id}" data-focus="resources-${module.id}" class="inline-flex items-center gap-1.5 text-[11px] font-medium text-violet-300 transition hover:text-white">Explorar módulo ${icon('arrow', 'h-3 w-3')}</button></div>
+            <div class="flex items-center justify-between gap-3 border-t border-white/7 bg-white/[.015] px-5 py-3"><span class="flex items-center gap-1.5 text-[10px] text-slate-500">${icon('book', 'h-3 w-3')}Aula + desafios + revisão</span><button data-module="${module.id}" data-focus="resources-${module.id}" class="inline-flex items-center gap-1.5 text-[11px] font-medium text-violet-300 transition hover:text-white">Explorar módulo ${icon('arrow', 'h-3 w-3')}</button></div>
           </article>`;
         }
       }
@@ -958,6 +977,10 @@
 
     function showDialog(title, eyebrow, body, footer) {
       if (!dialog.open) dialogReturnFocus = document.activeElement;
+      const isLesson = dialogContext?.type === 'lesson';
+      dialog.classList.toggle('lesson-reader', isLesson);
+      $('#lesson-sections').classList.toggle('hidden', !isLesson);
+      $('#lesson-sections').classList.toggle('flex', isLesson);
       $('#dialog-title').textContent = title;
       $('#dialog-eyebrow').textContent = eyebrow;
       $('#dialog-body').innerHTML = body;
@@ -970,6 +993,64 @@
       $('#close-dialog').focus({ preventScroll: true });
     }
 
+    const READER_SECTIONS = [
+      ['learn', '1. Conceitos'], ['example', '2. Exemplo'],
+      ['practice', '3. Prática'], ['review', '4. Revisão'], ['resources', 'Fontes']
+    ];
+    let activeLessonSection = 'learn';
+    let notesSaveTimer;
+
+    function prose(value) {
+      return escapeHTML(value).replace(/`([^`]+)`/g, '<code class="rounded bg-white/5 px-1 text-violet-200">$1</code>');
+    }
+
+    function readerParagraph(text) {
+      return `<p class="mt-3 text-[15px] text-slate-300">${prose(text)}</p>`;
+    }
+
+    function readerCode(code, label) {
+      return `<div class="my-5 overflow-hidden rounded-xl border border-white/10 bg-[#0b101b]"><div class="border-b border-white/8 px-4 py-2 text-xs text-slate-400">${escapeHTML(label)}</div><pre tabindex="0" aria-label="${escapeHTML(label)}" class="max-h-[32rem] overflow-auto p-4 font-mono text-[13px] leading-7 text-sky-100"><code>${escapeHTML(code)}</code></pre></div>`;
+    }
+
+    function renderLessonFooter() {
+      if (dialogContext?.type !== 'lesson') return;
+      const { id } = dialogContext;
+      const { lesson, track } = lessonIndex.get(id);
+      const nextSection = { learn: 'Exemplo', example: 'Prática', practice: 'Revisão' }[activeLessonSection];
+      $('#dialog-footer').innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3"><label class="flex cursor-pointer items-center gap-3 text-sm"><input type="checkbox" data-complete="${id}" data-focus="modal-check-${id}" ${state.completed[id] ? 'checked' : ''} class="h-4 w-4 cursor-pointer accent-violet-400"><span id="modal-completion-label">${state.completed[id] ? 'Lição concluída' : 'Marcar como concluída'}</span></label><button data-action="${nextSection ? 'section-next' : 'next'}" class="inline-flex items-center gap-2 rounded-xl bg-violet-500 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-violet-400">${nextSection ? `Continuar: ${nextSection}` : lessonsOf(track).at(-1).id === lesson.id ? 'Voltar à trilha' : 'Próxima aula'}${icon('arrow')}</button></div>`;
+    }
+
+    function quizMarkup(lesson) {
+      const attempt = state.quizAttempts[lesson.id] || { answers: [], checked: false };
+      const questions = lesson.guide.quiz;
+      const score = questions.reduce((total, question, i) => total + (attempt.answers[i] === question.correctIndex ? 1 : 0), 0);
+      return `<form id="lesson-quiz" class="mt-8 rounded-2xl border border-violet-400/20 bg-violet-400/5 p-4 sm:p-6"><h3 class="font-display text-xl font-semibold">Confira o que você entendeu</h3><p class="mt-2 text-sm leading-relaxed text-slate-400">Escolha uma resposta por questão. A correção explica os conceitos; você pode tentar novamente.</p>${questions.map((question, i) => `<fieldset class="mt-6"><legend class="mb-3 text-[15px] font-semibold leading-relaxed">${i + 1}. ${escapeHTML(question.question)}</legend><div class="space-y-2">${question.options.map((option, j) => `<label class="flex cursor-pointer items-start gap-3 rounded-lg border border-white/10 bg-[#141824] p-3 text-sm leading-relaxed hover:border-violet-300/50"><input type="radio" name="quiz-${i}" value="${j}" data-quiz-question="${i}" ${attempt.answers[i] === j ? 'checked' : ''} class="mt-1 h-4 w-4 shrink-0 accent-violet-400"><span>${escapeHTML(option)}</span></label>`).join('')}</div><div data-quiz-feedback ${attempt.checked ? '' : 'hidden'} class="mt-3 rounded-lg border border-white/10 p-3 text-sm leading-relaxed"><p class="font-semibold ${attempt.answers[i] === question.correctIndex ? 'text-emerald-300' : 'text-amber-200'}">${attempt.answers[i] === question.correctIndex ? 'Correto.' : `Ainda não. A resposta é: ${escapeHTML(question.options[question.correctIndex])}`}</p><p class="mt-2 text-slate-300">${escapeHTML(question.explanation)}</p></div></fieldset>`).join('')}<button type="submit" class="mt-6 rounded-xl bg-violet-500 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-400">Conferir respostas</button><p id="quiz-result" role="status" aria-live="polite" tabindex="-1" class="mt-4 text-sm leading-relaxed text-violet-200">${attempt.checked ? `${score} de ${questions.length} respostas corretas. ${score === questions.length ? 'Agora tente explicar os conceitos sem consultar a aula.' : 'Leia os comentários e volte aos conceitos que precisarem de revisão.'}` : ''}</p></form>`;
+    }
+
+    function renderLessonSection(section = activeLessonSection, moveFocus = false) {
+      if (dialogContext?.type !== 'lesson' || !READER_SECTIONS.some(([key]) => key === section)) return;
+      const { lesson, module, track } = lessonIndex.get(dialogContext.id);
+      const guide = lesson.guide;
+      activeLessonSection = section;
+      $('#lesson-sections').innerHTML = READER_SECTIONS.map(([key, label]) => `<button id="reader-tab-${key}" role="tab" aria-selected="${key === section}" aria-controls="lesson-reading-panel" tabindex="${key === section ? 0 : -1}" data-lesson-section="${key}" class="reader-section shrink-0 rounded-lg border border-transparent px-3 py-2.5 text-xs font-semibold text-slate-400 transition hover:bg-white/5 hover:text-white">${label}</button>`).join('');
+      let content = '';
+      if (section === 'learn') {
+        content = `<div class="mb-6 flex flex-wrap items-center gap-2"><span class="rounded-full bg-violet-400/10 px-3 py-1 text-xs text-violet-200">${module.level}</span><span class="text-xs text-slate-400">~${duration(lesson.minutes)} de estudo e prática</span></div><h3 class="font-display text-2xl font-semibold">Antes do primeiro passo</h3><div class="mt-4 rounded-xl border border-white/10 bg-white/[.025] p-4"><h4 class="text-sm font-semibold text-violet-200">O que você precisa saber</h4>${readerParagraph(guide.prerequisites)}<h4 class="mt-5 text-sm font-semibold text-violet-200">Prepare seu ambiente</h4>${readerParagraph(guide.setup)}</div><h3 class="mt-8 font-display text-xl font-semibold">Onde isso entra na prática?</h3>${readerParagraph(guide.why)}<div class="mt-6 border-l-2 border-violet-400/60 pl-4"><h4 class="text-sm font-semibold text-violet-200">Ao terminar esta aula</h4><ul class="mt-2 list-disc space-y-2 pl-4 text-sm leading-relaxed text-slate-300">${lesson.objectives.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul></div>${guide.sections.map((part, i) => `<section class="mt-9"><h3 class="font-display text-xl font-semibold leading-snug"><span class="mr-2 text-violet-300">${String(i + 1).padStart(2, '0')}.</span>${escapeHTML(part.title)}</h3>${part.paragraphs.map(readerParagraph).join('')}</section>`).join('')}<p class="mt-8 rounded-xl bg-violet-400/10 p-4 text-sm leading-relaxed text-violet-100">Quando conseguir explicar essas ideias com suas palavras, continue para o exemplo. Você verá como cada parte aparece no código ou no fluxo de trabalho.</p>`;
+      } else if (section === 'example') {
+        content = `<h3 class="font-display text-2xl font-semibold">Um exemplo, parte por parte</h3><p class="mt-3 text-sm leading-relaxed text-slate-400">Leia a explicação e execute no ambiente indicado. O código exibido aqui é material de estudo; ele não é executado dentro do dashboard.</p>${readerParagraph(guide.setup)}${readerCode(guide.example.code, guide.example.language)}<h3 class="mt-7 font-display text-xl font-semibold">Por que cada parte está aqui?</h3><ol class="mt-4 space-y-4">${guide.example.explanation.map((step, i) => `<li class="flex gap-3"><span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-violet-400/15 text-xs font-bold text-violet-200">${i + 1}</span><p class="text-[15px] text-slate-300">${prose(step)}</p></li>`).join('')}</ol><div class="mt-6 rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-4"><h3 class="text-sm font-semibold text-emerald-200">O que você deve observar</h3>${readerParagraph(guide.example.expected)}</div><h3 class="mt-8 font-display text-xl font-semibold">Agora, faça uma mudança de cada vez</h3><ol class="mt-4 space-y-4">${guide.guided.map((step, i) => `<li class="rounded-xl border border-white/10 p-4"><h4 class="mb-2 text-xs font-semibold uppercase tracking-wide text-violet-300">Passo ${i + 1}</h4>${readerParagraph(step.instruction)}<p class="mt-3 text-sm text-emerald-200"><strong>Observe:</strong> ${prose(step.result)}</p></li>`).join('')}</ol>`;
+      } else if (section === 'practice') {
+        content = `<h3 class="font-display text-2xl font-semibold">Da prática guiada à sua solução</h3><p class="mt-3 text-sm leading-relaxed text-slate-400">Tente resolver antes de abrir as dicas. Use o rascunho para planejar ou guardar seu código e execute no ambiente da aula.</p>${guide.exercises.map((exercise, i) => { const key = `${lesson.id}:${i}`; return `<section class="mt-7 rounded-2xl border border-white/10 p-4 sm:p-6"><p class="mb-2 text-xs font-bold tracking-wide text-violet-300">EXERCÍCIO ${i + 1} · ${i === 0 ? 'FIXAÇÃO' : 'APLICAÇÃO'}</p><h3 class="sr-only">Exercício ${i + 1}</h3>${readerParagraph(exercise.prompt)}<label class="mb-2 mt-5 block text-sm font-medium" for="exercise-note-${i}">Sua tentativa — exercício ${i + 1}</label><textarea id="exercise-note-${i}" data-note="${key}" maxlength="10000" rows="6" spellcheck="false" class="w-full resize-y rounded-xl border border-white/15 bg-[#0b101b] p-3 font-mono text-sm leading-6 text-slate-200 placeholder:text-slate-500 focus:border-violet-400" placeholder="Escreva seu raciocínio, pseudocódigo ou uma solução para testar…">${escapeHTML(state.notes[key] || '')}</textarea><p class="mt-1 text-xs text-slate-400">Rascunho salvo neste navegador. Até 10.000 caracteres.</p><details class="mt-4 rounded-xl border border-amber-300/15 bg-amber-300/5 p-4"><summary class="text-sm font-semibold text-amber-100">Preciso de uma dica</summary><ol class="list-decimal space-y-3 pl-5 text-sm leading-7 text-slate-300">${exercise.hints.map(hint => `<li>${prose(hint)}</li>`).join('')}</ol></details><details class="mt-3 rounded-xl border border-emerald-300/15 bg-emerald-300/5 p-4"><summary class="text-sm font-semibold text-emerald-100">Ver solução comentada</summary>${readerCode(exercise.solution, 'Uma solução possível')}${readerParagraph(exercise.explanation)}<p class="mt-4 text-sm text-emerald-200"><strong>Resultado esperado:</strong> ${prose(exercise.expected)}</p></details></section>`; }).join('')}<p class="mt-7 text-sm leading-relaxed text-slate-400">Uma solução diferente também pode estar correta. Compare comportamento e critérios, depois explique por que a sua solução funciona.</p>`;
+      } else if (section === 'review') {
+        content = `<h3 class="font-display text-2xl font-semibold">Revise antes de avançar</h3><h4 class="mb-3 mt-6 text-base font-semibold text-amber-200">Erros comuns e como corrigi-los</h4><ul class="space-y-3">${guide.mistakes.map(item => `<li class="rounded-xl border border-white/8 p-4 text-[15px] leading-7 text-slate-300">${prose(item)}</li>`).join('')}</ul>${quizMarkup(lesson)}<h3 class="mb-3 mt-8 font-display text-xl font-semibold">Leve estas ideias com você</h3><ul class="list-disc space-y-3 pl-5 text-[15px] leading-7 text-slate-300">${guide.summary.map(item => `<li>${prose(item)}</li>`).join('')}</ul><p class="mt-6 rounded-xl border border-emerald-300/20 p-4 text-sm leading-relaxed text-emerald-100">Marque a aula como concluída quando conseguir explicar os conceitos, aplicar o exemplo e resolver os exercícios. A conclusão é sua autoavaliação; a revisão não marca aulas automaticamente.</p>`;
+      } else {
+        content = `<h3 class="font-display text-2xl font-semibold">Aprofunde quando precisar</h3><p class="mt-3 text-[15px] leading-relaxed text-slate-400">A explicação, a prática e a revisão estão dentro desta aula. As referências abaixo servem para consultar detalhes e explorar aplicações adicionais. Algumas aulas em vídeo usam versões anteriores; confira a documentação para o seu ambiente.</p>${resourceCards([...(lesson.docs || []), ...module.resources])}`;
+      }
+      $('#dialog-body').innerHTML = `<article id="lesson-reading-panel" role="tabpanel" aria-labelledby="reader-tab-${section}" tabindex="0" class="reader-prose">${content}</article>`;
+      $('#dialog-body').scrollTop = 0;
+      renderLessonFooter();
+      if (moveFocus) $(`#reader-tab-${section}`).focus({ preventScroll: true });
+    }
+
     function openLesson(id) {
       const entry = lessonIndex.get(id);
       if (!entry) return;
@@ -977,22 +1058,34 @@
       state.lastLesson = id;
       state.activeTrack = track.id;
       saveState();
-      // Capture o botão original antes de atualizar os elementos atrás do modal.
       if (!dialog.open) dialogReturnFocus = document.activeElement;
       const origin = dialogReturnFocus;
       render();
       dialogContext = { type: 'lesson', id };
-      const body = `
-        <div class="mb-5 flex flex-wrap items-center gap-2"><span class="rounded-full bg-violet-400/10 px-3 py-1 text-[11px] text-violet-200">${module.level}</span><span class="flex items-center gap-1.5 text-xs text-slate-400">${icon('clock', 'h-3.5 w-3.5')}${duration(lesson.minutes)} sugeridos</span></div>
-        <p class="text-sm leading-7 text-slate-300">${escapeHTML(lesson.concept)}</p>
-        <section class="mt-6"><h3 class="mb-3 flex items-center gap-2 text-sm font-semibold">${icon('target', 'h-4 w-4 text-violet-300')}Ao final, você será capaz de</h3><ul class="space-y-2">${lesson.objectives.map((objective) => `<li class="flex items-start gap-2 text-sm leading-relaxed text-slate-400">${icon('check', 'mt-1 h-3.5 w-3.5 text-emerald-300')}<span>${escapeHTML(objective)}</span></li>`).join('')}</ul></section>
-        <section class="mt-6 overflow-hidden rounded-xl border border-white/9 bg-[#0d111b]"><div class="flex items-center justify-between border-b border-white/7 px-4 py-2.5"><h3 class="font-mono text-[10px] text-slate-400">${track.id === 'ai' ? 'ESBOÇO PARA EXPLORAR' : 'EXEMPLO PARA EXPLORAR'}</h3><span class="flex gap-1"><span class="h-1.5 w-1.5 rounded-full bg-slate-600"></span><span class="h-1.5 w-1.5 rounded-full bg-slate-600"></span><span class="h-1.5 w-1.5 rounded-full bg-slate-600"></span></span></div><pre tabindex="0" aria-label="Exemplo de estudo" class="overflow-x-auto p-4 text-xs leading-6 text-sky-200"><code>${escapeHTML(lesson.code)}</code></pre></section>
-        <section class="mt-6 rounded-xl border border-emerald-400/15 bg-emerald-400/5 p-4"><h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-200">${icon('terminal')}Agora é sua vez</h3><p class="text-sm leading-relaxed text-slate-300">${escapeHTML(lesson.exercise)}</p></section>
-        ${resourceCards([...(lesson.docs || []), ...module.resources])}
-        <p class="mt-5 text-[11px] leading-relaxed text-slate-500">Os materiais complementam o módulo. Os vídeos abrem diretamente em uma nova aba; alguns são aulas introdutórias ou workshops. Os exemplos desta página são para leitura e prática no seu editor.</p>`;
-      showDialog(lesson.title, `${track.title} / Módulo ${module.number}`, body, `<div class="flex flex-wrap items-center justify-between gap-3"><label class="flex cursor-pointer items-center gap-3 text-sm"><input type="checkbox" data-complete="${id}" data-focus="modal-check-${id}" ${state.completed[id] ? 'checked' : ''} class="h-4 w-4 cursor-pointer accent-violet-400"><span id="modal-completion-label">${state.completed[id] ? 'Lição concluída' : 'Marcar como concluída'}</span></label><button data-action="next" class="inline-flex items-center gap-2 rounded-xl bg-violet-500 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-violet-400">${lessonsOf(track).at(-1).id === id ? 'Voltar à trilha' : 'Próxima lição'}${icon('arrow')}</button></div>`);
+      activeLessonSection = 'learn';
+      showDialog(lesson.title, `${track.title} / Módulo ${module.number}`, '', '');
+      renderLessonSection();
       dialogReturnFocus = origin;
     }
+
+    function gradeQuiz() {
+      if (dialogContext?.type !== 'lesson') return;
+      const { lesson } = lessonIndex.get(dialogContext.id);
+      const attempt = state.quizAttempts[lesson.id] || { answers: [], checked: false };
+      const missing = lesson.guide.quiz.findIndex((_, i) => !Number.isInteger(attempt.answers[i]));
+      if (missing !== -1) {
+        $('#quiz-result').textContent = `Responda à questão ${missing + 1} antes de conferir.`;
+        $(`[name="quiz-${missing}"]`).focus();
+        return;
+      }
+      attempt.checked = true;
+      state.quizAttempts[lesson.id] = attempt;
+      saveState();
+      renderLessonSection('review');
+      $('#quiz-result').scrollIntoView({ block: 'nearest' });
+      $('#quiz-result').focus({ preventScroll: true });
+    }
+
 
     function openModule(id) {
       const entry = moduleIndex.get(id);
@@ -1014,9 +1107,9 @@
       dialogContext = { type: 'how' };
       const steps = [
         ['Escolha um caminho', 'Comece por HTML & CSS para interfaces, Python para automação, Banco de Dados para organizar informações ou pelos fundamentos de IA. Revise programação antes das integrações com agentes.'],
-        ['Entenda e experimente', 'Leia o conceito e a documentação. Reproduza o exemplo no seu editor e altere uma coisa por vez para observar o resultado.'],
-        ['Construa sem copiar', 'Faça o desafio da lição. Explique com suas palavras o que criou e teste um caso de sucesso e um de erro.'],
-        ['Registre a conquista', 'Marque a caixa de conclusão quando conseguir aplicar o conteúdo. Você pode desmarcar a qualquer momento para revisar.']
+        ['Entenda e experimente', 'Leia a aba Conceitos e prepare o ambiente indicado. Em Exemplo, acompanhe cada explicação, reproduza o código e siga as mudanças guiadas.'],
+        ['Construa sem copiar', 'Na aba Prática, tente os dois exercícios antes de abrir as dicas e soluções. Seu rascunho fica salvo neste navegador; execute o código no ambiente indicado na aula.'],
+        ['Revise e registre a conquista', 'Responda às perguntas em Revisão e leia o feedback. Marque a conclusão quando conseguir explicar e aplicar o conteúdo. A correção não marca aulas automaticamente.']
       ];
       showDialog('Aprender é construir, aos poucos.', 'SEU MÉTODO DE ESTUDO', `<ol class="space-y-5">${steps.map(([title, description], index) => `<li class="flex gap-4"><span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-400/10 font-display text-violet-300">${index + 1}</span><div><h3 class="text-sm font-semibold">${title}</h3><p class="mt-1.5 text-sm leading-relaxed text-slate-400">${description}</p></div></li>`).join('')}</ol><div class="mt-7 rounded-xl border border-white/8 bg-white/[.025] p-4"><h3 class="mb-2 text-sm font-medium">Sobre o seu progresso</h3><p class="text-xs leading-6 text-slate-400">A conclusão é autodeclarada e fica no localStorage deste navegador. Não há conta nem sincronização entre dispositivos. Limpar os dados do site pode apagar o progresso. Se o armazenamento estiver bloqueado, você receberá um aviso e poderá continuar nesta sessão. Os tempos são sugestões de estudo, não duração dos vídeos.</p></div>`, '<button data-action="close" class="rounded-xl bg-violet-500 px-4 py-2.5 text-xs font-semibold text-white hover:bg-violet-400">Entendi, vamos aprender</button>');
     }
@@ -1067,12 +1160,51 @@
 
     document.addEventListener('change', (event) => {
       if (event.target.matches('[data-complete]')) setCompleted(event.target.dataset.complete, event.target.checked);
+      if (event.target.matches('[data-quiz-question]') && dialogContext?.type === 'lesson') {
+        const id = dialogContext.id;
+        const question = Number(event.target.dataset.quizQuestion);
+        const attempt = state.quizAttempts[id] || { answers: [], checked: false };
+        attempt.answers[question] = Number(event.target.value);
+        attempt.checked = false;
+        state.quizAttempts[id] = attempt;
+        document.querySelectorAll('[data-quiz-feedback]').forEach(element => { element.hidden = true; });
+        $('#quiz-result').textContent = '';
+        saveState();
+      }
+    });
+
+    document.addEventListener('input', (event) => {
+      if (!event.target.matches('[data-note]')) return;
+      state.notes[event.target.dataset.note] = event.target.value.slice(0, 10000);
+      clearTimeout(notesSaveTimer);
+      notesSaveTimer = setTimeout(saveState, 350);
+    });
+
+    document.addEventListener('submit', (event) => {
+      if (event.target.id !== 'lesson-quiz') return;
+      event.preventDefault();
+      gradeQuiz();
+    });
+
+    window.addEventListener('pagehide', () => {
+      clearTimeout(notesSaveTimer);
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* A indisponibilidade é informada durante o uso. */ }
+    });
+
+    $('#lesson-sections').addEventListener('keydown', (event) => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      const current = READER_SECTIONS.findIndex(([key]) => key === activeLessonSection);
+      const index = event.key === 'Home' ? 0 : event.key === 'End' ? READER_SECTIONS.length - 1 : (current + (event.key === 'ArrowLeft' ? -1 : 1) + READER_SECTIONS.length) % READER_SECTIONS.length;
+      renderLessonSection(READER_SECTIONS[index][0], true);
     });
 
     document.addEventListener('click', (event) => {
       const button = event.target.closest('button');
       if (!button) return;
-      if (button.dataset.track) {
+      if (button.dataset.lessonSection) {
+        renderLessonSection(button.dataset.lessonSection, true);
+      } else if (button.dataset.track) {
         selectTrack(button.dataset.track, button.dataset.focus);
         $('#journey').scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
       } else if (button.dataset.lesson) openLesson(button.dataset.lesson);
@@ -1082,6 +1214,11 @@
         renderModules();
       } else {
         switch (button.dataset.action) {
+          case 'section-next': {
+            const index = READER_SECTIONS.findIndex(([key]) => key === activeLessonSection);
+            if (index < 3) renderLessonSection(READER_SECTIONS[index + 1][0], true);
+            break;
+          }
           case 'resume': openLesson(nextLesson().id); break;
           case 'library': openLibrary(); break;
           case 'how': openHow(); break;
