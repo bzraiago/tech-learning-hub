@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0d1018">
-  <meta name="description" content="Sua jornada em tecnologia: 32 lições de HTML, CSS, JavaScript, Python e Engenharia de IA, com recursos gratuitos e progresso pessoal.">
+  <meta name="description" content="Sua jornada em tecnologia: 48 lições de HTML, CSS, JavaScript, Python, Banco de Dados e Engenharia de IA, com recursos gratuitos e progresso pessoal.">
   <title>Tech Learning Hub — Sua próxima conquista</title>
   <!-- Arquivo único, sem build. A conexão com a internet carrega o Tailwind e as fontes. -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -53,6 +53,7 @@
     <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5m8-10 5 5-5 5M14 4l-4 16"/></symbol>
     <symbol id="i-bolt" viewBox="0 0 24 24"><path d="m13 2-9 12h7l-1 8 10-12h-7l1-8Z"/></symbol>
     <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m6 9 3 3-3 3m6 0h5"/></symbol>
+    <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
     <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4L12 3ZM20 2v4m-2-2h4"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5C8 2 4 3 2 4v15c4-1 7-1 10 2 3-3 6-3 10-2V4c-2-1-6-2-10 1Zm0 0v16"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
@@ -111,14 +112,14 @@
       <section id="overview" aria-labelledby="welcome-title" class="scroll-mt-6">
         <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div><p class="text-[10px] font-bold tracking-[.22em] text-violet-300">APRENDA NO SEU RITMO</p><h1 id="welcome-title" class="mt-2 font-display text-2xl font-bold tracking-tight sm:text-[28px]">Sua próxima conquista começa aqui<span class="text-violet-400">.</span></h1></div>
-          <span class="flex items-center gap-2 rounded-full border border-white/8 px-3 py-1.5 text-[11px] text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>4 trilhas · acesso livre</span>
+          <span class="flex items-center gap-2 rounded-full border border-white/8 px-3 py-1.5 text-[11px] text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span><span id="track-count">5 trilhas · acesso livre</span></span>
         </div>
         <div class="hero-grid relative isolate overflow-hidden rounded-[22px] border border-violet-300/15 bg-gradient-to-r from-[#24203f] via-[#1b1c36] to-[#161b2b] px-6 py-7 sm:px-8 sm:py-8">
           <div class="pointer-events-none absolute -right-12 -top-32 -z-10 h-80 w-80 rounded-full bg-violet-600/10 blur-3xl"></div>
           <div class="relative z-10 max-w-xl md:max-w-[65%]">
             <span class="inline-flex items-center gap-2 text-[10px] font-bold tracking-[.18em] text-violet-300"><svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.7"><use href="#i-bolt"/></svg>DO PRIMEIRO CÓDIGO À INTELIGÊNCIA ARTIFICIAL</span>
             <h2 class="mt-3 font-display text-3xl font-bold leading-[1.18] tracking-tight sm:text-[36px]">Conhecimento que vira<br><span class="text-violet-300">possibilidade.</span></h2>
-            <p class="mt-3 max-w-md text-sm leading-relaxed text-slate-400">Uma jornada, quatro caminhos. Aprenda com boas fontes, construa projetos e acompanhe cada passo.</p>
+            <p class="mt-3 max-w-md text-sm leading-relaxed text-slate-400">Uma jornada, muitas possibilidades. Aprenda com boas fontes, construa projetos e acompanhe cada passo.</p>
             <div class="mt-6 flex flex-wrap items-center gap-4"><button id="resume" data-action="resume" class="inline-flex items-center gap-2 rounded-xl bg-violet-500 px-4 py-3 text-xs font-bold text-white shadow-lg shadow-violet-600/20 transition hover:-translate-y-0.5 hover:bg-violet-400"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8"><use href="#i-play"/></svg><span id="resume-label">Começar minha jornada</span><svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8"><use href="#i-arrow"/></svg></button><span id="resume-meta" class="text-[11px] text-slate-400"></span></div>
           </div>
           <div class="absolute right-7 top-1/2 hidden w-[28%] -translate-y-1/2 xl:right-12 md:block" aria-hidden="true">
@@ -130,7 +131,7 @@
           </div>
         </div>
         <div class="mb-4 mt-7 flex items-center justify-between gap-4"><h2 class="font-display text-base font-semibold">Seu progresso, em tempo real</h2><span id="total-caption" class="text-xs text-slate-400"></span></div>
-        <div id="progress-cards" class="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 xl:grid-cols-4"></div>
+        <div id="progress-cards" class="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 xl:grid-cols-5"></div>
       </section>
 
       <section id="journey" class="mt-9 scroll-mt-6" aria-label="Lições da trilha">
@@ -208,7 +209,30 @@
       mcpBook: resource('book', 'MCP for Beginners · Microsoft', 'https://github.com/microsoft/mcp-for-beginners', 'EN / traduções'),
       promptVideo: resource('video', 'Engenharia de Prompt na Prática · Curso em Vídeo', 'https://www.youtube.com/watch?v=_3lq1Mg4lYw'),
       ragVideo: resource('video', 'RAG: Geração Aumentada de Busca · Microsoft Reactor', 'https://www.youtube.com/watch?v=GkC8TXNC69Q'),
-      mcpVideo: resource('video', 'Workshop de agentes e MCP · Renato Romão / Reactor', 'https://www.youtube.com/watch?v=T_C_aFirdBU')
+      mcpVideo: resource('video', 'Workshop de agentes e MCP · Renato Romão / Reactor', 'https://www.youtube.com/watch?v=T_C_aFirdBU'),
+      sql: resource('doc', 'W3Schools · SQL com exemplos interativos', 'https://www.w3schools.com/sql/', 'EN'),
+      postgres: resource('doc', 'PostgreSQL · Tutorial oficial', 'https://www.postgresql.org/docs/current/tutorial.html', 'EN'),
+      postgresSql: resource('doc', 'PostgreSQL · A linguagem SQL', 'https://www.postgresql.org/docs/current/tutorial-sql.html', 'EN'),
+      maria: resource('doc', 'MariaDB · Guia de primeiros comandos', 'https://mariadb.com/docs/server/mariadb-quickstart-guides/mariadb-usage-guide', 'EN'),
+      sqlite: resource('doc', 'SQLite · Quando usar um banco embarcado', 'https://www.sqlite.org/whentouse.html', 'EN'),
+      sqlitePython: resource('doc', 'Python · Tutorial do módulo sqlite3', 'https://docs.python.org/pt-br/3/library/sqlite3.html'),
+      firebird: resource('doc', 'Firebird 5 · Referência oficial da linguagem', 'https://firebirdsql.org/file/documentation/chunk/en/refdocs/fblangref50/firebird-50-language-reference.html', 'EN'),
+      mongo: resource('doc', 'MongoDB · Operações CRUD', 'https://www.mongodb.com/docs/manual/crud/', 'EN'),
+      mongoModel: resource('doc', 'MongoDB · Modelagem de documentos', 'https://www.mongodb.com/docs/manual/data-modeling/', 'EN'),
+      mongoAggregation: resource('doc', 'MongoDB · Pipelines de agregação', 'https://www.mongodb.com/docs/manual/core/aggregation-pipeline/', 'EN'),
+      nosql: resource('doc', 'MongoDB · Famílias e conceitos de NoSQL', 'https://www.mongodb.com/resources/basics/databases/nosql-explained', 'EN'),
+      explain: resource('doc', 'PostgreSQL · Entendendo EXPLAIN', 'https://www.postgresql.org/docs/current/using-explain.html', 'EN'),
+      transactions: resource('doc', 'PostgreSQL · Transações', 'https://www.postgresql.org/docs/current/tutorial-transactions.html', 'EN'),
+      backup: resource('doc', 'PostgreSQL · Backup e restauração com SQL dump', 'https://www.postgresql.org/docs/current/backup-dump.html', 'EN'),
+      dbBook: resource('book', 'Database Design, 2ª edição · BCcampus / livro aberto', 'https://opentextbc.ca/dbdesign01/', 'EN'),
+      mongoBook: resource('book', 'MongoDB · Manual completo gratuito', 'https://www.mongodb.com/pt-br/docs/manual/'),
+      modelVideo: resource('video', 'Modelagem de bancos com projeto prático · Bóson', 'https://www.youtube.com/watch?v=Kd1yqYjylCg'),
+      joinsVideo: resource('video', 'Chaves estrangeiras e JOIN · Curso em Vídeo / MySQL', 'https://www.youtube.com/watch?v=paZNDJAPT4E'),
+      pgVideo: resource('video', 'PostgreSQL: comandos básicos do psql · Bóson', 'https://www.youtube.com/watch?v=Ft3F7wWA-x8'),
+      mariaVideo: resource('video', 'MariaDB no Ubuntu 20.04 · Bóson / aula de 2021', 'https://www.youtube.com/watch?v=ixKpfUPsO9M'),
+      sqliteVideo: resource('video', 'SQLite com Python #1 · Professor Neto Paschoal', 'https://www.youtube.com/watch?v=jYUDi83tJXc'),
+      mongoVideo: resource('video', 'MongoDB fundamental em 1 hora · Hora de Codar', 'https://www.youtube.com/watch?v=x9tC0eK0GtA'),
+      firebirdVideo: resource('video', 'Bate-papo sobre Firebird 4 · Firebird Developers Day', 'https://www.youtube.com/watch?v=Wjm4nYO5_xs')
     };
 
     const tracks = [
@@ -463,6 +487,170 @@
         ]
       },
       {
+        id: 'database', title: 'Banco de Dados', subtitle: 'Transforme dados em conhecimento.', icon: 'database', color: '#6ed9ae', range: 'Básico → Avançado',
+        description: 'Modele informações, domine SQL e explore bancos relacionais e NoSQL.',
+        prerequisite: 'Comece pelo módulo de SQL com SQLite ou PostgreSQL. Os exemplos indicam o banco ou cliente esperado; execute-os em uma base de estudos. Para a integração com SQLite, revise funções em Python. Alguns vídeos mostram versões anteriores: confira a documentação atual ao instalar ou adaptar comandos.',
+        project: 'Um catálogo de trilhas e lições com consultas de progresso, uma versão documental em MongoDB e um plano de recuperação testado.',
+        modules: [
+          {
+            id: 'db-foundations', title: 'Fundamentos e linguagem SQL', level: 'Básico', number: '01',
+            description: 'Da modelagem dos dados às consultas, relacionamentos e transações.',
+            resources: [R.sql, R.postgresSql, R.transactions, R.dbBook, R.modelVideo, R.joinsVideo],
+            lessons: [
+              {
+                id: 'db-modeling', title: 'Modelagem, chaves e normalização', minutes: 45,
+                concept: 'Um SGBD armazena, consulta e protege dados. No modelo relacional, tabelas representam entidades e chaves conectam registros. A chave primária identifica uma linha; a estrangeira preserva uma referência válida. Desenhe cardinalidades 1:1, 1:N e N:N. A normalização até a terceira forma normal ajuda a reduzir redundância e anomalias de atualização; desnormalize apenas com uma necessidade medida.',
+                objectives: ['Identificar entidades, atributos, chaves e cardinalidades.', 'Separar dados repetidos e representar uma relação N:N com uma tabela associativa.'],
+                exercise: 'Modele estudantes, trilhas, lições e matrículas. Uma trilha possui várias lições; um estudante pode participar de várias trilhas. Desenhe o diagrama e explique onde ficaria o progresso individual de cada lição.',
+                code: 'TRILHAS      (id PK, nome UNIQUE)\nLICOES       (id PK, trilha_id FK, titulo, minutos)\nESTUDANTES   (id PK, nome, email UNIQUE)\nMATRICULAS   (estudante_id FK, trilha_id FK, data_inicio)\n             PK composta: (estudante_id, trilha_id)\nPROGRESSO    (estudante_id FK, licao_id FK, concluida)\n             PK composta: (estudante_id, licao_id)\n\nTrilha 1 ── N Lições\nEstudante N ── N Trilhas, por meio de Matrículas\n\nNos próximos exemplos, concluida em LICOES simplifica\no laboratório para uma única pessoa.',
+                docs: [R.postgresSql, resource('doc', 'PostgreSQL · Restrições e integridade', 'https://www.postgresql.org/docs/current/ddl-constraints.html', 'EN')]
+              },
+              {
+                id: 'db-ddl-crud', title: 'DDL, constraints e operações CRUD', minutes: 55,
+                concept: 'SQL é uma linguagem, e PostgreSQL, MariaDB, SQLite e Firebird são sistemas que a implementam com diferenças de dialeto. DDL define estruturas; INSERT, SELECT, UPDATE e DELETE manipulam dados. Use NOT NULL, UNIQUE, CHECK e FOREIGN KEY para expressar regras. Defina explicitamente o filtro de alterações e confira quais registros serão afetados.',
+                objectives: ['Criar tabelas com regras de integridade e dados de exemplo.', 'Distinguir definição de estrutura, consulta e alteração de registros.'],
+                exercise: 'Execute a base abaixo uma vez em PostgreSQL ou SQLite. No SQLite, ative PRAGMA foreign_keys = ON antes de iniciar. Tente cadastrar uma lição sem trilha e outra com minutos negativos: ambas devem falhar. Guarde essa base para as próximas lições.',
+                code: '-- Laboratório: PostgreSQL ou SQLite com foreign_keys = ON.\nCREATE TABLE trilhas (\n  id INTEGER PRIMARY KEY,\n  nome VARCHAR(80) NOT NULL UNIQUE\n);\nCREATE TABLE licoes (\n  id INTEGER PRIMARY KEY,\n  trilha_id INTEGER NOT NULL REFERENCES trilhas(id),\n  titulo VARCHAR(120) NOT NULL,\n  minutos INTEGER NOT NULL CHECK (minutos > 0),\n  concluida INTEGER NOT NULL DEFAULT 0 CHECK (concluida IN (0, 1))\n);\nINSERT INTO trilhas VALUES (1, \'Banco de Dados\'), (2, \'Python\');\nINSERT INTO licoes VALUES (1, 1, \'SQL\', 45, 0), (2, 1, \'JOINs\', 50, 0);\nUPDATE licoes SET concluida = 1 WHERE id = 1;\nSELECT * FROM licoes;\n-- Em um teste separado: DELETE FROM licoes WHERE id = 2;',
+                docs: [R.postgresSql, resource('doc', 'SQLite · Ativando chaves estrangeiras', 'https://www.sqlite.org/foreignkeys.html', 'EN')]
+              },
+              {
+                id: 'db-select', title: 'SELECT, filtros e agregações', minutes: 50,
+                concept: 'SELECT escolhe colunas; WHERE filtra linhas; ORDER BY ordena o resultado. Acrescente um desempate único, como id, para garantir uma ordem determinística. GROUP BY reúne registros e HAVING filtra os grupos após a agregação. COUNT, SUM e AVG produzem resumos. NULL representa ausência ou desconhecimento: use IS NULL, não igualdade. COUNT(coluna) ignora valores nulos; COUNT(*) conta linhas.',
+                objectives: ['Combinar filtros e ordenação sem depender da ordem física dos registros.', 'Resumir dados com GROUP BY e distinguir WHERE de HAVING.'],
+                exercise: 'Na base da aula anterior, liste as lições pendentes da mais longa para a mais curta. Depois calcule os minutos totais por trilha e filtre grupos com pelo menos 60 minutos.',
+                code: '-- Use as tabelas criadas em DDL e CRUD.\nSELECT titulo, minutos\nFROM licoes\nWHERE concluida = 0\nORDER BY minutos DESC, id ASC;\n\nSELECT trilha_id, COUNT(*) AS quantidade, SUM(minutos) AS total\nFROM licoes\nGROUP BY trilha_id\nHAVING SUM(minutos) >= 60\nORDER BY total DESC, trilha_id ASC;\n\n-- Para um campo opcional: WHERE data_conclusao IS NULL',
+                docs: [resource('doc', 'PostgreSQL · Consultando uma tabela', 'https://www.postgresql.org/docs/current/tutorial-select.html', 'EN'), resource('doc', 'PostgreSQL · Funções de agregação', 'https://www.postgresql.org/docs/current/tutorial-agg.html', 'EN')]
+              },
+              {
+                id: 'db-joins', title: 'JOINs, subconsultas e CTEs', minutes: 55,
+                concept: 'INNER JOIN devolve combinações com correspondência; LEFT JOIN preserva todas as linhas da esquerda. Uma relação 1:N pode multiplicar linhas, então verifique a granularidade antes de somar. Subconsultas e CTEs, definidas com WITH, ajudam a expressar etapas. Um filtro da tabela direita no WHERE pode remover as linhas sem correspondência de um LEFT JOIN.',
+                objectives: ['Combinar tabelas preservando a cardinalidade desejada.', 'Organizar uma consulta por etapas com WITH e subconsultas.'],
+                exercise: 'Liste todas as trilhas e a quantidade de lições, incluindo Python com zero. Use COUNT(l.id), não COUNT(*), nesse LEFT JOIN. Depois reescreva o resumo com uma CTE e encontre trilhas acima da média de minutos.',
+                code: '-- PostgreSQL ou SQLite; base da aula de DDL.\nSELECT t.nome, COUNT(l.id) AS licoes\nFROM trilhas AS t\nLEFT JOIN licoes AS l ON l.trilha_id = t.id\nGROUP BY t.id, t.nome\nORDER BY t.nome;\n\nWITH resumo AS (\n  SELECT t.id AS trilha_id, COALESCE(SUM(l.minutos), 0) AS total\n  FROM trilhas AS t\n  LEFT JOIN licoes AS l ON l.trilha_id = t.id\n  GROUP BY t.id\n)\nSELECT * FROM resumo\nWHERE total > (SELECT AVG(total) FROM resumo)\nORDER BY total DESC, trilha_id ASC;',
+                docs: [resource('doc', 'PostgreSQL · JOINs entre tabelas', 'https://www.postgresql.org/docs/current/tutorial-join.html', 'EN'), resource('doc', 'PostgreSQL · Consultas WITH', 'https://www.postgresql.org/docs/current/queries-with.html', 'EN')]
+              },
+              {
+                id: 'db-transactions', title: 'Transações, ACID e concorrência', minutes: 50,
+                concept: 'Transações agrupam alterações em uma unidade. ACID reúne atomicidade, consistência, isolamento e durabilidade. COMMIT confirma e ROLLBACK desfaz alterações ainda não confirmadas. Níveis de isolamento controlam quais efeitos concorrentes podem ser observados; locks e MVCC são mecanismos usados pelos bancos. Uma transação não substitui constraints nem validação das regras de negócio.',
+                objectives: ['Testar confirmação e reversão de um conjunto de alterações.', 'Reconhecer conflitos de concorrência e a necessidade de repetição controlada.'],
+                exercise: 'Altere a conclusão de duas lições na mesma transação e use ROLLBACK. Confira que o estado anterior foi mantido. Repita com COMMIT e, em PostgreSQL, observe o comportamento em duas conexões separadas.',
+                code: '-- PostgreSQL ou SQLite; base da aula de DDL.\nBEGIN;\nUPDATE licoes SET concluida = 1 WHERE id IN (1, 2);\nSELECT id, concluida FROM licoes ORDER BY id;\nROLLBACK;\n\nSELECT id, concluida FROM licoes ORDER BY id;\n-- Para persistir a experiência seguinte, finalize com COMMIT.\n-- MariaDB usa START TRANSACTION; em Firebird, veja SET TRANSACTION.',
+                docs: [R.transactions, resource('doc', 'PostgreSQL · Isolamento de transações', 'https://www.postgresql.org/docs/current/transaction-iso.html', 'EN')]
+              }
+            ]
+          },
+          {
+            id: 'db-relational', title: 'Bancos relacionais na prática', level: 'Intermediário', number: '02',
+            description: 'PostgreSQL, MariaDB, SQLite e Firebird: recursos e diferenças de uso.',
+            resources: [R.postgres, R.maria, R.sqlite, R.firebird, R.dbBook, R.pgVideo, R.mariaVideo, R.sqliteVideo, R.firebirdVideo],
+            lessons: [
+              {
+                id: 'db-postgres', title: 'PostgreSQL: schemas, identidade e JSONB', minutes: 60,
+                concept: 'PostgreSQL combina o modelo relacional com recursos como schemas, tipos extensíveis e JSONB. Um schema organiza objetos dentro de um banco. Colunas identity geram identificadores; JSONB representa conteúdo documental consultável. Use colunas tipadas para campos centrais e constraints para as invariantes. O cliente psql e ferramentas gráficas ajudam a explorar o catálogo.',
+                objectives: ['Organizar tabelas em um schema e gerar identificadores.', 'Consultar um campo JSONB sem abrir mão da modelagem relacional.'],
+                exercise: 'Em uma base PostgreSQL de estudos, crie o schema laboratorio e a tabela abaixo. Insira dois materiais com tags diferentes e filtre aqueles que contêm sql. Explique quais campos devem ser colunas e quais podem ficar em JSONB.',
+                code: '-- PostgreSQL; execute uma vez em uma base de laboratório.\nCREATE SCHEMA laboratorio;\nCREATE TABLE laboratorio.materiais (\n  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n  titulo TEXT NOT NULL,\n  tags JSONB NOT NULL DEFAULT \'[]\'::jsonb\n);\nINSERT INTO laboratorio.materiais (titulo, tags)\nVALUES (\'Introdução ao SQL\', \'["sql", "banco-de-dados"]\');\nSELECT titulo FROM laboratorio.materiais\nWHERE tags @> \'["sql"]\'::jsonb;',
+                docs: [R.postgres, resource('doc', 'PostgreSQL · Tipos JSON e JSONB', 'https://www.postgresql.org/docs/current/datatype-json.html', 'EN')]
+              },
+              {
+                id: 'db-mariadb', title: 'MariaDB e o ecossistema MySQL', minutes: 55,
+                concept: 'MariaDB tem origem no MySQL, mas os produtos evoluem separadamente: compatibilidade precisa ser verificada por versão, driver e recurso. Explore o cliente mariadb, AUTO_INCREMENT, InnoDB e utf8mb4. InnoDB oferece transações e chaves estrangeiras. Operações DDL podem causar commit implícito; não suponha que um ROLLBACK reverta qualquer mudança de estrutura.',
+                objectives: ['Criar uma tabela InnoDB com identificação automática e texto Unicode.', 'Identificar diferenças de dialeto e de compatibilidade com MySQL.'],
+                exercise: 'Crie uma tabela em uma base MariaDB de estudos e insira um título com acentos e emoji. Teste uma transação de UPDATE seguida de ROLLBACK. Compare AUTO_INCREMENT com identity no PostgreSQL.',
+                code: '-- MariaDB; conecte-se a uma base de laboratório.\nCREATE TABLE materiais_maria (\n  id BIGINT PRIMARY KEY AUTO_INCREMENT,\n  titulo VARCHAR(120) NOT NULL\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\nINSERT INTO materiais_maria (titulo) VALUES (\'Introdução a dados\');\nSTART TRANSACTION;\nUPDATE materiais_maria SET titulo = \'Rascunho\' WHERE id = 1;\nROLLBACK;\nSELECT * FROM materiais_maria;',
+                docs: [R.maria, resource('doc', 'MariaDB · Instrução START TRANSACTION', 'https://mariadb.com/docs/server/reference/sql-statements/transactions/start-transaction', 'EN')]
+              },
+              {
+                id: 'db-sqlite', title: 'SQLite: dados locais e integração com Python', minutes: 50,
+                concept: 'SQLite roda dentro da aplicação e pode armazenar um banco em um arquivo, sem um serviço de banco separado. É útil em aplicações locais, dispositivos e protótipos. Escritas concorrentes são serializadas; planeje esse limite conforme a carga. Ative foreign_keys em cada conexão quando usar relacionamentos. No Python, envie valores como parâmetros, sem concatená-los ao SQL.',
+                objectives: ['Usar SQLite pelo módulo sqlite3 do Python.', 'Executar consultas parametrizadas e fechar a conexão corretamente.'],
+                exercise: 'Execute o exemplo em memória e depois troque :memory: por estudos.db para persistir em disco. Insira um título com apóstrofo, feche e abra novamente a conexão para verificar a gravação.',
+                code: 'import sqlite3\nfrom contextlib import closing\n\nwith closing(sqlite3.connect(":memory:")) as conexao:\n    conexao.execute("PRAGMA foreign_keys = ON")\n    with conexao:\n        conexao.execute(\n            "CREATE TABLE IF NOT EXISTS materiais (id INTEGER PRIMARY KEY, titulo TEXT NOT NULL)"\n        )\n        conexao.execute("INSERT INTO materiais (titulo) VALUES (?)", ("Lendo dados",))\n    registros = conexao.execute(\n        "SELECT titulo FROM materiais WHERE id = ?", (1,)\n    ).fetchall()\n    print(registros)',
+                docs: [R.sqlite, R.sqlitePython, resource('doc', 'SQLite · Chaves estrangeiras', 'https://www.sqlite.org/foreignkeys.html', 'EN')]
+              },
+              {
+                id: 'db-firebird', title: 'Firebird: SQL, PSQL e transações', minutes: 60,
+                concept: 'Firebird é um SGBD relacional com opções de uso em servidor e embarcado. Além do SQL de consulta, PSQL permite procedimentos e triggers no banco. Explore o cliente isql, colunas identity e SELECT FIRST. A visibilidade dos dados depende da transação: confirme alterações com COMMIT e evite transações desnecessariamente longas.',
+                objectives: ['Criar e consultar uma tabela usando o dialeto do Firebird.', 'Distinguir SQL dinâmico, PSQL e o ciclo de uma transação.'],
+                exercise: 'Conecte o isql a uma base Firebird 5 de laboratório. Execute o exemplo e confirme a persistência em uma segunda conexão após COMMIT. Em seguida, leia um exemplo de procedure na referência oficial e identifique entradas e saídas.',
+                code: '-- Firebird 5 / isql, conectado a uma base de laboratório.\nCREATE TABLE materiais_fb (\n  id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,\n  titulo VARCHAR(120) NOT NULL\n);\nCOMMIT;\nINSERT INTO materiais_fb (titulo) VALUES (\'Primeiros passos\');\nCOMMIT;\nSELECT FIRST 5 id, titulo FROM materiais_fb ORDER BY id;\nCOMMIT;\n-- PSQL: estude CREATE PROCEDURE e CREATE TRIGGER na referência.',
+                docs: [R.firebird, resource('doc', 'Firebird · Guias oficiais e manuais gratuitos', 'https://www.firebirdsql.org/en/documentation/', 'EN')]
+              }
+            ]
+          },
+          {
+            id: 'db-nosql', title: 'NoSQL e MongoDB', level: 'Intermediário', number: '03',
+            description: 'Documentos, outras famílias de dados e consultas orientadas ao acesso.',
+            resources: [R.nosql, R.mongo, R.mongoModel, R.mongoAggregation, R.mongoBook, R.mongoVideo],
+            lessons: [
+              {
+                id: 'db-nosql-models', title: 'NoSQL: documentos, chave-valor e grafos', minutes: 45,
+                concept: 'NoSQL reúne famílias de bancos, não um único produto ou linguagem. MongoDB trabalha com documentos; Redis é conhecido por estruturas chave-valor; Cassandra organiza dados em famílias de colunas; Neo4j modela grafos. Escolha a representação a partir das consultas e garantias necessárias. NoSQL não significa ausência de esquema, impossibilidade de transações ou desempenho automaticamente superior.',
+                objectives: ['Relacionar famílias de bancos a padrões de consulta.', 'Comparar consistência, transações e distribuição por produto.'],
+                exercise: 'Escolha uma representação para catálogo de cursos, cache de sessão, eventos por dispositivo e relações de pré-requisito. Justifique cada escolha com duas consultas e um requisito de consistência. Comece com um único banco até haver motivo para combinar tecnologias.',
+                code: 'CATÁLOGO VARIÁVEL → documentos (ex.: MongoDB)\nCACHE DE SESSÃO → chave-valor (ex.: Redis)\nEVENTOS POR CHAVE / TEMPO → famílias de colunas (ex.: Cassandra)\nREDE DE PRÉ-REQUISITOS → grafo (ex.: Neo4j)\n\nPerguntas antes de escolher:\n1. Quais consultas precisam ser rápidas?\n2. Quais operações precisam ser atômicas?\n3. Como os dados crescem e são distribuídos?\n4. Como fazer backup, recuperar e operar o sistema?',
+                docs: [R.nosql, resource('doc', 'Redis · Documentação oficial', 'https://redis.io/docs/latest/', 'EN'), resource('doc', 'Apache Cassandra · Documentação', 'https://cassandra.apache.org/doc/latest/', 'EN'), resource('doc', 'Neo4j · Documentação oficial', 'https://neo4j.com/docs/', 'EN')]
+              },
+              {
+                id: 'db-mongo-crud', title: 'MongoDB: documentos, coleções e CRUD', minutes: 55,
+                concept: 'MongoDB armazena documentos BSON em coleções. Cada documento tem um _id; campos podem conter arrays e objetos. No mongosh, use insertOne, find, updateOne e deleteOne com filtros explícitos. Operações de escrita em um documento são atômicas. Para relacionamentos, avalie incorporar dados lidos juntos ou referenciar entidades independentes.',
+                objectives: ['Criar, consultar e alterar documentos pelo mongosh.', 'Escolher entre incorporação e referência com base no acesso e no crescimento.'],
+                exercise: 'Em MongoDB local com mongosh, use uma base de laboratório e cadastre três lições. Consulte as pendentes, conclua uma pelo _id e compare um documento com recursos incorporados a uma coleção separada de recursos.',
+                code: '// mongosh; selecione a base de laboratório.\nuse tech_hub_lab\ndb.licoes.insertOne({\n  _id: "mongo-01",\n  titulo: "Documentos", trilha: "Banco de Dados",\n  minutos: 45, concluida: false, tags: ["nosql", "mongodb"]\n});\ndb.licoes.find({ concluida: false }, { titulo: 1, _id: 0 });\ndb.licoes.updateOne(\n  { _id: "mongo-01" }, { $set: { concluida: true } }\n);\n// Em um teste separado: db.licoes.deleteOne({ _id: "mongo-01" });',
+                docs: [R.mongo, R.mongoModel]
+              },
+              {
+                id: 'db-mongo-pipelines', title: 'MongoDB: validação, índices e aggregation', minutes: 60,
+                concept: 'Esquema flexível também precisa de regras: valide tipos e campos necessários quando isso fizer parte do contrato. Índices devem acompanhar filtros e ordenações reais. Um pipeline de aggregation encadeia estágios como $match, $group e $sort. Observe a quantidade de documentos examinados e o resultado antes de adicionar índices ou replicar dados.',
+                objectives: ['Construir um pipeline de resumo a partir de documentos.', 'Relacionar validação de esquema e índices ao uso da aplicação.'],
+                exercise: 'Na coleção da aula anterior, insira mais documentos com minutos numéricos. Some o tempo pendente por trilha. Compare explain antes e depois de criar um índice e escreva um validador que rejeite minutos textuais.',
+                code: '// mongosh; coleção da aula anterior.\ndb.licoes.createIndex({ concluida: 1, trilha: 1 });\ndb.licoes.aggregate([\n  { $match: { concluida: false } },\n  { $group: { _id: "$trilha", minutos: { $sum: "$minutos" } } },\n  { $sort: { minutos: -1, _id: 1 } }\n]);\ndb.licoes.find({ concluida: false })\n  .explain("executionStats");\n// Um conjunto muito pequeno pode justificar varredura completa.',
+                docs: [R.mongoAggregation, resource('doc', 'MongoDB · Validação de esquema', 'https://www.mongodb.com/docs/manual/core/schema-validation/', 'EN'), resource('doc', 'MongoDB · Índices', 'https://www.mongodb.com/docs/manual/indexes/', 'EN')]
+              }
+            ]
+          },
+          {
+            id: 'db-engineering', title: 'Dados confiáveis, do projeto à operação', level: 'Avançado', number: '04',
+            description: 'Desempenho, acesso seguro, recuperação e decisões de arquitetura.',
+            resources: [R.explain, R.backup, R.sqlitePython, R.mongoModel, R.dbBook, R.modelVideo],
+            lessons: [
+              {
+                id: 'db-performance', title: 'Índices e planos de execução', minutes: 60,
+                concept: 'Índices podem reduzir leituras, mas consomem espaço e têm custo nas escritas. A ordem das colunas de um índice composto importa. Leia o plano de execução e compare estimativas com observações; uma varredura sequencial pode ser a melhor escolha em uma tabela pequena. EXPLAIN ANALYZE executa a consulta, por isso use um SELECT no laboratório.',
+                objectives: ['Interpretar o caminho de acesso e a quantidade de linhas.', 'Medir o efeito de um índice sem presumir que ele sempre será usado.'],
+                exercise: 'Em PostgreSQL, preencha a tabela licoes com um volume maior de dados sintéticos. Observe o plano antes e depois de indexar trilha_id e concluida, atualizando estatísticas. Compare tempo, linhas e leituras, mantendo a mesma consulta.',
+                code: '-- PostgreSQL; tabela licoes do primeiro módulo.\nEXPLAIN (ANALYZE, BUFFERS)\nSELECT titulo FROM licoes\nWHERE trilha_id = 1 AND concluida = 0;\n\nCREATE INDEX idx_licoes_trilha_status\nON licoes (trilha_id, concluida);\nANALYZE licoes;\n\nEXPLAIN (ANALYZE, BUFFERS)\nSELECT titulo FROM licoes\nWHERE trilha_id = 1 AND concluida = 0;',
+                docs: [R.explain, resource('doc', 'PostgreSQL · Índices', 'https://www.postgresql.org/docs/current/indexes.html', 'EN')]
+              },
+              {
+                id: 'db-security', title: 'Consultas parametrizadas e permissões', minutes: 50,
+                concept: 'Dados digitados pelo usuário devem ser enviados como parâmetros, separados da instrução SQL. Placeholders representam valores, não nomes de tabelas ou colunas: identificadores dinâmicos exigem uma lista permitida ou composição segura do driver. Restrinja as permissões da conta da aplicação e mantenha credenciais no servidor. O navegador acessa uma API; não deve receber uma senha de banco.',
+                objectives: ['Escrever consultas parametrizadas sem interpolação de valores.', 'Separar interface, API, autenticação e autorização de acesso aos dados.'],
+                exercise: 'Crie uma função de busca com sqlite3 e teste títulos com apóstrofos. Depois desenhe o fluxo navegador → API → banco e defina quais operações a conta da aplicação pode executar.',
+                code: '# Python / sqlite3: recebe uma conexão já aberta.\ndef buscar_licoes(conexao, titulo):\n    return conexao.execute(\n        "SELECT id, titulo FROM licoes WHERE titulo = ?",\n        (titulo,)\n    ).fetchall()\n\n# O placeholder depende do driver: consulte sua documentação.\n# Não use f-strings para montar o SQL com entradas externas.\n# Credenciais do banco ficam na aplicação de servidor.',
+                docs: [R.sqlitePython, resource('doc', 'PostgreSQL · Roles e privilégios', 'https://www.postgresql.org/docs/current/user-manag.html', 'EN')]
+              },
+              {
+                id: 'db-recovery', title: 'Backups, restauração e migrações', minutes: 60,
+                concept: 'Um backup só é confiável quando a restauração é testada. Defina RPO, a perda máxima de dados aceitável, e RTO, o tempo máximo de recuperação. Versione migrações e ensaie mudanças de esquema em uma base de teste. Backups lógicos, físicos e recuperação por logs têm propósitos diferentes; siga a ferramenta de cada banco e não copie arquivos em uso sem um procedimento consistente.',
+                objectives: ['Restaurar uma cópia em outra base e validar seu conteúdo.', 'Planejar migrações com verificação e estratégia de recuperação.'],
+                exercise: 'Em PostgreSQL, faça um dump da base tech_hub_lab e restaure em uma nova base tech_hub_restore. Compare contagens e consultas. Esboce uma migração que acrescenta uma coluna opcional, preenche dados e só depois impõe uma nova restrição.',
+                code: '# Terminal com ferramentas PostgreSQL e acesso configurado.\n# A base original tech_hub_lab precisa existir.\npg_dump -Fc -d tech_hub_lab -f tech_hub_lab.dump\ncreatedb tech_hub_restore\npg_restore --exit-on-error -d tech_hub_restore tech_hub_lab.dump\n\n# No cliente SQL da base restaurada:\n# SELECT COUNT(*) FROM trilhas;\n# SELECT COUNT(*) FROM licoes;\n# Compare também as consultas e restrições esperadas.\n# Roles globais exigem planejamento separado do dump da base.',
+                docs: [R.backup, resource('doc', 'SQLite · API de backup', 'https://www.sqlite.org/backup.html', 'EN'), resource('doc', 'Firebird · Ferramenta gbak', 'https://firebirdsql.org/file/documentation/html/en/firebirddocs/gbak/firebird-gbak.html', 'EN')]
+              },
+              {
+                id: 'db-project', title: 'Projeto: escolhendo o banco certo', minutes: 75,
+                concept: 'A escolha do banco envolve formato dos dados, consultas, integridade, concorrência e operação. SQLite simplifica um aplicativo local; bancos cliente-servidor atendem compartilhamento e controle centralizado; documentos podem acomodar catálogos variáveis. Esses critérios não são regras absolutas. Relacionais também oferecem JSON, e bancos documentais podem ter transações: valide recursos na versão escolhida.',
+                objectives: ['Justificar a escolha de banco a partir de requisitos concretos.', 'Comparar os resultados de duas modelagens e documentar limitações.'],
+                exercise: 'Implemente o catálogo de estudos em um banco relacional e represente parte dele em MongoDB. Entregue o diagrama, consultas de progresso por estudante, dados de teste, uma consulta medida e uma restauração validada. Escreva por que escolheu cada tecnologia.',
+                code: 'CRITÉRIOS DE ACEITE\n[ ] Matrículas e progresso não se misturam entre estudantes.\n[ ] Uma lição inválida é rejeitada por regras explícitas.\n[ ] A consulta inclui trilhas sem lições concluídas.\n[ ] Valores externos são enviados como parâmetros.\n[ ] Um plano de execução foi interpretado e registrado.\n[ ] O backup foi restaurado e conferido em outra base.\n[ ] A comparação SQL × documentos cita consultas e custos.\n\nExtensão: exportar o catálogo como fonte de contexto para RAG.',
+                docs: [R.sqlite, R.postgres, R.mongoModel, R.maria, R.firebird]
+              }
+            ]
+          }
+        ]
+      },
+      {
         id: 'ai', title: 'Engenharia de IA', subtitle: 'Construa novas possibilidades.', icon: 'spark', color: '#b39afa', range: 'Básico → Avançado',
         description: 'Entenda os modelos e construa sistemas com contexto, ferramentas e avaliações.',
         prerequisite: 'Os fundamentos são acessíveis a todos. Para a prática intermediária, revise Python, JSON e APIs.',
@@ -664,6 +852,7 @@
     }
 
     function renderProgress() {
+      $('#track-count').textContent = `${tracks.length} trilhas · acesso livre`;
       $('#progress-cards').innerHTML = tracks.map((track) => {
         const { done, total, percent } = stats(lessonsOf(track));
         return `<button data-track="${track.id}" data-focus="card-${track.id}" aria-pressed="${state.activeTrack === track.id}" aria-label="Abrir trilha ${track.title}, ${percent}% concluído" style="--accent:${track.color}" class="track-card rounded-2xl border border-white/9 bg-[#141824] p-4 text-left">
@@ -824,7 +1013,7 @@
     function openHow() {
       dialogContext = { type: 'how' };
       const steps = [
-        ['Escolha um caminho', 'Comece por HTML & CSS para interfaces, por Python para automação ou pelos fundamentos de IA. Revise programação antes das integrações com agentes.'],
+        ['Escolha um caminho', 'Comece por HTML & CSS para interfaces, Python para automação, Banco de Dados para organizar informações ou pelos fundamentos de IA. Revise programação antes das integrações com agentes.'],
         ['Entenda e experimente', 'Leia o conceito e a documentação. Reproduza o exemplo no seu editor e altere uma coisa por vez para observar o resultado.'],
         ['Construa sem copiar', 'Faça o desafio da lição. Explique com suas palavras o que criou e teste um caso de sucesso e um de erro.'],
         ['Registre a conquista', 'Marque a caixa de conclusão quando conseguir aplicar o conteúdo. Você pode desmarcar a qualquer momento para revisar.']
