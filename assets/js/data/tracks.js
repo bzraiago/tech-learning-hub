@@ -198,6 +198,21 @@
               {"kind": "doc", "title": "Python · sqlite3", "url": "https://docs.python.org/3/library/sqlite3.html", "language": "EN"},
               {"kind": "doc", "title": "Docker · instalação por plataforma", "url": "https://docs.docker.com/engine/install/", "language": "EN"}
             ]
+          },
+          {
+            "id": "setup-postgresql",
+            "title": "Preparar PostgreSQL e clientes de conexão",
+            "minutes": 75,
+            "concept": "Subir o PostgreSQL do laboratório pelo Docker, instalar ou localizar o psql e conectar usando host, porta, banco e usuário explícitos.",
+            "objectives": ["Distinguir servidor PostgreSQL de clientes como psql e pgAdmin.", "Conectar ao laboratório em 127.0.0.1:55432 sem confundir a porta interna 5432.", "Diagnosticar separadamente serviço, porta, credencial e banco."],
+            "exercise": "Conecte com psql ou pgAdmin, execute SELECT current_database(), current_user; e registre os parâmetros sem salvar a senha.",
+            "code": "psql --version\npsql -h 127.0.0.1 -p 55432 -U aluno -d estudos -W\n# Dentro do psql:\nSELECT current_database(), current_user;\n\\q",
+            "docs": [
+              {"kind": "doc", "title": "PostgreSQL · downloads", "url": "https://www.postgresql.org/download/", "language": "EN"},
+              {"kind": "doc", "title": "PostgreSQL · cliente psql", "url": "https://www.postgresql.org/docs/current/app-psql.html", "language": "EN"},
+              {"kind": "doc", "title": "pgAdmin · downloads", "url": "https://www.pgadmin.org/download/", "language": "EN"},
+              {"kind": "doc", "title": "PostgreSQL · imagem oficial", "url": "https://hub.docker.com/_/postgres", "language": "EN"}
+            ]
           }
         ]
       }

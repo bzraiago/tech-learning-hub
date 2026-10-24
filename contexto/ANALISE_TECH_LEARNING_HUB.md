@@ -9,7 +9,7 @@
 
 O Tech Learning Hub oferece um caminho de aprendizagem real, mas ainda não está totalmente preparado para conduzir uma pessoa absolutamente leiga até uma formação intermediária autônoma usando somente suas instruções. A preparação digital inicial foi implementada em 24/10/2026; as maiores lacunas restantes estão nas instalações das ferramentas, na progressão entre assuntos e na passagem dos exercícios isolados para aplicações completas.
 
-A aplicação contém **9 trilhas, 28 módulos, 103 aulas, 414 exercícios, 309 questões e 20 projetos** (contagem atualizada em 24/10/2026 após a preparação de Docker e sua alternativa leve). Esses números descrevem o material disponível; não medem domínio do aluno.
+A aplicação contém **9 trilhas, 28 módulos, 104 aulas, 418 exercícios, 312 questões e 20 projetos** (contagem atualizada em 24/10/2026 após a preparação de PostgreSQL e clientes). Esses números descrevem o material disponível; não medem domínio do aluno.
 
 ## O que já funciona bem
 
@@ -66,7 +66,7 @@ As instruções ainda não estão completas para o público totalmente leigo.
 | MongoDB | A prática explica servidor, cliente e conexão. | Roteiro completo para instalar e iniciar o servidor e instalar o `mongosh`. O ambiente já conectado é pressuposto. |
 | Serviços remotos | Repositório remoto, publicação e APIs reais são frequentemente opcionais. | Um percurso reproduzível para cada competência que o curso pretende certificar como praticada. |
 
-Há uma inconsistência didática específica: o laboratório Docker publica PostgreSQL na porta **55432**, enquanto o projeto relacional oferece comandos de conexão sem indicar essa porta, embora permita usar o banco do Docker. Quem seguir literalmente esse caminho pode falhar na conexão ou alcançar outra instalação.
+A inconsistência entre a porta **55432** do laboratório Docker e o projeto relacional foi corrigida em 24/10/2026. O projeto agora declara `127.0.0.1:55432` nos comandos do cliente externo e explica a diferença para `db:5432` dentro da rede Compose.
 
 Padrão recomendado para qualquer preparação de ambiente: **objetivo → requisitos → passos por sistema → verificação → resultado esperado → problemas comuns → como parar e retomar**. Links oficiais continuam úteis, mas não substituem essa explicação quando a proposta é permitir estudar sem depender de material externo.
 

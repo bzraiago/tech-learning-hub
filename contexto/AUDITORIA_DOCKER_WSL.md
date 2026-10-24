@@ -17,7 +17,7 @@
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
 | 1 | Alta | M | `setup-docker` | RISCO | A instalação não foi executada em máquinas reais dos três sistemas. | Testar por plataforma e registrar divergências. |
-| 2 | Alta | G | Fase 2 | FATO | PostgreSQL e seus clientes ainda não têm preparação independente. | Implementar a próxima etapa antes de liberar o projeto intermediário. |
+| 2 | Baixa | P | Fase 2 | FATO | PostgreSQL e seus clientes passaram a ter preparação independente em `setup-postgresql`. | Manter a conexão e as fontes atualizadas. |
 | 3 | Média | P | `setup-docker-alternative` | FATO | O conteúdo lista explicitamente as competências que SQLite não cobre. | Preservar essa distinção em futuras revisões. |
 | 4 | Média | P | `setup-docker` | FATO | O risco de privilégio do grupo `docker` no Linux é informado. | Manter a orientação alinhada à documentação oficial. |
 
@@ -59,9 +59,8 @@ O aluno pode demonstrar diagnóstico inicial do ambiente, execução mínima do 
 
 ## 8. Próximos passos sugeridos
 
-1. Criar preparação de PostgreSQL e clientes com conexão padronizada em `127.0.0.1:55432`.
-2. Criar preparações dos bancos de aprofundamento.
-3. Executar testes manuais em Windows, macOS e Linux.
+1. Criar preparações dos bancos de aprofundamento.
+2. Executar testes manuais em Windows, macOS e Linux.
 
 ## 9. Limites desta auditoria
 
