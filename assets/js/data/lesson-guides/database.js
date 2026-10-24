@@ -669,13 +669,6 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "Dividir consultas em etapas",
-        "paragraphs": [
-          "Uma CTE é uma expressão de tabela nomeada com WITH, válida durante a instrução. Ela ajuda a dar nome a um resultado intermediário, como resumo. Não cria automaticamente uma tabela permanente e não garante uma otimização específica; seu primeiro benefício é clareza.",
-          "Uma subconsulta é uma consulta dentro de outra. SELECT AVG(total) FROM resumo devolve um único número, que pode servir de comparação. COALESCE(SUM(...),0) transforma a ausência de minutos em zero neste relatório. Assim a média considera Dados com 70 e Python com 0, resultando em 35."
-        ]
-      },
-      {
         "title": "A unidade de cada linha vem antes da soma",
         "paragraphs": [
           "Uma junção não busca simplesmente um nome: ela produz todas as combinações que satisfazem ON. Dados possui duas lições, então contribui com duas linhas. Se você juntar também três matrículas diretamente pela trilha, poderá produzir seis linhas para Dados, porque cada lição combina com cada matrícula. Somar os minutos nesse resultado triplicaria o total. Antes de escrever SUM, anote o que uma linha representa: uma lição, uma matrícula ou um par lição-matrícula? Essa pergunta detecta o erro de multiplicação sem depender de memorizar sintaxe.",
@@ -688,37 +681,19 @@ Object.assign(LESSON_GUIDES, {
           "Escreva as duas linhas de TRILHAS e as duas de LICOES em papel. Para cada trilha, compare t.id com l.trilha_id. Dados combina com as duas; Python não combina com nenhuma. INNER JOIN mantém apenas combinações encontradas. LEFT JOIN produz essas combinações e acrescenta uma linha de ausência para Python. A coluna l.id nessa linha é NULL, enquanto t.id continua sendo 2. Os aliases são nomes locais que deixam explícito de qual tabela vem cada campo e evitam ambiguidade quando ambas têm coluna id.",
           "O lado esquerdo deve ser o conjunto que o relatório precisa preservar. Se o pedido é listar toda trilha, comece por trilhas. Se o pedido é listar toda lição e seu nome de trilha, comece pelas lições e reflita sobre a integridade referencial. Uma FK obrigatória corretamente aplicada evita lições órfãs, mas consultas de diagnóstico podem lidar com importações antigas ou relações opcionais. Não confunda uma junção que encontrou correspondência com uma FK que impede dados inválidos: a consulta lê o estado atual; a restrição protege futuras escritas."
         ]
-      },
-      {
-        "title": "ON, WHERE, subconsultas e nomes intermediários",
-        "paragraphs": [
-          "Considere o pedido: todas as trilhas com suas lições de mais de trinta minutos. Coloque l.minutos>30 junto de ON: a busca de correspondências considera apenas lições longas, e Python continua preservada. Se colocar a condição em WHERE, as linhas sem correspondência são descartadas porque a duração NULL não satisfaz a comparação. Há pedidos em que essa exclusão é intencional. Por exemplo, WHERE l.id IS NULL depois do LEFT JOIN seleciona apenas trilhas sem lições. Portanto, não existe regra de sempre mover condições para ON; existe a obrigação de manter a pergunta original.",
-          "Uma subconsulta escalar devolve um valor, como AVG(total), e pode participar de uma comparação. Uma subconsulta usada com EXISTS responde se ao menos uma linha corresponde; SELECT t.nome FROM trilhas t WHERE EXISTS (SELECT 1 FROM licoes l WHERE l.trilha_id=t.id) devolve Dados uma única vez, sem multiplicá-la por duas lições. NOT EXISTS representa o oposto e é útil para ausência. Evite trocar automaticamente por NOT IN quando o conjunto puder conter NULL, pois a lógica de desconhecido pode alterar o resultado esperado.",
-          "WITH resumo AS (...) dá nome a uma etapa apenas durante uma instrução. Execute primeiro a consulta interna e confira as linhas Dados,2,70 e Python,0,0. Depois execute a consulta externa que compara os totais com a média 35. Essa estratégia localiza erros: se o resumo já está errado, não culpe o filtro final. Uma CTE não é uma promessa de cache ou ganho de velocidade; é uma ferramenta para expressar e testar raciocínio. Ao terminar, explique por que GROUP BY inclui t.id e t.nome: nomes podem repetir, enquanto a identidade mantém cada trilha separada."
-        ]
-      },
-      {
-        "title": "Executar e inspecionar este laboratório",
-        "paragraphs": [
-          "Crie os dois arquivos na mesma pasta. O programa abaixo é apenas o executor: o conteúdo da aula continua sendo SQL e fica em aula.sql. O modo isolation_level=None permite que os comandos BEGIN, COMMIT e ROLLBACK do arquivo controlem explicitamente as transações. O executor aceita os exemplos desta aula, com uma instrução por encerramento de linha; não é um analisador genérico para qualquer script SQL. Antes de cada exercício, preserve o exemplo e acrescente somente a solução que quer testar. Compare o resultado observado com a previsão, e guarde no rascunho a consulta, a saída e a explicação."
-        ],
-        "code": {
-          "language": "python",
-          "code": "# executar.py — Python 3, biblioteca padrão\nfrom pathlib import Path\nimport sqlite3\n\ncon = sqlite3.connect(\":memory:\", isolation_level=None)\ntry:\n    pendente = \"\"\n    for linha in Path(\"aula.sql\").read_text(encoding=\"utf-8\").splitlines():\n        pendente += linha + \"\\n\"\n        if sqlite3.complete_statement(pendente):\n            cursor = con.execute(pendente)\n            if cursor.description:\n                print(\" | \".join(coluna[0] for coluna in cursor.description))\n                for registro in cursor:\n                    print(\" | \".join(\"NULL\" if valor is None else str(valor) for valor in registro))\n            pendente = \"\"\n    if pendente.strip():\n        raise ValueError(\"Falta ponto e vírgula na última instrução\")\nexcept Exception:\n    if con.in_transaction:\n        con.rollback()\n    raise\nfinally:\n    con.close()\n"
-        }
       }
     ],
     "example": {
       "language": "sql",
-      "code": "CREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT);\nCREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha_id INTEGER,titulo TEXT,minutos INTEGER);\nINSERT INTO trilhas VALUES(1,'Dados'),(2,'Python');\nINSERT INTO licoes VALUES(10,1,'SELECT',30),(11,1,'JOIN',40);\nSELECT t.nome,l.titulo FROM trilhas t\nLEFT JOIN licoes l ON l.trilha_id=t.id ORDER BY t.id,l.id;\nWITH resumo AS (\n SELECT t.id,t.nome,COUNT(l.id) AS quantidade,\n COALESCE(SUM(l.minutos),0) AS total\n FROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id\n GROUP BY t.id,t.nome\n)\nSELECT nome,quantidade,total FROM resumo\nWHERE total>(SELECT AVG(total) FROM resumo) ORDER BY id;",
+      "code": "CREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT);\nCREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha_id INTEGER,titulo TEXT,minutos INTEGER);\nINSERT INTO trilhas VALUES(1,'Dados'),(2,'Python');\nINSERT INTO licoes VALUES(10,1,'SELECT',30),(11,1,'JOIN',40);\nSELECT t.nome,l.titulo FROM trilhas t\nLEFT JOIN licoes l ON l.trilha_id=t.id ORDER BY t.id,l.id;\nSELECT t.nome,COUNT(l.id) AS quantidade\nFROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id\nGROUP BY t.id,t.nome ORDER BY t.id;",
       "explanation": [
         "ON conecta o identificador da trilha à referência guardada na lição, não aos títulos.",
         "LEFT JOIN produz uma linha para Python mesmo sem lição correspondente.",
-        "COUNT(l.id) conta as lições reais; COALESCE converte a soma ausente em zero.",
-        "A subconsulta calcula média 35 e a consulta externa conserva apenas totais maiores que esse valor.",
+        "COUNT(l.id) conta somente lições reais e devolve zero para Python.",
+        "Agrupar por identidade e nome mantém uma linha significativa por trilha.",
         "Executor opcional: o código Python está na seção de preparação local. Cada SELECT imprime cabeçalho e linhas; mudanças não produzem uma tabela de saída."
       ],
-      "expected": "Primeira consulta: Dados | SELECT; Dados | JOIN; Python | NULL. Consulta com CTE: Dados | 2 | 70."
+      "expected": "Primeira consulta: Dados | SELECT; Dados | JOIN; Python | NULL. Contagem: Dados | 2; Python | 0."
     },
     "guided": [
       {
@@ -726,8 +701,8 @@ Object.assign(LESSON_GUIDES, {
         "result": "Restam duas linhas, ambas de Dados; Python desaparece."
       },
       {
-        "instruction": "Execute apenas o SELECT interno da CTE.",
-        "result": "Dados possui quantidade 2 e total 70; Python possui quantidade 0 e total 0."
+        "instruction": "Conte l.id e depois troque temporariamente por COUNT(*).",
+        "result": "COUNT(l.id) devolve zero para Python; COUNT(*) conta a linha preservada e devolve um indevido um."
       },
       {
         "instruction": "Na primeira consulta acrescente AND l.minutos>30 ao ON.",
@@ -736,7 +711,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "1. Guiado: Liste todas as trilhas e a quantidade de lições, incluindo zero.",
+        "prompt": "Prever: antes de executar, diga quantas linhas o LEFT JOIN produzirá e depois liste todas as trilhas com a quantidade de lições, incluindo zero.",
         "hints": [
           "Comece por TRILHAS, o conjunto que deve ser preservado.",
           "Conte l.id e agrupe pelos identificadores e nomes da trilha."
@@ -746,7 +721,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Dados | 2; Python | 0."
       },
       {
-        "prompt": "2. Adaptar: Encontre somente as trilhas sem lições.",
+        "prompt": "Alterar: encontre somente as trilhas sem lições.",
         "hints": [
           "Após LEFT JOIN, identifique a ausência no lado direito.",
           "A chave primária da lição nunca é NULL em uma correspondência real."
@@ -756,17 +731,17 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Python, uma única linha."
       },
       {
-        "prompt": "3. Construir: use uma CTE para obter total de minutos de todas as trilhas e devolva somente totais iguais a zero.",
+        "prompt": "Construir: liste todas as trilhas e somente suas lições com mais de 30 minutos, preservando trilhas sem correspondência.",
         "hints": [
-          "Preserve trilhas com LEFT JOIN.",
-          "Use COALESCE na soma."
+          "Comece por trilhas com LEFT JOIN.",
+          "Coloque a condição de duração no ON."
         ],
-        "solution": "WITH totais AS (\n SELECT t.id,t.nome,COALESCE(SUM(l.minutos),0) AS total\n FROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id GROUP BY t.id,t.nome\n)\nSELECT nome,total FROM totais WHERE total=0 ORDER BY id;",
-        "expected": "Python | 0.",
-        "explanation": "A CTE dá nome ao resumo; a consulta externa filtra o total já calculado."
+        "solution": "SELECT t.nome,l.titulo FROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id AND l.minutos>30 ORDER BY t.id,l.id;",
+        "expected": "Dados | JOIN; Python | NULL.",
+        "explanation": "A condição limita filhos elegíveis sem remover o pai preservado."
       },
       {
-        "prompt": "4. Depurar: um relatório com LEFT JOIN e WHERE l.minutos>30 perdeu Python. Corrija para mostrar toda trilha com suas lições longas, mantendo trilhas sem correspondência.",
+        "prompt": "Investigar erro: um relatório com LEFT JOIN e WHERE l.minutos>30 perdeu Python. Corrija para mostrar toda trilha com suas lições longas, mantendo trilhas sem correspondência.",
         "hints": [
           "A condição deve limitar correspondências, não eliminar a linha preservada.",
           "Acrescente a condição ao ON."
@@ -793,14 +768,14 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "LEFT JOIN preserva o conjunto à esquerda e preenche ausências com NULL."
       },
       {
-        "question": "O que WITH resumo AS (...) cria aqui?",
+        "question": "Por que COUNT(l.id) devolve zero para uma trilha sem lições?",
         "options": [
-          "Uma tabela permanente",
-          "Uma expressão nomeada para esta instrução",
-          "Um backup"
+          "Porque l.id é NULL na linha preservada",
+          "Porque COUNT sempre ignora a tabela direita",
+          "Porque LEFT JOIN remove a trilha"
         ],
-        "correctIndex": 1,
-        "explanation": "A CTE organiza etapas da consulta sem criar uma tabela persistente."
+        "correctIndex": 0,
+        "explanation": "COUNT(coluna) ignora NULL, enquanto a trilha continua presente."
       },
       {
         "question": "Juntar duas lições com três matrículas da mesma trilha pode produzir quantas combinações?",
@@ -819,8 +794,43 @@ Object.assign(LESSON_GUIDES, {
       "LEFT JOIN e contagem de chaves permitem representar zero corretamente."
     ]
   },
+"db-subqueries-ctes": {
+    "prerequisites": "Concluir JOINs, ausência e granularidade (db-joins) e Agregações, GROUP BY e HAVING (db-aggregation).",
+    "setup": "Use uma base SQLite descartável no cliente ou com aula.sql e executar.py. Execute primeiro cada consulta interna isoladamente; só depois componha a consulta externa. Não é necessário instalar servidor.",
+    "why": "Consultas maiores ficam mais seguras quando cada etapa tem nome, unidade e resultado conferível. Subconsultas respondem perguntas internas; CTEs tornam resultados intermediários legíveis sem criar tabelas permanentes.",
+    "sections": [
+      {"title":"Subconsulta escalar e EXISTS","paragraphs":["Uma subconsulta escalar deve devolver um valor, como AVG(total), para participar de uma comparação. EXISTS responde apenas se ao menos uma linha corresponde e evita multiplicar a linha externa.","NOT EXISTS expressa ausência. Não troque automaticamente por NOT IN quando o conjunto puder conter NULL, pois a lógica de desconhecido pode mudar o resultado."]},
+      {"title":"CTE nomeia uma etapa","paragraphs":["WITH resumo AS (...) cria uma expressão nomeada válida durante a instrução, não uma tabela permanente. Seu primeiro benefício é permitir ler e testar uma etapa por vez.","Execute o corpo da CTE isoladamente. Se o resumo já estiver errado, corrija-o antes de investigar o filtro externo."]},
+      {"title":"Agregue antes de juntar resumos","paragraphs":["Juntar duas lições a três matrículas pela trilha produz seis combinações e pode triplicar a soma. Quando precisa de dois totais independentes, agregue cada conjunto primeiro.","Uma CTE pode somar lições; outra pode contar matrículas. Juntar uma linha de cada resumo preserva a granularidade por trilha. DISTINCT não corrige totais multiplicados e pode remover valores legítimos iguais."]},
+      {"title":"Verifique unidade e limites","paragraphs":["Escreva o significado de cada linha intermediária e final. No exemplo, resumo tem uma linha por trilha; a subconsulta da média devolve um número.","CTE não promete cache nem ganho de desempenho. Use plano de execução e medição quando desempenho for requisito; aqui ela organiza raciocínio verificável."]}
+    ],
+    "example": {
+      "language":"sql",
+      "code":"CREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT);\nCREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha_id INTEGER,titulo TEXT,minutos INTEGER);\nINSERT INTO trilhas VALUES(1,'Dados'),(2,'Python');\nINSERT INTO licoes VALUES(10,1,'SELECT',30),(11,1,'JOIN',40);\nWITH resumo AS (\n SELECT t.id,t.nome,COUNT(l.id) AS quantidade,COALESCE(SUM(l.minutos),0) AS total\n FROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id GROUP BY t.id,t.nome\n)\nSELECT nome,quantidade,total FROM resumo\nWHERE total<(SELECT AVG(total) FROM resumo) ORDER BY id;",
+      "explanation":["A CTE produz Dados 2/70 e Python 0/0.","A subconsulta calcula média 35.","A consulta externa conserva apenas o total abaixo da média."],
+      "expected":"Python | 0 | 0"
+    },
+    "guided":[
+      {"instruction":"Execute apenas o SELECT interno da CTE.","result":"Dados | 2 | 70 e Python | 0 | 0."},
+      {"instruction":"Troque < por > na comparação externa.","result":"A saída passa a ser Dados | 2 | 70."},
+      {"instruction":"Use EXISTS para listar trilhas que possuem ao menos uma lição.","result":"Dados aparece uma vez; Python não aparece."}
+    ],
+    "exercises":[
+      {"prompt":"Prever: qual valor a subconsulta SELECT AVG(total) FROM resumo devolve para totais 70 e 0? Qual trilha fica com total abaixo dele?","hints":["Some e divida por dois."],"solution":"A média é 35; Python tem total 0 e fica abaixo dela.","explanation":"A subconsulta escalar produz um único valor comparável.","expected":"35 e Python."},
+      {"prompt":"Alterar: troque a consulta externa para devolver trilhas com total igual ou acima da média.","hints":["Altere apenas o operador da condição externa."],"solution":"WHERE total >= (SELECT AVG(total) FROM resumo)","explanation":"A CTE continua igual; somente o critério final muda.","expected":"Dados | 2 | 70."},
+      {"prompt":"Construir: use uma CTE para calcular o total de todas as trilhas, incluindo zero, e devolva apenas as que estão abaixo da média dos totais.","hints":["LEFT JOIN preserva as trilhas.","COALESCE representa ausência de soma como zero neste relatório."],"solution":"WITH resumo AS (SELECT t.id,t.nome,COALESCE(SUM(l.minutos),0) AS total FROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id GROUP BY t.id,t.nome) SELECT nome,total FROM resumo WHERE total<(SELECT AVG(total) FROM resumo) ORDER BY id;","explanation":"Cada etapa conserva uma linha por trilha e a média usa os dois totais.","expected":"Python | 0."},
+      {"prompt":"Investigar erro: uma consulta juntou duas lições a três matrículas e somou 210 em vez de 70. Explique a multiplicação e indique a correção estrutural.","hints":["Conte as combinações antes de somar."],"solution":"Duas lições vezes três matrículas produzem seis linhas. Agregue lições por trilha em uma CTE e matrículas por trilha em outra; depois junte os dois resumos pela identidade da trilha.","explanation":"A correção preserva uma linha por trilha antes de combinar medidas independentes.","expected":"Total de minutos 70 e quantidade de matrículas 3, sem multiplicação cruzada."}
+    ],
+    "mistakes":["Usar uma subconsulta escalar que devolve várias linhas.","Não executar a etapa interna antes de compor a externa.","Somar após uma junção que multiplicou a granularidade.","Tratar CTE como garantia automática de desempenho."],
+    "quiz":[
+      {"question":"Por quanto tempo existe uma CTE comum?","options":["Durante a instrução","Para sempre no banco","Até fechar o computador"],"correctIndex":0,"explanation":"WITH nomeia um resultado dentro daquela instrução."},
+      {"question":"Quando EXISTS é útil?","options":["Para saber se há ao menos uma correspondência","Para criar tabela permanente","Para ordenar números"],"correctIndex":0,"explanation":"EXISTS responde presença sem precisar devolver ou multiplicar todas as linhas."},
+      {"question":"Como evitar somar minutos multiplicados por matrículas?","options":["Usar SUM(DISTINCT minutos) sempre","Agregar cada conjunto antes de juntar os resumos","Remover todas as chaves"],"correctIndex":1,"explanation":"Resumos com uma linha por trilha preservam a unidade correta."}
+    ],
+    "summary":["Use subconsultas conforme a forma do resultado necessário.","CTEs nomeiam etapas verificáveis sem criar tabelas permanentes.","Agregue antes de juntar medidas independentes."]
+  },
 "db-transactions": {
-    "prerequisites": "Saiba executar UPDATE com WHERE e ler resultados. Não são necessárias duas conexões para entender a primeira experiência.",
+    "prerequisites": "Saiba executar UPDATE com WHERE e ler resultados. Subconsultas e CTEs não são obrigatórias para a primeira experiência; conclua db-subqueries-ctes antes dos exercícios de relatórios posteriores.",
     "setup": "Use uma base SQLite nova e descartável para cada aula. Você pode colar o SQL em uma ferramenta SQLite local e executar instrução por instrução. Alternativa sem instalar servidor: com Python 3, salve o SQL em aula.sql e o executor abaixo em executar.py, na mesma pasta; rode python executar.py (ou py executar.py no Windows). Ele cria uma base apenas em memória, imprime cada resultado de consulta e fecha a conexão ao terminar. Cada execução começa vazia. Exercícios usam o estado final do exemplo: acrescente apenas o exercício escolhido ao final de aula.sql e reinicie o executor. Não cole cercas de Markdown nos arquivos. Se faltar o módulo sqlite3, use uma distribuição de Python com esse módulo ou uma ferramenta SQLite. A página apenas guarda rascunhos; o SQL será executado na ferramenta local. Neste executor, não coloque duas instruções completas na mesma linha; cada instrução deve terminar em sua própria linha.",
     "why": "Transferir dez créditos exige retirar dez de Ana e adicionar dez a Beto. Se apenas metade acontecer, o total muda indevidamente. Uma transação transforma essas duas alterações em uma unidade que pode ser confirmada ou desfeita.",
     "sections": [

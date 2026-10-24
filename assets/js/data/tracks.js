@@ -2396,8 +2396,8 @@
           },
           {
             "id": "db-joins",
-            "title": "JOINs, subconsultas e CTEs",
-            "minutes": 120,
+            "title": "JOINs, ausência e granularidade",
+            "minutes": 90,
             "concept": "Separar o nome da trilha das lições evita repetição, mas o relatório precisa reunir essas informações novamente. JOIN expressa essa ligação e permite incluir até trilhas que ainda não receberam nenhuma aula.",
             "objectives": [
               "A condição ON determina como as linhas se relacionam.",
@@ -2425,6 +2425,23 @@
                 "url": "https://docs.python.org/3/library/sqlite3.html",
                 "language": "EN"
               }
+            ]
+          },
+          {
+            "id": "db-subqueries-ctes",
+            "title": "Subconsultas e CTEs",
+            "minutes": 85,
+            "concept": "Divida consultas complexas em resultados intermediários verificáveis e compare valores sem esconder a unidade de cada linha.",
+            "objectives": [
+              "Usar subconsulta escalar e EXISTS conforme o resultado necessário.",
+              "Nomear uma etapa com WITH e inspecioná-la separadamente.",
+              "Evitar multiplicação de totais agregando antes de juntar resumos."
+            ],
+            "exercise": "Construir: use uma CTE para calcular o total de todas as trilhas, incluindo zero, e devolva apenas as que estão abaixo da média dos totais.",
+            "code": "CREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT);\nCREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha_id INTEGER,titulo TEXT,minutos INTEGER);\nINSERT INTO trilhas VALUES(1,'Dados'),(2,'Python');\nINSERT INTO licoes VALUES(10,1,'SELECT',30),(11,1,'JOIN',40);\nWITH resumo AS (\n SELECT t.id,t.nome,COUNT(l.id) AS quantidade,COALESCE(SUM(l.minutos),0) AS total\n FROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id\n GROUP BY t.id,t.nome\n)\nSELECT nome,quantidade,total FROM resumo\nWHERE total<(SELECT AVG(total) FROM resumo) ORDER BY id;",
+            "docs": [
+              {"kind":"doc","title":"SQLite · SELECT e WITH","url":"https://www.sqlite.org/lang_select.html","language":"EN"},
+              {"kind":"doc","title":"SQLite · cláusula WITH","url":"https://www.sqlite.org/lang_with.html","language":"EN"}
             ]
           },
           {
