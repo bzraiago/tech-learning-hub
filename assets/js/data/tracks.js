@@ -2601,14 +2601,14 @@
           {
             "id": "db-docker-compose",
             "title": "Compose: portas, volumes e conexão ao PostgreSQL",
-            "minutes": 110,
-            "concept": "Descreva um PostgreSQL local e comprove que clientes acessam a porta correta e os dados ficam em volume nomeado.",
+            "minutes": 95,
+            "concept": "Descreva um PostgreSQL local, identifique a porta de cada cliente e comprove que os dados ficam em volume nomeado.",
             "objectives": [
               "Ler um compose.yaml e suas relações de configuração.",
-              "Conectar pelo host e pelo cliente interno do container.",
+              "Conectar pelo cliente interno e identificar os parâmetros do cliente externo.",
               "Verificar persistência sem remover o volume."
             ],
-            "exercise": "Crie evidência de persistência com uma tabela própria.",
+            "exercise": "Construir: crie evidência de persistência com uma tabela própria.",
             "code": "# compose.yaml — PostgreSQL 17; não troque a major sem plano de migração.\nname: techhub-dados-lab\nservices:\n  db:\n    image: postgres:17\n    environment:\n      POSTGRES_USER: aluno\n      POSTGRES_DB: estudos\n      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}\n    ports:\n      - \"127.0.0.1:55432:5432\"\n    volumes:\n      - dados:/var/lib/postgresql/data\n    healthcheck:\n      test: [\"CMD-SHELL\", \"pg_isready -U aluno -d estudos\"]\n      interval: 5s\n      timeout: 5s\n      retries: 10\nvolumes:\n  dados:\n",
             "docs": [
               {

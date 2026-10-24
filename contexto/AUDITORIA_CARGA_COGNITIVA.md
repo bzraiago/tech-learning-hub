@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-docker-basics`, a auditoria automática aponta 35: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; a primeira das dez aulas avançadas foi condensada sem mudar seu ID. Restam nove aulas avançadas de banco prioritárias.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-docker-compose`, a auditoria automática aponta 34: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; duas das dez aulas avançadas foram condensadas sem mudar seus IDs. Restam oito aulas avançadas de banco prioritárias.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Alta | G | 9 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
+| 1 | Alta | G | 8 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
 | 2 | Média | G | 5 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 3 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 4 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
@@ -82,6 +82,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 - **Sequência:** `setup-docker` ou `setup-docker-alternative` → `db-docker-basics` → `db-docker-compose`. Sem dependência circular identificada nesse recorte.
 - **Ambiente e fontes:** os comandos permanecem no terminal da pasta `dados-local`; a alternativa SQLite é declarada. Documentação oficial Docker sobre [containers](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/), [volumes](https://docs.docker.com/engine/storage/volumes/) e [`docker ps`](https://docs.docker.com/reference/cli/docker/container/ls/) foi aberta em 24/10/2026 (EN, OK).
 - **Limite:** a estrutura e as fontes foram conferidas, mas não houve observação de aluno real; concluir o quiz não comprova autonomia para operar Docker ou PostgreSQL.
+
+### Revisão localizada: `db-docker-compose`
+
+- **Público e saída:** quem concluiu `db-docker-basics` com Docker operacional deve subir o PostgreSQL 17, identificar `127.0.0.1:55432` no computador e `db:5432` entre serviços, e comprovar persistência por consulta após recriação.
+- **FATO, alta, M:** a aula tinha seis seções e a prática de cliente externo aparecia antes da preparação `setup-postgresql`, que por sua vez depende do serviço criado nesta aula. O guia passou a quatro blocos; o cliente externo ficou opcional aqui e obrigatório na preparação seguinte. Os exercícios agora explicitam prever, alterar, construir e investigar erro.
+- **Sequência:** `setup-docker` → `db-docker-basics` → `db-docker-compose` → `setup-postgresql` → `db-docker-operations`. A alternativa `setup-docker-alternative` permite estudar o desenho sem comprovar o laboratório real. Nenhuma aresta circular resta nesse recorte.
+- **Ambiente:** `compose.yaml`, `.env` e `.gitignore` pertencem à pasta `dados-local`. A porta 55432 e o volume `dados` foram mantidos. Instalação e operação real do Docker neste computador não foram executadas nesta revisão.
+- **Fontes:** documentação oficial Docker de [rede Compose](https://docs.docker.com/compose/how-tos/networking/), [interpolação](https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/) e [`compose down`](https://docs.docker.com/reference/cli/docker/compose/down/), além da [imagem oficial PostgreSQL](https://hub.docker.com/_/postgres), aberta em 24/10/2026 (EN, OK). Confirma serviço por nome, variável obrigatória, preservação de volume sem `-v` e inicialização somente em diretório vazio.
+- **Limite:** a auditoria verifica sequência e fidelidade das instruções; não comprova que um aluno consiga reconstruir o serviço sem ajuda ou que o ambiente funcione em todos os sistemas.
 
 ## 9. Limites desta auditoria
 

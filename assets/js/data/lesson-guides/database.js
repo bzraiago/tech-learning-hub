@@ -1153,20 +1153,15 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "db-docker-compose": {
-    "prerequisites": "Docker e Compose operacionais. Revise CREATE TABLE, INSERT e SELECT. O exemplo usa PostgreSQL 17 e uma pasta de laboratório nova.",
-    "setup": "Na pasta dados-local, salve o exemplo como compose.yaml. Crie .env contendo POSTGRES_PASSWORD= seguido de uma senha escolhida para esse laboratório; não use a mesma senha de serviços pessoais. Crie .gitignore com as linhas .env e *.dump. No terminal dessa pasta execute docker compose config --quiet, depois docker compose up -d e docker compose ps. Aguarde db healthy. Os dados de conexão pelo computador são host 127.0.0.1, porta 55432, banco estudos e usuário aluno. A senha é a do .env.",
+    "prerequisites": "Conclua db-docker-basics com Docker e Compose operacionais (preparação setup-docker). Revise CREATE TABLE, INSERT e SELECT. A alternativa setup-docker-alternative permite estudar o desenho, mas não comprova conexão nem persistência em PostgreSQL.",
+    "setup": "No editor, abra a pasta dados-local criada na aula anterior e salve o exemplo como compose.yaml. Crie .env com POSTGRES_PASSWORD= seguido de uma senha exclusiva deste laboratório e .gitignore com as linhas .env e *.dump; não registre a senha no README. No terminal aberto nessa pasta, execute docker compose config --quiet, docker compose up -d e docker compose ps, nessa ordem; aguarde db healthy. Para parar e retomar, use docker compose down (sem -v) e depois docker compose up -d na mesma pasta. No computador, a conexão externa será 127.0.0.1:55432, banco estudos, usuário aluno e senha do .env; se ainda não tiver cliente externo, conclua setup-postgresql depois desta aula. Se a porta estiver ocupada, escolha outra porta do host e registre a mudança; não altere 5432 dentro do container.",
     "why": "Uma configuração declarada e pequena permite entender por que a aplicação não conecta e por que os dados sobrevivem. O mesmo endereço não serve automaticamente para clientes dentro e fora de containers.",
     "sections": [
       {
-        "title": "Ler YAML como estrutura",
+        "title": "Ler configuração e inicialização",
         "paragraphs": [
           "YAML organiza pares chave/valor e listas com indentação. Use espaços, mantendo alinhamento consistente. services contém os serviços do ambiente; db é um nome escolhido por nós. image escolhe o software. environment passa variáveis para a inicialização. ports publica uma porta. volumes monta o armazenamento. A declaração volumes no fim define o volume nomeado, enquanto a entrada dentro do serviço indica onde ele aparece no container.",
-          "O campo name dá um nome estável ao projeto. Isso ajuda a reconhecer os recursos, mas também significa que copiar o mesmo arquivo para outra pasta não cria automaticamente um ambiente independente se você mantiver o mesmo nome. Para um segundo laboratório, mude nome, porta e volume de forma planejada. Não use o mesmo volume de dados em dois servidores PostgreSQL simultâneos."
-        ]
-      },
-      {
-        "title": "Variáveis e inicialização",
-        "paragraphs": [
+          "O campo name dá um nome estável ao projeto. Copiar o mesmo arquivo para outra pasta com o mesmo nome não cria automaticamente um ambiente independente. Para um segundo laboratório, mude nome, porta e volume de forma planejada; não monte o mesmo diretório de dados em dois servidores PostgreSQL simultâneos.",
           "Compose lê .env para substituir a expressão da senha no arquivo. A sintaxe com :? exige um valor não vazio e explica o erro se ele faltar. O arquivo .env fica no computador e não deve entrar no Git; .env.example pode listar o nome da variável com valor fictício. Variáveis de ambiente não são um cofre: quem controla o mecanismo pode inspecionar a configuração. O objetivo aqui é evitar credenciais gravadas no arquivo versionado.",
           "POSTGRES_USER, POSTGRES_DB e POSTGRES_PASSWORD configuram a criação inicial quando o diretório de dados está vazio. Depois que o volume foi inicializado, editar a senha no .env não modifica a senha armazenada no banco. Isso explica uma falha comum: o aluno muda o arquivo, recria o container e tenta autenticar com uma senha nova que ainda não foi aplicada por SQL. Não exclua o volume para trocar senha de uma base com dados importantes."
         ]
@@ -1175,14 +1170,16 @@ Object.assign(LESSON_GUIDES, {
         "title": "Duas portas e dois pontos de vista",
         "paragraphs": [
           "O mapeamento 127.0.0.1:55432:5432 tem três partes: endereço de escuta no computador, porta do computador e porta dentro do container. Um cliente gráfico instalado no computador usa 127.0.0.1 e 55432. O PostgreSQL continua escutando em 5432 dentro do container. A restrição ao loopback mantém a publicação local neste laboratório.",
-          "Outro serviço na mesma rede Compose pode usar o nome db e a porta 5432, sem passar pela porta publicada no computador. localhost dentro de um container aponta para esse próprio container, não para seu computador nem para outro serviço. Portanto uma futura API em outro container deve usar db:5432. Não copie localhost:55432 para todos os lugares sem identificar de onde parte a conexão."
+          "Outro serviço na mesma rede Compose pode usar o nome db e a porta 5432, sem passar pela porta publicada no computador. localhost dentro de um container aponta para esse próprio container, não para seu computador nem para outro serviço. Portanto uma futura API em outro container deve usar db:5432. Não copie localhost:55432 para todos os lugares sem identificar de onde parte a conexão.",
+          "Se já houver cliente PostgreSQL no computador, informe host, porta, banco, usuário e senha explicitamente, teste a conexão e execute SELECT current_database(), current_user;. Se não houver, a preparação setup-postgresql ensinará a instalar um cliente depois que o serviço estiver funcionando. Se houver outro PostgreSQL local, confira a porta para saber qual base consultou."
         ]
       },
       {
         "title": "Iniciar e comprovar funcionamento",
         "paragraphs": [
           "docker compose config --quiet valida o modelo e a interpolação sem imprimir a configuração resolvida, que poderia conter a senha. docker compose up -d cria ou atualiza os serviços e retorna ao terminal. A primeira execução pode baixar a imagem. docker compose ps mostra estado e porta. O healthcheck executa pg_isready para verificar se o servidor aceita conexões básicas; ainda precisamos executar uma consulta para verificar o banco escolhido.",
-          "Use docker compose exec db psql -U aluno -d estudos para abrir o cliente dentro do container. No prompt psql, execute SELECT current_database(), current_user; e confira estudos e aluno. Termine o SQL com ponto e vírgula. Digite \\q para sair do cliente e voltar ao terminal. Essa conexão local interna pode seguir regras diferentes de autenticação da conexão TCP pelo host; teste também o cliente externo com a senha configurada."
+          "Use docker compose exec db psql -U aluno -d estudos para abrir o cliente dentro do container. No prompt psql, execute SELECT current_database(), current_user; e confira estudos e aluno. Termine o SQL com ponto e vírgula. Digite \\q para sair do cliente e voltar ao terminal. Essa conexão local interna pode seguir regras diferentes de autenticação da conexão TCP pelo host; teste também o cliente externo com a senha configurada.",
+          "Um erro de senha indica que um servidor recusou a credencial; conexão recusada pode indicar serviço parado ou porta errada. Guarde no README os comandos de inicialização e parada, a conexão sem senha e a saída das consultas de verificação. Outra pessoa deve conseguir seguir o roteiro em uma pasta própria."
         ]
       },
       {
@@ -1190,13 +1187,6 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "No cliente SQL, crie uma tabela pequena e insira um marcador. Confirme que a consulta devolve o registro. Depois saia do cliente, execute docker compose down sem a opção -v e suba o serviço novamente. Aguarde healthy e consulte a tabela. O registro deve permanecer porque o volume nomeado foi reutilizado no mesmo projeto.",
           "No PostgreSQL 17 da imagem escolhida, usamos /var/lib/postgresql/data. A imagem PostgreSQL 18 e posteriores adotou outro layout; por isso copiar apenas a tag sem revisar montagem e migração é incorreto. Volume montado em um caminho qualquer não garante que o banco esteja gravando nele. A evidência de persistência é consultar os dados depois da recriação, não apenas ver a palavra volumes no YAML."
-        ]
-      },
-      {
-        "title": "Conectar por uma interface e registrar evidências",
-        "paragraphs": [
-          "Em um cliente gráfico já instalado, escolha PostgreSQL e preencha host, porta, banco, usuário e senha explicitamente. Use testar conexão e depois execute a consulta de identidade. Um erro de senha indica que você alcançou um servidor que recusou a credencial; conexão recusada pode indicar serviço parado ou porta errada. Se houver outro PostgreSQL no computador, confira a porta para não consultar a base errada.",
-          "Guarde no README o comando de inicialização, a conexão sem senha, o comando de parada e o resultado do teste de persistência. Não cole a senha nem saídas de configuração que a exibam. A avaliação exige que outra pessoa consiga seguir o roteiro numa pasta própria. Configuração declarativa sem instrução de execução ainda deixa lacunas para quem está começando."
         ]
       }
     ],
@@ -1227,7 +1217,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Interprete 127.0.0.1:55432:5432 e informe a conexão do cliente no computador.",
+        "prompt": "Prever: interprete 127.0.0.1:55432:5432 e preveja a conexão do cliente no computador.",
         "hints": [
           "Leia endereço:porta host:porta container.",
           "O cliente do computador não usa o nome db."
@@ -1237,7 +1227,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Conexão TCP para 127.0.0.1:55432."
       },
       {
-        "prompt": "A porta 55432 está ocupada. Adapte apenas o necessário.",
+        "prompt": "Alterar: a porta 55432 está ocupada. Adapte apenas o necessário e registre a nova porta no README.",
         "hints": [
           "Não mude a porta interna do PostgreSQL.",
           "Altere também o README do cliente."
@@ -1247,7 +1237,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "O serviço continua em db:5432 dentro da rede."
       },
       {
-        "prompt": "Crie evidência de persistência com uma tabela própria.",
+        "prompt": "Construir: crie evidência de persistência com uma tabela própria.",
         "hints": [
           "Rode SQL no psql e comandos Docker no terminal.",
           "Saia com \\q antes de down."
@@ -1257,7 +1247,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Antes e depois: 1 | persistiu."
       },
       {
-        "prompt": "Uma API em outro container tenta localhost:55432 e falha. Corrija o endereço.",
+        "prompt": "Investigar erro: uma API em outro container tenta localhost:55432 e falha. Corrija o endereço e explique a origem da conexão.",
         "hints": [
           "localhost é relativo à origem da conexão.",
           "Compose fornece descoberta pelo nome do serviço."
