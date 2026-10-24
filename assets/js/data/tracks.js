@@ -2918,12 +2918,11 @@
             "minutes": 75,
             "concept": "NoSQL reúne famílias de bancos, não um único produto ou linguagem. MongoDB trabalha com documentos; Redis é conhecido por estruturas chave-valor; Cassandra organiza dados em famílias de colunas; Neo4j modela grafos. Escolha a representação a partir das consultas e garantias necessárias. NoSQL não significa ausência de esquema, impossibilidade de transações ou desempenho automaticamente superior.",
             "objectives": [
-              "Relacionar famílias de bancos a padrões de consulta.",
-              "Comparar consistência, transações e distribuição por produto.",
-              "Modele de acordo com o acesso esperado.",
-              "Verificar resultados e explicar os limites do laboratório com casos válidos e inválidos."
+              "Relacionar quatro representações a perguntas de consulta concretas.",
+              "Distinguir fonte de verdade, cópia histórica e dado temporário.",
+              "Registrar uma escolha com alternativa, custo aceito e gatilho de revisão."
             ],
-            "exercise": "Escreva uma decisão para um app individual offline de anotações e diga qual requisito futuro justificaria revisá-la.",
+            "exercise": "Identifique a falsa promessa de sincronização automática e registre uma decisão para o app individual offline de anotações.",
             "code": "DOCUMENTO: curso\n{ id: \"dados\", titulo: \"Dados\",\n  recursos: [{tipo: \"livro\", titulo: \"SQL inicial\"}] }\nPergunta: mostrar um curso com seus poucos recursos.\n\nCHAVE-VALOR: sessao:abc -> {usuario: 7, expira: \"18:00\"}\nPergunta: quem possui a sessão abc?\n\nCOLUNAS AMPLAS: partição (sensor=9, dia=2026-01-01)\n  10:00 -> 21; 10:01 -> 22\nPergunta: leituras do sensor 9 naquele dia, por horário.\n\nGRAFO: HTML -> JavaScript -> DOM\nPergunta: quais pré-requisitos indiretos levam a DOM?",
             "docs": [
               {

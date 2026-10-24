@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-performance`, a auditoria automática aponta 30: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; seis das dez aulas avançadas foram condensadas sem mudar seus IDs. Restam quatro aulas avançadas de banco prioritárias.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-nosql-models`, a auditoria automática aponta 29: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; sete das dez aulas avançadas foram condensadas sem mudar seus IDs. Restam três aulas avançadas de banco prioritárias.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Alta | G | 4 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
+| 1 | Alta | G | 3 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
 | 2 | Média | G | 5 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 3 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 4 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
@@ -127,6 +127,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 - **Ambiente:** PostgreSQL 17 de laboratório, tabela `perf_licoes` ainda inexistente e dez mil registros sintéticos. O aluno deve conferir banco e usuário antes de criar objetos. `EXPLAIN (ANALYZE, BUFFERS)` executa a consulta; o laboratório limita-o a `SELECT`. Para retomar, usa-se outro banco autorizado, sem apagar dados existentes. Não houve execução de PostgreSQL nesta revisão.
 - **Fontes:** documentação oficial [PostgreSQL 17 — EXPLAIN](https://www.postgresql.org/docs/17/using-explain.html), [PostgreSQL 17 — índices](https://www.postgresql.org/docs/17/indexes.html) e [SQLite — EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html), abertas em 24/10/2026 (EN, OK). Os links PostgreSQL da aula, antes em `current` (versão 18 nessa data), foram fixados em 17 para acompanhar o laboratório.
 - **Limite:** o exemplo tem distribuição uniforme e uma única consulta. Plano e tempo reais dependem da instância; sem executar o banco ou observar um aluno, não há evidência de melhoria de desempenho nem de autonomia diagnóstica.
+
+### Revisão localizada: `db-nosql-models`
+
+- **Público e saída:** após `db-modeling` e `db-select`, o aluno compara representações para quatro perguntas de acesso e justifica uma decisão para um aplicativo offline. A atividade usa papel ou editor de texto; não exige instalar bancos adicionais.
+- **FATO, alta, M:** seis seções retomavam perguntas de acesso, regras de cópia e consistência depois de apresentar as famílias. A aula ficou com quatro blocos: perguntas, representações, consequências de chaves/consistência e decisão. Os exercícios explicitam prever, alterar, construir e investigar erro; este último rejeita a promessa de sincronização automática por mero formato de banco.
+- **Sequência:** `db-modeling` → `db-select` → `db-nosql-models` → `db-mongo-crud` como aprofundamento opcional com `setup-mongodb`. Não se identificou ciclo. Conhecer os nomes Redis, Cassandra e Neo4j não comprova operação desses produtos.
+- **Ambiente:** desenho textual, sem serviço real e sem comandos. A saída esperada é uma escolha defendida por consulta, regra de atualização, custo e gatilho de revisão. Não há instalação a executar nesta aula.
+- **Fontes:** páginas oficiais [Redis](https://redis.io/docs/latest/), [Apache Cassandra](https://cassandra.apache.org/doc/latest/), [Neo4j](https://neo4j.com/docs/) e [MongoDB — modelagem](https://www.mongodb.com/docs/manual/data-modeling/) foram abertas em 24/10/2026 (EN, OK). As três primeiras são portais gerais, úteis para aprofundamento, não substituem a explicação da aula.
+- **Limite:** a atividade é modelagem em papel, não comprovação de desempenho, transações, recuperação ou operação dos motores. Sem observar uma decisão feita pelo aluno diante de requisito novo, autonomia permanece não comprovada.
 
 ## 9. Limites desta auditoria
 

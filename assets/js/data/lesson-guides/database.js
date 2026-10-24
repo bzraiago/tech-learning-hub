@@ -2048,51 +2048,37 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "db-nosql-models": {
-    "prerequisites": "Entenda tabela, registro e consulta. Você não precisa instalar nenhum banco nesta aula: a atividade é escolher representações a partir de perguntas concretas.",
+    "prerequisites": "Revise entidades, tabelas e consultas em db-modeling e db-select. Esta aula compara representações; não exige concluir a preparação MongoDB nem instalar Redis, Cassandra ou Neo4j.",
     "setup": "Use papel ou editor de texto. O exemplo é um desenho de dados, não comandos executáveis. Os nomes MongoDB, Redis, Cassandra e Neo4j ilustram famílias; não são recomendações obrigatórias para todo projeto que tenha dados parecidos.",
     "why": "O mesmo domínio pode ser organizado de formas diferentes. Antes de adotar um banco porque ele parece moderno, descreva duas consultas importantes e uma regra de consistência. Essas necessidades ajudam a avaliar o custo de cada modelo.",
     "sections": [
       {
-        "title": "Documento e chave-valor",
+        "title": "Comece pelas perguntas de acesso",
         "paragraphs": [
-          "Um documento reúne campos relacionados, incluindo objetos e listas. Um curso pode possuir título e uma pequena lista de recursos lidos junto com ele. MongoDB usa documentos BSON, um formato com tipos além do JSON. Incorporar informações reduz a necessidade de buscar partes separadas, mas repetições exigem manutenção e listas ilimitadas podem crescer excessivamente.",
-          "No modelo chave-valor, uma chave conhecida leva diretamente a um valor. sessao:abc pode apontar para o usuário 7 e uma expiração. Isso favorece acessos diretos pelo identificador; não oferece automaticamente relatórios arbitrários sobre todos os campos do valor. Redis oferece estruturas adicionais, mas escolher uma chave útil continua essencial."
+          "Antes de escolher uma família de banco, escreva a entrada e a saída de duas consultas. A página de um curso recebe seu identificador e devolve título e poucos recursos; o histórico recebe pessoa e intervalo e pode devolver milhares de eventos. Os dois conjuntos têm crescimento e atualização diferentes: não incorpore eventos sem limite ao curso só porque pertencem ao mesmo produto.",
+          "Escreva também uma regra de mudança. Um endereço copiado para um pedido pode preservar a fotografia histórica; o nome atual de um autor compartilhado deve refletir correções recentes. Repetir dados não é automaticamente erro, mas exige dizer se a cópia é histórica ou deve acompanhar a fonte atual."
         ]
       },
       {
-        "title": "Colunas amplas e grafos",
+        "title": "Compare quatro representações",
         "paragraphs": [
-          "Bancos de famílias de colunas, como Cassandra, organizam dados para padrões de acesso e distribuição planejados. Eventos de um dispositivo em um dia podem compartilhar uma partição. Definir a chave afeta onde os dados ficam e quais consultas são eficientes. Isso é diferente de apenas trocar linhas por colunas em uma planilha.",
-          "Grafos representam entidades como nós e relações como arestas. Se HTML é pré-requisito de JavaScript e JavaScript de DOM, uma travessia encontra caminhos de aprendizagem. Neo4j é um exemplo dessa família. Uma relação direta entre dois registros não obriga a usar grafos; o benefício aparece quando percorrer redes é parte importante das consultas."
+          "Documentos reúnem campos, objetos e listas lidos juntos. Um curso pode incorporar poucos recursos, mas listas ilimitadas e cópias que precisam ser atualizadas têm custo. MongoDB usa BSON, com tipos além de JSON. Chave-valor recupera um valor por chave conhecida: sessao:abc pode apontar para usuário 7 e expiração. Redis oferece outras estruturas, mas isso não torna automáticos relatórios arbitrários sobre os campos do valor.",
+          "Famílias de colunas amplas, como Cassandra, organizam dados segundo padrões de acesso e partições: sensor e dia podem reunir leituras daquele período. Isso não é apenas trocar linhas por colunas. Grafos usam nós e arestas; HTML → JavaScript → DOM permite percorrer pré-requisitos indiretos. Neo4j é um exemplo, mas uma relação direta entre dois registros não obriga a usar um grafo."
         ]
       },
       {
-        "title": "Garantias e custo operacional",
+        "title": "Verifique chaves, crescimento e consistência",
         "paragraphs": [
-          "NoSQL é um conjunto de famílias, não uma linguagem única nem uma ausência total de esquema. O contrato dos dados continua existindo na aplicação ou no banco. Também não significa impossibilidade de transações: atomicidade e consistência dependem do produto, da operação e de como ele foi configurado.",
-          "Combinar quatro bancos cria quatro conjuntos de ferramentas, backups e habilidades operacionais. Para um pequeno hub, um único relacional pode atender todas as necessidades iniciais. Escolha um segundo motor quando houver benefício demonstrável. Escreva o padrão de acesso, a atualização crítica e a estratégia de recuperação antes de comparar popularidade."
+          "NoSQL não é uma linguagem única, ausência total de esquema ou impossibilidade de transações. Contratos, atomicidade e consistência dependem do produto, da operação e da configuração. Duas telas alterando o mesmo progresso precisam de uma regra de conflito — última escrita, versão ou atualização condicional — independentemente de o banco ser relacional ou documental.",
+          "Uma partição por sensor e dia limita o grupo de eventos; somente sensor pode crescer sem limite, enquanto uma chave por leitura perde o agrupamento útil. Isso é raciocínio de modelagem, não operação de um cluster Cassandra. Uma sessão temporária deve expirar; cache reconstruível e único registro de compra exigem recuperação diferente. Classifique cada dado como fonte de verdade, cópia ou temporário.",
+          "No grafo, a direção HTML → JavaScript indica qual assunto vem antes. Para buscar pré-requisitos de DOM, caminhe no sentido contrário das setas; inverter a relação muda a resposta. Um ciclo A exige B e B exige A pode ser inválido no domínio mesmo que o motor o armazene."
         ]
       },
       {
-        "title": "Começar pelas perguntas e pelas mudanças",
+        "title": "Registre uma decisão proporcional",
         "paragraphs": [
-          "Descreva o acesso antes de escolher a família. Para mostrar a página de um curso, a entrada é seu identificador; a resposta contém título, descrição e três recursos. Para gerar o histórico de estudos, a entrada é pessoa e intervalo de datas; a resposta pode ter milhares de eventos. Embora ambas as telas pertençam ao mesmo produto, os conjuntos têm crescimento e atualização diferentes. Desenhar um único documento com tudo porque os dados são relacionados pode criar um objeto enorme e frequentemente alterado.",
-          "Uma cópia incorporada precisa de uma semântica explícita. O endereço registrado em um pedido pode ser uma fotografia histórica e não deve mudar quando o cliente edita o cadastro. Já o nome atual de um autor deve refletir a correção feita hoje. No primeiro caso, repetir dados preserva o fato passado; no segundo, a repetição pode gerar divergência. Portanto, desnormalização não é automaticamente erro: o erro é repetir sem explicar qual informação é atual e qual representa um momento passado."
-        ]
-      },
-      {
-        "title": "Chaves, partições e relações têm consequências",
-        "paragraphs": [
-          "No desenho de sensores, a chave sensor e dia limita a quantidade de eventos agrupados. Uma partição que usa apenas o sensor pode crescer sem limite ao longo dos anos; uma partição que usa um valor diferente para cada leitura perde o agrupamento útil. A chave resulta de volume esperado, distribuição e consulta. Essa atividade apresenta o raciocínio de particionamento, mas não equivale a configurar ou operar um cluster Cassandra. Consultas novas podem exigir outra tabela orientada ao acesso, com custo adicional de sincronização.",
-          "Uma sessão guardada por chave deve expirar conforme a regra da aplicação. Expiração de cache e exclusão definitiva de um cadastro são decisões distintas. Se o cache some, a aplicação geralmente consegue reconstruí-lo a partir da fonte oficial; se o único registro de uma compra some, o prejuízo é diferente. Classifique cada dado como fonte de verdade, cópia derivada ou informação temporária. Isso orienta tanto a escolha do mecanismo quanto a estratégia de recuperação.",
-          "Em um grafo, a direção da relação também carrega significado. Se HTML aponta para JavaScript indicando que HTML é pré-requisito, consultar o que devo estudar antes de DOM exige caminhar contra essa direção. Uma seta invertida muda a resposta. Ciclos como A exige B e B exige A podem ser inválidos no domínio, mesmo que o motor permita armazená-los. Modele a regra e teste um ciclo pequeno antes de apresentar um mapa de aprendizagem como correto."
-        ]
-      },
-      {
-        "title": "Consistência, duplicação e decisão registrada",
-        "paragraphs": [
-          "Imagine duas telas alterando o mesmo progresso. Uma grava concluída e outra grava pendente com informação antiga. Trocar SQL por documentos não resolve o conflito de negócio. Você precisa escolher entre última escrita, controle de versão, operação condicional ou outra regra verificável. Atomicidade de uma operação protege sua indivisibilidade; não define qual intenção humana deve vencer. Ao comparar tecnologias, pergunte qual operação precisa acontecer por inteiro e quais leituras podem aceitar alguma defasagem.",
-          "Registre uma decisão em cinco frases: requisito principal, opção escolhida, alternativa avaliada, custo aceito e sinal que exigirá revisão. Por exemplo: um catálogo local precisa abrir sem internet; SQLite atende; documentos também representariam os recursos, mas um servidor extra não é necessário; aceitamos planejar outra arquitetura se vários dispositivos precisarem escrever ao mesmo tempo. Uma justificativa assim é mais útil no trabalho do que uma classificação genérica de banco melhor. A competência desta aula é reconhecer adequação e limites, e não dominar quatro produtos apenas por conhecer seus nomes."
+          "Combine consultas, atualização crítica e recuperação antes de comparar popularidade. Quatro bancos implicam quatro conjuntos de ferramentas, backups e competências de operação; um único relacional pode atender um hub pequeno. Só acrescente outro motor quando o benefício for demonstrável.",
+          "Registre cinco itens: requisito, escolha, alternativa, custo aceito e gatilho de revisão. Exemplo: um catálogo local precisa abrir sem internet; SQLite atende; documentos também poderiam representar recursos, mas um servidor extra não é necessário; sincronização entre dispositivos fica pendente; escrita simultânea por várias pessoas exigirá reavaliar. A saída desta aula é justificar uma escolha, não dominar quatro produtos por conhecer seus nomes."
         ]
       }
     ],
@@ -2123,7 +2109,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Escolha uma representação para recuperar uma preferência de idioma pelo id do usuário, sem outras consultas.",
+        "prompt": "Prever: se a única pergunta é recuperar o idioma pelo id do usuário, qual chave e valor responderiam sem percorrer outros registros? Depois compare com o exemplo.",
         "hints": [
           "A chave é conhecida antes da busca.",
           "O valor pode ser pequeno, como pt-BR."
@@ -2133,7 +2119,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "A busca por preferencia:7 devolve pt-BR."
       },
       {
-        "prompt": "O catálogo tem um autor cujo nome aparece em 500 cursos e pode mudar. Compare incorporar o nome e guardar autor_id.",
+        "prompt": "Alterar: o catálogo passa a ter um autor cujo nome aparece em 500 cursos e pode mudar. Compare incorporar o nome e guardar autor_id.",
         "hints": [
           "Conte quantos documentos mudariam no primeiro caso.",
           "Referenciar reduz repetição, mas pode exigir outra consulta."
@@ -2143,7 +2129,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Uma atualização no autor contra até 500 atualizações nos cursos; leitura pode exigir composição adicional."
       },
       {
-        "prompt": "Um curso recebe um milhão de eventos de visualização. Proponha onde guardar os eventos e quais campos permitem buscar os últimos de uma pessoa.",
+        "prompt": "Construir: um curso recebe um milhão de eventos de visualização. Proponha onde guardar os eventos e quais campos permitem buscar os últimos de uma pessoa.",
         "hints": [
           "Separe dados de catálogo e histórico.",
           "Não escolha Cassandra somente porque o número parece grande."
@@ -2153,7 +2139,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Eventos separados do documento do curso; crescimento e acesso explicitamente descritos."
       },
       {
-        "prompt": "Escreva uma decisão para um app individual offline de anotações e diga qual requisito futuro justificaria revisá-la.",
+        "prompt": "Investigar erro: alguém escolheu um servidor documental para um app individual offline de anotações e afirmou que isso fornece sincronização automática. Identifique a suposição incorreta e escreva uma decisão com requisito, escolha, alternativa, custo e gatilho de revisão.",
         "hints": [
           "Offline exige dados disponíveis no dispositivo.",
           "Não prometa sincronização automática pelo formato do banco."
