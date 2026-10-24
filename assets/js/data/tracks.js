@@ -2336,13 +2336,13 @@
           },
           {
             "id": "db-select",
-            "title": "Consultas, NULL, filtros e agregações",
-            "minutes": 120,
+            "title": "Consultas, filtros, ordenação e NULL",
+            "minutes": 85,
             "concept": "O dashboard precisa responder quais aulas estão pendentes e quanto tempo falta em cada trilha. SELECT transforma registros individuais em respostas, sem exigir que você carregue tudo na aplicação para calcular manualmente.",
             "objectives": [
-              "WHERE escolhe linhas; HAVING escolhe grupos.",
-              "NULL precisa de testes específicos.",
-              "Ordenação e desempate fazem parte de uma consulta previsível."
+              "Selecionar colunas e filtrar linhas com condições explícitas.",
+              "Tratar NULL sem confundi-lo com zero ou texto vazio.",
+              "Ordenar resultados com critérios e desempates previsíveis."
             ],
             "exercise": "3. Construir: produza um relatório das pendências por trilha, com quantidade e total, maior total primeiro. Inclua as duas trilhas, sem HAVING.",
             "code": "CREATE TABLE licoes (\n id INTEGER PRIMARY KEY, trilha TEXT, titulo TEXT,\n minutos INTEGER, concluida INTEGER, observacao TEXT\n);\nINSERT INTO licoes VALUES\n (1,'Dados','SELECT',30,0,NULL),\n (2,'Dados','JOIN',40,0,'Revisar'),\n (3,'Python','Listas',20,1,NULL),\n (4,'Python','Arquivos',30,0,'');\nSELECT titulo,minutos FROM licoes WHERE concluida=0\nORDER BY minutos DESC,id ASC;\nSELECT trilha,COUNT(*) AS quantidade,SUM(minutos) AS total\nFROM licoes WHERE concluida=0 GROUP BY trilha\nHAVING SUM(minutos)>=50 ORDER BY trilha;\nSELECT COUNT(*) AS linhas,COUNT(observacao) AS preenchidas FROM licoes;",
@@ -2363,6 +2363,33 @@
                 "kind": "doc",
                 "title": "Python · sqlite3 e parâmetros SQL",
                 "url": "https://docs.python.org/3/library/sqlite3.html",
+                "language": "EN"
+              }
+            ]
+          },
+          {
+            "id": "db-aggregation",
+            "title": "Agregações, GROUP BY e HAVING",
+            "minutes": 85,
+            "concept": "Transforme várias linhas em medidas por grupo, respeitando a ordem lógica da consulta e a unidade de cada resultado.",
+            "objectives": [
+              "Calcular contagens, somas e médias com significado definido.",
+              "Agrupar linhas e diferenciar filtros WHERE de HAVING.",
+              "Validar relatórios agregados com contas manuais em dados pequenos."
+            ],
+            "exercise": "Construir: produza um relatório das pendências por trilha, com quantidade e total, maior total primeiro, incluindo todos os grupos sem HAVING.",
+            "code": "CREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha TEXT,titulo TEXT,minutos INTEGER,concluida INTEGER,observacao TEXT);\nINSERT INTO licoes VALUES\n (1,'Dados','SELECT',30,0,NULL),\n (2,'Dados','JOIN',40,0,'Revisar'),\n (3,'Python','Listas',20,1,NULL),\n (4,'Python','Arquivos',30,0,'');\nSELECT trilha,COUNT(*) AS quantidade,SUM(minutos) AS total\nFROM licoes WHERE concluida=0\nGROUP BY trilha ORDER BY total DESC,trilha;",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "SQLite · SELECT",
+                "url": "https://www.sqlite.org/lang_select.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "SQLite · funções agregadas",
+                "url": "https://www.sqlite.org/lang_aggfunc.html",
                 "language": "EN"
               }
             ]

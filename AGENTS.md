@@ -135,7 +135,7 @@ Os scripts são clássicos e compartilham o mesmo escopo global, carregados na o
 
 Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workflow`, `quality`, `delivery`.
 
-> Os números de referência (9 trilhas, 28 módulos, 111 aulas, 446 exercícios, 332 questões, 20 projetos) foram conferidos no código em 24/10/2026. **Confira no código antes de citá-los** e atualize `ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
+> Os números de referência (9 trilhas, 28 módulos, 112 aulas, 450 exercícios, 335 questões, 20 projetos) foram conferidos no código em 24/10/2026. **Confira no código antes de citá-los** e atualize `ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
 
 ### 5.2 Persistência e compatibilidade (cuidado máximo)
 - O progresso fica em `localStorage` na chave **`tech-learning-hub:v1`**.

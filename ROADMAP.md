@@ -137,7 +137,8 @@ Toda implementação só pode ser considerada pronta quando:
   - [ ] Prioridade 1: dividir ou intercalar prática nas cinco aulas fundamentais de banco.
     - [x] `db-modeling`: separar entidades/relacionamentos de normalização/ausência.
     - [x] `db-ddl-crud`: separar estrutura/restrições de manipulação segura.
-    - [ ] `db-select`, `db-joins` e `db-transactions`.
+    - [x] `db-select`: separar filtros/`NULL` de agregações/agrupamentos.
+    - [ ] `db-joins` e `db-transactions`.
   - [ ] Prioridade 2: revisar as dez aulas avançadas de banco mapeadas com seis seções.
   - [ ] Prioridade 3: revisar 11 aulas de HTML/JavaScript e distinguir aprofundamento legítimo de sobrecarga.
   - [ ] Prioridade 4: revisar 15 aulas de IA/Entrega, preservando o nível avançado quando os pré-requisitos forem suficientes.
@@ -415,6 +416,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Fase 3.2 — mapa de carga cognitiva | Commit da Fase 3.2 | 41 candidatas identificadas por estrutura e organizadas em quatro prioridades; cinco fundamentos de banco ficaram no topo. |
 | 24/10/2026 | Fase 3.3 — modelagem de dados | Commit da Fase 3.3 | `db-modeling` foi reduzida e `db-normalization` passou a ensinar normalização, ausência e limites com prática própria. |
 | 24/10/2026 | Fase 3.4 — DDL e CRUD | Commit da Fase 3.4 | `db-ddl-constraints` passou a ensinar estrutura e regras; `db-ddl-crud` ficou focada em manipulação segura. |
+| 24/10/2026 | Fase 3.5 — consultas e agregações | Commit da Fase 3.5 | `db-select` ficou focada em linhas, filtros e `NULL`; `db-aggregation` recebeu medidas, grupos e `HAVING`. |
 
 ## Decisões e bloqueios
 

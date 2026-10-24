@@ -465,13 +465,6 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "Agrupar e resumir",
-        "paragraphs": [
-          "GROUP BY reúne as linhas que compartilham um valor, como trilha. SUM(minutos) soma a duração dentro de cada grupo, e COUNT(*) conta suas lições. Uma coluna apresentada sem agregação deve fazer parte do agrupamento para ter um significado definido; evite depender das permissões particulares do SQLite para consultas ambíguas.",
-          "WHERE filtra antes do agrupamento; HAVING filtra os grupos depois que suas somas foram calculadas. Para obter trilhas com pelo menos 50 minutos pendentes, primeiro retenha concluida = 0, depois agrupe por trilha e então aplique HAVING SUM(minutos) >= 50. A ordem lógica ajuda a prever o resultado."
-        ]
-      },
-      {
         "title": "Uma consulta é uma pergunta com fronteiras",
         "paragraphs": [
           "Antes de escrever SQL, reformule o pedido em uma frase que inclua população, condição, colunas e ordem: quero títulos de aulas pendentes com pelo menos trinta minutos, da maior duração para a menor, com id como desempate. Traduzindo, a população vem de FROM licoes, a condição de WHERE concluida=0 AND minutos>=30, as colunas de SELECT e a ordem de ORDER BY minutos DESC,id. Esse pequeno planejamento evita responder uma pergunta diferente. Teste sempre o limite: pelo menos trinta inclui trinta, portanto usa >=; mais de trinta usa >.",
@@ -484,42 +477,24 @@ Object.assign(LESSON_GUIDES, {
           "SQL trabalha com uma situação desconhecida além de verdadeiro e falso quando há NULL. Se observacao é NULL, comparar observacao='Revisar' não permite concluir verdadeiro nem falso. WHERE conserva apenas verdadeiro. Isso explica por que observacao\u003c>'Revisar' também não inclui automaticamente ausências: para incluí-las, escreva observacao\u003c>'Revisar' OR observacao IS NULL. Use IS NULL para localizar ausência e ='' para localizar uma string vazia. Não escreva 'NULL' pensando em ausência: com aspas isso é um texto de quatro letras.",
           "COALESCE(observacao,'Sem observação') altera a apresentação do resultado, sem escrever nada na tabela. Escolha o texto alternativo de modo que a pessoa entenda a ausência. No cálculo de média, substituir duração desconhecida por zero muda o denominador e pode reduzir artificialmente a média; não faça isso por hábito. COUNT(*) conta todas as quatro linhas do exemplo, enquanto COUNT(observacao) conta duas. COUNT(DISTINCT trilha) conta duas trilhas diferentes. SUM em um conjunto sem linhas retorna NULL no SQLite, enquanto COUNT retorna zero. Essas convenções precisam ser consideradas ao montar cartões de relatório."
         ]
-      },
-      {
-        "title": "Agregação, ordem lógica e inspeção do resultado",
-        "paragraphs": [
-          "Imagine a execução lógica em etapas: FROM define linhas; WHERE remove algumas; GROUP BY forma grupos; funções como SUM calculam cada grupo; HAVING elimina grupos; SELECT define a saída; ORDER BY ordena; LIMIT restringe a quantidade apresentada. O motor pode executar fisicamente de outra maneira, mas essa ordem conceitual ajuda a entender por que SUM não pertence ao WHERE da mesma consulta. Não use HAVING para substituir indiscriminadamente filtros simples: concluida=0 deve ser aplicado antes da soma se a pergunta pede apenas minutos pendentes.",
-          "Cada coluna exibida precisa ter significado para a linha resultante. Ao agrupar por trilha, mostrar titulo sem agregação é ambíguo, pois Dados contém SELECT e JOIN. Mesmo que um motor aceite escolher algum título, a pergunta continua mal definida. Mostre trilha e SUM(minutos), ou inclua titulo no agrupamento se realmente quiser um grupo por título. DISTINCT remove repetições do resultado escolhido, mas não corrige um agrupamento errado. LIMIT 2 deve ser acompanhado de ORDER BY quando houver intenção de obter os dois maiores; sem ordenação, são apenas duas linhas sem garantia de prioridade.",
-          "Valide consultas com contas manuais em conjuntos pequenos. Separe as três pendências: trinta, quarenta e trinta minutos, totalizando cem. Dentro de Dados são duas linhas e setenta minutos; dentro de Python sobra apenas Arquivos, com trinta. Agora altere uma duração para zero, remova todos os pendentes de uma trilha em uma cópia ou acrescente empate. Preveja a saída antes de executar. Uma consulta que funciona apenas com o exemplo feliz pode ocultar problemas de NULL, limites e ordenação que surgirão assim que o usuário cadastrar novos dados."
-        ]
-      },
-      {
-        "title": "Executar e inspecionar este laboratório",
-        "paragraphs": [
-          "Crie os dois arquivos na mesma pasta. O programa abaixo é apenas o executor: o conteúdo da aula continua sendo SQL e fica em aula.sql. O modo isolation_level=None permite que os comandos BEGIN, COMMIT e ROLLBACK do arquivo controlem explicitamente as transações. O executor aceita os exemplos desta aula, com uma instrução por encerramento de linha; não é um analisador genérico para qualquer script SQL. Antes de cada exercício, preserve o exemplo e acrescente somente a solução que quer testar. Compare o resultado observado com a previsão, e guarde no rascunho a consulta, a saída e a explicação."
-        ],
-        "code": {
-          "language": "python",
-          "code": "# executar.py — Python 3, biblioteca padrão\nfrom pathlib import Path\nimport sqlite3\n\ncon = sqlite3.connect(\":memory:\", isolation_level=None)\ntry:\n    pendente = \"\"\n    for linha in Path(\"aula.sql\").read_text(encoding=\"utf-8\").splitlines():\n        pendente += linha + \"\\n\"\n        if sqlite3.complete_statement(pendente):\n            cursor = con.execute(pendente)\n            if cursor.description:\n                print(\" | \".join(coluna[0] for coluna in cursor.description))\n                for registro in cursor:\n                    print(\" | \".join(\"NULL\" if valor is None else str(valor) for valor in registro))\n            pendente = \"\"\n    if pendente.strip():\n        raise ValueError(\"Falta ponto e vírgula na última instrução\")\nexcept Exception:\n    if con.in_transaction:\n        con.rollback()\n    raise\nfinally:\n    con.close()\n"
-        }
       }
     ],
     "example": {
       "language": "sql",
-      "code": "CREATE TABLE licoes (\n id INTEGER PRIMARY KEY, trilha TEXT, titulo TEXT,\n minutos INTEGER, concluida INTEGER, observacao TEXT\n);\nINSERT INTO licoes VALUES\n (1,'Dados','SELECT',30,0,NULL),\n (2,'Dados','JOIN',40,0,'Revisar'),\n (3,'Python','Listas',20,1,NULL),\n (4,'Python','Arquivos',30,0,'');\nSELECT titulo,minutos FROM licoes WHERE concluida=0\nORDER BY minutos DESC,id ASC;\nSELECT trilha,COUNT(*) AS quantidade,SUM(minutos) AS total\nFROM licoes WHERE concluida=0 GROUP BY trilha\nHAVING SUM(minutos)>=50 ORDER BY trilha;\nSELECT COUNT(*) AS linhas,COUNT(observacao) AS preenchidas FROM licoes;",
+      "code": "CREATE TABLE licoes (\n id INTEGER PRIMARY KEY, trilha TEXT, titulo TEXT,\n minutos INTEGER, concluida INTEGER, observacao TEXT\n);\nINSERT INTO licoes VALUES\n (1,'Dados','SELECT',30,0,NULL),\n (2,'Dados','JOIN',40,0,'Revisar'),\n (3,'Python','Listas',20,1,NULL),\n (4,'Python','Arquivos',30,0,'');\nSELECT titulo,minutos FROM licoes WHERE concluida=0\nORDER BY minutos DESC,id ASC;\nSELECT id,titulo,COALESCE(observacao,'Sem observação') AS observacao\nFROM licoes ORDER BY id;",
       "explanation": [
         "A quarta linha possui texto vazio em observacao; isso difere de NULL nas linhas 1 e 3.",
         "A primeira consulta ordena JOIN antes de SELECT e Arquivos; o id desempata os 30 minutos.",
-        "WHERE exclui Listas antes de somar, de modo que Python possui apenas 30 minutos pendentes.",
-        "COUNT(observacao) inclui o texto vazio e Revisar, mas ignora os dois NULL.",
+        "IS NULL identifica ausência, enquanto texto vazio continua sendo um valor conhecido.",
+        "COALESCE altera somente a apresentação do resultado e não escreve na tabela.",
         "Executor opcional: o código Python está na seção de preparação local. Cada SELECT imprime cabeçalho e linhas; mudanças não produzem uma tabela de saída."
       ],
-      "expected": "Pendentes: JOIN 40, SELECT 30, Arquivos 30. Agrupamento: Dados | 2 | 70. Contagens finais: linhas 4, preenchidas 2."
+      "expected": "Pendentes: JOIN 40, SELECT 30, Arquivos 30. Na segunda consulta, SELECT e Listas mostram Sem observação; JOIN mostra Revisar; Arquivos mantém texto vazio."
     },
     "guided": [
       {
-        "instruction": "Remova temporariamente HAVING da consulta agrupada.",
-        "result": "Dados aparece com 70 minutos e Python com 30; os dois grupos ficam visíveis."
+        "instruction": "Antes de executar, preveja a ordem das três pendências quando duas possuem 30 minutos.",
+        "result": "JOIN vem primeiro com 40; SELECT vem antes de Arquivos porque id desempata os 30 minutos."
       },
       {
         "instruction": "Consulte SELECT id FROM licoes WHERE observacao IS NULL ORDER BY id;",
@@ -532,7 +507,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "1. Guiado: Liste títulos das aulas com pelo menos 30 minutos, ordenando por id.",
+        "prompt": "Prever: liste mentalmente quais aulas têm pelo menos 30 minutos e depois escreva a consulta ordenada por id.",
         "hints": [
           "Use >= para incluir exatamente 30.",
           "Não filtre conclusão: o pedido é sobre duração."
@@ -542,27 +517,27 @@ Object.assign(LESSON_GUIDES, {
         "expected": "SELECT, JOIN e Arquivos, nessa ordem."
       },
       {
-        "prompt": "2. Adaptar: Calcule a média de minutos de todas as aulas por trilha e mantenha somente médias acima de 30.",
+        "prompt": "Alterar: liste apenas aulas de Dados que estejam pendentes e tenham entre 30 e 40 minutos, ordenando da maior duração para a menor.",
         "hints": [
-          "AVG calcula média dentro de cada grupo.",
-          "O filtro da média deve ficar em HAVING."
+          "Combine as condições com AND.",
+          "BETWEEN inclui os dois limites."
         ],
-        "solution": "SELECT trilha,AVG(minutos) AS media FROM licoes GROUP BY trilha HAVING AVG(minutos)>30 ORDER BY trilha;",
-        "explanation": "Dados tem (30+40)/2 = 35 e Python tem (20+30)/2 = 25. O filtro agregado conserva apenas o primeiro grupo.",
-        "expected": "Dados | 35.0."
+        "solution": "SELECT titulo,minutos FROM licoes WHERE trilha='Dados' AND concluida=0 AND minutos BETWEEN 30 AND 40 ORDER BY minutos DESC,id;",
+        "explanation": "Todos os filtros atuam sobre linhas e os limites 30 e 40 são incluídos.",
+        "expected": "JOIN | 40; SELECT | 30."
       },
       {
-        "prompt": "3. Construir: produza um relatório das pendências por trilha, com quantidade e total, maior total primeiro. Inclua as duas trilhas, sem HAVING.",
+        "prompt": "Construir: liste id, título e observação das aulas pendentes. Mostre 'Sem observação' somente quando o valor for NULL e coloque textos vazios por último.",
         "hints": [
-          "Filtre concluida=0 antes de agrupar.",
-          "Use trilha como desempate."
+          "Use COALESCE apenas para apresentação.",
+          "Ordene primeiro pelo teste observacao='' e depois pelo id."
         ],
-        "solution": "SELECT trilha,COUNT(*) AS quantidade,SUM(minutos) AS total FROM licoes WHERE concluida=0 GROUP BY trilha ORDER BY total DESC,trilha;",
-        "expected": "Dados | 2 | 70; Python | 1 | 30.",
-        "explanation": "A consulta agrega apenas linhas pendentes e ordena os grupos por resultado calculado."
+        "solution": "SELECT id,titulo,COALESCE(observacao,'Sem observação') AS observacao_exibida FROM licoes WHERE concluida=0 ORDER BY observacao='',id;",
+        "expected": "SELECT, JOIN e Arquivos; Arquivos fica por último por conter texto vazio.",
+        "explanation": "NULL recebe um texto apenas no resultado. A expressão booleana de ordenação posiciona o texto vazio depois dos demais."
       },
       {
-        "prompt": "4. Depurar: WHERE observacao=NULL não encontra as ausências. Liste os IDs sem observação conhecida e explique por que id 4 não entra.",
+        "prompt": "Investigar erro: WHERE observacao=NULL não encontra as ausências. Liste os IDs sem observação conhecida e explique por que id 4 não entra.",
         "hints": [
           "Use o operador específico para NULL.",
           "Texto vazio ainda é texto conhecido."
@@ -574,7 +549,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "mistakes": [
       "Comparar com = NULL: substitua por IS NULL.",
-      "Filtrar SUM em WHERE: use HAVING, pois a soma só existe após agrupar.",
+      "Confundir texto vazio com NULL: teste cada estado conforme a regra do domínio.",
       "Esperar ordem fixa sem ORDER BY: declare a ordem e um desempate quando necessário."
     ],
     "quiz": [
@@ -589,34 +564,93 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "COUNT(*) inclui linhas mesmo quando algumas colunas são nulas."
       },
       {
-        "question": "Onde filtrar grupos com soma maior que 100?",
+        "question": "Como localizar valores ausentes em observacao?",
         "options": [
-          "HAVING",
-          "VALUES",
-          "ORDER BY"
-        ],
-        "correctIndex": 0,
-        "explanation": "HAVING avalia condições sobre grupos já agregados."
-      },
-      {
-        "question": "Uma consulta agrupa por trilha. É correto mostrar um titulo solto sem agrupá-lo?",
-        "options": [
-          "Sempre, pois qualquer título serve",
-          "Não: uma trilha pode ter vários títulos e a saída fica ambígua",
-          "Sim, GROUP BY ordena títulos"
+          "observacao = NULL",
+          "observacao IS NULL",
+          "observacao = ''"
         ],
         "correctIndex": 1,
-        "explanation": "Uma coluna não agregada precisa ter significado definido no grupo; agrupar por trilha não escolhe um título representativo."
+        "explanation": "IS NULL é o teste específico para ausência."
+      },
+      {
+        "question": "Por que acrescentar id após minutos em ORDER BY minutos DESC,id ajuda?",
+        "options": [
+          "Cria um desempate previsível",
+          "Remove valores NULL",
+          "Soma os minutos iguais"
+        ],
+        "correctIndex": 0,
+        "explanation": "Linhas com a mesma duração passam a ter uma ordem definida pelo identificador."
       }
     ],
     "summary": [
-      "WHERE escolhe linhas; HAVING escolhe grupos.",
+      "WHERE escolhe linhas com condições explícitas.",
       "NULL precisa de testes específicos.",
       "Ordenação e desempate fazem parte de uma consulta previsível."
     ]
   },
+"db-aggregation": {
+    "prerequisites": "Concluir Consultas, filtros, ordenação e NULL (db-select). Você deve saber selecionar as linhas que participarão do relatório antes de agrupá-las.",
+    "setup": "Use uma base SQLite nova e descartável em um cliente SQLite ou com aula.sql e executar.py. Execute o exemplo completo, faça a conta manual dos três registros pendentes e somente depois altere a consulta. Não é necessário instalar servidor.",
+    "why": "Um dashboard raramente mostra todas as linhas: ele responde quantas tarefas existem, quanto tempo está pendente e qual grupo exige atenção. Agregações transformam conjuntos de linhas em medidas, mas um filtro na etapa errada pode responder outra pergunta.",
+    "sections": [
+      {
+        "title": "Funções agregadas resumem conjuntos",
+        "paragraphs": [
+          "COUNT(*) conta linhas; COUNT(coluna) ignora valores NULL nessa coluna. SUM soma valores e AVG calcula média. No SQLite, SUM sobre um conjunto sem linhas retorna NULL, enquanto COUNT retorna zero. Escreva qual população está sendo medida antes de escolher a função.",
+          "Uma agregação sem GROUP BY produz um resumo do conjunto inteiro. Com GROUP BY trilha, cada trilha passa a representar uma linha do resultado. Toda coluna exibida precisa ter significado para aquela unidade."
+        ]
+      },
+      {
+        "title": "WHERE filtra linhas; HAVING filtra grupos",
+        "paragraphs": [
+          "A ordem lógica útil é FROM, WHERE, GROUP BY, agregações, HAVING, SELECT e ORDER BY. Se o relatório pede apenas pendências, WHERE concluida=0 remove linhas concluídas antes da soma. HAVING SUM(minutos)>=50 conserva grupos depois que o total existe.",
+          "Não use HAVING para substituir todo filtro. Aplicar concluida=0 depois do agrupamento não forma a população correta. Primeiro decida quais linhas participam; depois decida quais grupos aparecem."
+        ]
+      },
+      {
+        "title": "Colunas ambíguas e resultados previsíveis",
+        "paragraphs": [
+          "Ao agrupar por trilha, mostrar titulo sem agregá-lo é ambíguo: Dados contém SELECT e JOIN. Mesmo que o motor aceite escolher algum valor, a pergunta não definiu qual título representa o grupo. Mostre trilha e medidas, ou altere a unidade do agrupamento.",
+          "Ordene por uma medida e acrescente desempate quando necessário. DISTINCT remove repetições do resultado selecionado; não corrige um agrupamento mal definido."
+        ]
+      },
+      {
+        "title": "Validar com contas manuais",
+        "paragraphs": [
+          "No exemplo, as pendências têm 30, 40 e 30 minutos: cem no total. Dados possui duas linhas e setenta minutos; Python possui uma e trinta. Esses números permitem detectar rapidamente filtro ausente, soma duplicada ou grupo inesperado.",
+          "Teste conjunto vazio, empate e valor NULL. Um relatório que funciona apenas com os dados iniciais não demonstra que a consulta responde corretamente quando o cadastro muda."
+        ]
+      }
+    ],
+    "example": {
+      "language": "sql",
+      "code": "CREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha TEXT,titulo TEXT,minutos INTEGER,concluida INTEGER,observacao TEXT);\nINSERT INTO licoes VALUES\n (1,'Dados','SELECT',30,0,NULL),\n (2,'Dados','JOIN',40,0,'Revisar'),\n (3,'Python','Listas',20,1,NULL),\n (4,'Python','Arquivos',30,0,'');\nSELECT trilha,COUNT(*) AS quantidade,SUM(minutos) AS total\nFROM licoes WHERE concluida=0\nGROUP BY trilha ORDER BY total DESC,trilha;",
+      "explanation": ["WHERE mantém somente pendências antes do agrupamento.", "GROUP BY cria uma linha de resultado por trilha.", "COUNT e SUM medem as linhas de cada grupo.", "ORDER BY usa o total e a trilha como desempate."],
+      "expected": "Dados | 2 | 70\nPython | 1 | 30"
+    },
+    "guided": [
+      { "instruction": "Remova temporariamente WHERE concluida=0 e preveja Python.", "result": "Python passa a ter duas aulas e 50 minutos, pois Listas entra no grupo." },
+      { "instruction": "Acrescente HAVING SUM(minutos)>=50 mantendo o WHERE.", "result": "Somente Dados permanece, com 70 minutos." },
+      { "instruction": "Execute SELECT COUNT(*),COUNT(observacao) FROM licoes.", "result": "A saída é 4 e 2: texto vazio conta como valor, NULL não." }
+    ],
+    "exercises": [
+      { "prompt": "Prever: antes de executar, calcule quantidade e média de minutos por trilha usando todas as aulas.", "hints": ["Dados: 30 e 40; Python: 20 e 30."], "solution": "SELECT trilha,COUNT(*) AS quantidade,AVG(minutos) AS media FROM licoes GROUP BY trilha ORDER BY trilha;", "explanation": "Cada média usa as duas linhas da respectiva trilha.", "expected": "Dados | 2 | 35.0; Python | 2 | 25.0." },
+      { "prompt": "Alterar: adapte o exemplo para manter somente trilhas com pelo menos 50 minutos pendentes.", "hints": ["A condição depende da soma do grupo."], "solution": "SELECT trilha,COUNT(*) AS quantidade,SUM(minutos) AS total FROM licoes WHERE concluida=0 GROUP BY trilha HAVING SUM(minutos)>=50 ORDER BY trilha;", "explanation": "WHERE forma a população pendente e HAVING conserva grupos pelo total calculado.", "expected": "Dados | 2 | 70." },
+      { "prompt": "Construir: produza um relatório das pendências por trilha, com quantidade e total, maior total primeiro, incluindo todos os grupos sem HAVING.", "hints": ["Filtre antes de agrupar.", "Use a trilha como desempate."], "solution": "SELECT trilha,COUNT(*) AS quantidade,SUM(minutos) AS total FROM licoes WHERE concluida=0 GROUP BY trilha ORDER BY total DESC,trilha;", "explanation": "A unidade final é uma trilha e cada medida considera apenas pendências.", "expected": "Dados | 2 | 70; Python | 1 | 30." },
+      { "prompt": "Investigar erro: SELECT trilha,titulo,SUM(minutos) FROM licoes GROUP BY trilha mostra um título arbitrário por grupo. Explique e corrija o relatório para uma linha significativa por trilha.", "hints": ["titulo não identifica o grupo inteiro."], "solution": "SELECT trilha,COUNT(*) AS quantidade,SUM(minutos) AS total FROM licoes GROUP BY trilha ORDER BY trilha;", "explanation": "As colunas agora descrevem a unidade trilha; nenhum título individual é apresentado como representante implícito.", "expected": "Dados | 2 | 70; Python | 2 | 50." }
+    ],
+    "mistakes": ["Colocar condição agregada em WHERE antes de a medida existir.", "Exibir coluna sem significado definido para o grupo.", "Confundir COUNT(*) com COUNT(coluna) quando há NULL.", "Aceitar um total sem conferir manualmente um conjunto pequeno."],
+    "quiz": [
+      { "question": "Onde filtrar grupos com soma mínima?", "options": ["WHERE", "HAVING", "VALUES"], "correctIndex": 1, "explanation": "HAVING avalia condições depois da formação e medição dos grupos." },
+      { "question": "Qual expressão conta também linhas cuja observacao é NULL?", "options": ["COUNT(*)", "COUNT(observacao)", "SUM(observacao)"], "correctIndex": 0, "explanation": "COUNT(*) conta linhas; COUNT(coluna) ignora NULL naquela coluna." },
+      { "question": "Ao agrupar por trilha, por que titulo solto é ambíguo?", "options": ["Uma trilha pode conter vários títulos", "GROUP BY apaga textos", "SUM exige título numérico"], "correctIndex": 0, "explanation": "A linha resultante representa a trilha inteira, não uma lição específica." }
+    ],
+    "summary": ["Defina as linhas participantes antes de agregar.", "WHERE filtra linhas e HAVING filtra grupos.", "Valide medidas com contas manuais e uma unidade de resultado explícita."]
+  },
 "db-joins": {
-    "prerequisites": "Revise chaves estrangeiras, SELECT, GROUP BY e COUNT. Nesta aula, aprenderemos como recuperar nomes e registros separados pela modelagem.",
+    "prerequisites": "Conclua Consultas, filtros, ordenação e NULL (db-select) e Agregações, GROUP BY e HAVING (db-aggregation). Revise também chaves estrangeiras.",
     "setup": "Use uma base SQLite nova e descartável para cada aula. Você pode colar o SQL em uma ferramenta SQLite local e executar instrução por instrução. Alternativa sem instalar servidor: com Python 3, salve o SQL em aula.sql e o executor abaixo em executar.py, na mesma pasta; rode python executar.py (ou py executar.py no Windows). Ele cria uma base apenas em memória, imprime cada resultado de consulta e fecha a conexão ao terminar. Cada execução começa vazia. Exercícios usam o estado final do exemplo: acrescente apenas o exercício escolhido ao final de aula.sql e reinicie o executor. Não cole cercas de Markdown nos arquivos. Se faltar o módulo sqlite3, use uma distribuição de Python com esse módulo ou uma ferramenta SQLite. A página apenas guarda rascunhos; o SQL será executado na ferramenta local. Neste executor, não coloque duas instruções completas na mesma linha; cada instrução deve terminar em sua própria linha.",
     "why": "Separar o nome da trilha das lições evita repetição, mas o relatório precisa reunir essas informações novamente. JOIN expressa essa ligação e permite incluir até trilhas que ainda não receberam nenhuma aula.",
     "sections": [

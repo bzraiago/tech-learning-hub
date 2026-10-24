@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após duas intervenções, a auditoria automática aponta 39: `db-modeling` e `db-ddl-crud` preservaram seus IDs e receberam aulas complementares menores. `db-select`, `db-joins` e `db-transactions` continuam prioritárias.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após três intervenções, a auditoria automática aponta 38: `db-modeling`, `db-ddl-crud` e `db-select` preservaram seus IDs e receberam aulas complementares menores. `db-joins` e `db-transactions` continuam prioritárias.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Alta | G | `db-select`, `db-joins`, `db-transactions` | FATO | Cada guia ainda possui sete seções e reúne fundamento, aprofundamento, diagnóstico e laboratório antes da prática final. | Dividir em sequências menores e inserir prática entre blocos. |
+| 1 | Alta | G | `db-joins`, `db-transactions` | FATO | Cada guia ainda possui sete seções e reúne fundamento, aprofundamento, diagnóstico e laboratório antes da prática final. | Dividir em sequências menores e inserir prática entre blocos. |
 | 2 | Alta | G | 10 aulas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma após os fundamentos e padronizar a progressão. |
 | 3 | Média | G | 5 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 4 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
@@ -56,6 +56,7 @@ Não foram encontradas dependências circulares nesse recorte. O risco atual é 
 | [SQLite — CREATE TABLE](https://www.sqlite.org/lang_createtable.html) | Oficial | OK | Consultada em 24/10/2026 | EN | Confirma tipos declarados, valores padrão e restrições disponíveis. |
 | [SQLite — Foreign Key Support](https://www.sqlite.org/foreignkeys.html) | Oficial | OK | Consultada em 24/10/2026 | EN | Confirma ativação de chaves estrangeiras por conexão com `PRAGMA foreign_keys`. |
 | [SQLite — SELECT](https://www.sqlite.org/lang_select.html) | Oficial | OK | Consultada em 24/10/2026 | EN | Sustenta ordem lógica, agregação e diferenças entre `ON` e `WHERE` em junções externas. |
+| [SQLite — Aggregate Functions](https://www.sqlite.org/lang_aggfunc.html) | Oficial | OK | Consultada em 24/10/2026 | EN | Confirma comportamento de `COUNT`, `SUM`, `AVG` e valores nulos. |
 | [SQLite — Transactions](https://www.sqlite.org/lang_transaction.html) | Oficial | OK | Consultada em 24/10/2026 | EN | Referência primária para a futura divisão de transações. |
 
 As demais fontes das candidatas não foram revalidadas nesta etapa, pois o objetivo foi triagem estrutural, não revisão técnica integral.
@@ -68,7 +69,7 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 
 1. [Concluído] Dividir `db-modeling` entre entidades/relacionamentos e `db-normalization` para normalização/decisões.
 2. [Concluído] Dividir `db-ddl-crud` entre `db-ddl-constraints` e operações seguras.
-3. Separar filtros/`NULL` de agregações em `db-select`.
+3. [Concluído] Separar filtros/`NULL` de agregações em `db-select` e `db-aggregation`.
 4. Separar junções básicas de granularidade, CTEs e subconsultas em `db-joins`.
 5. Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
