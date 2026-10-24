@@ -2354,52 +2354,38 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "db-mongo-pipelines": {
-    "prerequisites": "Saiba cadastrar e consultar documentos no mongosh. Revise agrupamento SQL: vamos expressar filtragem, soma e ordenação em uma sequência de estágios.",
-    "setup": "Use MongoDB e mongosh conectados. O banco tech_hub_aula_pipeline deve estar vazio para este exercício. A coleção será criada explicitamente com validador. Números de duração serão Double para deixar o tipo BSON inequívoco, embora o contrato também aceite inteiros.",
+    "prerequisites": "Conclua setup-mongodb e db-mongo-crud: confirme o ping e saiba cadastrar e consultar documentos no mongosh. Se estudou agrupamento SQL, use-o como comparação; ele não é necessário para executar este laboratório.",
+    "setup": "No terminal, conecte o mongosh ao servidor MongoDB real e confirme db.runCommand({ping:1}) com ok: 1, como em setup-mongodb. Use um banco tech_hub_aula_pipeline ainda não criado: o exemplo cria a coleção licoes com validador e insere três documentos. Execute o bloco uma vez; para repetir sem colisão, troque o nome do banco em getSiblingDB. Não apague uma coleção existente para reiniciar a aula. Números de duração serão Double para explicitar o tipo BSON, embora o contrato também aceite inteiros.",
     "why": "Se um documento guardar minutos como \"30\" e outro como 40, relatórios podem omitir valores inesperadamente. A validação impede entradas incompatíveis e o pipeline transforma documentos válidos em um resumo de tempo pendente por trilha.",
     "sections": [
       {
-        "title": "Contrato de entrada verificável",
+        "title": "Contrato de entrada e teste de rejeição",
         "paragraphs": [
           "createCollection pode receber validator com $jsonSchema. required enumera os campos obrigatórios, enquanto properties descreve os tipos e limites. Dizer que minutos é numérico não exige automaticamente sua presença: por isso usamos ambas as partes. O mínimo 1 impede duração zero ou negativa.",
-          "A validação do exemplo aceita int, long, double e decimal, todos tipos numéricos BSON. Ela também exige concluida bool e trilha string. Não é uma regra universal para qualquer aplicação: é o contrato específico deste laboratório. Se criarmos uma regra em coleção existente, devemos planejar a avaliação e correção dos registros antigos."
+          "A validação do exemplo aceita int, long, double e decimal, além de exigir concluida bool e trilha string. É o contrato deste laboratório, não uma regra universal. required exige presença, mas string ainda aceita texto vazio sem uma regra adicional; minimum:1 permite frações. Teste uma entrada válida, uma sem campo obrigatório, outra com tipo errado e duração zero, cada falha em comando separado.",
+          "Este exemplo cria uma coleção nova. Acrescentar validação a uma coleção existente não corrige registros antigos: primeiro examine os formatos, conte incompatíveis e teste a transformação em uma cópia. Só depois configure a regra adequada à migração, sem surpreender a aplicação com falhas de escrita."
         ]
       },
       {
-        "title": "Uma transformação por estágio",
+        "title": "Filtrar, agrupar e ordenar",
         "paragraphs": [
           "aggregate recebe um array de estágios executados conceitualmente em sequência. $match filtra os documentos pendentes, $group reúne por trilha e $sort ordena o resumo. Em _id:\"$trilha\", o sinal $ indica acesso ao campo trilha; sem ele, a string literal trilha agruparia tudo sob o mesmo nome.",
-          "Dentro de $group, {$sum:\"$minutos\"} acumula os valores de duração. A saída muda de formato: deixa de ser uma lição e passa a ser um grupo com _id e total. O estágio posterior trabalha com esse novo formato. Colocar $match antes da soma evita contar as aulas já concluídas."
+          "Dentro de $group, {$sum:\"$minutos\"} acumula duração, enquanto {$sum:1} conta documentos. A saída deixa de ser uma lição e passa a ser um grupo com _id e total. O estágio posterior trabalha com esse novo formato. Colocar $match antes da soma evita contar as aulas já concluídas."
         ]
       },
       {
-        "title": "Índices e observação",
+        "title": "Conferir a saída em cada estágio",
         "paragraphs": [
-          "createIndex cria uma estrutura auxiliar para padrões de acesso. O índice {concluida:1,trilha:1} começa por conclusão e depois trilha. Ele pode ajudar consultas compatíveis, mas ocupa espaço e adiciona trabalho às escritas. A ordem das chaves importa e deve refletir filtros e ordenações reais.",
-          "explain(\"executionStats\") mostra o plano e medidas, como documentos examinados e quantidade retornada. Em uma coleção de três registros, uma varredura completa pode ser perfeitamente razoável. Não prometa aceleração por existir um índice: compare a consulta, os dados e o plano escolhido. A soma em si ainda exige examinar os valores relevantes."
+          "Leia como uma tabela de entradas e saídas: três lições antes de $match, duas lições de Dados depois dele e um resumo com total 70 depois de $group. Nesse resumo, minutos e concluida não são mais campos disponíveis. Um $match por concluida depois do agrupamento não filtra as lições originais. A ordem faz parte da lógica, embora o otimizador possa reordenar operações equivalentes.",
+          "$project pode dar nome legível à chave agrupada: {$project:{_id:0,trilha:\"$_id\",total:1}}. A expressão \"$_id\" lê a chave; total:1 inclui o valor calculado. Conte documentos com $sum:1, não com $sum:\"$minutos\". Como aprofundamento, $unwind cria uma saída por item do array: uma lição com três tags pode passar a contar três vezes. Antes de somar, declare se cada linha representa lição, tag ou grupo."
         ]
       },
       {
-        "title": "Contrato em coleção nova e em coleção existente",
+        "title": "Índices e plano observado",
         "paragraphs": [
-          "Este laboratório parte de uma coleção nova para que todas as entradas passem pelo mesmo contrato. Em produção, adicionar um validador não limpa automaticamente os documentos antigos. Primeiro descubra os formatos existentes, conte os incompatíveis, defina a transformação e teste uma cópia. Depois configure as regras de validação apropriadas à migração. O objetivo não é surpreender a aplicação com falhas de escrita, mas tornar explícito um formato que ela já sabe produzir e ler.",
-          "required exige a presença, mas string ainda aceita texto vazio sem uma regra adicional de comprimento. Numericamente, minimum:1 aceita valores fracionários maiores ou iguais a um; se o domínio exigir minutos inteiros, restrinja o tipo ou estabeleça uma regra adicional. O contrato do exemplo aceita vários números BSON deliberadamente. Não diga que uma validação garante algo que não foi escrito: teste ausência, tipo errado, limite inferior e valor válido para cada campo importante."
-        ]
-      },
-      {
-        "title": "Acompanhar o formato em cada estágio",
-        "paragraphs": [
-          "Leia o pipeline como uma tabela de entradas e saídas. Antes de $match existem três lições. Depois dele existem duas, ambas de Dados. Depois de $group existe um resumo com total 70. Nesse ponto, minutos e concluida deixaram de ser campos da saída. Um $match por concluida colocado depois do agrupamento não filtra as lições originais; ele testa documentos de resumo que não possuem o campo. A ordem faz parte da lógica, mesmo que o otimizador possa reorganizar algumas operações equivalentes.",
-          "$project seleciona ou calcula campos de saída e pode dar um nome legível à chave do grupo: {$project:{_id:0,trilha:\"$_id\",total:1}}. A expressão \"$_id\" lê a chave existente; o número 1 em total inclui o campo. Caso acrescente {$sum:1} ao grupo, cada documento contribui uma unidade. Diferencie contar documentos de somar minutos, pois ambos devolvem números plausíveis e um relatório pode parecer correto apesar de medir a grandeza errada.",
-          "Um array exige cuidado antes de agregar. $unwind produz um documento de saída para cada elemento do array. Se uma lição tem três tags, ela poderá aparecer três vezes após esse estágio; somar minutos então contabiliza a mesma duração três vezes. Isso pode fazer sentido para um relatório de duração associada a cada tag, mas não para o total global de estudo. Sempre escreva qual é a unidade de uma linha intermediária: lição, tag ou grupo."
-        ]
-      },
-      {
-        "title": "Medir índices e evitar conclusões apressadas",
-        "paragraphs": [
-          "Um índice composto é uma ordem de chaves, não uma promessa de que todo filtro ficará rápido. Se quase todos os documentos estão pendentes, o filtro concluida:false seleciona grande parte da coleção. A existência do índice pode não reduzir trabalho suficiente para compensar o acesso auxiliar. O exemplo de três documentos serve para aprender a ler o plano; uma avaliação de desempenho precisa de distribuição e volume representativos. Não use hint para forçar um plano só para provar a hipótese inicial.",
-          "Na saída de executionStats, nReturned descreve os documentos retornados pela consulta observada; totalDocsExamined mostra quantos documentos foram examinados e totalKeysExamined informa chaves examinadas. Se a consulta simples devolve dois documentos, não compare esse número diretamente com o único grupo que sai de outro pipeline. São operações distintas. Registre a consulta junto das medidas para que outra pessoa consiga repetir a experiência.",
-          "Índice único é também uma regra de dados: um par estudante e lição não deve aparecer duas vezes no progresso. Antes de criá-lo em dados existentes, procure duplicados e defina qual registro representa a verdade. Excluir duplicados sem olhar seus estados pode perder informação. No projeto, entregue uma entrada inválida rejeitada, um resumo com valores conferidos manualmente e uma leitura do plano sem inventar tempos. Esses três artefatos demonstram integridade, lógica e observação."
+          "createIndex({concluida:1,trilha:1}) cria uma estrutura auxiliar ordenada por conclusão e depois trilha. Pode ajudar consultas compatíveis, mas ocupa espaço e custa trabalho nas escritas. Com três registros, uma varredura completa pode ser razoável; mesmo com o índice, não prometa aceleração. O filtro concluida:false pode selecionar quase toda uma coleção maior. Avaliar desempenho exige volume e distribuição representativos, sem forçar hint para confirmar a hipótese.",
+          "explain(\"executionStats\") mostra o plano da consulta executada: nReturned, totalDocsExamined e totalKeysExamined. No exemplo, o find observado retorna duas lições, enquanto o pipeline retorna um grupo; não compare essas quantidades como se fossem a mesma operação. Registre a consulta e as medidas, sem inventar tempos. A soma ainda precisa ler os valores relevantes.",
+          "Como aprofundamento, um índice único no par estudante e lição pode impor a regra de um progresso por pessoa. Antes de criá-lo em dados existentes, procure duplicados e decida qual registro preservar; excluir sem análise pode perder informação. A entrega deste laboratório é uma entrada inválida rejeitada, o resumo conferido manualmente e a leitura do plano — evidências de integridade, lógica e observação, não de ganho de desempenho."
         ]
       }
     ],
@@ -2430,7 +2416,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Calcule o total de minutos apenas das lições concluídas.",
+        "prompt": "Prever: antes de executar, diga qual trilha e total aparecerão se $match selecionar somente lições concluídas; depois compare com a consulta.",
         "hints": [
           "Troque false por true no filtro.",
           "Mantenha a soma agrupada por trilha."
@@ -2440,7 +2426,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "{_id:\"Python\",total:20}."
       },
       {
-        "prompt": "Conte a quantidade de lições por trilha, sem filtrar conclusão.",
+        "prompt": "Alterar: troque a soma de minutos por uma contagem de lições por trilha, sem filtrar conclusão.",
         "hints": [
           "Somar 1 por documento produz uma contagem.",
           "Use $sum:1 em vez de somar o campo minutos."
@@ -2450,7 +2436,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Dados com quantidade 2; Python com quantidade 1."
       },
       {
-        "prompt": "Produza um resumo com trilha, total e quantidade das lições pendentes; omita _id na saída.",
+        "prompt": "Construir: produza um resumo com trilha, total e quantidade das lições pendentes; omita _id na saída.",
         "hints": [
           "Use $sum:1 para contar.",
           "Leia $_id na projeção, não $trilha, pois o campo foi agrupado."
@@ -2460,7 +2446,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Um documento: {trilha:\"Dados\",total:70,quantidade:2}."
       },
       {
-        "prompt": "Teste separadamente duração zero e ausência de concluida. Depois confirme que a contagem continua três.",
+        "prompt": "Investigar erro: tente inserir separadamente duração zero e ausência de concluida. Identifique qual regra rejeita cada entrada e confirme que a contagem continua três.",
         "hints": [
           "Um script pode parar na primeira exceção.",
           "Consulte a coleção após as duas tentativas no shell."

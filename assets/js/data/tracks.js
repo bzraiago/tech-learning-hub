@@ -2985,10 +2985,9 @@
             "minutes": 75,
             "concept": "Esquema flexível também precisa de regras: valide tipos e campos necessários quando isso fizer parte do contrato. Índices devem acompanhar filtros e ordenações reais. Um pipeline de aggregation encadeia estágios como $match, $group e $sort. Observe a quantidade de documentos examinados e o resultado antes de adicionar índices ou replicar dados.",
             "objectives": [
-              "Construir um pipeline de resumo a partir de documentos.",
-              "Relacionar validação de esquema e índices ao uso da aplicação.",
-              "Valide presença e tipo separadamente.",
-              "Verificar resultados e explicar os limites do laboratório com casos válidos e inválidos."
+              "Rejeitar documentos fora do contrato de presença, tipo e limite.",
+              "Construir e conferir um resumo por estágios de agregação.",
+              "Ler o plano de uma consulta sem presumir ganho de desempenho pelo índice."
             ],
             "exercise": "Teste separadamente duração zero e ausência de concluida. Depois confirme que a contagem continua três.",
             "code": "const lab = db.getSiblingDB(\"tech_hub_aula_pipeline\");\nlab.createCollection(\"licoes\",{validator:{$jsonSchema:{\n bsonType:\"object\", required:[\"trilha\",\"minutos\",\"concluida\"],\n properties:{\n   trilha:{bsonType:\"string\"},\n   minutos:{bsonType:[\"int\",\"long\",\"double\",\"decimal\"],minimum:1},\n   concluida:{bsonType:\"bool\"}\n }\n}}});\nlab.licoes.insertMany([\n {_id:1,trilha:\"Dados\",minutos:Double(30),concluida:false},\n {_id:2,trilha:\"Dados\",minutos:Double(40),concluida:false},\n {_id:3,trilha:\"Python\",minutos:Double(20),concluida:true}\n]);\nlab.licoes.createIndex({concluida:1,trilha:1});\nlab.licoes.aggregate([\n {$match:{concluida:false}},\n {$group:{_id:\"$trilha\",total:{$sum:\"$minutos\"}}},\n {$sort:{total:-1,_id:1}}\n]);\nlab.licoes.find({concluida:false}).explain(\"executionStats\");",

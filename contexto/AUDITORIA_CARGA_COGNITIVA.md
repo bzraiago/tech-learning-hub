@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-mongo-crud`, a auditoria automática aponta 32: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; quatro das dez aulas avançadas foram condensadas sem mudar seus IDs. Restam seis aulas avançadas de banco prioritárias.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-mongo-pipelines`, a auditoria automática aponta 31: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; cinco das dez aulas avançadas foram condensadas sem mudar seus IDs. Restam cinco aulas avançadas de banco prioritárias.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Alta | G | 6 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
+| 1 | Alta | G | 5 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
 | 2 | Média | G | 5 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 3 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 4 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
@@ -109,6 +109,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 - **Ambiente:** `mongosh` conectado a um servidor real, banco `tech_hub_aula_crud` inicialmente vazio. O `ping` confirma conexão; repetir a inserção com os mesmos `_id` no mesmo banco causa colisão, portanto a retomada usa outro nome de banco, sem apagar dados. Nenhuma escrita foi executada em servidor MongoDB nesta revisão.
 - **Fontes:** documentação oficial [MongoDB CRUD](https://www.mongodb.com/docs/manual/crud/), [modelagem de dados](https://www.mongodb.com/docs/manual/data-modeling/) e [`updateOne`](https://www.mongodb.com/docs/manual/reference/method/db.collection.updateone/), aberta em 24/10/2026 (EN, OK). Sustenta operações por documento, incorporação/referência e resultados da atualização.
 - **Limite:** a revisão estrutural e das fontes não comprova execução no ambiente do aluno, retenção nem capacidade de projetar uma coleção de progresso sem apoio.
+
+### Revisão localizada: `db-mongo-pipelines`
+
+- **Público e saída:** após `setup-mongodb` e `db-mongo-crud`, o aluno deve rejeitar entradas fora do contrato, construir um resumo por estágios e interpretar medidas de uma consulta sem atribuir ganho automático ao índice. SQL agrupado é apenas uma comparação opcional.
+- **FATO, alta, M:** seis seções retomavam validação, mudança de formato e índices em blocos separados. O guia ficou com quatro blocos que seguem a execução: contrato, transformação, saída intermediária e observação do plano. A prática agora distingue prever, alterar, construir e investigar erro.
+- **Sequência:** `setup-mongodb` → `db-mongo-crud` → `db-mongo-pipelines` → projeto MongoDB. Nenhuma dependência circular identificada nesse recorte. `$unwind` e índice único permanecem aprofundamentos, não são exigidos para o exercício central.
+- **Ambiente:** `mongosh` ligado a um servidor real, banco `tech_hub_aula_pipeline` inicialmente inexistente; o exemplo cria a coleção uma vez. A retomada usa outro nome de banco, preservando dados anteriores. Os testes inválidos são comandos separados, pois uma exceção pode interromper a sequência. Não houve execução em servidor MongoDB nesta revisão.
+- **Fontes:** documentação oficial MongoDB de [pipeline](https://www.mongodb.com/docs/manual/core/aggregation-pipeline/), [validação de esquema](https://www.mongodb.com/docs/manual/core/schema-validation/), [índices](https://www.mongodb.com/docs/manual/indexes/), [tipos no mongosh](https://www.mongodb.com/docs/mongodb-shell/reference/data-types/) e [análise do plano](https://www.mongodb.com/docs/manual/tutorial/analyze-query-plan/) foi aberta em 24/10/2026 (EN, OK). Ela sustenta estágios em sequência, rejeição padrão de documentos inválidos, `Double()` e a interpretação de `explain`.
+- **Limite:** o plano em três documentos ensina observação, não demonstra benefício do índice. Sem servidor executado nem aluno real observado, a autonomia para criar pipelines, validar dados e otimizar consultas segue não comprovada.
 
 ## 9. Limites desta auditoria
 
