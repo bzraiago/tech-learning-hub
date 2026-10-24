@@ -53,7 +53,7 @@ Os scripts são carregados como JavaScript clássico e em ordem explícita no fi
 No PowerShell:
 
 ```powershell
-Get-ChildItem -Recurse assets/js/*.js | ForEach-Object { node --check $_.FullName }
+node scripts/validate-content.js
 ```
 
-Depois, abra `index.html`, navegue por uma aula, marque e desmarque a conclusão, recarregue a página e confira a persistência.
+O comando checa sintaxe, assets, ids, relações entre aulas e guias, exercícios, quizzes, projetos e contagens estruturais. Depois, siga [`docs/CHECKLIST_REGRESSAO.md`](docs/CHECKLIST_REGRESSAO.md).

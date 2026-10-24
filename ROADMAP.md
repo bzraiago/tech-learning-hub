@@ -1,7 +1,9 @@
 # Roadmap de evolução — Tech Learning Hub
 
-**Início do acompanhamento:** 24/10/2026  
-**Objetivo:** transformar o Tech Learning Hub em um percurso autoguiado, reproduzível e verificável que leve uma pessoa sem conhecimento prévio ao nível júnior e ofereça continuidade até os níveis intermediário e avançado.  
+**Início do acompanhamento:** 24/10/2026
+
+**Objetivo:** transformar o Tech Learning Hub em um percurso autoguiado, reproduzível e verificável que leve uma pessoa sem conhecimento prévio ao nível júnior e ofereça continuidade até os níveis intermediário e avançado.
+
 **Fonte inicial:** `AGENTS.md` e `contexto/ANALISE_TECH_LEARNING_HUB.md`.
 
 > Este roadmap acompanha a evolução do produto e do conteúdo. Marcar uma implementação como concluída significa que ela passou pelos critérios de aceite e pelas verificações indicadas. Isso não significa, por si só, que um aluno dominou a competência.
@@ -46,7 +48,7 @@ Toda implementação só pode ser considerada pronta quando:
 
 | Fase | Resultado principal | Dependências | Estado |
 |---|---|---|---|
-| 0 | Base de medição e proteção do projeto | — | [ ] |
+| 0 | Base de medição e proteção do projeto | — | [x] |
 | 1 | Preparação digital antes das trilhas | Fase 0 | [ ] |
 | 2 | Pré-requisitos e ambientes reproduzíveis | Fase 1 | [ ] |
 | 3 | Aulas e exercícios com progressão verificável | Fase 2 | [ ] |
@@ -65,15 +67,15 @@ Toda implementação só pode ser considerada pronta quando:
 
 **Meta:** conhecer o estado real do curso e impedir regressões estruturais durante as melhorias.
 
-- [ ] Criar verificador de consistência do conteúdo.
-  - [ ] Detectar ids duplicados de trilha, módulo, aula, projeto e check.
-  - [ ] Confirmar correspondência entre aulas de `tracks` e `LESSON_GUIDES`.
-  - [ ] Confirmar que toda aula contém exercícios, quiz e soluções.
-  - [ ] Contar trilhas, módulos, aulas, exercícios, questões e projetos diretamente do código.
-- [ ] Documentar o procedimento de checagem de sintaxe do JavaScript extraído de `index.html`.
-- [ ] Criar uma lista manual de regressão para desktop, largura móvel, teclado e persistência.
-- [ ] Registrar uma linha de base dos números atuais do curso.
-- [ ] Conferir e, se necessário, atualizar a descrição em `<meta name="description">`.
+- [x] Criar verificador de consistência do conteúdo.
+  - [x] Detectar ids duplicados de trilha, módulo, aula, projeto e check.
+  - [x] Confirmar correspondência entre aulas de `tracks` e `LESSON_GUIDES`.
+  - [x] Confirmar que toda aula contém exercícios, quiz e soluções.
+  - [x] Contar trilhas, módulos, aulas, exercícios, questões e projetos diretamente do código.
+- [x] Documentar o procedimento de checagem de sintaxe do JavaScript.
+- [x] Criar uma lista manual de regressão para desktop, largura móvel, teclado e persistência.
+- [x] Registrar uma linha de base dos números atuais do curso.
+- [x] Conferir e, se necessário, atualizar a descrição em `<meta name="description">`.
 
 **Aceite:** uma alteração estrutural inválida é detectada antes da publicação; os números divulgados são derivados do código e têm data de conferência.
 
@@ -336,8 +338,9 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 
 | Data | Fase/item | Commit | Resultado e verificação |
 |---|---|---|---|
-| 24/10/2026 | Criação do roadmap | A preencher após o commit | Roadmap consolidado a partir do backlog e da análise pedagógica. |
-| 24/10/2026 | Reorganização estrutural | Commit de reorganização | HTML, CSS, dados e funções separados por responsabilidade, sem mudança intencional de comportamento. |
+| 24/10/2026 | Criação do roadmap | `14126c8` | Roadmap consolidado a partir do backlog e da análise pedagógica. |
+| 24/10/2026 | Reorganização estrutural | `14126c8` | HTML, CSS, dados e funções separados por responsabilidade, sem mudança intencional de comportamento. |
+| 24/10/2026 | Fase 0 — base de medição | Commit da Fase 0 | Validador automático, linha de base e checklist manual de regressão adicionados. |
 
 ## Decisões e bloqueios
 

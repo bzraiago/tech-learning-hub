@@ -170,18 +170,11 @@ Manter: link "Pular para as lições", foco visível (`:focus-visible`), navega�
 Rode o que estiver disponível e **relate o resultado real** (inclusive falhas):
 
 ```bash
-# 1) Checar a sintaxe de todos os arquivos JavaScript
-find assets/js -name '*.js' -print0 | xargs -0 -n1 node --check
-
-# 2) Checagens de consistência de conteúdo (adaptar ao que existir no repositório)
-#    - todo id de aula em `tracks` tem entrada em LESSON_GUIDES
-#    - todo id em LESSON_GUIDES existe em `tracks`
-#    - nenhum id duplicado
-#    - toda aula tem exercícios, quiz e solução
-#    - toda URL de `R` responde (quando houver rede)
+# Sintaxe, assets, ids, relações, conteúdo obrigatório e contagens
+node scripts/validate-content.js
 ```
 
-Checklist manual mínimo: abrir a página, abrir uma aula de cada trilha alterada, marcar/desmarcar conclusão, recarregar e confirmar que o progresso persiste, navegar só pelo teclado, testar em largura de celular (≈ 375 px).
+Checklist manual: seguir `docs/CHECKLIST_REGRESSAO.md`. No mínimo, abrir uma aula de cada trilha alterada, marcar/desmarcar conclusão, recarregar e confirmar persistência, navegar só pelo teclado e testar em largura de celular (≈ 375 px).
 
 Se não conseguir executar uma verificação, **diga que não executou**. Nunca afirme que testou o que não testou.
 
