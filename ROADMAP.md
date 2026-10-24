@@ -100,8 +100,8 @@ Toda implementação só pode ser considerada pronta quando:
 
 **Meta:** remover dependências implícitas e tornar cada ferramenta instalável, verificável e retomável.
 
-- [ ] Criar mapa explícito de pré-requisitos entre trilhas, módulos e aulas.
-- [ ] Adicionar atalhos de preparação mínima sem obrigar o estudo antecipado de uma trilha inteira.
+- [x] Criar mapa explícito de pré-requisitos entre trilhas, módulos e aulas.
+- [x] Adicionar atalhos de preparação mínima sem obrigar o estudo antecipado de uma trilha inteira.
 - [ ] Criar preparação de editor e arquivos por sistema operacional.
 - [ ] Criar preparação de Python e seleção do interpretador.
 - [ ] Criar preparação de Git e primeiro repositório local.
@@ -342,6 +342,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Reorganização estrutural | `14126c8` | HTML, CSS, dados e funções separados por responsabilidade, sem mudança intencional de comportamento. |
 | 24/10/2026 | Fase 0 — base de medição | Commit da Fase 0 | Validador automático, linha de base e checklist manual de regressão adicionados. |
 | 24/10/2026 | Fase 1 — Etapa 0 | Commit da Fase 1 | Cinco aulas de preparação digital, prova prática e auditoria pré-publicação adicionadas. |
+| 24/10/2026 | Fase 2.1 — pré-requisitos | Commit da Fase 2.1 | Grafo, dependências por trilha, atalhos mínimos e arestas abertas documentados. |
 
 ## Decisões e bloqueios
 

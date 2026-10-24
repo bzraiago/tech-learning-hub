@@ -128,7 +128,7 @@
     "color": "#fb997b",
     "range": "Base completa → Layouts aplicados",
     "description": "Aprenda HTML e CSS do zero, pratique com apoio progressivo e comprove sua aplicação em três projetos.",
-    "prerequisite": "Comece aqui. Basta um navegador, um editor de texto e curiosidade.",
+    "prerequisite": "Recomendado: conclua a Etapa 0 para praticar criação de arquivos, editor, navegador e erros. Nenhuma linguagem anterior é necessária.",
     "project": "Clube de estudos semântico, versão estilizada e portfólio responsivo com critérios verificáveis.",
     "modules": [
       {
@@ -827,7 +827,7 @@
     "color": "#e9ca72",
     "range": "Fundamentos → Aplicações no navegador",
     "description": "Construa uma base em JavaScript, depure problemas e aplique DOM, persistência e operações assíncronas em três projetos.",
-    "prerequisite": "Conhecer a estrutura de uma página HTML ajuda nas aulas sobre DOM.",
+    "prerequisite": "Conclua a Etapa 0. HTML básico é recomendado no início e obrigatório antes das aulas de DOM e eventos.",
     "project": "Uma lista de tarefas com filtros, persistência local e consulta a uma API pública.",
     "modules": [
       {
@@ -1443,7 +1443,7 @@
     "color": "#73cdd8",
     "range": "Básico → Intermediário aplicado",
     "description": "Aprenda Python do zero com exemplos, exercícios progressivos e três projetos testáveis no terminal.",
-    "prerequisite": "Para praticar, instale Python 3 e use um editor e terminal. As aulas explicam a linguagem desde o começo.",
+    "prerequisite": "Conclua prep-workspace e prep-cycle. Para praticar, prepare Python 3; a linguagem é ensinada desde o começo.",
     "project": "Diário de estudos em JSON, biblioteca de empréstimos e cliente de catálogo com testes locais.",
     "modules": [
       {
@@ -1981,7 +1981,7 @@
     "color": "#6ed9ae",
     "range": "Básico → Intermediário aplicado",
     "description": "SQL, Docker local, bancos relacionais e NoSQL, com aulas completas e cinco projetos de integridade, integração e recuperação.",
-    "prerequisite": "Comece pelos fundamentos SQL com SQLite. Docker prepara servidores locais; siga depois para PostgreSQL, MariaDB, SQLite e Firebird, documentos MongoDB e operação. As práticas Python usam a trilha Python como apoio.",
+    "prerequisite": "Conclua a Etapa 0. Comece por SQL e SQLite; práticas com sqlite3 exigem Python básico. Docker e Compose são obrigatórios antes do PostgreSQL em 127.0.0.1:55432. MariaDB, Firebird e MongoDB são aprofundamentos.",
     "project": "Catálogo SQL, laboratório Docker, estoque PostgreSQL, sessões MongoDB e recuperação testada em SQLite.",
     "modules": [
       {
@@ -2947,7 +2947,7 @@
     "color": "#b39afa",
     "range": "Fundamentos → Engenharia aplicada",
     "description": "Entenda modelos, prepare dados, integre ferramentas e avalie sistemas de IA com exemplos locais e seis projetos verificáveis.",
-    "prerequisite": "Os conceitos iniciais não exigem experiência com IA. Para executar os laboratórios, conclua Python, JSON, funções, testes e noções de APIs. A prática principal é local; integrações reais opcionais exigem ambiente, credenciais e podem ter custo.",
+    "prerequisite": "Os conceitos iniciais não exigem IA prévia. Para os laboratórios, conclua Python, JSON, funções e testes; para conexão real, acrescente HTTP/APIs e segurança de credenciais.",
     "project": "Contratos de saída, recuperação de evidências, ferramentas autorizadas, workflows limitados, avaliação e assistente integrado com testes.",
     "modules": [
       {
@@ -3788,7 +3788,7 @@
     "color": "#58d5ae",
     "range": "Básico ao intermediário",
     "description": "Aprenda a registrar mudanças, resolver conflitos, sincronizar repositórios e entregar tarefas com critérios claros e revisão.",
-    "prerequisite": "Ter criado ao menos um projeto simples de HTML/CSS ou JavaScript; o laboratório Git começa do zero.",
+    "prerequisite": "Conclua a Etapa 0 e tenha um projeto pequeno de HTML/CSS ou JavaScript. A instalação do Git é uma preparação mínima; o uso começa do zero.",
     "project": "Entregar uma melhoria na lista de estudos com issue, branch, commits, remoto simulado, README e revisão documentada.",
     "modules": [
       {
@@ -4063,7 +4063,7 @@
     "color": "#e2aeff",
     "range": "Fundamentos ao intermediário",
     "description": "Use evidências para alterar software com confiança: testes de lógica e interface, integração contínua, depuração, refatoração e revisão de qualidade.",
-    "prerequisite": "Concluir HTML, CSS e JavaScript básicos; saber salvar arquivos e executar comandos simples no terminal.",
+    "prerequisite": "Conclua HTML, CSS e JavaScript básicos, a Etapa 0 e a preparação Node.js/npm para executar os testes locais.",
     "project": "Entregar e manter uma aplicação pequena com testes, relatório de falha reproduzível, correção e revisão de acessibilidade.",
     "modules": [
       {
@@ -4332,7 +4332,7 @@
     "color": "#78c9ff",
     "range": "Base profissional → Entrega aplicada",
     "description": "Integre uma interface a serviços, proteja fronteiras, publique com critérios e trabalhe com mudanças reais.",
-    "prerequisite": "Recomendado após fundamentos de HTML/CSS e JavaScript. Node.js é usado nos laboratórios locais.",
+    "prerequisite": "Conclua fundamentos de HTML/CSS e JavaScript, a Etapa 0 e a preparação Node.js/npm usada nos laboratórios HTTP e de CI.",
     "project": "Aplicação de estudos integrada a uma API local, com contrato, testes, plano de publicação, mudança de requisito e README verificável.",
     "modules": [
       {
