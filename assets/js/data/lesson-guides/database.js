@@ -2207,51 +2207,39 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "db-mongo-crud": {
-    "prerequisites": "Entenda objetos com campos, arrays e booleanos. Revise a diferença entre entidade e relacionamento; SQL não será usado neste exemplo.",
-    "setup": "Ambiente: servidor MongoDB acessível e cliente mongosh. Conecte-se à sua instância e execute o bloco no shell, não no console do navegador. O código seleciona o banco tech_hub_aula_crud e usa uma coleção chamada licoes. Execute uma vez; para repetir sem colisões, escolha outro nome de banco de laboratório.",
+    "prerequisites": "Conclua setup-mongodb e confirme o ping antes desta aula. Entenda objetos com campos, arrays e booleanos. Revise a diferença entre entidade e relacionamento; SQL não será usado neste exemplo.",
+    "setup": "No terminal, conecte o cliente mongosh ao servidor MongoDB conforme setup-mongodb e confirme db.runCommand({ping:1}) com ok: 1. Execute o bloco no mongosh, não no console do navegador. O código seleciona o banco tech_hub_aula_crud e usa a coleção licoes. Execute uma vez em banco vazio; para repetir sem colisões, escolha outro nome de banco de laboratório no getSiblingDB. Não apague dados existentes apenas para repetir a atividade.",
     "why": "Um material de estudo pode possuir tags e um recurso incorporado. Em MongoDB esses elementos podem morar no mesmo documento e ser lidos juntos. Vamos cadastrar, filtrar e alterar esse documento sem confundir comandos mongosh com JavaScript de página web.",
     "sections": [
       {
-        "title": "Documento, coleção e identidade",
+        "title": "Documento, coleção e ambiente",
         "paragraphs": [
           "Uma coleção reúne documentos. Cada documento possui _id único; você pode fornecê-lo, como a string a1, ou deixar o MongoDB gerar um ObjectId. O exemplo escolhe strings legíveis para facilitar a conferência. BSON armazena tipos como números, booleanos, arrays e objetos, não apenas textos.",
-          "Duas lições podem ter campos diferentes, mas o aplicativo precisa saber o que esperar. concluida será booleano, minutos será número e tags será array. O texto \"false\" não é o booleano false. Misturar tipos dificulta consultas e somas; flexibilidade de estrutura não deve virar ausência de contrato."
+          "Duas lições podem ter campos diferentes, mas o aplicativo precisa saber o que esperar. concluida será booleano, minutos será número e tags será array. O texto \"false\" não é o booleano false. Misturar tipos dificulta consultas e somas; flexibilidade de estrutura não deve virar ausência de contrato.",
+          "O servidor MongoDB guarda os documentos; mongosh é o cliente que envia comandos. O ping da preparação confirma que há conexão, não que este exemplo já foi inserido. lab.licoes existe no shell conectado, não no console de uma página web. Um backend usa um driver e mantém suas credenciais fora do HTML."
         ]
       },
       {
-        "title": "Filtros e projeções",
+        "title": "Ler: filtros, projeções e ausência",
         "paragraphs": [
           "find recebe primeiro um filtro. {concluida:false} encontra documentos com esse valor. O segundo objeto define a projeção, isto é, quais campos devolver. {titulo:1,_id:0} inclui titulo e omite _id. Em geral não misture inclusões e exclusões na mesma projeção, com a exceção de _id usada aqui.",
-          "sort define a ordem dos resultados. O filtro {tags:\"sql\"} encontra documentos cujo array tags contém sql. Para alterar uma lição específica, use seu _id. updateOne limita a alteração a um documento correspondente, mas um filtro ambíguo continua sendo uma escolha ruim: o alvo deve ser identificável."
+          "sort define a ordem dos resultados. O filtro {tags:\"sql\"} encontra documentos cujo array tags contém sql. {minutos:{$gte:30}} filtra duração mínima. Não aceite um objeto de filtro arbitrário do usuário com operadores inesperados: a camada de entrada deve construir a consulta conhecida a partir dos valores permitidos.",
+          "find devolve um cursor para percorrer resultados; o shell exibe um lote automaticamente. toArray() materializa os documentos para conferir um conjunto pequeno. findOne({_id:\"a1\"}) devolve o documento ou null: teste a ausência antes de acessar titulo. Quando a ordem precisa ser estável, use sort e um campo de desempate."
         ]
       },
       {
-        "title": "Atualizar e decidir incorporação",
+        "title": "Atualizar, conferir e remover",
         "paragraphs": [
           "O operador $set altera somente os campos nomeados. updateOne({_id:\"a1\"},{$set:{concluida:true}}) preserva título, duração e tags. A operação de escrita sobre um documento é atômica. Isso não torna automaticamente atômica uma sequência de alterações em documentos diferentes.",
-          "Recursos pequenos, limitados e lidos junto da lição podem ser incorporados. Um autor compartilhado por muitas lições, com atualizações independentes, pode ser referenciado pelo id. Pense no crescimento e nas consultas antes de decidir. A sintaxe de deleteOne também recebe filtro: confirme o documento encontrado antes de removê-lo."
+          "insertMany devolve confirmação e identificadores; updateOne devolve matchedCount e modifiedCount. Repetir a conclusão de a1 pode produzir matchedCount 1 e modifiedCount 0: o alvo existe, mas já tinha o valor desejado. Um alvo inexistente produz matchedCount 0. {$inc:{minutos:5}} soma cinco; {$addToSet:{tags:\"revisao\"}} acrescenta a tag apenas se ela ainda não estiver no array.",
+          "deleteOne também recebe filtro. Antes de excluir, localize pelo _id e confirme que o documento é descartável; depois confira deletedCount e countDocuments com o mesmo _id. Um filtro amplo continua perigoso mesmo quando o método remove no máximo um documento."
         ]
       },
       {
-        "title": "Do shell à aplicação, sem confundir ambientes",
+        "title": "Modelar dados compartilhados e individuais",
         "paragraphs": [
-          "O servidor MongoDB mantém os documentos; mongosh é o cliente que envia comandos. Abra o terminal, conecte com mongosh \"mongodb://127.0.0.1:27017\" se houver um servidor local em execução e use db.runCommand({ping:1}) para confirmar a conexão. Se houver recusa de conexão, nenhuma consulta da aula foi enviada: confira serviço, endereço e porta antes de procurar erro no insert. Instalar apenas o cliente não cria o servidor. Uma instância remota requer a URI fornecida pelo administrador e credenciais com acesso ao laboratório.",
-          "Os exemplos usam JavaScript no shell, mas lab.licoes não existe no console de uma página web. Um backend usa um driver para abrir a conexão e executar métodos equivalentes. As credenciais desse backend não devem ficar no HTML. Para repetir o laboratório, altere o sufixo do nome da base e mantenha os IDs legíveis. Isso evita apagar dados para resolver um simples erro de chave duplicada. Se reutilizar a mesma sessão do shell, reutilize a variável lab já declarada ou abra outra sessão."
-        ]
-      },
-      {
-        "title": "Ler a resposta da escrita e testar ausência",
-        "paragraphs": [
-          "insertMany devolve confirmação e identificadores; updateOne devolve informações como matchedCount e modifiedCount. Encontrar uma lição não significa alterá-la: depois de marcar a1 como concluída, repetir a mesma atualização pode produzir matchedCount igual a 1 e modifiedCount igual a 0. Esse resultado é esperado porque o estado já era o desejado. Uma aplicação deve distinguir operação repetida, alvo inexistente e falha real para não mostrar mensagens incorretas ao usuário.",
-          "find devolve um cursor, isto é, uma forma de percorrer resultados. O shell exibe um lote automaticamente; toArray() materializa os documentos em um array para conferir um conjunto pequeno. Para uma única identidade, findOne({_id:\"a1\"}) devolve o documento ou null. Null não é um documento vazio: teste a ausência antes de acessar titulo. Também não suponha ordem natural de inserção; use sort e um campo de desempate quando a apresentação exige resultado estável.",
-          "Os operadores descrevem condições e alterações. {minutos:{$gte:30}} filtra duração mínima; {$inc:{minutos:5}} acrescenta cinco; {$addToSet:{tags:\"revisao\"}} acrescenta um elemento que ainda não existe no array. Diferencie a propriedade do domínio, como minutos, do operador, como $gte. Nunca aceite do usuário um objeto de filtro arbitrário com operadores inesperados: a camada de entrada deve aceitar os valores permitidos e construir a consulta conhecida."
-        ]
-      },
-      {
-        "title": "Progresso por pessoa e atualizações limitadas",
-        "paragraphs": [
-          "A coluna concluida deste laboratório representa uma única pessoa. Em um sistema com muitos estudantes, embutir esse booleano na lição compartilhada mistura catálogo e estado individual. Uma coleção de progresso pode conter estudante_id, licao_id e concluida, com um índice único sobre o par. MongoDB não verifica uma referência entre coleções como uma FK relacional. A aplicação precisa confirmar existência e autorização, ou adotar uma modelagem que mantenha a regra dentro de uma unidade controlada.",
-          "deleteOne remove apenas um documento correspondente, mas isso não torna um filtro amplo correto. Primeiro leia pelo identificador, confirme o cenário de teste e remova somente o documento descartável criado para a atividade. Depois confira deletedCount e countDocuments com o mesmo filtro. Uma exclusão deve ser praticada junto da verificação de ausência. Aprender CRUD inclui saber o que mudou, preservar campos não envolvidos e reconhecer operações que não encontraram alvo; decorar quatro nomes de métodos não é suficiente para manter dados de uma aplicação."
+          "Recursos pequenos, limitados e lidos junto da lição podem ser incorporados. Um autor compartilhado por muitas lições, com atualizações independentes, pode ser referenciado pelo id. Pense no crescimento e nas consultas antes de decidir.",
+          "O campo concluida deste laboratório representa uma única pessoa. Em um sistema com muitos estudantes, embutir esse booleano na lição compartilhada mistura catálogo e estado individual. Uma coleção de progresso pode conter estudante_id, licao_id e concluida, com um índice único sobre o par. MongoDB não verifica uma referência entre coleções como uma FK relacional: a aplicação precisa confirmar existência e autorização. Este é um limite do modelo didático, não uma funcionalidade implementada neste laboratório."
         ]
       }
     ],
@@ -2282,7 +2270,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Encontre os títulos das lições que contêm a tag sql, incluindo concluídas.",
+        "prompt": "Prever: antes de executar, diga quais títulos a consulta por tag sql devolverá, incluindo lições concluídas; depois execute e compare.",
         "hints": [
           "O filtro de array pode comparar o elemento diretamente.",
           "Não acrescente um filtro de conclusão que não foi pedido."
@@ -2292,7 +2280,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "JOIN e SELECT."
       },
       {
-        "prompt": "Conclua apenas JOIN e verifique quantas pendências restam depois do exemplo principal.",
+        "prompt": "Alterar: conclua apenas JOIN e verifique quantas pendências restam depois do exemplo principal.",
         "hints": [
           "O _id de JOIN é a2.",
           "countDocuments conta o filtro informado."
@@ -2302,17 +2290,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "0 documentos pendentes."
       },
       {
-        "prompt": "Depois do exemplo, repita a conclusão de a1 duas vezes. Compare encontrado e modificado e explique se houve falha.",
-        "hints": [
-          "a1 foi alterada no exemplo principal.",
-          "Leia matchedCount e modifiedCount separadamente."
-        ],
-        "solution": "lab.licoes.updateOne({_id:\"a1\"},{$set:{concluida:true}});\nlab.licoes.updateOne({_id:\"a1\"},{$set:{concluida:true}});",
-        "explanation": "Uma atualização que preserva o estado é uma operação válida. Contagem de modificação zero não basta para concluir que o alvo inexiste.",
-        "expected": "Em ambas: matchedCount 1, modifiedCount 0; a1 já estava concluída."
-      },
-      {
-        "prompt": "Crie uma lição temporária x9, consulte-a, remova-a e prove que a1 permanece.",
+        "prompt": "Construir: crie uma lição temporária x9, consulte-a, remova-a e prove que a1 permanece.",
         "hints": [
           "Use o mesmo _id em criação, leitura e remoção.",
           "Não use filtro vazio no delete."
@@ -2320,6 +2298,16 @@ Object.assign(LESSON_GUIDES, {
         "solution": "lab.licoes.insertOne({_id:\"x9\",titulo:\"Rascunho\",minutos:5,concluida:false,tags:[]});\nlab.licoes.findOne({_id:\"x9\"});\nlab.licoes.deleteOne({_id:\"x9\"});\nlab.licoes.countDocuments({_id:\"x9\"});\nlab.licoes.countDocuments({_id:\"a1\"});",
         "explanation": "A criação de uma identidade descartável torna o teste de exclusão delimitado e a consulta final verifica o que foi preservado.",
         "expected": "deleteOne: deletedCount 1; contagem x9: 0; contagem a1: 1."
+      },
+      {
+        "prompt": "Investigar erro: depois do exemplo, repita a conclusão de a1 duas vezes. modifiedCount igual a zero é falha? Compare com matchedCount antes de decidir.",
+        "hints": [
+          "a1 foi alterada no exemplo principal.",
+          "Leia matchedCount e modifiedCount separadamente."
+        ],
+        "solution": "lab.licoes.updateOne({_id:\"a1\"},{$set:{concluida:true}});\nlab.licoes.updateOne({_id:\"a1\"},{$set:{concluida:true}});",
+        "explanation": "Uma atualização que preserva o estado é uma operação válida. Contagem de modificação zero não basta para concluir que o alvo inexiste.",
+        "expected": "Em ambas: matchedCount 1, modifiedCount 0; a1 já estava concluída."
       }
     ],
     "mistakes": [

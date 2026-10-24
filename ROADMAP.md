@@ -144,7 +144,8 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `db-docker-basics`: reduzir sobreposição com a preparação Docker e intercalar diagnóstico com os conceitos essenciais.
     - [x] `db-docker-compose`: organizar configuração, conexão e persistência sem pressupor cliente externo já instalado.
     - [x] `db-docker-operations`: reunir diagnóstico e ciclo de vida, explicitar retomada após o exemplo e concentrar fontes de backup/restauração.
-    - [ ] Revisar as sete aulas avançadas de banco restantes.
+    - [x] `db-mongo-crud`: ligar à preparação MongoDB e organizar leitura, escrita segura e modelagem em quatro blocos.
+    - [ ] Revisar as seis aulas avançadas de banco restantes.
   - [ ] Prioridade 3: revisar 11 aulas de HTML/JavaScript e distinguir aprofundamento legítimo de sobrecarga.
   - [ ] Prioridade 4: revisar 15 aulas de IA/Entrega, preservando o nível avançado quando os pré-requisitos forem suficientes.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
@@ -427,6 +428,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Fase 3.8 — fundamentos de Docker | Revisão da primeira aula da prioridade 2 | `db-docker-basics` remete à preparação por sistema, concentra conceitos e diagnóstico em quatro blocos e padroniza a prática. |
 | 24/10/2026 | Fase 3.9 — Compose e persistência | Revisão da segunda aula da prioridade 2 | `db-docker-compose` ficou com quatro blocos; conexão externa foi encaminhada para `setup-postgresql`, após o serviço subir. |
 | 24/10/2026 | Fase 3.10 — operação e recuperação | Revisão da terceira aula da prioridade 2 | `db-docker-operations` ficou com quatro blocos, prática progressiva e retomada explícita após `down`. |
+| 24/10/2026 | Fase 3.11 — CRUD MongoDB | Revisão da quarta aula da prioridade 2 | `db-mongo-crud` ficou com quatro blocos, preparação explícita e verificação de leitura, atualização e exclusão. |
 
 ## Decisões e bloqueios
 

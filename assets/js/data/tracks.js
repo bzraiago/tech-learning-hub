@@ -2959,9 +2959,8 @@
             "concept": "MongoDB armazena documentos BSON em coleções. Cada documento tem um _id; campos podem conter arrays e objetos. No mongosh, use insertOne, find, updateOne e deleteOne com filtros explícitos. Operações de escrita em um documento são atômicas. Para relacionamentos, avalie incorporar dados lidos juntos ou referenciar entidades independentes.",
             "objectives": [
               "Criar, consultar e alterar documentos pelo mongosh.",
-              "Escolher entre incorporação e referência com base no acesso e no crescimento.",
-              "Coleções reúnem documentos com identidade _id.",
-              "Verificar resultados e explicar os limites do laboratório com casos válidos e inválidos."
+              "Verificar o resultado de atualizações e exclusões por identificador.",
+              "Explicar quando incorporar um recurso e por que progresso individual pede outro modelo."
             ],
             "exercise": "Crie uma lição temporária x9, consulte-a, remova-a e prove que a1 permanece.",
             "code": "const lab = db.getSiblingDB(\"tech_hub_aula_crud\");\nlab.licoes.insertMany([\n { _id:\"a1\", titulo:\"SELECT\", minutos:30, concluida:false,\n   tags:[\"sql\",\"basico\"], recurso:{tipo:\"texto\",titulo:\"Primeira consulta\"} },\n { _id:\"a2\", titulo:\"JOIN\", minutos:40, concluida:false, tags:[\"sql\"] },\n { _id:\"a3\", titulo:\"Documentos\", minutos:25, concluida:true, tags:[\"nosql\"] }\n]);\nlab.licoes.find({concluida:false},{_id:0,titulo:1}).sort({titulo:1});\nlab.licoes.updateOne({_id:\"a1\"},{$set:{concluida:true}});\nlab.licoes.find({concluida:false},{_id:0,titulo:1}).sort({titulo:1});",

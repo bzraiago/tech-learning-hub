@@ -1,12 +1,12 @@
 # Auditoria didática — carga cognitiva das aulas
 
 **Data:** 24/10/2026  
-**Verificação de fontes:** parcial; fontes SQLite das candidatas prioritárias conferidas  
+**Verificação de fontes:** parcial; fontes SQLite, Docker e MongoDB CRUD das candidatas revisadas conferidas
 **Escopo:** aulas com mais de quatro seções conceituais em `LESSON_GUIDES`
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-docker-operations`, a auditoria automática aponta 33: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; três das dez aulas avançadas foram condensadas sem mudar seus IDs. Restam sete aulas avançadas de banco prioritárias.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-mongo-crud`, a auditoria automática aponta 32: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; quatro das dez aulas avançadas foram condensadas sem mudar seus IDs. Restam seis aulas avançadas de banco prioritárias.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Alta | G | 7 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
+| 1 | Alta | G | 6 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
 | 2 | Média | G | 5 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 3 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 4 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
@@ -100,6 +100,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 - **Ambiente:** a mesma pasta `dados-local`, o serviço `db`, o banco `estudos` e a imagem PostgreSQL 17 são reutilizados. `estudos_restaurado` precisa ser um destino novo; nenhum passo da aula pede apagar a origem. Os comandos que modificam containers e bancos não foram executados nesta revisão.
 - **Fontes:** documentação oficial de [`docker compose cp`](https://docs.docker.com/reference/cli/docker/compose/cp/), [`docker compose down`](https://docs.docker.com/reference/cli/docker/compose/down/), [`pg_dump` 17](https://www.postgresql.org/docs/17/app-pgdump.html) e [`pg_restore` 17](https://www.postgresql.org/docs/17/app-pgrestore.html), aberta em 24/10/2026 (EN, OK). Sustenta o transporte do arquivo, preservação do volume nomeado sem `-v` e restauração do formato custom.
 - **Limite:** o validador confere estrutura e consistência; sem restauração executada nem observação de aluno, a competência operacional continua não comprovada.
+
+### Revisão localizada: `db-mongo-crud`
+
+- **Público e saída:** após `setup-mongodb`, o aluno deve executar CRUD em um banco de laboratório, prever consultas por tag, conferir resultados de escrita e explicar por que progresso de vários alunos não cabe no booleano da lição compartilhada.
+- **FATO, alta, M:** seis seções distribuíam operações relacionadas por blocos distantes; o pré-requisito não apontava para a preparação do servidor e do `mongosh`. A aula ficou com quatro blocos: documento/ambiente, leitura, escrita segura e modelagem. Os quatro tipos de prática receberam rótulos explícitos.
+- **Sequência:** `setup-mongodb` → `db-mongo-crud` → `db-mongo-pipelines`. SQL relacional é comparação útil, não pré-requisito para os comandos do exemplo. Nenhuma dependência circular identificada nesse recorte.
+- **Ambiente:** `mongosh` conectado a um servidor real, banco `tech_hub_aula_crud` inicialmente vazio. O `ping` confirma conexão; repetir a inserção com os mesmos `_id` no mesmo banco causa colisão, portanto a retomada usa outro nome de banco, sem apagar dados. Nenhuma escrita foi executada em servidor MongoDB nesta revisão.
+- **Fontes:** documentação oficial [MongoDB CRUD](https://www.mongodb.com/docs/manual/crud/), [modelagem de dados](https://www.mongodb.com/docs/manual/data-modeling/) e [`updateOne`](https://www.mongodb.com/docs/manual/reference/method/db.collection.updateone/), aberta em 24/10/2026 (EN, OK). Sustenta operações por documento, incorporação/referência e resultados da atualização.
+- **Limite:** a revisão estrutural e das fontes não comprova execução no ambiente do aluno, retenção nem capacidade de projetar uma coleção de progresso sem apoio.
 
 ## 9. Limites desta auditoria
 
