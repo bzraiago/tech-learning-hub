@@ -318,7 +318,7 @@ Object.assign(LESSON_GUIDES, {
 "js-functions": {
     "prerequisites": "Valores, comparações, if/else e laços da trilha JavaScript.",
     "setup": "Crie uma pasta javascript-estudos e salve o exemplo completo em um arquivo .html, usando texto simples e UTF-8. Abra-o no navegador; não precisa de biblioteca, servidor, conta ou conexão. A cada mudança, salve e atualize a página. Abra as ferramentas do desenvolvedor pelo menu do navegador e selecione Console para ver mensagens e erros. Nos exercícios, substitua somente o conteúdo do script, mantendo o documento e o pre com id=\"saida\". Para exibir um resultado use document.getElementById(\"saida\").textContent = String(resultado); essa linha localiza o pre e coloca texto nele, sem interpretar HTML. Não cole as tags script dentro de outro script. Se o resultado não mudar, confira primeiro o arquivo aberto e se houve erro no Console.",
-    "why": "Copiar um cálculo em vários lugares aumenta a chance de corrigir uma cópia e esquecer outra. Uma função dá nome a uma operação e define o que entra e sai. Aprender funções não é só decorar function: é conseguir escrever um contrato, testar a operação isoladamente e saber de onde vêm os dados. Nesta aula a regra de uma compra fica separada de como seu resultado aparece na página.",
+    "why": "Copiar um cálculo em vários lugares aumenta a chance de corrigir uma cópia e esquecer outra. Uma função dá nome a uma operação e define o que entra e sai. Nesta aula o foco fica em declaração, chamada, parâmetros, argumentos, retorno e contrato; escopo, callbacks e closures aparecem nas aulas seguintes, depois que esta base estiver praticada.",
     "sections": [
       {
         "title": "Declarar não é executar",
@@ -336,28 +336,6 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "Escopo e funções puras",
-        "paragraphs": [
-          "Uma variável declarada dentro da função pertence àquela execução. Chamadas diferentes têm seus próprios parâmetros e variáveis locais. let e const também respeitam blocos como os de if. Um nome declarado no nível externo pode ser lido internamente, mas depender de muitos valores externos torna difícil prever o resultado. Passe os dados necessários como argumentos quando isso representar melhor a operação.",
-          "Uma função pura devolve o mesmo resultado para as mesmas entradas e não altera estado externo observável. calcularSubtotal é pura: só lê seus argumentos e devolve um valor. Alterar textContent, registrar no Console ou mudar uma variável externa são efeitos observáveis e devem ficar em pontos deliberados. Pureza não é uma obrigação para toda função; é uma ferramenta para isolar regras fáceis de verificar.",
-          "Escopo não é a mesma coisa que tempo de vida de uma chamada. Uma função pode conservar acesso às variáveis do ambiente em que foi criada. Esse mecanismo é chamado closure e permite, por exemplo, criar contadores independentes. Antes de usar closures, pratique passar parâmetros e retornar valores: a maioria dos cálculos iniciais não precisa de memória oculta."
-        ]
-      },
-      {
-        "title": "Funções também são valores",
-        "paragraphs": [
-          "Além da declaração, podemos escrever const dobro = function (numero) { return numero * 2; };. A expressão cria uma função e associa ao nome dobro. O nome não pode ser usado antes dessa inicialização como se já tivesse valor. Uma declaração function tradicional pode ser chamada antes da linha onde aparece, mas neste curso prefira declarar antes de usar para facilitar a leitura.",
-          "Uma função pode receber outra função como argumento. Essa função recebida costuma ser chamada callback, isto é, uma operação que outra parte do código vai chamar. function aplicar(valor, operacao) { return operacao(valor); } permite aplicar(3, dobro), resultando em 6. Note que passamos dobro, sem parênteses; dobro(3) passaria o resultado, não a função. Na aula de arrays esse padrão será usado para transformar listas."
-        ]
-      },
-      {
-        "title": "Uma closure com memória compreensível",
-        "paragraphs": [
-          "function criarContador() { let valor = 0; return function () { valor += 1; return valor; }; } devolve uma função interna. Ao executar const contar = criarContador(), a função externa termina, mas contar ainda pode acessar valor. Cada contar() incrementa a mesma variável preservada: a primeira chamada devolve 1, a segunda 2. Isso é uma closure, não uma variável global.",
-          "Se executar const outro = criarContador(), outro terá sua própria variável valor e começará em 1. Duas referências à mesma função interna compartilham o mesmo contador, enquanto duas chamadas à fábrica criam estados independentes. Esse detalhe é útil para componentes, mas também exige cuidado: ao contrário do cálculo puro, repetir a chamada sem argumentos muda o resultado porque existe memória."
-        ]
-      },
-      {
         "title": "Verificar o contrato",
         "paragraphs": [
           "Liste testes antes de adaptar a função à interface: preço 1200 e quantidade 2 devem devolver 2400; quantidade zero deve devolver zero; preço negativo ou quantidade fracionária devem devolver null. Confira o retorno diretamente no Console. Depois verifique se a camada de apresentação distingue zero válido de null inválido. if (!total) confundiria ambos porque os dois são falsy; use total === null.",
@@ -367,15 +345,14 @@ Object.assign(LESSON_GUIDES, {
     ],
     "example": {
       "language": "html",
-      "code": "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\">\n\u003chead>\n  \u003cmeta charset=\"UTF-8\">\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  \u003ctitle>Funções, contratos, escopo e closures\u003c/title>\n\u003c/head>\n\u003cbody>\n  \u003ch1>Funções, contratos, escopo e closures\u003c/h1>\n  \u003cpre id=\"saida\" aria-label=\"Resultados do programa\">\u003c/pre>\n  \u003cscript>\n\"use strict\";\nfunction calcularSubtotal(precoCentavos, quantidade) {\n  if (!Number.isInteger(precoCentavos) || !Number.isInteger(quantidade)) { return null; }\n  if (precoCentavos \u003c 0 || quantidade \u003c 0) { return null; }\n  return precoCentavos * quantidade;\n}\nfunction apresentarSubtotal(total) {\n  if (total === null) { return \"Dados inválidos.\"; }\n  return `Subtotal: ${total} centavos`;\n}\nconst subtotal = calcularSubtotal(1200, 2);\ndocument.getElementById(\"saida\").textContent = apresentarSubtotal(subtotal);\nconsole.log(calcularSubtotal(1200, 0));\nconsole.log(calcularSubtotal(-1, 2));\nfunction criarContador() {\n  let valor = 0;\n  return function () { valor += 1; return valor; };\n}\nconst contar = criarContador();\nconst outro = criarContador();\nconsole.log(contar(), contar(), outro());\n  \u003c/script>\n\u003c/body>\n\u003c/html>",
+      "code": "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\">\n\u003chead>\n  \u003cmeta charset=\"UTF-8\">\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  \u003ctitle>Funções: parâmetros, retorno e contratos\u003c/title>\n\u003c/head>\n\u003cbody>\n  \u003ch1>Funções: parâmetros, retorno e contratos\u003c/h1>\n  \u003cpre id=\"saida\" aria-label=\"Resultados do programa\">\u003c/pre>\n  \u003cscript>\n\"use strict\";\nfunction calcularSubtotal(precoCentavos, quantidade) {\n  if (!Number.isInteger(precoCentavos) || !Number.isInteger(quantidade)) { return null; }\n  if (precoCentavos \u003c 0 || quantidade \u003c 0) { return null; }\n  return precoCentavos * quantidade;\n}\nfunction apresentarSubtotal(total) {\n  if (total === null) { return \"Dados inválidos.\"; }\n  return `Subtotal: ${total} centavos`;\n}\nconst subtotal = calcularSubtotal(1200, 2);\ndocument.getElementById(\"saida\").textContent = apresentarSubtotal(subtotal);\nconsole.log(calcularSubtotal(1200, 0));\nconsole.log(calcularSubtotal(-1, 2));\n  \u003c/script>\n\u003c/body>\n\u003c/html>",
       "explanation": [
         "calcularSubtotal valida o contrato e devolve null nos casos recusados, sem escrever na página.",
         "Os returns antecipados impedem continuar o cálculo com entradas inválidas.",
         "apresentarSubtotal transforma o retorno em mensagem e compara null explicitamente para preservar zero válido.",
-        "A chamada com quantidade zero devolve 0; a de preço negativo devolve null.",
-        "criarContador conserva valor em cada função interna; os contadores contam separadamente."
+        "A chamada com quantidade zero devolve 0; a de preço negativo devolve null."
       ],
-      "expected": "Página: Subtotal: 2400 centavos. Console: 0, null e depois 1 2 1."
+      "expected": "Página: Subtotal: 2400 centavos. Console: 0 e null."
     },
     "guided": [
       {
@@ -385,15 +362,11 @@ Object.assign(LESSON_GUIDES, {
       {
         "instruction": "Troque-a por 1.5 e depois pela string \"2\".",
         "result": "Ambas são recusadas pelo contrato: Dados inválidos."
-      },
-      {
-        "instruction": "Acrescente outra chamada outro() no Console.",
-        "result": "Ela devolve 2: o contador outro tem memória independente de contar."
       }
     ],
     "exercises": [
       {
-        "prompt": "Guiado: escreva dobro(numero), que retorna o dobro. Chame com 6 e exiba o retorno na página.",
+        "prompt": "Prever: sem executar, diga o valor de dobro(6) e o valor de resultado quando dobro só usa console.log. Depois rode as duas versões.",
         "hints": [
           "O parâmetro é o valor recebido.",
           "Retorne antes de apresentar; não coloque só console.log dentro."
@@ -403,7 +376,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "12."
       },
       {
-        "prompt": "Completar: crie saudacao(nome = \"Visitante\") e teste sem argumento, com \"Ana\" e com undefined. Retorne uma mensagem.",
+        "prompt": "Alterar: crie saudacao(nome = \"Visitante\") e teste sem argumento, com \"Ana\" e com undefined. Retorne uma mensagem.",
         "hints": [
           "O padrão atua quando o argumento falta ou é undefined.",
           "Use uma template literal no retorno."
@@ -423,7 +396,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "40, 0, null e null."
       },
       {
-        "prompt": "Depurar: function somar(a,b) { console.log(a+b); } const resultado = somar(2,3); mostra 5 no Console mas resultado é undefined. Corrija e explique.",
+        "prompt": "Investigar erro: function somar(a,b) { console.log(a+b); } const resultado = somar(2,3); mostra 5 no Console mas resultado é undefined. Corrija e explique.",
         "hints": [
           "Registrar não é retornar.",
           "A apresentação deve usar o resultado da chamada."
@@ -434,7 +407,7 @@ Object.assign(LESSON_GUIDES, {
       }
     ],
     "mistakes": [
-      "Confundir referência com chamada: passe nomeDaFuncao para entregar a função e nomeDaFuncao() para executar.",
+      "Confundir declarar com executar: o corpo só roda quando a função é chamada.",
       "Esquecer return produz undefined mesmo quando o Console mostra o número correto.",
       "Usar if (!total) confunde zero válido com ausência; compare o sinal de erro explicitamente.",
       "Alterar variáveis externas dentro de todo cálculo dificulta testes; receba entradas e devolva resultados."
@@ -459,26 +432,112 @@ Object.assign(LESSON_GUIDES, {
         ],
         "correctIndex": 2,
         "explanation": "O padrão atua em ausência ou undefined; null e zero são valores fornecidos."
-      },
-      {
-        "question": "Duas chamadas a criarContador() criam o quê?",
-        "options": [
-          "Dois contadores com estados independentes.",
-          "Um único contador global obrigatório.",
-          "Dois números constantes."
-        ],
-        "correctIndex": 0,
-        "explanation": "Cada execução externa cria seu próprio ambiente conservado pela função interna."
       }
     ],
     "summary": [
       "Diferencie declaração, chamada, argumento, parâmetro e retorno.",
       "Descreva contratos e trate inválidos sem confundir valores legítimos.",
-      "Isole cálculos puros e use memória em closures de forma deliberada."
+      "Teste casos comuns, limites e entradas recusadas antes de ligar a função à interface."
     ]
   },
+"js-scope-pure": {
+    "prerequisites": "Concluir Funções: parâmetros, retorno e contratos (js-functions).",
+    "setup": "Use a mesma pasta javascript-estudos e o arquivo .html da aula anterior. Abra o arquivo no navegador e o Console nas ferramentas do desenvolvedor. Nos exercícios, mantenha o pre com id=\"saida\" e altere apenas o script. Não é necessário instalar biblioteca nem usar servidor.",
+    "why": "Uma função pode parecer correta e ainda depender de um valor escondido fora dela. Entender escopo permite localizar cada nome; explicitar dependências e separar cálculos de efeitos torna o comportamento mais fácil de prever, testar e reutilizar.",
+    "sections": [
+      {
+        "title": "Onde um nome pode ser usado",
+        "paragraphs": [
+          "Escopo é a região do programa em que um nome pode ser acessado. Parâmetros e variáveis declaradas dentro de uma função ficam no escopo daquela função. let e const declarados dentro de um bloco, como o corpo de um if, não existem fora desse bloco.",
+          "Quando há nomes iguais em escopos diferentes, o mais próximo é usado. Evite depender dessa sobreposição enquanto aprende: nomes distintos deixam mais claro qual valor participa do cálculo."
+        ]
+      },
+      {
+        "title": "Dependências explícitas",
+        "paragraphs": [
+          "Uma função consegue ler variáveis externas, mas isso cria uma dependência que não aparece na chamada. Se calcularBonus() usa uma taxa global, mudar a taxa altera o retorno sem mudar os argumentos. calcularBonus(valor, taxa) deixa o contrato visível.",
+          "Nem todo dado externo é proibido. A pergunta útil é: quem lê a chamada consegue descobrir de quais valores o resultado depende? Para regras de negócio pequenas, prefira receber esses valores por parâmetros."
+        ]
+      },
+      {
+        "title": "Cálculo puro e efeito observável",
+        "paragraphs": [
+          "Uma função pura produz o mesmo retorno para as mesmas entradas e não altera algo fora dela. calcularProgresso recebe números e devolve um número; já escrever em textContent é um efeito observável. Separar as duas etapas permite testar o cálculo sem depender do navegador.",
+          "Pureza é uma ferramenta, não uma regra absoluta. Interfaces precisam causar efeitos. O objetivo é manter a regra previsível e concentrar a apresentação em um ponto deliberado."
+        ]
+      }
+    ],
+    "example": {
+      "language": "html",
+      "code": "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\">\n\u003cbody>\n  \u003cpre id=\"saida\">\u003c/pre>\n  \u003cscript>\n\"use strict\";\nfunction calcularProgresso(meta, realizado) {\n  if (!Number.isFinite(meta) || !Number.isFinite(realizado) || meta \u003c= 0 || realizado \u003c 0) { return null; }\n  return Math.min(100, Math.round((realizado / meta) * 100));\n}\nconst progresso = calcularProgresso(60, 45);\nconst mensagem = progresso === null ? \"Dados inválidos.\" : `Progresso: ${progresso}%`;\ndocument.getElementById(\"saida\").textContent = mensagem;\n  \u003c/script>\n\u003c/body>\n\u003c/html>",
+      "explanation": [
+        "calcularProgresso depende apenas dos parâmetros e não modifica a página.",
+        "A validação faz parte do contrato e null representa uma entrada recusada.",
+        "A escrita em textContent ocorre fora do cálculo, no ponto responsável pela apresentação."
+      ],
+      "expected": "A página mostra Progresso: 75%."
+    },
+    "guided": [
+      { "instruction": "Troque realizado por 90 e preveja o resultado antes de atualizar.", "result": "A página mostra Progresso: 100%, pois Math.min limita o valor." },
+      { "instruction": "Troque meta por zero e observe o contrato.", "result": "A página mostra Dados inválidos." }
+    ],
+    "exercises": [
+      { "prompt": "Prever: há const taxa = 2 fora de function multiplicar(valor) { const taxa = 3; return valor * taxa; }. Sem executar, diga o retorno de multiplicar(4) e explique qual taxa é usada.", "hints": ["Procure primeiro no escopo mais próximo."], "solution": "O retorno é 12. O parâmetro valor e a taxa declarada dentro da função estão no escopo local; a taxa externa fica ocultada nessa função.", "explanation": "A resolução de nomes começa no escopo atual e segue para os externos apenas se o nome não for encontrado.", "expected": "12, usando a taxa local 3." },
+      { "prompt": "Alterar: transforme function totalComTaxa(valor) { return valor * taxa; } em uma função que não dependa da variável externa taxa.", "hints": ["Faça a dependência aparecer entre os parâmetros."], "solution": "function totalComTaxa(valor, taxa) { return valor * taxa; }\nconsole.log(totalComTaxa(100, 1.1));", "explanation": "A chamada agora mostra todos os dados que influenciam o retorno.", "expected": "110 no Console, admitindo a imprecisão comum de ponto flutuante quando aplicável." },
+      { "prompt": "Construir: crie calcularProgresso(meta, realizado), sem ler nem alterar variáveis externas. Retorne null para entradas inválidas e a porcentagem limitada a 100 nos demais casos. Apresente o resultado fora da função.", "hints": ["Valide números finitos; meta deve ser maior que zero.", "Use Math.min para limitar o resultado."], "solution": "function calcularProgresso(meta, realizado) {\n  if (!Number.isFinite(meta) || !Number.isFinite(realizado) || meta \u003c= 0 || realizado \u003c 0) return null;\n  return Math.min(100, Math.round((realizado / meta) * 100));\n}\nconst valor = calcularProgresso(80, 20);\ndocument.getElementById(\"saida\").textContent = valor === null ? \"Inválido\" : `${valor}%`;", "explanation": "O cálculo continua utilizável sem DOM; apenas o chamador apresenta o retorno.", "expected": "25% na página." },
+      { "prompt": "Investigar erro: function registrar() { if (true) { const minutos = 30; } return minutos; } causa ReferenceError. Localize o escopo do nome e corrija sem trocar const por var.", "hints": ["minutos só existe dentro do bloco do if."], "solution": "function registrar() {\n  const minutos = 30;\n  if (true) { console.log(\"Sessão válida\"); }\n  return minutos;\n}", "explanation": "A declaração foi movida para o escopo da função, onde o return também pode acessá-la.", "expected": "registrar() retorna 30 sem ReferenceError." }
+    ],
+    "mistakes": [
+      "Tentar acessar fora do bloco um let ou const declarado dentro dele.",
+      "Ler muitas variáveis externas e esconder as dependências da função.",
+      "Misturar cálculo e alteração do DOM, tornando a regra mais difícil de testar."
+    ],
+    "quiz": [
+      { "question": "Onde um const declarado dentro de um if pode ser usado?", "options": ["Em qualquer arquivo", "Somente naquele bloco e nos blocos internos", "Somente no Console"], "correctIndex": 1, "explanation": "const e let têm escopo de bloco." },
+      { "question": "Qual assinatura deixa a taxa como dependência explícita?", "options": ["calcular(valor, taxa)", "calcular() lendo taxa global", "calcular() alterando taxa"], "correctIndex": 0, "explanation": "O parâmetro torna a dependência visível na chamada." },
+      { "question": "Qual ação é um efeito observável?", "options": ["Retornar a soma dos parâmetros", "Calcular um valor local", "Alterar textContent"], "correctIndex": 2, "explanation": "A página muda fora da função de cálculo." }
+    ],
+    "summary": [
+      "Localize cada nome pelo escopo em que foi declarado.",
+      "Prefira dependências explícitas em parâmetros para regras pequenas.",
+      "Separe o cálculo puro do efeito de apresentar o resultado."
+    ]
+  },
+"js-callbacks-closures": {
+    "prerequisites": "Concluir Funções: parâmetros, retorno e contratos (js-functions) e Escopo, dependências e funções puras (js-scope-pure).",
+    "setup": "Use a mesma pasta javascript-estudos e um arquivo .html aberto no navegador. Mantenha o Console visível para comparar chamadas. Não é necessário instalar biblioteca ou servidor. Digite cada exemplo e preveja a saída antes de atualizar a página.",
+    "why": "JavaScript permite guardar e passar funções como qualquer outro valor. Esse recurso aparece em eventos e métodos de arrays. Closures explicam como uma função interna continua acessando o ambiente onde nasceu, permitindo estado privado sem criar uma variável global.",
+    "sections": [
+      { "title": "Funções como valores e callbacks", "paragraphs": ["Uma função pode ser atribuída a uma variável ou recebida como argumento. A função entregue a outra operação para ser chamada depois é um callback. Em aplicar(3, dobro), dobro é passado sem parênteses; aplicar decide quando executá-lo.", "Escrever aplicar(3, dobro()) executaria dobro imediatamente e passaria seu retorno. Compare referência e chamada antes de usar callbacks em arrays ou eventos."] },
+      { "title": "Closure conserva acesso", "paragraphs": ["Uma função interna forma uma closure ao conservar acesso às variáveis do ambiente em que foi criada. criarContador declara valor e devolve uma função que incrementa esse valor. Mesmo após a função externa terminar, a interna continua usando aquele ambiente.", "A variável preservada não é global. Cada nova chamada a criarContador cria outro ambiente; por isso dois contadores podem avançar de modo independente."] },
+      { "title": "Estado deliberado", "paragraphs": ["Diferente de uma função pura, uma closure com estado pode retornar valores diferentes em chamadas sem argumentos. Isso é adequado quando memória faz parte do contrato, mas deve ser explicado e testado.", "Use closure quando o estado pertence a uma instância e precisa ficar protegido. Para um cálculo simples, parâmetros e retorno continuam sendo a opção mais direta."] }
+    ],
+    "example": {
+      "language": "html",
+      "code": "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\">\n\u003cbody>\n  \u003cpre id=\"saida\">\u003c/pre>\n  \u003cscript>\n\"use strict\";\nfunction aplicar(valor, operacao) { return operacao(valor); }\nfunction dobro(numero) { return numero * 2; }\nfunction criarContador() {\n  let valor = 0;\n  return function () { valor += 1; return valor; };\n}\nconst contar = criarContador();\nconst outro = criarContador();\nconst linhas = [aplicar(4, dobro), contar(), contar(), outro()];\ndocument.getElementById(\"saida\").textContent = linhas.join(\"\\n\");\n  \u003c/script>\n\u003c/body>\n\u003c/html>",
+      "explanation": ["aplicar recebe a referência dobro e a chama com valor.", "contar conserva seu próprio valor entre chamadas.", "outro nasceu de uma nova execução e começa em 1."],
+      "expected": "A página mostra, em linhas separadas: 8, 1, 2 e 1."
+    },
+    "guided": [
+      { "instruction": "Troque dobro por function triplo(numero) { return numero * 3; }.", "result": "A primeira linha passa a mostrar 12; aplicar não precisa ser alterada." },
+      { "instruction": "Acrescente outro() ao final da lista.", "result": "A nova linha mostra 2; o estado de outro permanece independente de contar." }
+    ],
+    "exercises": [
+      { "prompt": "Prever: qual é a diferença entre executar aplicar(5, dobro) e tentar aplicar(5, dobro(5))? Responda antes de rodar.", "hints": ["Na segunda forma, observe o que é passado como segundo argumento."], "solution": "aplicar(5, dobro) retorna 10. Em aplicar(5, dobro(5)), dobro(5) vira 10 antes da chamada; aplicar tenta executar o número 10 como função e lança TypeError.", "explanation": "Callbacks são passados por referência, sem parênteses.", "expected": "10 na primeira forma; TypeError na segunda." },
+      { "prompt": "Alterar: adapte aplicar para receber dois valores e um callback, permitindo aplicar(3, 4, somar).", "hints": ["Chame operacao com dois argumentos."], "solution": "function aplicar(a, b, operacao) { return operacao(a, b); }\nfunction somar(a, b) { return a + b; }\nconsole.log(aplicar(3, 4, somar));", "explanation": "A função de ordem superior controla a chamada sem conhecer a regra específica.", "expected": "7 no Console." },
+      { "prompt": "Construir: crie criarMarcador(inicial), que devolve uma função capaz de somar uma quantidade ao valor preservado. Crie dois marcadores e demonstre que seus estados são independentes.", "hints": ["Declare valor na função externa.", "A função interna recebe quantidade, altera valor e o retorna."], "solution": "function criarMarcador(inicial) {\n  let valor = inicial;\n  return function (quantidade) { valor += quantidade; return valor; };\n}\nconst a = criarMarcador(10);\nconst b = criarMarcador(0);\nconsole.log(a(5), a(2), b(3));", "explanation": "Cada chamada da função externa cria um ambiente separado conservado pela função interna.", "expected": "15, 17 e 3 no Console." },
+      { "prompt": "Investigar erro: const contar = criarContador; console.log(contar()) devolve uma função em vez de 1. Explique e corrija.", "hints": ["criarContador é a fábrica; ela precisa ser chamada para produzir o contador."], "solution": "const contar = criarContador();\nconsole.log(contar());", "explanation": "Sem os primeiros parênteses, contar referencia a função externa. A chamada correta cria e guarda a função interna.", "expected": "1 no Console." }
+    ],
+    "mistakes": ["Executar o callback ao passá-lo, usando parênteses quando era necessária a referência.", "Confundir a função externa, que cria o ambiente, com a função interna que o utiliza.", "Usar estado oculto quando parâmetros e retorno deixariam o cálculo mais simples."],
+    "quiz": [
+      { "question": "Em aplicar(3, dobro), o que dobro representa?", "options": ["Uma referência à função", "O retorno já calculado", "Uma string"], "correctIndex": 0, "explanation": "Sem parênteses, a própria função é passada como valor." },
+      { "question": "Por que contar() ainda acessa valor depois que criarContador terminou?", "options": ["Porque valor é global", "Porque a closure conserva acesso ao ambiente de criação", "Porque const copia todas as variáveis"], "correctIndex": 1, "explanation": "A função interna mantém a ligação com o escopo em que foi criada." },
+      { "question": "Duas chamadas separadas a criarContador() compartilham obrigatoriamente o mesmo estado?", "options": ["Sim", "Não, cada chamada cria seu próprio ambiente", "Somente no Console"], "correctIndex": 1, "explanation": "Cada execução da função externa cria um novo ambiente léxico." }
+    ],
+    "summary": ["Passe callbacks como referências e deixe quem recebe decidir quando chamá-los.", "Uma closure conserva acesso ao ambiente de criação.", "Instâncias criadas por chamadas diferentes mantêm estados independentes."]
+  },
 "js-arrays": {
-    "prerequisites": "Funções, callbacks, comparações, loops e retorno. Arrow functions não são necessárias nesta aula.",
+    "prerequisites": "Concluir Funções: parâmetros, retorno e contratos (js-functions), Escopo, dependências e funções puras (js-scope-pure) e Callbacks e closures (js-callbacks-closures). Arrow functions não são necessárias nesta aula.",
     "setup": "Crie uma pasta javascript-estudos e salve o exemplo completo em um arquivo .html, usando texto simples e UTF-8. Abra-o no navegador; não precisa de biblioteca, servidor, conta ou conexão. A cada mudança, salve e atualize a página. Abra as ferramentas do desenvolvedor pelo menu do navegador e selecione Console para ver mensagens e erros. Nos exercícios, substitua somente o conteúdo do script, mantendo o documento e o pre com id=\"saida\". Para exibir um resultado use document.getElementById(\"saida\").textContent = String(resultado); essa linha localiza o pre e coloca texto nele, sem interpretar HTML. Não cole as tags script dentro de outro script. Se o resultado não mudar, confira primeiro o arquivo aberto e se houve erro no Console.",
     "why": "Uma aplicação raramente trabalha com um único valor. Um catálogo contém produtos; cada produto tem nome e preço. Arrays organizam a coleção e objetos agrupam as propriedades de cada registro. O objetivo é conseguir responder perguntas sobre essa coleção sem perder dados, modificar o original por acidente ou confundir uma lista filtrada com um único resultado.",
     "sections": [

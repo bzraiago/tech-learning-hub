@@ -1086,21 +1086,69 @@
           },
           {
             "id": "js-functions",
-            "title": "Funções, contratos, escopo e closures",
-            "minutes": 110,
-            "concept": "Organize cálculos em funções pequenas, distinguindo entradas, retorno, apresentação e memória de uma closure.",
+            "title": "Funções: parâmetros, retorno e contratos",
+            "minutes": 80,
+            "concept": "Organize cálculos em funções pequenas, distinguindo parâmetros, argumentos, retorno e apresentação.",
             "objectives": [
               "Declarar e chamar funções com parâmetros e retorno explícito.",
-              "Distinguir variáveis locais de dependências externas.",
-              "Construir uma função pura e compreender uma closure simples."
+              "Descrever as entradas aceitas e as saídas de uma função.",
+              "Testar casos válidos, limites e entradas recusadas."
             ],
             "exercise": "Construir: escreva minutosRestantes(meta, estudado). Aceite apenas números finitos não negativos. Retorne null para inválidos, zero quando a meta foi alcançada e a diferença nos demais casos. Teste (60,20), (60,80), (-1,20) e (60,\"20\").",
-            "code": "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\">\n\u003chead>\n  \u003cmeta charset=\"UTF-8\">\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  \u003ctitle>Funções, contratos, escopo e closures\u003c/title>\n\u003c/head>\n\u003cbody>\n  \u003ch1>Funções, contratos, escopo e closures\u003c/h1>\n  \u003cpre id=\"saida\" aria-label=\"Resultados do programa\">\u003c/pre>\n  \u003cscript>\n\"use strict\";\nfunction calcularSubtotal(precoCentavos, quantidade) {\n  if (!Number.isInteger(precoCentavos) || !Number.isInteger(quantidade)) { return null; }\n  if (precoCentavos \u003c 0 || quantidade \u003c 0) { return null; }\n  return precoCentavos * quantidade;\n}\nfunction apresentarSubtotal(total) {\n  if (total === null) { return \"Dados inválidos.\"; }\n  return `Subtotal: ${total} centavos`;\n}\nconst subtotal = calcularSubtotal(1200, 2);\ndocument.getElementById(\"saida\").textContent = apresentarSubtotal(subtotal);\nconsole.log(calcularSubtotal(1200, 0));\nconsole.log(calcularSubtotal(-1, 2));\nfunction criarContador() {\n  let valor = 0;\n  return function () { valor += 1; return valor; };\n}\nconst contar = criarContador();\nconst outro = criarContador();\nconsole.log(contar(), contar(), outro());\n  \u003c/script>\n\u003c/body>\n\u003c/html>",
+            "code": "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\">\n\u003chead>\n  \u003cmeta charset=\"UTF-8\">\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  \u003ctitle>Funções: parâmetros, retorno e contratos\u003c/title>\n\u003c/head>\n\u003cbody>\n  \u003ch1>Funções: parâmetros, retorno e contratos\u003c/h1>\n  \u003cpre id=\"saida\" aria-label=\"Resultados do programa\">\u003c/pre>\n  \u003cscript>\n\"use strict\";\nfunction calcularSubtotal(precoCentavos, quantidade) {\n  if (!Number.isInteger(precoCentavos) || !Number.isInteger(quantidade)) { return null; }\n  if (precoCentavos \u003c 0 || quantidade \u003c 0) { return null; }\n  return precoCentavos * quantidade;\n}\nfunction apresentarSubtotal(total) {\n  if (total === null) { return \"Dados inválidos.\"; }\n  return `Subtotal: ${total} centavos`;\n}\nconst subtotal = calcularSubtotal(1200, 2);\ndocument.getElementById(\"saida\").textContent = apresentarSubtotal(subtotal);\nconsole.log(calcularSubtotal(1200, 0));\nconsole.log(calcularSubtotal(-1, 2));\n  \u003c/script>\n\u003c/body>\n\u003c/html>",
             "docs": [
               {
                 "kind": "doc",
                 "title": "MDN · Funções",
                 "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions",
+                "language": "EN"
+              }
+            ]
+          },
+          {
+            "id": "js-scope-pure",
+            "title": "Escopo, dependências e funções puras",
+            "minutes": 75,
+            "concept": "Reconheça de onde cada valor vem e isole regras previsíveis de efeitos como alterar a página.",
+            "objectives": [
+              "Distinguir escopo global, de função e de bloco.",
+              "Trocar dependências externas ocultas por parâmetros explícitos.",
+              "Separar cálculos puros de efeitos observáveis."
+            ],
+            "exercise": "Construir: crie calcularProgresso(meta, realizado), sem ler nem alterar variáveis externas. Retorne null para entradas inválidas e a porcentagem limitada a 100 nos demais casos. Apresente o resultado fora da função.",
+            "code": "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\">\n\u003chead>\n  \u003cmeta charset=\"UTF-8\">\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  \u003ctitle>Escopo, dependências e funções puras\u003c/title>\n\u003c/head>\n\u003cbody>\n  \u003ch1>Escopo, dependências e funções puras\u003c/h1>\n  \u003cpre id=\"saida\" aria-label=\"Resultados do programa\">\u003c/pre>\n  \u003cscript>\n\"use strict\";\nfunction calcularProgresso(meta, realizado) {\n  if (!Number.isFinite(meta) || !Number.isFinite(realizado) || meta \u003c= 0 || realizado \u003c 0) { return null; }\n  return Math.min(100, Math.round((realizado / meta) * 100));\n}\nconst progresso = calcularProgresso(60, 45);\nconst mensagem = progresso === null ? \"Dados inválidos.\" : `Progresso: ${progresso}%`;\ndocument.getElementById(\"saida\").textContent = mensagem;\n  \u003c/script>\n\u003c/body>\n\u003c/html>",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "MDN · Escopo",
+                "url": "https://developer.mozilla.org/en-US/docs/Glossary/Scope",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "MDN · Funções",
+                "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions",
+                "language": "EN"
+              }
+            ]
+          },
+          {
+            "id": "js-callbacks-closures",
+            "title": "Callbacks e closures",
+            "minutes": 80,
+            "concept": "Passe funções como valores e compreenda quando uma função interna conserva acesso ao ambiente em que foi criada.",
+            "objectives": [
+              "Passar uma função como callback sem executá-la antecipadamente.",
+              "Construir uma closure simples com estado privado.",
+              "Comparar instâncias independentes criadas pela mesma função externa."
+            ],
+            "exercise": "Construir: crie criarMarcador(inicial), que devolve uma função capaz de somar uma quantidade ao valor preservado. Crie dois marcadores e demonstre que seus estados são independentes.",
+            "code": "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\">\n\u003chead>\n  \u003cmeta charset=\"UTF-8\">\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  \u003ctitle>Callbacks e closures\u003c/title>\n\u003c/head>\n\u003cbody>\n  \u003ch1>Callbacks e closures\u003c/h1>\n  \u003cpre id=\"saida\" aria-label=\"Resultados do programa\">\u003c/pre>\n  \u003cscript>\n\"use strict\";\nfunction aplicar(valor, operacao) { return operacao(valor); }\nfunction dobro(numero) { return numero * 2; }\nfunction criarContador() {\n  let valor = 0;\n  return function () { valor += 1; return valor; };\n}\nconst contar = criarContador();\nconst outro = criarContador();\nconst linhas = [aplicar(4, dobro), contar(), contar(), outro()];\ndocument.getElementById(\"saida\").textContent = linhas.join(\"\\n\");\n  \u003c/script>\n\u003c/body>\n\u003c/html>",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "MDN · Callback",
+                "url": "https://developer.mozilla.org/en-US/docs/Glossary/Callback_function",
                 "language": "EN"
               },
               {

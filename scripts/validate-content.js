@@ -189,6 +189,43 @@ for (const lessonId of preparationIds) {
   }
 }
 
+const progressiveJavaScriptLessonIds = ['js-functions', 'js-scope-pure', 'js-callbacks-closures'];
+for (const lessonId of progressiveJavaScriptLessonIds) {
+  const guide = LESSON_GUIDES[lessonId];
+  if (!guide) {
+    fail(`Aula progressiva obrigatória ausente: ${lessonId}`);
+    continue;
+  }
+  const prompts = (guide.exercises || []).map((exercise) => exercise.prompt || '');
+  for (const kind of exerciseKinds) {
+    if (!prompts.some((prompt) => prompt.startsWith(kind))) {
+      fail(`Aula ${lessonId} sem exercício do tipo ${kind}`);
+    }
+  }
+
+  const lesson = lessons.find((item) => item.id === lessonId);
+  const exampleScript = lesson?.code?.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+  if (!exampleScript) {
+    fail(`Aula ${lessonId} sem script executável no exemplo principal.`);
+    continue;
+  }
+  let visibleOutput = '';
+  const exampleContext = vm.createContext({
+    console: { log() {} },
+    document: {
+      getElementById() {
+        return { set textContent(value) { visibleOutput = String(value); } };
+      },
+    },
+  });
+  try {
+    vm.runInContext(exampleScript, exampleContext, { filename: `${lessonId}.html` });
+    if (!visibleOutput.trim()) fail(`Aula ${lessonId} não produz saída visível no exemplo principal.`);
+  } catch (error) {
+    fail(`Exemplo principal de ${lessonId} falhou: ${error.message}`);
+  }
+}
+
 const environmentContracts = [
   ['PostgreSQL no host', LESSON_GUIDES['setup-postgresql'], ['127.0.0.1', '55432', 'estudos', 'aluno']],
   ['PostgreSQL no projeto relacional', PROJECTS.find((project) => project.id === 'project-db-relational'), ['127.0.0.1', '55432', 'laboratorio_estoque', 'aluno']],

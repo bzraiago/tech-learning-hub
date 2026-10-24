@@ -132,7 +132,7 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Garantir, em cada aula, atividades de prever, alterar, construir e investigar erro.
 - [ ] Adicionar erros comuns e como reconhecê-los pela mensagem ou comportamento.
 - [ ] Adicionar exercício de transferência em contexto diferente.
-- [ ] Dividir a aula de funções JavaScript em blocos menores com prática intermediária.
+- [x] Dividir a aula de funções JavaScript em blocos menores com prática intermediária.
 - [ ] Mapear outras aulas com mais de quatro conceitos centrais sem prática intermediária.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
 - [ ] Adicionar demonstrações visuais de laços.
@@ -348,6 +348,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Fase 2.4 — PostgreSQL e clientes | Commit da Fase 2.4 | Preparação de psql/pgAdmin e projeto relacional padronizados em `127.0.0.1:55432`. |
 | 24/10/2026 | Fase 2.5 — bancos de aprofundamento | Commit da Fase 2.5 | Preparações opcionais de MariaDB, Firebird e MongoDB/mongosh adicionadas. |
 | 24/10/2026 | Fase 2.6 — auditoria global de ambientes | Commit da Fase 2.6 | Contratos de preparação e parâmetros dos laboratórios protegidos pelo validador automático. |
+| 24/10/2026 | Fase 3.1 — funções JavaScript | Commit da Fase 3.1 | Aula sobrecarregada dividida em contratos, escopo/pureza e callbacks/closures, preservando o id existente. |
 
 ## Decisões e bloqueios
 

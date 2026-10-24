@@ -135,7 +135,7 @@ Os scripts são clássicos e compartilham o mesmo escopo global, carregados na o
 
 Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workflow`, `quality`, `delivery`.
 
-> Os números de referência (9 trilhas, 28 módulos, 107 aulas, 430 exercícios, 321 questões, 20 projetos) foram conferidos no código em 24/10/2026. **Confira no código antes de citá-los** e atualize `ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
+> Os números de referência (9 trilhas, 28 módulos, 109 aulas, 438 exercícios, 326 questões, 20 projetos) foram conferidos no código em 24/10/2026. **Confira no código antes de citá-los** e atualize `ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
 
 ### 5.2 Persistência e compatibilidade (cuidado máximo)
 - O progresso fica em `localStorage` na chave **`tech-learning-hub:v1`**.
@@ -258,7 +258,7 @@ Vem da análise em `ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima para baixo e
 6. [ ] **CI, publicação e integração externa** como práticas guiadas e verificáveis (observar falha, corrigir, conferir URL final, voltar versão).
 7. [ ] Atividades gerais de conclusão (básica e intermediária) — ver seção 9.
 8. [x] Corrigir a inconsistência da porta do PostgreSQL (55432) entre laboratório Docker e projeto relacional.
-9. [ ] Dividir aulas com excesso de conceitos (começar por funções em JavaScript).
+9. [ ] Dividir aulas com excesso de conceitos (a aula de funções em JavaScript já foi dividida; mapear as demais).
 10. [ ] Demonstrações visuais de execução (laços, referências, `JOIN`, requisições HTTP).
 11. [ ] Revisão acumulativa e recuperação de dificuldades (indicar aula a revisar e segunda tentativa diferente).
 12. [ ] Exportar e importar progresso e anotações (evitar perda por `localStorage`).
