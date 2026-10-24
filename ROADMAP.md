@@ -134,7 +134,9 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Adicionar exercício de transferência em contexto diferente.
 - [x] Dividir a aula de funções JavaScript em blocos menores com prática intermediária.
 - [x] Mapear outras aulas com mais de quatro conceitos centrais sem prática intermediária.
-  - [ ] Prioridade 1: dividir ou intercalar prática nas cinco aulas fundamentais de banco (`db-modeling`, `db-ddl-crud`, `db-select`, `db-joins`, `db-transactions`).
+  - [ ] Prioridade 1: dividir ou intercalar prática nas cinco aulas fundamentais de banco.
+    - [x] `db-modeling`: separar entidades/relacionamentos de normalização/ausência.
+    - [ ] `db-ddl-crud`, `db-select`, `db-joins` e `db-transactions`.
   - [ ] Prioridade 2: revisar as dez aulas avançadas de banco mapeadas com seis seções.
   - [ ] Prioridade 3: revisar 11 aulas de HTML/JavaScript e distinguir aprofundamento legítimo de sobrecarga.
   - [ ] Prioridade 4: revisar 15 aulas de IA/Entrega, preservando o nível avançado quando os pré-requisitos forem suficientes.
@@ -410,6 +412,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Fase 3.1 — funções JavaScript | Commit da Fase 3.1 | Aula sobrecarregada dividida em contratos, escopo/pureza e callbacks/closures, preservando o id existente. |
 | 24/10/2026 | Planejamento da trilha de deploy | Próximo ciclo | Stack guiada Clerk + Supabase + Vercel e módulos transferíveis de DNS, OAuth/OIDC, segurança, LGPD, Redis e operação adicionados ao roadmap. |
 | 24/10/2026 | Fase 3.2 — mapa de carga cognitiva | Commit da Fase 3.2 | 41 candidatas identificadas por estrutura e organizadas em quatro prioridades; cinco fundamentos de banco ficaram no topo. |
+| 24/10/2026 | Fase 3.3 — modelagem de dados | Commit da Fase 3.3 | `db-modeling` foi reduzida e `db-normalization` passou a ensinar normalização, ausência e limites com prática própria. |
 
 ## Decisões e bloqueios
 

@@ -5,7 +5,7 @@ Object.assign(LESSON_GUIDES, {
 "db-modeling": {
     "prerequisites": "Nenhuma experiência com bancos é necessária. Você precisa apenas distinguir um curso, uma aula e uma pessoa: vamos transformar esses objetos cotidianos em dados organizados.",
     "setup": "Use uma base SQLite nova e descartável para cada aula. Você pode colar o SQL em uma ferramenta SQLite local e executar instrução por instrução. Alternativa sem instalar servidor: com Python 3, salve o SQL em aula.sql e o executor abaixo em executar.py, na mesma pasta; rode python executar.py (ou py executar.py no Windows). Ele cria uma base apenas em memória, imprime cada resultado de consulta e fecha a conexão ao terminar. Cada execução começa vazia. Exercícios usam o estado final do exemplo: acrescente apenas o exercício escolhido ao final de aula.sql e reinicie o executor. Não cole cercas de Markdown nos arquivos. Se faltar o módulo sqlite3, use uma distribuição de Python com esse módulo ou uma ferramenta SQLite. A página apenas guarda rascunhos; o SQL será executado na ferramenta local. Neste executor, não coloque duas instruções completas na mesma linha; cada instrução deve terminar em sua própria linha.",
-    "why": "Imagine que Ana e Beto estudam SQL. Se você guardar a conclusão na própria aula, marcar a aula como concluída para Ana também mudará o estado visto por Beto. Modelar significa decidir a qual coisa cada informação pertence antes de escrever comandos.",
+    "why": "Imagine que Ana e Beto estudam SQL. Se você guardar a conclusão na própria aula, marcar a aula como concluída para Ana também mudará o estado visto por Beto. Nesta aula o foco é reconhecer as coisas do domínio, identificá-las e representar as relações entre elas; normalização e ausência ficam na aula seguinte.",
     "sections": [
       {
         "title": "Entidades, atributos e linhas",
@@ -22,32 +22,10 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "Normalizar para evitar contradições",
-        "paragraphs": [
-          "Guardar nome_trilha em cada lição repete informação: renomear a trilha exigiria alterar muitas linhas. Separar TRILHAS e referenciá-la reduz essa anomalia de atualização. Como orientação inicial, mantenha valores individuais nas células, atributos dependentes da chave inteira e atributos que descrevam diretamente a entidade. Isso aproxima o modelo das três primeiras formas normais.",
-          "PROGRESSO pertence ao par estudante e lição. Uma linha (1,10,1) significa que o estudante 1 concluiu a lição 10, não que todos a concluíram. Neste modelo, ausência de linha significa ainda não registrado; a aplicação poderá tratar isso como pendente. Defina essa convenção, pois ausência de registro e conclusão falsa são estados distintos no armazenamento."
-        ]
-      },
-      {
         "title": "Do pedido em português para um modelo verificável",
         "paragraphs": [
           "Comece descrevendo ações e perguntas, sem pensar em comandos. Uma pessoa se matricula em uma trilha; uma trilha contém lições; a pessoa conclui uma lição. Agora escreva dados de exemplo no papel. Ana e Beto existem mesmo que ainda não tenham matrícula. A trilha Dados existe mesmo vazia. Uma matrícula só existe quando liga uma pessoa a uma trilha. Essa diferença ajuda a separar entidades de relacionamentos. Desenhe caixas para ESTUDANTES, TRILHAS e LICOES e setas para suas referências. Depois tente responder: onde fica a data da matrícula? Ela não descreve apenas a pessoa nem apenas a trilha: descreve a associação entre ambas.",
           "O modelo depende de regras declaradas. Nesta versão, cada lição pertence a uma única trilha. Se o produto permitir reutilizar a mesma lição em várias trilhas, será necessário outro relacionamento N:N, possivelmente com posição e obrigatoriedade na associação. Não existe um desenho universal que atenda a todo aplicativo. Antes de implementar, registre hipóteses como: uma pessoa pode matricular-se duas vezes na mesma trilha? Excluir uma trilha deve apagar histórico? Um título pode repetir? Perguntas assim revelam decisões que uma tela bonita não resolve e evitam mudanças improvisadas no banco."
-        ]
-      },
-      {
-        "title": "As três primeiras formas normais com exemplos concretos",
-        "paragraphs": [
-          "Na primeira forma normal, cada posição deve guardar um valor do domínio escolhido e a linha deve ser identificável. Não guarde \"1,2,3\" em uma coluna trilhas para representar três matrículas: o banco enxergará um texto, e cada busca exigirá interpretação. Crie três linhas na associação. O que é um valor individual depende do uso: um endereço pode começar como texto único, mas precisa de campos próprios se o sistema filtrar cidades. Normalizar não significa dividir cada palavra em uma tabela; significa permitir as operações necessárias sem contradição.",
-          "Na segunda forma normal, um atributo não chave depende da chave inteira. Em MATRICULAS com chave (estudante_id,trilha_id), nome_estudante depende apenas de estudante_id; deixe-o em ESTUDANTES. A data_matricula depende do par e pode permanecer na associação. Na terceira forma normal, evite dependências transitivas indevidas: se uma tabela guarda cidade_id e nome_cidade, o nome depende da cidade, não diretamente da matrícula. Centralize a cidade quando o domínio exigir esse cadastro. Essas regras reduzem anomalias: não precisar atualizar vinte cópias de um nome, não perder uma trilha ao apagar a última lição e poder cadastrar um estudante sem inventar uma matrícula."
-        ]
-      },
-      {
-        "title": "Identidade, ausência e limites do modelo",
-        "paragraphs": [
-          "Um identificador artificial, como id inteiro, serve à referência estável. Uma chave candidata é qualquer conjunto mínimo de atributos capaz de identificar uma ocorrência segundo as regras: email poderia ser uma candidata se for obrigatório e exclusivo. Mesmo usando id como chave primária, mantenha UNIQUE no email quando essa exclusividade fizer parte do contrato. Não use apenas o nome para distinguir pessoas. A chave composta da matrícula impõe uma regra diferente: cada componente pode repetir, mas o par não. Teste mentalmente (1,1), (1,2) e (2,1): os três são distintos; outro (1,1) é duplicata.",
-          "Decida o significado de NULL coluna por coluna. Um telefone ausente pode significar não informado, enquanto uma duração obrigatória não deveria aceitar ausência. Não substitua desconhecido por zero só para facilitar uma soma: zero minutos e duração desconhecida representam situações diferentes. A FK de PROGRESSO para uma lição garante a existência da lição, mas não garante que o estudante esteja matriculado na trilha correspondente. Essa regra exigiria desenho adicional ou validação transacional. Conhecer o que uma restrição garante e o que deixa de garantir é tão importante quanto saber escrevê-la.",
-          "Revise o modelo com casos pequenos antes de criar dados grandes. Acrescente duas pessoas com o mesmo nome, uma trilha vazia, uma pessoa sem matrícula e duas lições com títulos iguais em trilhas diferentes. Pergunte se cada situação válida pode ser representada e se cada situação proibida seria recusada. O resultado desta aula deve ser um diagrama textual acompanhado de regras e exemplos. No laboratório SQL abaixo, as chaves tornam parte dessas regras executáveis. Leia os nomes como tradução do desenho; os detalhes de CREATE TABLE e INSERT serão retomados na próxima aula."
         ]
       },
       {
@@ -89,7 +67,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "1. Guiado: Acrescente a estudante Carla, identificador 3, matriculada em Dados, sem concluir lições. Quais registros são necessários?",
+        "prompt": "Prever: antes de executar, diga quais registros são necessários para acrescentar a estudante Carla, identificador 3, matriculada em Dados, sem concluir lições.",
         "hints": [
           "Crie a pessoa antes de referenciá-la.",
           "Não invente conclusão quando ela ainda não ocorreu."
@@ -99,7 +77,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Três estudantes, três matrículas e ainda dois registros de progresso."
       },
       {
-        "prompt": "2. Adaptar: partindo apenas do exemplo inicial, registre que Ana concluiu JOIN. Não execute o exercício anterior. Explique por que duplicar (1,10) seria inválido.",
+        "prompt": "Alterar: partindo apenas do exemplo inicial, registre que Ana concluiu JOIN. Não execute o exercício anterior. Explique por que duplicar (1,10) seria inválido.",
         "hints": [
           "JOIN tem id 11.",
           "A identidade do progresso é um par, não apenas o estudante."
@@ -109,7 +87,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Ana tem duas conclusões; Beto continua pendente em SELECT."
       },
       {
-        "prompt": "3. Construir: modele avaliações de lições. Cada estudante pode avaliar cada lição uma vez, com nota inteira de 1 a 5. Crie a tabela e registre nota 4 de Ana para SELECT.",
+        "prompt": "Construir: modele avaliações de lições. Cada estudante pode avaliar cada lição uma vez, com nota inteira de 1 a 5. Crie a tabela e registre nota 4 de Ana para SELECT.",
         "hints": [
           "A identidade é o par estudante/lição.",
           "Combine referências, NOT NULL e CHECK para a nota."
@@ -119,7 +97,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "A nota depende do par completo; a chave composta impede avaliações duplicadas e a restrição limita o domínio."
       },
       {
-        "prompt": "4. Depurar: alguém propôs estudantes(id,nome,trilhas_texto) com trilhas_texto=\"1,2\". Explique o problema e registre corretamente a matrícula de Ana na nova trilha Web.",
+        "prompt": "Investigar erro: alguém propôs estudantes(id,nome,trilhas_texto) com trilhas_texto=\"1,2\". Explique o problema e registre corretamente a matrícula de Ana na nova trilha Web.",
         "hints": [
           "Uma lista textual não cria referências verificáveis por item.",
           "A matrícula já tem uma tabela associativa."
@@ -172,8 +150,105 @@ Object.assign(LESSON_GUIDES, {
       "Guarde informações da relação na tabela que representa a relação."
     ]
   },
+"db-normalization": {
+    "prerequisites": "Concluir Entidades, relacionamentos e chaves (db-modeling). Você deve distinguir entidade, atributo, chave primária, chave estrangeira e tabela associativa.",
+    "setup": "Use uma base SQLite nova e descartável. Você pode executar o SQL em um cliente SQLite ou reutilizar os arquivos aula.sql e executar.py apresentados em db-modeling. Execute uma instrução por vez, compare a saída com o resultado esperado e reinicie com uma base vazia antes de cada exercício. Não é necessário instalar um servidor de banco.",
+    "why": "Uma planilha pode repetir o nome e o email da mesma pessoa em dezenas de matrículas. Quando um dado muda, cópias podem divergir. Normalizar é organizar dependências para reduzir contradições, preservando as perguntas que o sistema precisa responder.",
+    "sections": [
+      {
+        "title": "Repetição e anomalias observáveis",
+        "paragraphs": [
+          "Se cada matrícula repetir nome e email, corrigir um email exige encontrar todas as cópias. Esquecer uma delas cria uma anomalia de atualização. Se só for possível cadastrar uma trilha inventando uma matrícula, há anomalia de inserção. Se apagar a última matrícula também apagar a única descrição da trilha, há anomalia de remoção.",
+          "Repetição nem sempre é um erro: relatórios e caches podem duplicar dados deliberadamente. Antes disso, construa um modelo principal coerente e documente qualquer cópia, sua origem e como será atualizada."
+        ]
+      },
+      {
+        "title": "As três primeiras formas normais",
+        "paragraphs": [
+          "Na primeira forma normal, cada posição guarda um valor do domínio escolhido e cada linha pode ser identificada. Em vez de trilhas_texto='10,20', use duas linhas em MATRICULAS. O que conta como valor individual depende das consultas: um endereço pode permanecer texto até o sistema precisar filtrar suas partes.",
+          "Na segunda forma normal, atributos não chave dependem da chave composta inteira. Em MATRICULAS(estudante_id,trilha_id), nome_estudante depende apenas de estudante_id e fica em ESTUDANTES; data_matricula descreve o par. Na terceira, evite dependência transitiva indevida: se cidade_id determina nome_cidade, centralize o nome em CIDADES quando o domínio exigir esse cadastro."
+        ]
+      },
+      {
+        "title": "Ausência, identidade e limites",
+        "paragraphs": [
+          "Defina NULL coluna por coluna. Uma data de matrícula ausente pode significar não registrada; zero não representa a mesma coisa. Uma linha ausente em PROGRESSO também pode significar ainda não iniciado, mas essa convenção pertence ao contrato da aplicação e precisa ser escrita.",
+          "Uma chave estrangeira garante a existência do registro referenciado, não toda regra de negócio imaginável. Referenciar estudante e lição em PROGRESSO não garante sozinho que a pessoa esteja matriculada na trilha daquela lição. Registre o limite e decida em qual camada a regra será aplicada."
+        ]
+      },
+      {
+        "title": "Modelo verificável, não modelo universal",
+        "paragraphs": [
+          "Comece por ações e perguntas: uma pessoa se matricula, uma trilha contém lições, uma pessoa conclui uma lição. Use dois ou três exemplos e tente representar casos válidos e proibir os inválidos. Duas pessoas podem ter o mesmo nome? Uma trilha pode existir vazia? Uma matrícula pode repetir?",
+          "Mudanças de requisito podem alterar o desenho. Se uma lição puder pertencer a várias trilhas, trilha_id deixa de bastar e surge outra associação. Normalização não elimina decisões: torna as dependências e os trade-offs mais explícitos."
+        ]
+      }
+    ],
+    "example": {
+      "language": "sql",
+      "code": "PRAGMA foreign_keys=ON;\nCREATE TABLE estudantes(id INTEGER PRIMARY KEY,nome TEXT NOT NULL,email TEXT NOT NULL UNIQUE);\nCREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT NOT NULL UNIQUE);\nCREATE TABLE matriculas(estudante_id INTEGER NOT NULL REFERENCES estudantes(id),trilha_id INTEGER NOT NULL REFERENCES trilhas(id),data_matricula TEXT,PRIMARY KEY(estudante_id,trilha_id));\nINSERT INTO estudantes VALUES(1,'Ana','ana@example.test');\nINSERT INTO trilhas VALUES(10,'Dados'),(20,'Web');\nINSERT INTO matriculas VALUES(1,10,'2026-10-24'),(1,20,NULL);\nSELECT estudante_id,trilha_id,data_matricula FROM matriculas ORDER BY trilha_id;",
+      "explanation": [
+        "O nome e o email aparecem uma vez em ESTUDANTES, mesmo com duas matrículas.",
+        "A chave composta impede repetir o mesmo par estudante/trilha.",
+        "data_matricula depende do par e pode ficar na associação.",
+        "NULL foi mantido como ausência conhecida de data, sem inventar texto ou zero."
+      ],
+      "expected": "estudante_id | trilha_id | data_matricula\n1 | 10 | 2026-10-24\n1 | 20 | NULL"
+    },
+    "guided": [
+      { "instruction": "Desenhe a planilha original com duas linhas de Ana e circule os valores repetidos.", "result": "nome e email aparecem duas vezes; a versão normalizada os mantém uma vez." },
+      { "instruction": "Tente inserir novamente a matrícula (1,10).", "result": "O banco recusa a duplicata por causa da chave primária composta." },
+      { "instruction": "Troque o email de Ana e conte as linhas alteradas.", "result": "Somente uma linha de ESTUDANTES precisa mudar." }
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: uma tabela matriculas(estudante_id,trilha_id,nome_estudante) usa chave composta. Se Ana mudar de nome, quantas linhas podem precisar de alteração? Qual dependência está errada?",
+        "hints": ["Pergunte de qual parte da chave o nome depende."],
+        "solution": "Todas as matrículas de Ana poderiam precisar de alteração. nome_estudante depende somente de estudante_id, não do par inteiro, e deve permanecer em ESTUDANTES.",
+        "explanation": "A dependência parcial cria cópias e risco de divergência.",
+        "expected": "Uma linha por matrícula seria afetada no modelo repetido; uma única linha no modelo normalizado."
+      },
+      {
+        "prompt": "Alterar: acrescente observacao à matrícula do exemplo. Permita ausência e registre 'Turma noturna' somente para a matrícula em Dados.",
+        "hints": ["A observação descreve o par estudante/trilha."],
+        "solution": "ALTER TABLE matriculas ADD COLUMN observacao TEXT;\nUPDATE matriculas SET observacao='Turma noturna' WHERE estudante_id=1 AND trilha_id=10;\nSELECT trilha_id,observacao FROM matriculas ORDER BY trilha_id;",
+        "explanation": "A observação pertence à associação; a outra matrícula permanece com NULL.",
+        "expected": "Dados recebe Turma noturna; Web apresenta NULL."
+      },
+      {
+        "prompt": "Construir: normalize uma planilha de matrículas que repete nome e email do estudante e guarda trilhas separadas por vírgula. Entregue tabelas, chaves e três linhas de exemplo.",
+        "hints": ["Separe ESTUDANTES e TRILHAS.", "Use uma linha por associação em MATRICULAS."],
+        "solution": "CREATE TABLE estudantes(id INTEGER PRIMARY KEY,nome TEXT NOT NULL,email TEXT NOT NULL UNIQUE);\nCREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT NOT NULL UNIQUE);\nCREATE TABLE matriculas(estudante_id INTEGER REFERENCES estudantes(id),trilha_id INTEGER REFERENCES trilhas(id),PRIMARY KEY(estudante_id,trilha_id));\nINSERT INTO estudantes VALUES(1,'Ana','ana@example.test');\nINSERT INTO trilhas VALUES(10,'Dados');\nINSERT INTO matriculas VALUES(1,10);",
+        "explanation": "Cada entidade é registrada uma vez e cada associação ocupa uma linha verificável.",
+        "expected": "Uma estudante, uma trilha e uma matrícula, sem lista de IDs em texto."
+      },
+      {
+        "prompt": "Investigar erro: alguém substituiu data_matricula ausente por '0000-00-00'. Explique por que o valor inventado prejudica consultas e proponha uma representação coerente.",
+        "hints": ["Ausência não é uma data antiga nem zero."],
+        "solution": "Mantenha data_matricula como NULL enquanto a data for desconhecida e consulte com IS NULL. Se a data for obrigatória, use NOT NULL e recuse a matrícula sem data em vez de inventar um valor.",
+        "explanation": "O contrato precisa distinguir valor conhecido de ausência; sentinelas falsas parecem datas e contaminam ordenações e relatórios.",
+        "expected": "Ausência representada por NULL ou entrada recusada por uma regra explícita."
+      }
+    ],
+    "mistakes": [
+      "Dividir todo texto automaticamente sem considerar as consultas do domínio.",
+      "Repetir atributo de uma entidade em cada associação e criar cópias divergentes.",
+      "Substituir ausência por zero ou data fictícia sem declarar essa semântica.",
+      "Acreditar que uma chave estrangeira implementa regras que não foram declaradas."
+    ],
+    "quiz": [
+      { "question": "Onde deve ficar data_matricula?", "options": ["Em ESTUDANTES", "Em TRILHAS", "Em MATRICULAS"], "correctIndex": 2, "explanation": "A data descreve a associação entre uma pessoa e uma trilha." },
+      { "question": "Por que trilhas_texto='10,20' dificulta a integridade?", "options": ["Porque texto nunca pode ter números", "Porque cada item não possui referência e unicidade verificáveis separadamente", "Porque toda coluna precisa ser inteira"], "correctIndex": 1, "explanation": "Uma linha por associação permite chaves estrangeiras e uma chave composta." },
+      { "question": "O que NULL deve representar?", "options": ["Sempre zero", "Sempre erro", "A ausência definida no contrato daquela coluna"], "correctIndex": 2, "explanation": "A semântica de ausência precisa ser decidida por dado e domínio." }
+    ],
+    "summary": [
+      "Normalize para reduzir contradições observáveis, não por ritual.",
+      "Mantenha cada atributo junto da chave da qual ele depende.",
+      "Documente ausência, limites das restrições e mudanças de requisito."
+    ]
+  },
 "db-ddl-crud": {
-    "prerequisites": "Conheça tabela, linha, coluna, chave primária e estrangeira da aula de modelagem. SQL será apresentado aqui desde os primeiros comandos.",
+    "prerequisites": "Conclua Entidades, relacionamentos e chaves (db-modeling) e Normalização, ausência e decisões de modelagem (db-normalization). SQL será apresentado aqui desde os primeiros comandos.",
     "setup": "Use uma base SQLite nova e descartável para cada aula. Você pode colar o SQL em uma ferramenta SQLite local e executar instrução por instrução. Alternativa sem instalar servidor: com Python 3, salve o SQL em aula.sql e o executor abaixo em executar.py, na mesma pasta; rode python executar.py (ou py executar.py no Windows). Ele cria uma base apenas em memória, imprime cada resultado de consulta e fecha a conexão ao terminar. Cada execução começa vazia. Exercícios usam o estado final do exemplo: acrescente apenas o exercício escolhido ao final de aula.sql e reinicie o executor. Não cole cercas de Markdown nos arquivos. Se faltar o módulo sqlite3, use uma distribuição de Python com esse módulo ou uma ferramenta SQLite. A página apenas guarda rascunhos; o SQL será executado na ferramenta local. Neste executor, não coloque duas instruções completas na mesma linha; cada instrução deve terminar em sua própria linha.",
     "why": "Uma interface pode impedir valores negativos, mas outro programa pode acessar o mesmo banco. Constraints colocam as regras junto aos dados, protegendo-os independentemente da tela que enviou a alteração.",
     "sections": [

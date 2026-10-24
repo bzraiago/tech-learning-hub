@@ -226,6 +226,21 @@ for (const lessonId of progressiveJavaScriptLessonIds) {
   }
 }
 
+const progressiveDatabaseLessonIds = ['db-modeling', 'db-normalization'];
+for (const lessonId of progressiveDatabaseLessonIds) {
+  const guide = LESSON_GUIDES[lessonId];
+  if (!guide) {
+    fail(`Aula progressiva obrigatória ausente: ${lessonId}`);
+    continue;
+  }
+  const prompts = (guide.exercises || []).map((exercise) => exercise.prompt || '');
+  for (const kind of exerciseKinds) {
+    if (!prompts.some((prompt) => prompt.startsWith(kind))) {
+      fail(`Aula ${lessonId} sem exercício do tipo ${kind}`);
+    }
+  }
+}
+
 const environmentContracts = [
   ['PostgreSQL no host', LESSON_GUIDES['setup-postgresql'], ['127.0.0.1', '55432', 'estudos', 'aluno']],
   ['PostgreSQL no projeto relacional', PROJECTS.find((project) => project.id === 'project-db-relational'), ['127.0.0.1', '55432', 'laboratorio_estoque', 'aluno']],

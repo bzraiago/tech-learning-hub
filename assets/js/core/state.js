@@ -39,7 +39,7 @@ function renderReadiness() {
 }
 
 function sanitizeState(candidate) {
-  const clean = { version: 1, completed: {}, activeTrack: 'preparacao', lastLesson: null, notes: {}, quizAttempts: {}, projects: {}, htmlCssRevision: 2, javascriptRevision: 3, pythonRevision: 2, databaseRevision: 2, aiRevision: 2, readiness: {} };
+  const clean = { version: 1, completed: {}, activeTrack: 'preparacao', lastLesson: null, notes: {}, quizAttempts: {}, projects: {}, htmlCssRevision: 2, javascriptRevision: 3, pythonRevision: 2, databaseRevision: 3, aiRevision: 2, readiness: {} };
   if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return clean;
   if (candidate.completed && typeof candidate.completed === 'object') {
     for (const id of lessonIndex.keys()) {
@@ -78,7 +78,10 @@ function sanitizeState(candidate) {
     if (Object.keys(candidate.quizAttempts || {}).some(id => lessonIndex.get(id)?.track.id === 'javascript')) startupNotice='JavaScript foi revisado. As respostas dessa trilha foram reiniciadas; conclusões e rascunhos foram preservados.';
   }
   if(candidate.pythonRevision!==2){for(const lesson of tracks.find(track=>track.id==='python').modules.flatMap(module=>module.lessons))delete clean.quizAttempts[lesson.id];}
-  if(candidate.databaseRevision!==2){for(const lesson of tracks.find(t=>t.id==='database').modules.flatMap(m=>m.lessons))delete clean.quizAttempts[lesson.id];}
+  if(candidate.databaseRevision!==3){
+    for(const lesson of tracks.find(t=>t.id==='database').modules.flatMap(m=>m.lessons))delete clean.quizAttempts[lesson.id];
+    if (Object.keys(candidate.quizAttempts || {}).some(id => lessonIndex.get(id)?.track.id === 'database')) startupNotice='Banco de Dados foi revisado. As respostas dessa trilha foram reiniciadas; conclusões e rascunhos foram preservados.';
+  }
   if(candidate.aiRevision!==2){for(const lesson of tracks.find(t=>t.id==='ai').modules.flatMap(m=>m.lessons))delete clean.quizAttempts[lesson.id];}
   return clean;
 }

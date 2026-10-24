@@ -2216,13 +2216,13 @@
         "lessons": [
           {
             "id": "db-modeling",
-            "title": "Modelagem relacional, chaves e normalização",
-            "minutes": 120,
+            "title": "Entidades, relacionamentos e chaves",
+            "minutes": 85,
             "concept": "Imagine que Ana e Beto estudam SQL. Se você guardar a conclusão na própria aula, marcar a aula como concluída para Ana também mudará o estado visto por Beto. Modelar significa decidir a qual coisa cada informação pertence antes de escrever comandos.",
             "objectives": [
-              "Identifique entidades antes de criar tabelas.",
-              "Use chaves para identidade e referências.",
-              "Guarde informações da relação na tabela que representa a relação."
+              "Distinguir entidade, atributo, linha e identidade.",
+              "Representar relações 1:N e N:N com referências.",
+              "Guardar informações da relação na tabela associativa."
             ],
             "exercise": "3. Construir: modele avaliações de lições. Cada estudante pode avaliar cada lição uma vez, com nota inteira de 1 a 5. Crie a tabela e registre nota 4 de Ana para SELECT.",
             "code": "PRAGMA foreign_keys=ON;\nCREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT NOT NULL UNIQUE);\nCREATE TABLE estudantes(id INTEGER PRIMARY KEY,nome TEXT NOT NULL,email TEXT NOT NULL UNIQUE);\nCREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha_id INTEGER NOT NULL REFERENCES trilhas(id),titulo TEXT NOT NULL);\nCREATE TABLE matriculas(estudante_id INTEGER NOT NULL REFERENCES estudantes(id),trilha_id INTEGER NOT NULL REFERENCES trilhas(id),PRIMARY KEY(estudante_id,trilha_id));\nCREATE TABLE progresso(estudante_id INTEGER NOT NULL REFERENCES estudantes(id),licao_id INTEGER NOT NULL REFERENCES licoes(id),concluida INTEGER NOT NULL CHECK(concluida IN (0,1)),PRIMARY KEY(estudante_id,licao_id));\nINSERT INTO trilhas VALUES(1,'Dados');\nINSERT INTO estudantes VALUES(1,'Ana','ana@example.test'),(2,'Beto','beto@example.test');\nINSERT INTO licoes VALUES(10,1,'SELECT'),(11,1,'JOIN');\nINSERT INTO matriculas VALUES(1,1),(2,1);\nINSERT INTO progresso VALUES(1,10,1),(2,10,0);\nSELECT estudante_id,licao_id,concluida FROM progresso ORDER BY estudante_id,licao_id;",
@@ -2243,6 +2243,33 @@
                 "kind": "doc",
                 "title": "Python · sqlite3 e parâmetros SQL",
                 "url": "https://docs.python.org/3/library/sqlite3.html",
+                "language": "EN"
+              }
+            ]
+          },
+          {
+            "id": "db-normalization",
+            "title": "Normalização, ausência e decisões de modelagem",
+            "minutes": 85,
+            "concept": "Reduza contradições separando dados por dependência, sem transformar normalização em divisão automática de toda informação.",
+            "objectives": [
+              "Reconhecer repetição que causa anomalias de atualização, inserção ou remoção.",
+              "Aplicar as três primeiras formas normais em um exemplo pequeno.",
+              "Documentar o significado de ausência e os limites do modelo escolhido."
+            ],
+            "exercise": "Construir: normalize uma planilha de matrículas que repete nome e email do estudante e guarda trilhas separadas por vírgula. Entregue tabelas, chaves e três linhas de exemplo.",
+            "code": "PRAGMA foreign_keys=ON;\nCREATE TABLE estudantes(id INTEGER PRIMARY KEY,nome TEXT NOT NULL,email TEXT NOT NULL UNIQUE);\nCREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT NOT NULL UNIQUE);\nCREATE TABLE matriculas(estudante_id INTEGER NOT NULL REFERENCES estudantes(id),trilha_id INTEGER NOT NULL REFERENCES trilhas(id),data_matricula TEXT,PRIMARY KEY(estudante_id,trilha_id));\nINSERT INTO estudantes VALUES(1,'Ana','ana@example.test');\nINSERT INTO trilhas VALUES(10,'Dados'),(20,'Web');\nINSERT INTO matriculas VALUES(1,10,'2026-10-24'),(1,20,NULL);\nSELECT estudante_id,trilha_id,data_matricula FROM matriculas ORDER BY trilha_id;",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "SQLite · referência da linguagem SQL",
+                "url": "https://www.sqlite.org/lang.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "SQLite · integridade referencial",
+                "url": "https://www.sqlite.org/foreignkeys.html",
                 "language": "EN"
               }
             ]

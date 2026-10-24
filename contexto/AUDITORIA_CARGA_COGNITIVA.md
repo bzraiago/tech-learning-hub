@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou 41 aulas com mais de quatro seções. Isso identifica candidatas, não comprova que todas estejam sobrecarregadas: algumas seções aprofundam a mesma ideia. O risco mais forte está nas cinco aulas de fundamentos de banco, cada uma com sete blocos e sem os quatro tipos de exercício explicitamente rotulados. A primeira intervenção recomendada é dividir `db-modeling`, preservando esse ID para o primeiro bloco e criando novos IDs para os aprofundamentos.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a primeira intervenção, a auditoria automática aponta 40: `db-modeling` preserva o ID e concentra entidades e relacionamentos; `db-normalization` recebeu normalização, ausência e limites. As quatro aulas fundamentais restantes continuam prioritárias.
 
 ## 2. Contrato de aprendizagem
 
@@ -65,7 +65,7 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 
 ## 8. Próximos passos sugeridos
 
-1. Dividir `db-modeling` em identidade/entidades, relacionamentos e normalização/decisões.
+1. [Concluído] Dividir `db-modeling` entre entidades/relacionamentos e `db-normalization` para normalização/decisões.
 2. Dividir `db-ddl-crud` em definição/restrições e operações seguras.
 3. Separar filtros/`NULL` de agregações em `db-select`.
 4. Separar junções básicas de granularidade, CTEs e subconsultas em `db-joins`.
