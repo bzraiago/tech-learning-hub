@@ -146,7 +146,8 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `db-docker-operations`: reunir diagnóstico e ciclo de vida, explicitar retomada após o exemplo e concentrar fontes de backup/restauração.
     - [x] `db-mongo-crud`: ligar à preparação MongoDB e organizar leitura, escrita segura e modelagem em quatro blocos.
     - [x] `db-mongo-pipelines`: organizar validação, transformação e observação de índices sem repetir os conceitos em seis blocos.
-    - [ ] Revisar as cinco aulas avançadas de banco restantes.
+    - [x] `db-performance`: ligar ao laboratório PostgreSQL 17 e separar hipótese, medição, escolha do índice e correção.
+    - [ ] Revisar as quatro aulas avançadas de banco restantes.
   - [ ] Prioridade 3: revisar 11 aulas de HTML/JavaScript e distinguir aprofundamento legítimo de sobrecarga.
   - [ ] Prioridade 4: revisar 15 aulas de IA/Entrega, preservando o nível avançado quando os pré-requisitos forem suficientes.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
@@ -431,6 +432,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Fase 3.10 — operação e recuperação | Revisão da terceira aula da prioridade 2 | `db-docker-operations` ficou com quatro blocos, prática progressiva e retomada explícita após `down`. |
 | 24/10/2026 | Fase 3.11 — CRUD MongoDB | Revisão da quarta aula da prioridade 2 | `db-mongo-crud` ficou com quatro blocos, preparação explícita e verificação de leitura, atualização e exclusão. |
 | 24/10/2026 | Fase 3.12 — pipelines MongoDB | Revisão da quinta aula da prioridade 2 | `db-mongo-pipelines` ficou com quatro blocos, contrato de dados testável, sequência de estágios visível e interpretação cautelosa do plano. |
+| 24/10/2026 | Fase 3.13 — desempenho SQL | Revisão da sexta aula da prioridade 2 | `db-performance` ficou com quatro blocos, preparação PostgreSQL 17 explícita, fontes alinhadas à versão e relatório baseado em evidências. |
 
 ## Decisões e bloqueios
 

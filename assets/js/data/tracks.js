@@ -3065,24 +3065,23 @@
             "minutes": 75,
             "concept": "Índices podem reduzir leituras, mas consomem espaço e têm custo nas escritas. A ordem das colunas de um índice composto importa. Leia o plano de execução e compare estimativas com observações; uma varredura sequencial pode ser a melhor escolha em uma tabela pequena. EXPLAIN ANALYZE executa a consulta, por isso use um SELECT no laboratório.",
             "objectives": [
-              "Interpretar o caminho de acesso e a quantidade de linhas.",
-              "Medir o efeito de um índice sem presumir que ele sempre será usado.",
-              "Meça consultas representativas antes de otimizar.",
-              "Verificar resultados e explicar os limites do laboratório com casos válidos e inválidos."
+              "Interpretar caminho de acesso, linhas estimadas e linhas observadas.",
+              "Comparar a mesma consulta antes e depois de um índice composto.",
+              "Conferir o resultado e relatar limites da medição sem prometer ganho universal."
             ],
-            "exercise": "Escreva um relatório de desempenho sem inventar tempos. Que dados precisam acompanhar a hipótese do índice?",
+            "exercise": "Relate a comparação antes/depois com planos reais, resultado funcional e limites da medição, sem inventar tempos.",
             "code": "CREATE TABLE perf_licoes (\n id INTEGER PRIMARY KEY, trilha_id INTEGER NOT NULL, titulo TEXT NOT NULL\n);\nINSERT INTO perf_licoes(id,trilha_id,titulo)\nSELECT n,n % 100,'Licao ' || n FROM generate_series(1,10000) AS g(n);\nANALYZE perf_licoes;\nEXPLAIN (ANALYZE, BUFFERS)\nSELECT id,titulo FROM perf_licoes WHERE trilha_id=7 ORDER BY id;\nCREATE INDEX idx_perf_trilha_id ON perf_licoes(trilha_id,id);\nANALYZE perf_licoes;\nEXPLAIN (ANALYZE, BUFFERS)\nSELECT id,titulo FROM perf_licoes WHERE trilha_id=7 ORDER BY id;\nSELECT COUNT(*) AS encontrados FROM perf_licoes WHERE trilha_id=7;",
             "docs": [
               {
                 "kind": "doc",
                 "title": "PostgreSQL · Entendendo EXPLAIN",
-                "url": "https://www.postgresql.org/docs/current/using-explain.html",
+                "url": "https://www.postgresql.org/docs/17/using-explain.html",
                 "language": "EN"
               },
               {
                 "kind": "doc",
                 "title": "PostgreSQL · Índices",
-                "url": "https://www.postgresql.org/docs/current/indexes.html",
+                "url": "https://www.postgresql.org/docs/17/indexes.html",
                 "language": "EN"
               },
               {

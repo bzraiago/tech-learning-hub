@@ -2500,52 +2500,38 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "db-performance": {
-    "prerequisites": "Revise WHERE, ORDER BY e chaves. Uma consulta pode devolver poucas linhas e ainda ler a tabela inteira para encontrá-las.",
-    "setup": "Use PostgreSQL em banco de laboratório com permissão para criar tabelas. O script gera dez mil registros sintéticos. EXPLAIN (ANALYZE, BUFFERS) executa o SELECT para observar seu comportamento. O nome perf_licoes deve estar livre.",
+    "prerequisites": "Conclua db-docker-compose e setup-postgresql para ter PostgreSQL 17 e um cliente conectados. Revise WHERE, ORDER BY e chaves em db-select e db-ddl-constraints. Uma consulta pode devolver poucas linhas e ainda ler a tabela inteira para encontrá-las.",
+    "setup": "No terminal ou cliente SQL preparado em setup-postgresql, conecte-se a 127.0.0.1:55432, banco estudos, usuário aluno, usando a senha local do laboratório. Confira SELECT current_database(), current_user; antes de executar. Use somente um banco de laboratório onde a tabela perf_licoes ainda não existe; o script cria a tabela, insere dez mil registros sintéticos e cria um índice. Não execute novamente no mesmo banco nem remova dados existentes para reiniciar: use outro banco de laboratório autorizado. EXPLAIN (ANALYZE, BUFFERS) executa o SELECT observado; nesta aula não o aplique a comandos que modificam dados.",
     "why": "Imagine uma biblioteca com dez mil fichas. Sem organização auxiliar, procurar uma trilha exige examinar muitas fichas. Um índice se parece com um catálogo que leva aos candidatos, mas precisa ser mantido quando os dados mudam.",
     "sections": [
       {
-        "title": "Caminhos de acesso",
+        "title": "Hipótese: caminho de acesso e seletividade",
         "paragraphs": [
           "Uma varredura sequencial lê a tabela procurando linhas que satisfaçam o filtro. Um índice pode permitir localizar uma faixa menor de chaves e depois buscar as linhas correspondentes. Ele ocupa espaço e recebe atualizações em INSERT, DELETE e alterações das colunas indexadas. Portanto, índices têm benefício de leitura e custo de manutenção.",
-          "Se quase toda a tabela corresponde ao filtro, percorrer o índice e buscar muitas linhas pode ser menos vantajoso que ler diretamente. O planejador estima custos usando estatísticas. A escolha de uma varredura sequencial não é prova de erro: precisa ser interpretada conforme os dados, a consulta e os recursos disponíveis."
+          "Seletividade descreve quão pequeno é o subconjunto selecionado. Aqui trilha_id=7 encontra 100 de 10.000 linhas, aproximadamente 1%. O índice (trilha_id,id) organiza primeiro por trilha e depois por id, como o filtro e a ordenação da consulta. (id,trilha_id) não oferece o mesmo caminho direto para todas as linhas da trilha. Se quase tudo corresponde ao filtro, uma varredura sequencial pode ser melhor; sua escolha pelo planejador não é prova de erro."
         ]
       },
       {
-        "title": "Seletividade e ordem",
-        "paragraphs": [
-          "Seletividade descreve quão pequeno é o subconjunto selecionado. Aqui trilha_id=7 encontra 100 de 10.000 linhas, aproximadamente 1%. O índice composto (trilha_id,id) organiza primeiro por trilha e, dentro dela, por identificador. Isso corresponde ao filtro de igualdade e à ordenação usados na consulta.",
-          "Um índice com ordem inversa, (id,trilha_id), organiza primeiro por id e não oferece o mesmo caminho direto para todas as linhas de uma trilha. Não crie um índice para cada combinação imaginável. Reúna consultas frequentes e mantenha estruturas que justifiquem seu custo nas escritas e no armazenamento."
-        ]
-      },
-      {
-        "title": "Medir sem inventar resultados",
+        "title": "Medir e ler o plano",
         "paragraphs": [
           "EXPLAIN mostra o plano estimado; ANALYZE dentro de EXPLAIN executa a consulta e acrescenta observações reais. BUFFERS ajuda a entender acessos a páginas. ANALYZE como comando separado atualiza estatísticas da tabela. São usos relacionados, mas diferentes, da mesma palavra. No laboratório mediremos apenas SELECT, que não modifica registros.",
-          "Compare estimativas de linhas, linhas efetivas, filtros e leituras, além do tempo total. Cache e carga do computador alteram tempos entre execuções. Não conclua que um índice é duas vezes melhor a partir de uma única execução. O resultado funcional deve permanecer igual antes e depois da otimização."
+          "O custo estimado não é uma duração em milissegundos. Compare linhas estimadas e reais, filtros e páginas lidas. Diferença grande entre expectativa e realidade pode indicar estatísticas ou distribuição difíceis de estimar; investigue antes de adicionar um índice. Em nós repetidos, loops também importa. Cache e carga do computador mudam tempos: uma execução não prova ganho estável.",
+          "Seq Scan lê sequencialmente; Index Scan usa índice e acessa linhas; Bitmap reúne candidatos antes de acessar páginas; Sort ordena explicitamente. Comece localizando obtenção, filtro e ordenação. A resposta de cem linhas pode ter exigido examinar milhares. O resultado funcional deve continuar igual antes e depois do índice."
         ]
       },
       {
-        "title": "Ler um plano como hipótese verificável",
+        "title": "Escolher índices para consultas representativas",
         "paragraphs": [
-          "O custo estimado do PostgreSQL não é uma duração em milissegundos. Ele permite comparar alternativas segundo o modelo de custos do planejador. Linhas estimadas descrevem a expectativa antes de executar; linhas reais aparecem quando usamos ANALYZE. Uma diferença grande entre expectativa e realidade pode indicar estatísticas inadequadas ou distribuição difícil de estimar. Investigue essa diferença antes de decidir que falta um índice. Em nós executados várias vezes, loops também importa para entender o trabalho total.",
-          "Seq Scan é leitura sequencial; Index Scan usa um índice e acessa linhas; Bitmap pode combinar candidatos e acessar páginas de outra forma. Sort indica ordenação explícita. Não precisa memorizar todos os tipos para começar: identifique onde os candidatos são obtidos, onde são filtrados e onde são ordenados. Compare esse caminho com a pergunta SQL. Uma consulta que retorna cem linhas pode ter descartado milhares antes; olhar apenas o tamanho da resposta oculta esse esforço."
+          "A carga sintética distribui igualmente cem trilhas. Um produto real pode ter uma trilha muito popular. Meça filtros comuns e extremos, registre SQL e dados, repita observações e não descarte medidas contrárias à hipótese. Informe mediana ou intervalo e ambiente, sem produzir um tempo universal.",
+          "(trilha_id,id) atende a um padrão específico, não toda consulta futura. Antes de criar outro índice, confirme frequência, volume retornado e custo das escritas. Transformar a coluna filtrada por uma função pode impedir o uso esperado de um índice simples; índices por expressão são outro desenho e exigem manutenção. Selecione apenas os campos necessários e use paginação com ordem estável. Consultas repetidas em laços, como buscar um autor por lição, podem gerar N+1 acessos — um problema diferente de falta de índice."
         ]
       },
       {
-        "title": "Consultas representativas e orçamento de índices",
+        "title": "Conferir correção e segurança da medição",
         "paragraphs": [
-          "A carga sintética tem cem trilhas com a mesma quantidade de lições. Um produto real pode ter uma trilha muito popular e outras pequenas. Meça filtros comuns e extremos, mantendo consulta e conjunto de dados registrados. Execute mais de uma vez para perceber o efeito do cache, mas não descarte seletivamente as medidas que contrariam sua hipótese. Guarde mediana ou intervalo de várias observações e descreva o ambiente. O relatório deve permitir comparação, não produzir um número universal.",
-          "Um índice cobre uma sequência de decisões. Igualdade em trilha_id e ordenação por id combinam com (trilha_id,id). Se a consulta passa a filtrar também por data, talvez seja necessário outro desenho. Isso não significa acrescentar índices imediatamente: primeiro confirme frequência, volume retornado e custo atual. Cada índice usa espaço e participa de operações de escrita. A aplicação que grava eventos continuamente pode sofrer com índices supérfluos mesmo que algumas leituras melhorem.",
-          "Evite envolver a coluna filtrada em uma transformação desnecessária. Se você aplica uma função a cada valor, um índice simples nessa coluna pode não oferecer o caminho esperado; índices por expressão existem em alguns motores, mas exigem correspondência e manutenção. Também selecione os campos necessários, use paginação com ordem estável e investigue consultas repetidas em laços. Fazer uma consulta por lição para buscar o autor pode gerar o problema N+1: muitos acessos pequenos somados em vez de uma busca planejada."
-        ]
-      },
-      {
-        "title": "Desempenho faz parte da correção",
-        "paragraphs": [
-          "Uma otimização que elimina linhas por acidente não é melhoria. Antes de medir, salve a quantidade e os identificadores esperados. Depois compare conteúdo e ordenação com a versão anterior. Alterar LEFT JOIN para JOIN pode acelerar uma consulta e ao mesmo tempo esconder trilhas vazias. O teste funcional detecta essa regressão. Quando uma mudança troca lógica e índice ao mesmo tempo, fica difícil atribuir o resultado: faça uma hipótese por experiência.",
-          "EXPLAIN ANALYZE executa a instrução. Para esta aula, limite-se aos SELECT de laboratório. Em manutenção real, aplicar essa opção a UPDATE ou DELETE pode modificar dados. Mesmo um SELECT pode adquirir locks e consumir recursos importantes, por isso volume de teste e ambiente importam. SQLite tem EXPLAIN QUERY PLAN, com outra apresentação; MariaDB e Firebird possuem ferramentas e planos próprios. Os conceitos de filtro, caminho e quantidade transferem-se, mas nomes de nós e comandos não são intercambiáveis.",
-          "Sua entrega deve conter o SQL, a carga usada, o plano observado antes, o plano depois, a conferência funcional e uma conclusão proporcional. Se não houver ganho relevante, registre isso e considere retirar o índice experimental. Encontrar uma hipótese que não se confirmou é resultado útil. Um desenvolvedor júnior deve conseguir produzir evidências e pedir análise com contexto; não precisa prometer a melhor estratégia possível para qualquer carga."
+          "Antes de medir, registre quantidade, IDs e ordem esperados. Depois confirme o mesmo resultado; uma otimização que perde linhas é defeito. Trocar LEFT JOIN por JOIN pode esconder trilhas vazias mesmo se parecer mais rápido. Mude uma hipótese por vez para poder atribuir o efeito ao índice ou à lógica.",
+          "EXPLAIN ANALYZE executa a instrução: nesta aula aplique-o somente aos SELECT sintéticos. Em UPDATE ou DELETE ele pode modificar dados; até um SELECT grande pode consumir recursos e adquirir locks. SQLite tem EXPLAIN QUERY PLAN, com saída própria; conceitos de filtro e caminho transferem-se, mas comandos e nós não são intercambiáveis.",
+          "Entregue SQL, descrição da carga, planos antes e depois, conferência funcional e conclusão proporcional. Se não houver ganho relevante, registre a hipótese não confirmada e avalie retirar o índice experimental. Isso é evidência de diagnóstico, não promessa de estratégia ótima para qualquer carga."
         ]
       }
     ],
@@ -2576,7 +2562,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Confirme quantos registros pertencem à trilha 8 e qual é seu menor id.",
+        "prompt": "Prever: antes de consultar, diga quantos registros pertencem à trilha 8 e qual é seu menor id; depois confirme no banco.",
         "hints": [
           "A distribuição usa o resto da divisão por 100.",
           "COUNT e MIN podem aparecer juntos sem GROUP BY."
@@ -2586,7 +2572,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "quantidade 100; primeiro 8."
       },
       {
-        "prompt": "Compare o plano da consulta de trilha 7 com uma consulta que seleciona todas as trilhas. O que verificar?",
+        "prompt": "Alterar: compare o plano da consulta de trilha 7 com uma consulta que seleciona todas as trilhas. O que verificar?",
         "hints": [
           "Use EXPLAIN ANALYZE em SELECT.",
           "O filtro trilha_id>=0 corresponde às dez mil linhas."
@@ -2596,7 +2582,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "A consulta ampla retorna 10000 linhas; o plano deve ser observado."
       },
       {
-        "prompt": "Crie uma consulta paginada para os cinco primeiros IDs da trilha 7 maiores que 207 e explique a ordem.",
+        "prompt": "Construir: crie uma consulta paginada para os cinco primeiros IDs da trilha 7 maiores que 207 e explique a ordem.",
         "hints": [
           "IDs da trilha 7 crescem de cem em cem.",
           "Não use apenas LIMIT sem ordenar."
@@ -2606,7 +2592,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "IDs 307, 407, 507, 607 e 707."
       },
       {
-        "prompt": "Escreva um relatório de desempenho sem inventar tempos. Que dados precisam acompanhar a hipótese do índice?",
+        "prompt": "Investigar erro: alguém afirma que o índice sempre acelerou a consulta porque o segundo plano tem outro custo. Escreva um relatório sem inventar tempos: que evidências faltam para aceitar ou rejeitar essa afirmação?",
         "hints": [
           "Anexe evidências da sua execução.",
           "Se não executou PostgreSQL, declare o plano como pendente de medição."

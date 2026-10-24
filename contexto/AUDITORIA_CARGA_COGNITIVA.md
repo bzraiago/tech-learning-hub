@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-mongo-pipelines`, a auditoria automática aponta 31: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; cinco das dez aulas avançadas foram condensadas sem mudar seus IDs. Restam cinco aulas avançadas de banco prioritárias.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-performance`, a auditoria automática aponta 30: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; seis das dez aulas avançadas foram condensadas sem mudar seus IDs. Restam quatro aulas avançadas de banco prioritárias.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Alta | G | 5 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
+| 1 | Alta | G | 4 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
 | 2 | Média | G | 5 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 3 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 4 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
@@ -118,6 +118,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 - **Ambiente:** `mongosh` ligado a um servidor real, banco `tech_hub_aula_pipeline` inicialmente inexistente; o exemplo cria a coleção uma vez. A retomada usa outro nome de banco, preservando dados anteriores. Os testes inválidos são comandos separados, pois uma exceção pode interromper a sequência. Não houve execução em servidor MongoDB nesta revisão.
 - **Fontes:** documentação oficial MongoDB de [pipeline](https://www.mongodb.com/docs/manual/core/aggregation-pipeline/), [validação de esquema](https://www.mongodb.com/docs/manual/core/schema-validation/), [índices](https://www.mongodb.com/docs/manual/indexes/), [tipos no mongosh](https://www.mongodb.com/docs/mongodb-shell/reference/data-types/) e [análise do plano](https://www.mongodb.com/docs/manual/tutorial/analyze-query-plan/) foi aberta em 24/10/2026 (EN, OK). Ela sustenta estágios em sequência, rejeição padrão de documentos inválidos, `Double()` e a interpretação de `explain`.
 - **Limite:** o plano em três documentos ensina observação, não demonstra benefício do índice. Sem servidor executado nem aluno real observado, a autonomia para criar pipelines, validar dados e otimizar consultas segue não comprovada.
+
+### Revisão localizada: `db-performance`
+
+- **Público e saída:** após SQL básico, `db-docker-compose` e `setup-postgresql`, o aluno deve comparar a mesma consulta antes e depois de um índice, conferir os mesmos 100 resultados e relatar plano, custo e limites sem inventar tempos.
+- **FATO, alta, M:** seis seções repetiam seletividade, interpretação do plano e cautela com índices. O guia passou a quatro blocos: hipótese de acesso, medição, escolha para carga representativa e correção. Os exercícios explicitam prever, alterar, construir e investigar erro; o último questiona a conclusão apressada de ganho.
+- **Sequência:** `db-select` e `db-ddl-constraints` → `db-docker-compose` → `setup-postgresql` → `db-performance`. Não se identificou ciclo nesse recorte. A instalação do cliente e a conexão 127.0.0.1:55432 ao banco `estudos` foram referenciadas sem duplicar instruções por sistema.
+- **Ambiente:** PostgreSQL 17 de laboratório, tabela `perf_licoes` ainda inexistente e dez mil registros sintéticos. O aluno deve conferir banco e usuário antes de criar objetos. `EXPLAIN (ANALYZE, BUFFERS)` executa a consulta; o laboratório limita-o a `SELECT`. Para retomar, usa-se outro banco autorizado, sem apagar dados existentes. Não houve execução de PostgreSQL nesta revisão.
+- **Fontes:** documentação oficial [PostgreSQL 17 — EXPLAIN](https://www.postgresql.org/docs/17/using-explain.html), [PostgreSQL 17 — índices](https://www.postgresql.org/docs/17/indexes.html) e [SQLite — EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html), abertas em 24/10/2026 (EN, OK). Os links PostgreSQL da aula, antes em `current` (versão 18 nessa data), foram fixados em 17 para acompanhar o laboratório.
+- **Limite:** o exemplo tem distribuição uniforme e uma única consulta. Plano e tempo reais dependem da instância; sem executar o banco ou observar um aluno, não há evidência de melhoria de desempenho nem de autonomia diagnóstica.
 
 ## 9. Limites desta auditoria
 
