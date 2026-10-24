@@ -213,6 +213,45 @@
               {"kind": "doc", "title": "pgAdmin · downloads", "url": "https://www.pgadmin.org/download/", "language": "EN"},
               {"kind": "doc", "title": "PostgreSQL · imagem oficial", "url": "https://hub.docker.com/_/postgres", "language": "EN"}
             ]
+          },
+          {
+            "id": "setup-mariadb",
+            "title": "Preparar MariaDB como aprofundamento",
+            "minutes": 65,
+            "concept": "Instalar MariaDB Community Server e o cliente mariadb, verificar o serviço e criar um banco descartável sem confundir MariaDB com PostgreSQL ou MySQL.",
+            "objectives": ["Instalar servidor e cliente pelo caminho oficial do sistema.", "Conectar localmente sem registrar a senha.", "Confirmar banco, usuário, versão e porta antes de iniciar db-mariadb."],
+            "exercise": "Crie hub_maria_aula, confirme SELECT DATABASE(), USER(), VERSION(); e registre a conexão sem senha.",
+            "code": "mariadb --version\nmariadb -h 127.0.0.1 -P 3306 -u root -p\nCREATE DATABASE hub_maria_aula CHARACTER SET utf8mb4;\nUSE hub_maria_aula;\nSELECT DATABASE(), USER(), VERSION();",
+            "docs": [
+              {"kind": "doc", "title": "MariaDB · instalação inicial", "url": "https://mariadb.com/get-started-with-mariadb/", "language": "EN"},
+              {"kind": "doc", "title": "MariaDB · implantação e instalação", "url": "https://mariadb.com/docs/server/server-management/install-and-upgrade-mariadb", "language": "EN"}
+            ]
+          },
+          {
+            "id": "setup-firebird",
+            "title": "Preparar Firebird 5 como aprofundamento",
+            "minutes": 75,
+            "concept": "Instalar Firebird 5 e localizar o cliente isql correto, verificando serviço, autenticação e caminho permitido para um banco de laboratório.",
+            "objectives": ["Instalar o kit oficial adequado ao sistema.", "Distinguir o isql do Firebird de programas homônimos.", "Criar e acessar um arquivo .fdb em pasta permitida sem expor a senha SYSDBA."],
+            "exercise": "Localize o isql do Firebird, crie um banco de laboratório e confirme CURRENT_USER sem salvar credenciais.",
+            "code": "isql -z\n# No isql do Firebird, adapte o caminho:\nCREATE DATABASE 'localhost:C:/dados/hub_fb_aula.fdb' USER 'SYSDBA' PASSWORD 'SUA_SENHA_LOCAL' DEFAULT CHARACTER SET UTF8;\nSELECT CURRENT_USER FROM RDB$DATABASE;\nQUIT;",
+            "docs": [
+              {"kind": "doc", "title": "Firebird · downloads", "url": "https://www.firebirdsql.org/en/downloads/", "language": "EN"},
+              {"kind": "doc", "title": "Firebird 5 · guia de início", "url": "https://www.firebirdsql.org/file/documentation/html/en/firebirddocs/qsg5/firebird-5-quickstartguide.html", "language": "EN"}
+            ]
+          },
+          {
+            "id": "setup-mongodb",
+            "title": "Preparar MongoDB Community e mongosh",
+            "minutes": 70,
+            "concept": "Instalar ou iniciar um servidor MongoDB Community, instalar mongosh separadamente quando necessário e verificar a conexão local em 127.0.0.1:27017.",
+            "objectives": ["Distinguir servidor MongoDB de cliente mongosh.", "Escolher instalação local ou container de aprofundamento.", "Executar ping e registrar URI, versão e estado sem credenciais."],
+            "exercise": "Conecte com mongosh, execute db.runCommand({ping:1}) e registre a evidência antes de iniciar db-mongo-crud.",
+            "code": "mongosh --version\nmongosh \"mongodb://127.0.0.1:27017\"\ndb.runCommand({ ping: 1 })\nexit",
+            "docs": [
+              {"kind": "doc", "title": "MongoDB Community · instalação", "url": "https://www.mongodb.com/docs/manual/installation/", "language": "EN"},
+              {"kind": "doc", "title": "MongoDB Shell · instalar mongosh", "url": "https://www.mongodb.com/docs/mongodb-shell/install/", "language": "EN"}
+            ]
           }
         ]
       }

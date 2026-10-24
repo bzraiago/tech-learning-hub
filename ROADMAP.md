@@ -109,12 +109,12 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Criar preparação de Docker, WSL e virtualização no Windows.
 - [x] Criar alternativa leve para práticas que usam Docker.
 - [x] Criar preparação de PostgreSQL e clientes de conexão.
-- [ ] Criar preparação de MariaDB.
-- [ ] Criar preparação de Firebird.
-- [ ] Criar preparação de MongoDB e `mongosh`.
+- [x] Criar preparação de MariaDB.
+- [x] Criar preparação de Firebird.
+- [x] Criar preparação de MongoDB e `mongosh`.
 - [ ] Padronizar cada preparação: objetivo → requisitos → passos por sistema → verificação → saída esperada → problemas comuns → parar e retomar → alternativa leve.
-- [ ] Definir SQLite e PostgreSQL como caminho principal da trilha de dados.
-- [ ] Posicionar MariaDB, Firebird e MongoDB como aprofundamentos explícitos.
+- [x] Definir SQLite e PostgreSQL como caminho principal da trilha de dados.
+- [x] Posicionar MariaDB, Firebird e MongoDB como aprofundamentos explícitos.
 - [x] Corrigir a inconsistência da porta PostgreSQL `55432` entre o laboratório Docker e o projeto relacional.
 - [ ] Revisar portas, bancos, usuários e nomes usados entre todos os laboratórios e projetos.
 
@@ -346,6 +346,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Fase 2.2 — ambientes essenciais | Commit da Fase 2.2 | Preparações de editor, Python, Git e Node.js/npm adicionadas com diagnóstico e alternativas. |
 | 24/10/2026 | Fase 2.3 — Docker e alternativa leve | Commit da Fase 2.3 | Preparação de Docker/WSL/virtualização e percurso temporário com SQLite adicionados. |
 | 24/10/2026 | Fase 2.4 — PostgreSQL e clientes | Commit da Fase 2.4 | Preparação de psql/pgAdmin e projeto relacional padronizados em `127.0.0.1:55432`. |
+| 24/10/2026 | Fase 2.5 — bancos de aprofundamento | Commit da Fase 2.5 | Preparações opcionais de MariaDB, Firebird e MongoDB/mongosh adicionadas. |
 
 ## Decisões e bloqueios
 

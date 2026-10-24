@@ -9,7 +9,7 @@
 
 O Tech Learning Hub oferece um caminho de aprendizagem real, mas ainda não está totalmente preparado para conduzir uma pessoa absolutamente leiga até uma formação intermediária autônoma usando somente suas instruções. A preparação digital inicial foi implementada em 24/10/2026; as maiores lacunas restantes estão nas instalações das ferramentas, na progressão entre assuntos e na passagem dos exercícios isolados para aplicações completas.
 
-A aplicação contém **9 trilhas, 28 módulos, 104 aulas, 418 exercícios, 312 questões e 20 projetos** (contagem atualizada em 24/10/2026 após a preparação de PostgreSQL e clientes). Esses números descrevem o material disponível; não medem domínio do aluno.
+A aplicação contém **9 trilhas, 28 módulos, 107 aulas, 430 exercícios, 321 questões e 20 projetos** (contagem atualizada em 24/10/2026 após as preparações dos bancos de aprofundamento). Esses números descrevem o material disponível; não medem domínio do aluno.
 
 ## O que já funciona bem
 

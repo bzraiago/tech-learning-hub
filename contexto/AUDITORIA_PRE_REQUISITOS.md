@@ -4,7 +4,7 @@
 
 ## 1. Veredito
 
-O mapa torna explícitas as principais dependências entre as nove trilhas e impede que Python, Node.js ou Docker apareçam como requisitos silenciosos. Os atalhos para servidor local, SQLite e PostgreSQL reduzem reordenações desnecessárias. Editor, Python, Git, Node.js/npm, Docker/WSL e PostgreSQL agora possuem preparações próprias; a Fase 2 permanece em andamento porque os bancos de aprofundamento ainda precisam do mesmo tratamento.
+O mapa torna explícitas as principais dependências entre as nove trilhas e impede que Python, Node.js ou Docker apareçam como requisitos silenciosos. Os atalhos para servidor local, SQLite e PostgreSQL reduzem reordenações desnecessárias. As ferramentas essenciais e os bancos agora possuem preparações próprias; MariaDB, Firebird e MongoDB estão explicitamente posicionados como aprofundamentos. A Fase 2 permanece aberta para a revisão global de parâmetros.
 
 ## 2. Contrato de aprendizagem
 
@@ -34,7 +34,7 @@ O grafo completo está em `docs/MAPA_PRE_REQUISITOS.md`. Não foram encontradas 
 | Node.js/npm | Sim, no conteúdo | Execução com aluno real | Fonte oficial verificada; instalação não executada |
 | Docker/WSL | Sim, no conteúdo | Execução em máquinas reais | Fontes verificadas; instalação não executada |
 | PostgreSQL | Sim, no conteúdo | Execução com psql externo | Fontes verificadas; cliente ausente nesta máquina |
-| Bancos de aprofundamento | Não nesta entrega | Preparações completas | Não verificado nesta entrega |
+| Bancos de aprofundamento | Sim, no conteúdo | Execução multiplataforma | Fontes verificadas; clientes ausentes nesta máquina |
 
 ## 6. Fontes
 
@@ -51,7 +51,7 @@ O mapa permite escolher uma sequência coerente e reconhecer preparações míni
 
 ## 8. Próximos passos sugeridos
 
-1. Criar as preparações dos motores de aprofundamento.
+1. Revisar globalmente portas, bancos, usuários e nomes dos laboratórios e projetos.
 2. Validar as preparações com alunos e máquinas reais.
 
 ## 9. Limites desta auditoria

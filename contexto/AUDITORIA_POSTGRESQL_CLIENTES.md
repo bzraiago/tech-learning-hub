@@ -56,9 +56,8 @@ Ao executar a aula, o aluno pode demonstrar instalação do cliente, conexão ex
 
 ## 8. Próximos passos sugeridos
 
-1. Criar preparações de MariaDB, Firebird e MongoDB como aprofundamentos.
-2. Revisar globalmente portas, bancos, usuários e nomes após todas as preparações.
-3. Testar a conexão `psql` ponta a ponta em Windows, macOS e Linux.
+1. Revisar globalmente portas, bancos, usuários e nomes após todas as preparações.
+2. Testar a conexão `psql` ponta a ponta em Windows, macOS e Linux.
 
 ## 9. Limites desta auditoria
 
