@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-docker-compose`, a auditoria automática aponta 34: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; duas das dez aulas avançadas foram condensadas sem mudar seus IDs. Restam oito aulas avançadas de banco prioritárias.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-docker-operations`, a auditoria automática aponta 33: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; três das dez aulas avançadas foram condensadas sem mudar seus IDs. Restam sete aulas avançadas de banco prioritárias.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Alta | G | 8 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
+| 1 | Alta | G | 7 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
 | 2 | Média | G | 5 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 3 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 4 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
@@ -91,6 +91,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 - **Ambiente:** `compose.yaml`, `.env` e `.gitignore` pertencem à pasta `dados-local`. A porta 55432 e o volume `dados` foram mantidos. Instalação e operação real do Docker neste computador não foram executadas nesta revisão.
 - **Fontes:** documentação oficial Docker de [rede Compose](https://docs.docker.com/compose/how-tos/networking/), [interpolação](https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/) e [`compose down`](https://docs.docker.com/reference/cli/docker/compose/down/), além da [imagem oficial PostgreSQL](https://hub.docker.com/_/postgres), aberta em 24/10/2026 (EN, OK). Confirma serviço por nome, variável obrigatória, preservação de volume sem `-v` e inicialização somente em diretório vazio.
 - **Limite:** a auditoria verifica sequência e fidelidade das instruções; não comprova que um aluno consiga reconstruir o serviço sem ajuda ou que o ambiente funcione em todos os sistemas.
+
+### Revisão localizada: `db-docker-operations`
+
+- **Público e saída:** quem concluiu `db-docker-compose` com PostgreSQL 17 ativo deve diagnosticar falhas por etapa, exportar a base, copiar o arquivo para o computador e restaurar em outro banco. O aluno deve comparar dados recuperados e registrar o que a cópia não cobre.
+- **FATO, alta, M:** seis seções separavam diagnóstico de ciclo de vida e credenciais do README, embora cada par forme uma mesma decisão de operação. O guia ficou com quatro blocos e exercícios de prever, alterar, construir e investigar erro. O exemplo termina com `docker compose down`; a preparação agora instrui a religar o serviço antes dos exercícios.
+- **Sequência:** `setup-docker` → `db-docker-basics` → `db-docker-compose` → `db-docker-operations`. `setup-postgresql` é necessário apenas para testar o cliente externo; o exemplo usa `psql` dentro do container. Sem Docker, `setup-docker-alternative` permite leitura conceitual, não a prova de recuperação real.
+- **Ambiente:** a mesma pasta `dados-local`, o serviço `db`, o banco `estudos` e a imagem PostgreSQL 17 são reutilizados. `estudos_restaurado` precisa ser um destino novo; nenhum passo da aula pede apagar a origem. Os comandos que modificam containers e bancos não foram executados nesta revisão.
+- **Fontes:** documentação oficial de [`docker compose cp`](https://docs.docker.com/reference/cli/docker/compose/cp/), [`docker compose down`](https://docs.docker.com/reference/cli/docker/compose/down/), [`pg_dump` 17](https://www.postgresql.org/docs/17/app-pgdump.html) e [`pg_restore` 17](https://www.postgresql.org/docs/17/app-pgrestore.html), aberta em 24/10/2026 (EN, OK). Sustenta o transporte do arquivo, preservação do volume nomeado sem `-v` e restauração do formato custom.
+- **Limite:** o validador confere estrutura e consistência; sem restauração executada nem observação de aluno, a competência operacional continua não comprovada.
 
 ## 9. Limites desta auditoria
 

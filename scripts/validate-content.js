@@ -226,7 +226,7 @@ for (const lessonId of progressiveJavaScriptLessonIds) {
   }
 }
 
-const progressiveDatabaseLessonIds = ['db-modeling', 'db-normalization', 'db-ddl-constraints', 'db-ddl-crud', 'db-select', 'db-aggregation', 'db-joins', 'db-subqueries-ctes', 'db-transactions', 'db-concurrency-boundaries', 'db-docker-basics', 'db-docker-compose'];
+const progressiveDatabaseLessonIds = ['db-modeling', 'db-normalization', 'db-ddl-constraints', 'db-ddl-crud', 'db-select', 'db-aggregation', 'db-joins', 'db-subqueries-ctes', 'db-transactions', 'db-concurrency-boundaries', 'db-docker-basics', 'db-docker-compose', 'db-docker-operations'];
 for (const lessonId of progressiveDatabaseLessonIds) {
   const guide = LESSON_GUIDES[lessonId];
   if (!guide) {

@@ -2652,52 +2652,20 @@
           {
             "id": "db-docker-operations",
             "title": "Operação local: diagnóstico, backup e restauração",
-            "minutes": 110,
+            "minutes": 100,
             "concept": "Resolva falhas por evidências e comprove recuperação em uma base separada sem remover os dados originais.",
             "objectives": [
               "Distinguir falhas de porta, autenticação, inicialização e consulta.",
               "Gerar backup, copiá-lo para o host e restaurar em banco novo.",
               "Documentar rotina reproduzível e limites de segurança."
             ],
-            "exercise": "Escreva um roteiro de recuperação com cinco evidências.",
+            "exercise": "Construir: escreva um roteiro de recuperação com cinco evidências.",
             "code": "# 1. Na pasta do compose.yaml, crie .env com uma senha local escolhida por você:\n# POSTGRES_PASSWORD=sua_senha_local\n# .gitignore deve conter .env e *.dump\ndocker compose config --quiet\ndocker compose up -d\ndocker compose ps\n# Espere o serviço db indicar healthy; se falhar, examine logs.\ndocker compose exec db psql -U aluno -d estudos -v ON_ERROR_STOP=1 -c \"CREATE TABLE IF NOT EXISTS marcador(id integer PRIMARY KEY, texto text NOT NULL); INSERT INTO marcador VALUES(1,'persistiu') ON CONFLICT(id) DO UPDATE SET texto=EXCLUDED.texto;\"\ndocker compose down\ndocker compose up -d\n# Espere healthy novamente antes da próxima consulta.\ndocker compose exec db psql -U aluno -d estudos -c \"SELECT * FROM marcador;\"\n# Backup em formato custom dentro do container; copie para o computador.\ndocker compose exec db pg_dump -U aluno -d estudos -Fc -f /tmp/estudos.dump\ndocker compose cp db:/tmp/estudos.dump ./estudos.dump\n# Banco restaurado novo (se já existir, escolha outro nome).\ndocker compose exec db createdb -U aluno estudos_restaurado\ndocker compose cp ./estudos.dump db:/tmp/restaurar.dump\ndocker compose exec db pg_restore -U aluno -d estudos_restaurado --exit-on-error /tmp/restaurar.dump\ndocker compose exec db psql -U aluno -d estudos_restaurado -c \"SELECT * FROM marcador;\"\n# Para parar preservando volume:\ndocker compose down\n",
             "docs": [
-              {
-                "kind": "doc",
-                "title": "Docker · instalação Windows",
-                "url": "https://docs.docker.com/desktop/setup/install/windows-install/",
-                "language": "EN"
-              },
-              {
-                "kind": "doc",
-                "title": "Docker · instalação macOS",
-                "url": "https://docs.docker.com/desktop/setup/install/mac-install/",
-                "language": "EN"
-              },
-              {
-                "kind": "doc",
-                "title": "Docker Engine · Linux",
-                "url": "https://docs.docker.com/engine/install/",
-                "language": "EN"
-              },
-              {
-                "kind": "doc",
-                "title": "Docker · Compose",
-                "url": "https://docs.docker.com/compose/gettingstarted/",
-                "language": "EN"
-              },
-              {
-                "kind": "doc",
-                "title": "Docker · redes no Compose",
-                "url": "https://docs.docker.com/compose/how-tos/networking/",
-                "language": "EN"
-              },
-              {
-                "kind": "doc",
-                "title": "PostgreSQL · imagem oficial",
-                "url": "https://hub.docker.com/_/postgres",
-                "language": "EN"
-              }
+              {"kind":"doc","title":"Docker · compose down e volumes","url":"https://docs.docker.com/reference/cli/docker/compose/down/","language":"EN"},
+              {"kind":"doc","title":"Docker · compose cp","url":"https://docs.docker.com/reference/cli/docker/compose/cp/","language":"EN"},
+              {"kind":"doc","title":"PostgreSQL 17 · pg_dump","url":"https://www.postgresql.org/docs/17/app-pgdump.html","language":"EN"},
+              {"kind":"doc","title":"PostgreSQL 17 · pg_restore","url":"https://www.postgresql.org/docs/17/app-pgrestore.html","language":"EN"}
             ]
           }
         ]

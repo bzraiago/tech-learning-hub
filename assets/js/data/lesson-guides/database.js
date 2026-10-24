@@ -1301,20 +1301,15 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "db-docker-operations": {
-    "prerequisites": "Conclua a aula Compose e mantenha seu laboratório PostgreSQL em execução. Revise transações e a diferença entre dados e arquivos de configuração.",
-    "setup": "Use a mesma pasta, compose.yaml e .env da aula anterior. Antes do exemplo, verifique docker compose ps e confirme db healthy. O exemplo cria a tabela marcador; se você já a criou no projeto, pule somente essa criação e confira seu conteúdo. O destino estudos_restaurado deve ser novo; se já existir, escolha outro nome e adapte os comandos. Nenhum comando desta aula exige apagar o banco original.",
+    "prerequisites": "Conclua db-docker-compose com PostgreSQL 17 em execução. Para verificar conexão externa, conclua também setup-postgresql; o roteiro principal usa psql dentro do container. Revise transações e a diferença entre dados e arquivos de configuração.",
+    "setup": "Use a mesma pasta dados-local, compose.yaml e .env da aula db-docker-compose. No terminal aberto nessa pasta, execute docker compose ps e confirme db healthy antes do exemplo. O exemplo cria ou atualiza marcador de id 1 e testa a cópia em um banco novo chamado estudos_restaurado; se esse destino já existir, escolha outro nome e adapte todos os comandos de destino. Ele termina com docker compose down sem -v. Para fazer os exercícios depois, execute docker compose up -d, aguarde healthy e escolha outro nome para cada banco restaurado. Nenhum passo pede apagar o banco original. Sem Docker, setup-docker-alternative permite estudar o fluxo, mas a recuperação real fica pendente.",
     "why": "Conseguir subir um container é apenas o início. Quando um serviço falha ou alguém exclui um registro, você precisa descobrir o que ocorreu e recuperar uma versão útil dos dados. Um backup que existe mas nunca foi restaurado oferece pouca evidência de recuperação.",
     "sections": [
       {
-        "title": "Diagnóstico por camadas",
+        "title": "Diagnosticar e preservar o ambiente",
         "paragraphs": [
           "Comece pelo mecanismo: docker version precisa alcançar o servidor. Depois veja docker compose ps e docker compose logs --tail=60 db. O log pode mostrar inicialização em progresso, diretório incompatível com versão ou falha na configuração. Anote a mensagem relevante e a ação anterior; não trate todo erro como senha errada. Logs podem conter dados de aplicação, então compartilhe somente o trecho necessário sem credenciais.",
-          "Se o serviço está disponível, confira docker compose port db 5432. Esse comando revela a porta publicada. Teste uma consulta interna via exec. Se ela funciona e a conexão pelo computador não funciona, compare endereço, porta, usuário e banco do cliente externo. Se a conexão funciona e somente uma consulta falha, leia o erro SQL e verifique schema/tabela; reinstalar Docker não corrige uma coluna inexistente."
-        ]
-      },
-      {
-        "title": "Parar, recriar e remover são ações distintas",
-        "paragraphs": [
+          "Se o serviço está disponível, confira docker compose port db 5432. Esse comando revela a porta publicada. Teste uma consulta interna via exec. Se ela funciona e a conexão pelo computador não funciona, compare endereço, porta, usuário e banco do cliente externo. Se a conexão funciona e somente uma consulta falha, leia o erro SQL e verifique schema/tabela; reinstalar Docker não corrige uma coluna inexistente.",
           "docker compose stop para os serviços preservando containers. docker compose start inicia os containers existentes. up -d também reconcilia a configuração e pode recriar containers alterados. down remove containers e a rede do projeto, preservando volumes nomeados por padrão. A opção -v acrescenta remoção de volumes declarados; portanto pode eliminar o banco desse laboratório.",
           "Antes de qualquer limpeza, identifique projeto e dados. Não use limpeza global de volumes para resolver problema de porta. Um conflito se resolve escolhendo outra porta do host ou parando conscientemente o serviço que a ocupa. Para experimentar outra major do PostgreSQL, crie ambiente separado e siga migração; não substitua a tag sobre o mesmo volume esperando conversão automática."
         ]
@@ -1327,22 +1322,17 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "Restaurar e conferir o contrato",
+        "title": "Restaurar e conferir os dados",
         "paragraphs": [
           "Crie estudos_restaurado com createdb. Copie o arquivo do host de volta para /tmp/restaurar.dump, deixando claro qual cópia está sendo testada. Execute pg_restore com --exit-on-error para interromper se houver erro. Em seguida, consulte a tabela marcador no banco restaurado e compare seu registro com o esperado. A base original estudos permanece disponível para comparação.",
           "Uma restauração tecnicamente concluída ainda precisa de verificações de negócio: contagens, totais e relações relevantes. Uma aplicação pode depender de migrações, permissões e configurações não demonstradas por SELECT 1. Registre quais consultas foram usadas e por quê. Em um ensaio posterior, crie uma alteração na origem após o backup e confirme que ela não aparece no restaurado; isso evidencia o momento da cópia."
         ]
       },
       {
-        "title": "Credenciais e ambientes locais",
+        "title": "Documentar acesso e recuperação",
         "paragraphs": [
           "O .env reduz a chance de versionar uma senha junto do YAML, mas continua sendo arquivo em texto. O .gitignore não remove segredos já commitados. Se uma credencial real foi compartilhada, trocar apenas o arquivo não revoga a credencial; ela precisa ser substituída no sistema correspondente. Para este curso, use credenciais exclusivas do laboratório e dados fictícios.",
-          "O usuário aluno criado pela imagem é uma conta de inicialização com privilégios amplos. Não use esse desenho como padrão de acesso de uma aplicação pública. Uma aplicação deve ter usuário próprio e somente as permissões necessárias; Docker não concede essa separação automaticamente. Montagens, porta publicada e acesso ao Engine também fazem parte da superfície de acesso. O laboratório local introduz esses limites sem exigir infraestrutura de produção."
-        ]
-      },
-      {
-        "title": "README e ensaio de recuperação",
-        "paragraphs": [
+          "O usuário aluno criado pela imagem é uma conta de inicialização com privilégios amplos. Não use esse desenho como padrão de acesso de uma aplicação pública. Uma aplicação deve ter usuário próprio e somente as permissões necessárias; Docker não concede essa separação automaticamente. Montagens, porta publicada e acesso ao Engine também fazem parte da superfície de acesso. O laboratório local introduz esses limites sem exigir infraestrutura de produção.",
           "Seu README deve dizer como instalar os requisitos, criar .env a partir de .env.example, iniciar o ambiente, conectar e testar. Inclua como parar preservando dados e qual comando removeria volumes, deixando claro que não pertence ao fluxo normal. Escreva onde ficam os backups e como restaurar uma cópia em destino separado. Não registre senhas nos exemplos ou capturas.",
           "Meça aproximadamente quanto levou para restaurar e validar. Esse ensaio ajuda a discutir RTO, tempo tolerável de recuperação, e RPO, quantidade de dados que se aceita perder desde a última cópia. Um backup por dia pode perder alterações recentes; um volume no mesmo computador não protege contra perda desse computador. No projeto, apresente resultados observados e limitações em vez de prometer segurança absoluta."
         ]
@@ -1375,7 +1365,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "A conexão é recusada no host. Liste três verificações antes de mudar a senha.",
+        "prompt": "Prever: a conexão é recusada no host. Liste três verificações e preveja que evidência cada uma fornece antes de mudar a senha.",
         "hints": [
           "Verifique serviço e publicação.",
           "Uma consulta interna ajuda a separar rede e SQL."
@@ -1385,7 +1375,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Estado, porta e mensagem registrados."
       },
       {
-        "prompt": "Adapte a restauração para um destino novo chamado estudos_ensaio2.",
+        "prompt": "Alterar: adapte a restauração para um destino novo chamado estudos_ensaio2, sem substituir a base original.",
         "hints": [
           "Crie a base antes do restore.",
           "Use o mesmo nome na consulta de conferência."
@@ -1395,7 +1385,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "O marcador está no novo banco."
       },
       {
-        "prompt": "Escreva um roteiro de recuperação com cinco evidências.",
+        "prompt": "Construir: escreva um roteiro de recuperação com cinco evidências.",
         "hints": [
           "Inclua configuração, cópia, destino e consulta.",
           "Informe tempo observado sem inventar números."
@@ -1405,7 +1395,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Outra pessoa consegue reproduzir e avaliar a recuperação."
       },
       {
-        "prompt": "Um colega editou a senha em .env e recebeu password authentication failed. Investigue sem apagar o volume.",
+        "prompt": "Investigar erro: um colega editou a senha em .env e recebeu password authentication failed. Investigue sem apagar o volume.",
         "hints": [
           "As variáveis inicializam o cluster vazio.",
           "Diferencie configuração desejada e estado persistido."
