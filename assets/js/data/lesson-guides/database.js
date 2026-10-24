@@ -1010,8 +1010,8 @@ Object.assign(LESSON_GUIDES, {
     "summary":["Use SAVEPOINT somente para etapas separáveis.","Mantenha transações curtas e repita a unidade completa com limite.","Modele efeitos externos como processos observáveis e tolerantes a repetição."]
   },
 "db-docker-basics": {
-    "prerequisites": "Conheça tabelas e consultas SQL do primeiro módulo. Os comandos desta aula são de terminal; não são SQL e não devem ser colados em um editor de consultas.",
-    "setup": "Windows/macOS: obtenha Docker Desktop no site oficial, escolha o instalador da arquitetura do computador, conclua a instalação e abra o aplicativo. No Windows use o mecanismo de containers Linux; se o instalador solicitar WSL/virtualização, conclua esses requisitos e reinicie quando solicitado. Linux: instale Docker Engine e o plugin Compose pelo repositório oficial da sua distribuição, ou use Docker Desktop. Abra um terminal novo e execute docker version e docker compose version. A instalação depende do sistema; os links de instalação estão em Fontes. O restante do laboratório está explicado nesta trilha.",
+    "prerequisites": "Conclua a preparação setup-docker (ou setup-docker-alternative se o computador não comportar Docker) e conheça tabelas e consultas SQL do primeiro módulo. Os comandos desta aula vão no terminal, não no editor de SQL.",
+    "setup": "Na pasta dados-local, abra um terminal PowerShell, Terminal do macOS ou terminal Linux. Se Docker foi instalado agora, abra um terminal novo e inicie Docker Desktop ou o Engine. Execute docker version, docker compose version e docker ps, um comando por vez. Em docker version, espere as partes Client e Server; em docker compose version, uma versão do plugin; em docker ps, um cabeçalho mesmo sem containers. Se faltar Server, volte à preparação setup-docker e resolva a inicialização. Se Docker não estiver disponível, use setup-docker-alternative para acompanhar os conceitos com SQLite; a prática real de containers fica pendente.",
     "why": "Uma equipe precisa conseguir iniciar a mesma versão de banco e reproduzir um problema. Docker descreve parte desse ambiente, mas não substitui saber SQL, definir permissões ou recuperar dados. Aprender as peças separadamente evita procurar um erro de consulta quando o servidor sequer iniciou.",
     "sections": [
       {
@@ -1036,24 +1036,10 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "Instalar e verificar em etapas",
+        "title": "Verificar e registrar o ambiente",
         "paragraphs": [
-          "No Windows e macOS, abra Docker Desktop após instalar e aguarde a indicação de que o mecanismo está em execução. O terminal precisa reconhecer docker. Se não reconhecer, abra outro terminal depois da instalação e confira a instalação antes de editar variáveis de sistema. No Linux, o procedimento do gerenciador de pacotes e a inicialização do serviço variam por distribuição; use o instalador oficial correspondente em vez de misturar comandos de distribuições diferentes.",
-          "Registre a saída de docker version, docker compose version e docker ps. O último lista containers em execução e pode mostrar somente o cabeçalho se nenhum existir. Isso é um resultado válido. Na próxima aula, docker compose up poderá baixar uma imagem oficial, exigindo rede e espaço em disco. Falha de download é um problema de obtenção da imagem, não de autenticação no banco."
-        ]
-      },
-      {
-        "title": "Versões e limites do laboratório",
-        "paragraphs": [
-          "Usaremos postgres:17 para manter os exemplos consistentes. Essa tag fixa a versão principal, mas pode receber atualizações dentro dela; uma reprodução exata pode exigir uma tag mais específica ou um digest registrado. Trocar a versão principal não equivale a atualizar uma biblioteca comum: os dados podem exigir migração. Não monte o volume antigo em outra major sem estudar o procedimento de upgrade.",
-          "O laboratório publica a porta somente no próprio computador, usa dados fictícios e uma conta de inicialização. Ele não configura alta disponibilidade, monitoramento completo ou uma política de acesso de produção. Ao terminar, você deverá explicar como o ambiente inicia e onde seus dados ficam. Essa capacidade é mais útil que decorar um comando sem reconhecer o que ele cria."
-        ]
-      },
-      {
-        "title": "Seu primeiro diagnóstico",
-        "paragraphs": [
-          "Crie uma pasta chamada dados-local no editor. Guarde um README com sistema, versões e objetivo. Execute uma linha de cada vez no terminal e confira o código de saída ou a mensagem. Não cole o símbolo de prompt junto do comando. docker ps -a inclui containers parados; compare sua saída com docker ps antes de concluir que um serviço desapareceu.",
-          "Se um comando falhar, classifique a etapa: comando não encontrado, Engine inacessível, imagem indisponível, container encerrado ou banco recusando conexão. Cada categoria pede uma observação diferente. Essa sequência economiza tentativas e será usada no projeto final. Não execute comandos de limpeza global como tentativa genérica de reparo: eles podem atingir outros projetos."
+          "Crie a pasta dados-local no editor e guarde nela um README com sistema, versões observadas e objetivo. Execute os comandos do exemplo um por vez no terminal, sem copiar o símbolo de prompt. docker ps lista containers ativos; docker ps -a inclui os parados. Uma lista vazia é válida neste ponto. Se docker não for reconhecido, abra um terminal novo e confira a preparação; se Client aparecer sem Server, inicie ou diagnostique o Engine.",
+          "Classifique outras falhas pela etapa: obtenção da imagem, encerramento do container ou conexão ao banco. Na próxima aula, docker compose up poderá baixar a imagem e exigir rede e espaço. Não execute limpeza global para tentar reparar um erro de conexão. Usaremos postgres:17 para manter a versão principal consistente; a tag pode receber atualizações menores e mudar a versão principal requer um plano de migração dos dados. O laboratório usa dados fictícios e porta local. Volume conserva arquivos, mas backup e uso de produção exigem cuidados próprios nas aulas seguintes."
         ]
       }
     ],
@@ -1083,7 +1069,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Identifique as peças: postgres:17, um processo PostgreSQL em execução e um volume chamado dados.",
+        "prompt": "Prever: identifique as peças postgres:17, um processo PostgreSQL em execução e um volume chamado dados; preveja o que persiste após recriar o container.",
         "hints": [
           "Pergunte qual peça contém o software.",
           "Diferencie execução e persistência."
@@ -1093,7 +1079,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Três papéis diferentes, sem chamar Docker de banco."
       },
       {
-        "prompt": "O terminal mostra a versão do cliente e erro de conexão ao Engine. Qual próximo passo?",
+        "prompt": "Alterar: o terminal mostra a versão do cliente e erro de conexão ao Engine. Qual próximo passo e qual comando repetirá para verificar a mudança?",
         "hints": [
           "Reinstalar PostgreSQL não liga o Engine.",
           "Confira Docker Desktop ou serviço Docker."
@@ -1103,7 +1089,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Cliente e servidor Docker acessíveis."
       },
       {
-        "prompt": "Escreva um README mínimo reproduzível do ambiente.",
+        "prompt": "Construir: escreva um README mínimo reproduzível do ambiente.",
         "hints": [
           "Inclua sistema e versões observadas, sem inventá-las.",
           "Registre a pasta e como validar a instalação."
@@ -1113,7 +1099,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "README permite identificar requisitos e comandos."
       },
       {
-        "prompt": "Um colega quer trocar postgres:17 por latest e apagar volumes para resolver um erro de conexão. Investigue.",
+        "prompt": "Investigar erro: um colega quer trocar postgres:17 por latest e apagar volumes para resolver um erro de conexão. Investigue.",
         "hints": [
           "Versão, rede e dados são problemas distintos.",
           "Limpeza não é diagnóstico."

@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após cinco intervenções, a auditoria automática aponta 36: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores. A próxima prioridade são as dez aulas avançadas de banco com seis seções.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-docker-basics`, a auditoria automática aponta 35: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; a primeira das dez aulas avançadas foi condensada sem mudar seu ID. Restam nove aulas avançadas de banco prioritárias.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Alta | G | 10 aulas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma após os fundamentos e padronizar a progressão. |
+| 1 | Alta | G | 9 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
 | 2 | Média | G | 5 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 3 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 4 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
@@ -74,6 +74,14 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `db-docker-basics`
+
+- **Público e saída:** quem concluiu SQL inicial e a preparação `setup-docker` deve distinguir imagem, container, volume, cliente e Engine, verificar o ambiente e registrar um diagnóstico reproduzível. Na alternativa `setup-docker-alternative`, a prática real com containers fica pendente.
+- **FATO, alta, M:** o guia reunia instalação, conceitos, versões e diagnóstico em seis seções, repetindo parte de `setup-docker`. A instalação passou a ser pré-requisito explícito, e a aula ficou com quatro seções e exercícios de prever, alterar, construir e investigar erro.
+- **Sequência:** `setup-docker` ou `setup-docker-alternative` → `db-docker-basics` → `db-docker-compose`. Sem dependência circular identificada nesse recorte.
+- **Ambiente e fontes:** os comandos permanecem no terminal da pasta `dados-local`; a alternativa SQLite é declarada. Documentação oficial Docker sobre [containers](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/), [volumes](https://docs.docker.com/engine/storage/volumes/) e [`docker ps`](https://docs.docker.com/reference/cli/docker/container/ls/) foi aberta em 24/10/2026 (EN, OK).
+- **Limite:** a estrutura e as fontes foram conferidas, mas não houve observação de aluno real; concluir o quiz não comprova autonomia para operar Docker ou PostgreSQL.
 
 ## 9. Limites desta auditoria
 

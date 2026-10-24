@@ -141,6 +141,8 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `db-joins`: separar junções/granularidade de subconsultas/CTEs.
     - [x] `db-transactions`: separar unidade transacional de concorrência, repetição e efeitos externos.
   - [ ] Prioridade 2: revisar as dez aulas avançadas de banco mapeadas com seis seções.
+    - [x] `db-docker-basics`: reduzir sobreposição com a preparação Docker e intercalar diagnóstico com os conceitos essenciais.
+    - [ ] Revisar as nove aulas avançadas de banco restantes.
   - [ ] Prioridade 3: revisar 11 aulas de HTML/JavaScript e distinguir aprofundamento legítimo de sobrecarga.
   - [ ] Prioridade 4: revisar 15 aulas de IA/Entrega, preservando o nível avançado quando os pré-requisitos forem suficientes.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
@@ -420,6 +422,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Fase 3.5 — consultas e agregações | Commit da Fase 3.5 | `db-select` ficou focada em linhas, filtros e `NULL`; `db-aggregation` recebeu medidas, grupos e `HAVING`. |
 | 24/10/2026 | Fase 3.6 — JOINs e CTEs | Commit da Fase 3.6 | `db-joins` ficou focada em junções e granularidade; `db-subqueries-ctes` recebeu consultas em etapas e prevenção de multiplicação. |
 | 24/10/2026 | Fase 3.7 — transações e concorrência | Commit da Fase 3.7 | `db-transactions` ficou focada na unidade atômica; `db-concurrency-boundaries` recebeu savepoints, repetição e efeitos externos. |
+| 24/10/2026 | Fase 3.8 — fundamentos de Docker | Revisão da primeira aula da prioridade 2 | `db-docker-basics` remete à preparação por sistema, concentra conceitos e diagnóstico em quatro blocos e padroniza a prática. |
 
 ## Decisões e bloqueios
 

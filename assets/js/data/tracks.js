@@ -2550,14 +2550,14 @@
           {
             "id": "db-docker-basics",
             "title": "Docker do zero: imagem, container e banco local",
-            "minutes": 85,
+            "minutes": 75,
             "concept": "Entenda a infraestrutura mínima para executar um servidor de banco isolado no computador e diferencie essa infraestrutura dos dados.",
             "objectives": [
               "Distinguir imagem, container, volume, cliente e servidor.",
-              "Instalar e verificar Docker e Compose no sistema utilizado.",
+              "Verificar Docker e Compose após a preparação do sistema utilizado.",
               "Diagnosticar cliente disponível com Engine parado."
             ],
-            "exercise": "Escreva um README mínimo reproduzível do ambiente.",
+            "exercise": "Construir: escreva um README mínimo reproduzível do ambiente.",
             "code": "docker version\ndocker compose version\ndocker ps\ndocker ps -a",
             "docs": [
               {
