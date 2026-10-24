@@ -247,18 +247,70 @@ Object.assign(LESSON_GUIDES, {
       "Documente ausência, limites das restrições e mudanças de requisito."
     ]
   },
-"db-ddl-crud": {
-    "prerequisites": "Conclua Entidades, relacionamentos e chaves (db-modeling) e Normalização, ausência e decisões de modelagem (db-normalization). SQL será apresentado aqui desde os primeiros comandos.",
-    "setup": "Use uma base SQLite nova e descartável para cada aula. Você pode colar o SQL em uma ferramenta SQLite local e executar instrução por instrução. Alternativa sem instalar servidor: com Python 3, salve o SQL em aula.sql e o executor abaixo em executar.py, na mesma pasta; rode python executar.py (ou py executar.py no Windows). Ele cria uma base apenas em memória, imprime cada resultado de consulta e fecha a conexão ao terminar. Cada execução começa vazia. Exercícios usam o estado final do exemplo: acrescente apenas o exercício escolhido ao final de aula.sql e reinicie o executor. Não cole cercas de Markdown nos arquivos. Se faltar o módulo sqlite3, use uma distribuição de Python com esse módulo ou uma ferramenta SQLite. A página apenas guarda rascunhos; o SQL será executado na ferramenta local. Neste executor, não coloque duas instruções completas na mesma linha; cada instrução deve terminar em sua própria linha.",
-    "why": "Uma interface pode impedir valores negativos, mas outro programa pode acessar o mesmo banco. Constraints colocam as regras junto aos dados, protegendo-os independentemente da tela que enviou a alteração.",
+"db-ddl-constraints": {
+    "prerequisites": "Concluir Entidades, relacionamentos e chaves (db-modeling) e Normalização, ausência e decisões de modelagem (db-normalization).",
+    "setup": "Use uma base SQLite nova e descartável. Execute o SQL em um cliente SQLite ou reutilize aula.sql e executar.py da aula de modelagem. Confirme PRAGMA foreign_keys; o resultado esperado é 1. Execute tentativas inválidas separadamente para observar a mensagem e verificar que nenhuma linha foi aceita.",
+    "why": "Validar apenas na interface não protege o banco de outros programas ou de uma falha no servidor. Restrições transformam parte das regras do modelo em condições verificadas sempre que uma escrita chega ao banco.",
     "sections": [
       {
-        "title": "Definir antes de preencher",
+        "title": "DDL descreve a estrutura",
         "paragraphs": [
-          "CREATE TABLE cria a estrutura; essa família de comandos é chamada DDL. Cada coluna recebe um nome, um tipo e possíveis restrições. INTEGER representa números inteiros e TEXT representa texto no exemplo SQLite. O ponto e vírgula encerra cada instrução, permitindo executar várias em sequência.",
-          "PRIMARY KEY identifica a linha. NOT NULL exige presença de valor. UNIQUE proíbe repetição de valores presentes. CHECK testa uma expressão, como minutos > 0. No SQLite tradicional a tipagem é flexível; essas declarações não equivalem a toda a rigidez de tipos de outros motores. Para tabelas de tipagem estrita existe o modo STRICT, fora deste exercício."
+          "CREATE TABLE pertence à linguagem de definição de dados, DDL. Dentro dos parênteses, cada item declara uma coluna ou uma restrição; vírgulas separam itens e o ponto e vírgula encerra a instrução. INTEGER, REAL, TEXT e BLOB atendem aos casos comuns deste laboratório SQLite.",
+          "SQLite tradicional trabalha com afinidade de tipos. Declarar INTEGER não reproduz toda a rigidez de outros motores. Quando a regra exigir inteiro, combine typeof(valor)='integer' com CHECK. Tabelas STRICT existem, mas ficam fora deste primeiro exercício."
         ]
       },
+      {
+        "title": "Restrições formam um contrato",
+        "paragraphs": [
+          "PRIMARY KEY identifica uma linha. NOT NULL exige presença. UNIQUE evita repetição dos valores cobertos. CHECK testa uma expressão e DEFAULT fornece valor quando a coluna é omitida. Uma regra pode precisar de mais de uma restrição: CHECK pode aceitar resultado NULL no SQLite, então duração obrigatória também precisa de NOT NULL.",
+          "NOT NULL não impede texto vazio. Para um título significativo, CHECK(length(trim(titulo)) > 0) recusa vazio e espaços. DEFAULT 0 atua quando concluida é omitida; enviar NULL explicitamente continua sujeito a NOT NULL."
+        ]
+      },
+      {
+        "title": "Referências exigem ativação e teste",
+        "paragraphs": [
+          "Uma chave estrangeira exige que o valor referenciado exista. No SQLite, habilite PRAGMA foreign_keys=ON logo após abrir cada conexão e antes de iniciar transação. Consulte PRAGMA foreign_keys e espere 1; não presuma a configuração.",
+          "A ação padrão recusa excluir uma categoria ainda referenciada. ON DELETE CASCADE teria outro significado e apagaria também os filhos. Escolha conforme a regra de negócio, em vez de usar cascata apenas para eliminar uma mensagem de erro."
+        ]
+      },
+      {
+        "title": "Teste positivo e negativo",
+        "paragraphs": [
+          "Para cada regra importante, escreva uma entrada aceita e outra recusada. Tente minutos zero, título só com espaços, categoria inexistente e tarefa válida. Depois de cada recusa, consulte a contagem para comprovar que o estado permaneceu válido.",
+          "Registre comando, resultado esperado, mensagem observada e estado posterior. Uma mensagem diferente pode indicar erro de sintaxe, conexão errada ou regra não ativada; investigar essas diferenças faz parte do laboratório."
+        ]
+      }
+    ],
+    "example": {
+      "language": "sql",
+      "code": "PRAGMA foreign_keys=ON;\nCREATE TABLE categorias(id INTEGER PRIMARY KEY,nome TEXT NOT NULL UNIQUE);\nCREATE TABLE tarefas(\n  id INTEGER PRIMARY KEY,\n  categoria_id INTEGER NOT NULL REFERENCES categorias(id),\n  titulo TEXT NOT NULL CHECK(length(trim(titulo)) > 0),\n  minutos INTEGER NOT NULL CHECK(typeof(minutos)='integer' AND minutos > 0),\n  concluida INTEGER NOT NULL DEFAULT 0 CHECK(concluida IN (0,1))\n);\nINSERT INTO categorias(id,nome) VALUES(1,'Estudos');\nINSERT INTO tarefas(id,categoria_id,titulo,minutos) VALUES(10,1,'Revisar SQL',30);\nSELECT id,titulo,minutos,concluida FROM tarefas;",
+      "explanation": ["A categoria é criada antes da tarefa que a referencia.", "Título e minutos combinam presença com regras de domínio.", "concluida recebe zero porque a coluna foi omitida no INSERT.", "A chave estrangeira está ativa somente nesta conexão."],
+      "expected": "10 | Revisar SQL | 30 | 0"
+    },
+    "guided": [
+      { "instruction": "Consulte PRAGMA foreign_keys antes de criar os dados.", "result": "O resultado é 1 nesta conexão." },
+      { "instruction": "Tente uma tarefa com categoria_id 99 em comando separado.", "result": "A inserção é recusada por chave estrangeira e a tarefa 10 permanece sozinha." },
+      { "instruction": "Tente minutos 0 e depois um título com somente espaços.", "result": "Cada tentativa é recusada pelo CHECK correspondente." }
+    ],
+    "exercises": [
+      { "prompt": "Prever: o que acontece se concluida for omitida, se receber NULL e se receber 2? Explique antes de executar.", "hints": ["DEFAULT, NOT NULL e CHECK respondem perguntas diferentes."], "solution": "Omitida: recebe 0. NULL: é recusado por NOT NULL. Valor 2: é recusado por CHECK(concluida IN (0,1)).", "explanation": "O valor padrão não substitui automaticamente um NULL explícito e não amplia os valores permitidos.", "expected": "Somente a versão que omite a coluna é aceita com concluida 0." },
+      { "prompt": "Alterar: acrescente prioridade inteira de 1 a 3, obrigatória e com padrão 2, em uma tabela tarefas recriada do zero.", "hints": ["Combine INTEGER, NOT NULL, DEFAULT e CHECK."], "solution": "prioridade INTEGER NOT NULL DEFAULT 2 CHECK(typeof(prioridade)='integer' AND prioridade BETWEEN 1 AND 3)", "explanation": "A declaração cobre presença, valor padrão, tipo efetivo e intervalo.", "expected": "Prioridade omitida vira 2; 0, 4 e 1.5 são recusados." },
+      { "prompt": "Construir: crie categorias e tarefas. Cada tarefa exige título não vazio, minutos inteiros positivos, categoria existente e estado pendente por padrão.", "hints": ["Crie a tabela referenciada primeiro.", "Teste pelo menos uma entrada inválida."], "solution": "PRAGMA foreign_keys=ON;\nCREATE TABLE categorias(id INTEGER PRIMARY KEY,nome TEXT NOT NULL UNIQUE);\nCREATE TABLE tarefas(id INTEGER PRIMARY KEY,categoria_id INTEGER NOT NULL REFERENCES categorias(id),titulo TEXT NOT NULL CHECK(length(trim(titulo))>0),minutos INTEGER NOT NULL CHECK(typeof(minutos)='integer' AND minutos>0),concluida INTEGER NOT NULL DEFAULT 0 CHECK(concluida IN (0,1)));", "explanation": "As restrições traduzem as regras observáveis sem depender da tela.", "expected": "Uma tarefa válida é aceita; categoria inexistente, título vazio e minutos não positivos são recusados." },
+      { "prompt": "Investigar erro: a chave estrangeira foi declarada, mas uma tarefa com categoria 99 foi aceita. Formule a hipótese mais provável e escreva a verificação e a correção.", "hints": ["No SQLite, a declaração e a ativação são etapas distintas."], "solution": "PRAGMA foreign_keys;\nPRAGMA foreign_keys=ON;\nPRAGMA foreign_keys;\n-- execute antes de iniciar uma transação; o último resultado deve ser 1", "explanation": "A proteção precisa estar habilitada por conexão; tentar ativá-la no meio de uma transação não produz o efeito esperado.", "expected": "A consulta passa a mostrar 1 e novas referências inexistentes são recusadas." }
+    ],
+    "mistakes": ["Confiar somente no tipo declarado em uma tabela SQLite flexível.", "Usar CHECK sem NOT NULL para um campo obrigatório.", "Declarar chave estrangeira e esquecer de ativá-la e verificá-la na conexão.", "Adicionar CASCADE sem decidir se os registros filhos realmente devem ser apagados."],
+    "quiz": [
+      { "question": "Quando DEFAULT é aplicado?", "options": ["Quando a coluna é omitida", "Sempre que chega NULL", "Depois de qualquer erro"], "correctIndex": 0, "explanation": "NULL explícito continua sendo um valor fornecido e pode ser recusado por NOT NULL." },
+      { "question": "Qual combinação exige minutos inteiros positivos?", "options": ["INTEGER apenas", "NOT NULL e CHECK(typeof(minutos)='integer' AND minutos>0)", "DEFAULT 0"], "correctIndex": 1, "explanation": "A combinação verifica presença, tipo efetivo e limite." },
+      { "question": "O que deve retornar PRAGMA foreign_keys no laboratório?", "options": ["0", "1", "NULL"], "correctIndex": 1, "explanation": "O valor 1 confirma a ativação na conexão atual." }
+    ],
+    "summary": ["DDL descreve a estrutura antes dos registros.", "Combine restrições conforme cada regra observável.", "Teste aceitações e recusas e confira o estado posterior."]
+  },
+"db-ddl-crud": {
+    "prerequisites": "Concluir Tabelas, tipos e restrições (db-ddl-constraints). Você deve saber criar a estrutura e verificar as chaves estrangeiras antes de manipular registros.",
+    "setup": "Use uma base SQLite nova e descartável para cada aula. Você pode colar o SQL em uma ferramenta SQLite local e executar instrução por instrução. Alternativa sem instalar servidor: com Python 3, salve o SQL em aula.sql e o executor abaixo em executar.py, na mesma pasta; rode python executar.py (ou py executar.py no Windows). Ele cria uma base apenas em memória, imprime cada resultado de consulta e fecha a conexão ao terminar. Cada execução começa vazia. Exercícios usam o estado final do exemplo: acrescente apenas o exercício escolhido ao final de aula.sql e reinicie o executor. Não cole cercas de Markdown nos arquivos. Se faltar o módulo sqlite3, use uma distribuição de Python com esse módulo ou uma ferramenta SQLite. A página apenas guarda rascunhos; o SQL será executado na ferramenta local. Neste executor, não coloque duas instruções completas na mesma linha; cada instrução deve terminar em sua própria linha.",
+    "why": "Depois que a estrutura protege as regras básicas, a aplicação precisa inserir, ler, alterar e remover registros sem atingir linhas erradas nem transformar entrada do usuário em sintaxe SQL.",
+    "sections": [
       {
         "title": "Criar, ler, alterar e remover",
         "paragraphs": [
@@ -274,36 +326,12 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "Ler a gramática e escolher tipos com intenção",
-        "paragraphs": [
-          "SQL é uma linguagem declarativa: você descreve o resultado ou a mudança desejada e o motor decide como executá-la. CREATE TABLE licoes abre a definição; cada linha entre parênteses descreve uma coluna ou uma restrição; vírgulas separam itens e o ponto e vírgula encerra a instrução. Uma string como SELECT enquanto título precisa de aspas simples: 'SELECT'. Para incluir apóstrofo em literal SQL, escreva duas aspas simples, como 'D''Ávila'. Em aplicações, prefira parâmetros, apresentados adiante, para que dados não sejam confundidos com instruções.",
-          "No SQLite, INTEGER, REAL, TEXT e BLOB atendem a casos comuns. INTEGER armazena contagens e centavos; REAL usa ponto flutuante e pode apresentar arredondamento; TEXT armazena títulos e datas em convenção textual; BLOB armazena bytes. SQLite tradicional usa afinidade de tipos, portanto declarar INTEGER não oferece a mesma rigidez de uma tabela STRICT. Para duração inteira nesta aula, combine NOT NULL com CHECK(typeof(minutos)='integer' AND minutos>0). Valores booleanos serão 0 e 1 com CHECK. Para datas textuais, combine um formato consistente, por exemplo YYYY-MM-DD, com validação apropriada na aplicação; o nome TEXT sozinho não valida calendário."
-        ]
-      },
-      {
-        "title": "Restrições formam um contrato, não uma decoração",
-        "paragraphs": [
-          "Pense em cada restrição como uma pergunta que o banco faz antes de aceitar uma alteração. NOT NULL pergunta se existe valor. UNIQUE pergunta se outro registro já usa aquele valor, com regras específicas para NULL conforme o motor. CHECK verifica uma expressão: no SQLite, uma expressão de CHECK que resulte em NULL não reprova a linha, por isso a obrigatoriedade precisa de NOT NULL. DEFAULT fornece um valor quando a coluna é omitida. Nenhuma dessas restrições substitui todas as outras. Um título obrigatório pode continuar sendo uma string vazia; para proibir isso, acrescente CHECK(length(trim(titulo))>0).",
-          "A chave estrangeira exige correspondência na tabela referenciada. Habilite PRAGMA foreign_keys=ON logo após abrir cada conexão SQLite e confirme com PRAGMA foreign_keys; o resultado deve ser 1. A ativação deve ocorrer antes de BEGIN. Excluir uma trilha referenciada normalmente falha com a ação padrão; ON DELETE CASCADE teria outro significado, apagando também filhos. Escolha essa ação com base na regra de negócio, e não apenas para remover um erro. No laboratório, a recusa protege as lições de ficarem apontando para uma trilha inexistente. Registre a mensagem e corrija a operação em vez de desabilitar a proteção."
-        ]
-      },
-      {
         "title": "Alterações seguras e entradas da aplicação",
         "paragraphs": [
           "Antes de um UPDATE ou DELETE, escreva o SELECT correspondente, confira identificadores e conte linhas. SELECT * FROM licoes WHERE id=10 deve mostrar exatamente o alvo esperado. Só então altere com o mesmo filtro. Um filtro incorreto continua perigoso mesmo tendo WHERE; WHERE id>0 pode selecionar tudo. Durante experimentos, use uma base descartável e uma transação que possa ser revertida. UPDATE que encontra zero linhas não é necessariamente erro SQL: a aplicação precisa decidir se o item não existe, já mudou ou não atende à condição. Essa distinção será essencial para atualizar estoque e saldo com segurança.",
           "Nunca monte comandos concatenando entrada de usuário. Com Python sqlite3, execute con.execute(\"UPDATE licoes SET titulo=? WHERE id=?\", (novo_titulo, 10)). Os pontos de interrogação são parâmetros para valores; o driver os envia sem transformá-los em sintaxe SQL. Não coloque aspas ao redor do ?. Nomes de tabelas e colunas não são valores parametrizáveis dessa maneira: se houver ordenação escolhida pelo usuário, use uma lista fechada de nomes permitidos. Um título contendo aspas ou texto parecido com SQL deve continuar sendo apenas um título. Não use executescript com texto externo, porque esse método recebe comandos completos.",
           "Repetibilidade faz parte do aprendizado. O exemplo cria tabelas e dados desde o começo; rode-o em uma base vazia para obter a mesma saída. Para experimentar uma restrição, execute o comando inválido isoladamente e confira que a contagem não mudou. Anote o comando, o motivo esperado da recusa e o estado posterior. Depois faça uma alteração válida e compare. Isso prova que a regra está funcionando e que o problema não é simplesmente uma ferramenta sem conexão. Ao finalizar, explique a diferença entre DELETE, que remove linhas, e DROP TABLE, que remove a própria estrutura."
         ]
-      },
-      {
-        "title": "Executar e inspecionar este laboratório",
-        "paragraphs": [
-          "Crie os dois arquivos na mesma pasta. O programa abaixo é apenas o executor: o conteúdo da aula continua sendo SQL e fica em aula.sql. O modo isolation_level=None permite que os comandos BEGIN, COMMIT e ROLLBACK do arquivo controlem explicitamente as transações. O executor aceita os exemplos desta aula, com uma instrução por encerramento de linha; não é um analisador genérico para qualquer script SQL. Antes de cada exercício, preserve o exemplo e acrescente somente a solução que quer testar. Compare o resultado observado com a previsão, e guarde no rascunho a consulta, a saída e a explicação."
-        ],
-        "code": {
-          "language": "python",
-          "code": "# executar.py — Python 3, biblioteca padrão\nfrom pathlib import Path\nimport sqlite3\n\ncon = sqlite3.connect(\":memory:\", isolation_level=None)\ntry:\n    pendente = \"\"\n    for linha in Path(\"aula.sql\").read_text(encoding=\"utf-8\").splitlines():\n        pendente += linha + \"\\n\"\n        if sqlite3.complete_statement(pendente):\n            cursor = con.execute(pendente)\n            if cursor.description:\n                print(\" | \".join(coluna[0] for coluna in cursor.description))\n                for registro in cursor:\n                    print(\" | \".join(\"NULL\" if valor is None else str(valor) for valor in registro))\n            pendente = \"\"\n    if pendente.strip():\n        raise ValueError(\"Falta ponto e vírgula na última instrução\")\nexcept Exception:\n    if con.in_transaction:\n        con.rollback()\n    raise\nfinally:\n    con.close()\n"
-        }
       }
     ],
     "example": {
@@ -334,7 +362,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "1. Guiado: Cadastre a lição Índices com id 12, duração 25, pertencente à trilha 1. Não informe concluida.",
+        "prompt": "Prever: antes de executar, diga qual valor concluida receberá ao cadastrar Índices sem informar essa coluna. Depois cadastre id 12, duração 25, na trilha 1.",
         "hints": [
           "Liste as quatro colunas que deseja preencher.",
           "O valor padrão fornece a quinta informação."
@@ -344,7 +372,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "A consulta devolve 0 e a tabela passa a ter três linhas."
       },
       {
-        "prompt": "2. Adaptar: Após o exercício anterior, remova apenas Índices, conferindo antes a linha selecionada.",
+        "prompt": "Alterar: após o exercício anterior, remova apenas Índices, conferindo antes a linha selecionada.",
         "hints": [
           "O id 12 identifica exclusivamente o alvo.",
           "Use o mesmo WHERE na leitura e na remoção."
@@ -354,7 +382,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "A contagem final é 2; SELECT e JOIN continuam presentes."
       },
       {
-        "prompt": "3. Construir: adicione a lição Transações de 50 minutos, id 13, e marque somente ela como concluída. Confira a linha antes e depois.",
+        "prompt": "Construir: adicione a lição Transações de 50 minutos, id 13, e marque somente ela como concluída. Confira a linha antes e depois.",
         "hints": [
           "Use INSERT com colunas explícitas.",
           "Selecione id=13 antes de alterar."
@@ -364,7 +392,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "DEFAULT inicializa pendência; o filtro por identidade limita a alteração a uma lição."
       },
       {
-        "prompt": "4. Depurar: UPDATE licoes SET minutos=25; alteraria toda a tabela. Corrija para afetar somente JOIN, id 11, e mostre as duas durações.",
+        "prompt": "Investigar erro: UPDATE licoes SET minutos=25; alteraria toda a tabela. Não execute o comando incorreto; corrija para afetar somente JOIN, id 11, e mostre as duas durações.",
         "hints": [
           "Não execute o comando incorreto.",
           "Use WHERE id=11 e ordene a inspeção."
@@ -412,13 +440,13 @@ Object.assign(LESSON_GUIDES, {
       }
     ],
     "summary": [
-      "DDL descreve a estrutura; CRUD manipula os registros.",
-      "Constraints tornam regras verificáveis pelo banco.",
-      "Confira o filtro antes de qualquer alteração."
+      "CRUD manipula registros sem alterar a definição das tabelas.",
+      "Confira o alvo com SELECT antes de UPDATE ou DELETE.",
+      "Envie valores externos por parâmetros, nunca por concatenação."
     ]
   },
 "db-select": {
-    "prerequisites": "Entenda INSERT e a organização de tabelas. Você não precisa ter conservado o laboratório anterior: este exemplo inclui os dados necessários.",
+    "prerequisites": "Conclua Tabelas, tipos e restrições (db-ddl-constraints) e CRUD seguro (db-ddl-crud). Você não precisa ter conservado o laboratório anterior: este exemplo inclui os dados necessários.",
     "setup": "Use uma base SQLite nova e descartável para cada aula. Você pode colar o SQL em uma ferramenta SQLite local e executar instrução por instrução. Alternativa sem instalar servidor: com Python 3, salve o SQL em aula.sql e o executor abaixo em executar.py, na mesma pasta; rode python executar.py (ou py executar.py no Windows). Ele cria uma base apenas em memória, imprime cada resultado de consulta e fecha a conexão ao terminar. Cada execução começa vazia. Exercícios usam o estado final do exemplo: acrescente apenas o exercício escolhido ao final de aula.sql e reinicie o executor. Não cole cercas de Markdown nos arquivos. Se faltar o módulo sqlite3, use uma distribuição de Python com esse módulo ou uma ferramenta SQLite. A página apenas guarda rascunhos; o SQL será executado na ferramenta local. Neste executor, não coloque duas instruções completas na mesma linha; cada instrução deve terminar em sua própria linha.",
     "why": "O dashboard precisa responder quais aulas estão pendentes e quanto tempo falta em cada trilha. SELECT transforma registros individuais em respostas, sem exigir que você carregue tudo na aplicação para calcular manualmente.",
     "sections": [

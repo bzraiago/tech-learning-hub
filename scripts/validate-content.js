@@ -226,7 +226,7 @@ for (const lessonId of progressiveJavaScriptLessonIds) {
   }
 }
 
-const progressiveDatabaseLessonIds = ['db-modeling', 'db-normalization'];
+const progressiveDatabaseLessonIds = ['db-modeling', 'db-normalization', 'db-ddl-constraints', 'db-ddl-crud'];
 for (const lessonId of progressiveDatabaseLessonIds) {
   const guide = LESSON_GUIDES[lessonId];
   if (!guide) {

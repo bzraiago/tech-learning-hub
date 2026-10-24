@@ -2275,14 +2275,41 @@
             ]
           },
           {
-            "id": "db-ddl-crud",
-            "title": "Tabelas, tipos, restrições e CRUD seguro",
-            "minutes": 120,
-            "concept": "Uma interface pode impedir valores negativos, mas outro programa pode acessar o mesmo banco. Constraints colocam as regras junto aos dados, protegendo-os independentemente da tela que enviou a alteração.",
+            "id": "db-ddl-constraints",
+            "title": "Tabelas, tipos e restrições",
+            "minutes": 85,
+            "concept": "Transforme regras do modelo em uma estrutura que o banco consegue verificar antes de aceitar dados.",
             "objectives": [
-              "DDL descreve a estrutura; CRUD manipula os registros.",
-              "Constraints tornam regras verificáveis pelo banco.",
-              "Confira o filtro antes de qualquer alteração."
+              "Criar tabelas com colunas e tipos adequados ao laboratório.",
+              "Combinar PRIMARY KEY, NOT NULL, UNIQUE, CHECK e DEFAULT.",
+              "Ativar e testar referências entre tabelas no SQLite."
+            ],
+            "exercise": "Construir: crie categorias e tarefas. Cada tarefa exige título não vazio, minutos inteiros positivos, categoria existente e estado pendente por padrão.",
+            "code": "PRAGMA foreign_keys=ON;\nCREATE TABLE categorias(id INTEGER PRIMARY KEY,nome TEXT NOT NULL UNIQUE);\nCREATE TABLE tarefas(\n  id INTEGER PRIMARY KEY,\n  categoria_id INTEGER NOT NULL REFERENCES categorias(id),\n  titulo TEXT NOT NULL CHECK(length(trim(titulo)) > 0),\n  minutos INTEGER NOT NULL CHECK(typeof(minutos)='integer' AND minutos > 0),\n  concluida INTEGER NOT NULL DEFAULT 0 CHECK(concluida IN (0,1))\n);\nINSERT INTO categorias(id,nome) VALUES(1,'Estudos');\nINSERT INTO tarefas(id,categoria_id,titulo,minutos) VALUES(10,1,'Revisar SQL',30);\nSELECT id,titulo,minutos,concluida FROM tarefas;",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "SQLite · CREATE TABLE",
+                "url": "https://www.sqlite.org/lang_createtable.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "SQLite · integridade referencial",
+                "url": "https://www.sqlite.org/foreignkeys.html",
+                "language": "EN"
+              }
+            ]
+          },
+          {
+            "id": "db-ddl-crud",
+            "title": "CRUD seguro: inserir, consultar, atualizar e remover",
+            "minutes": 85,
+            "concept": "Manipule registros com filtros verificáveis e envie valores como parâmetros, preservando a estrutura e as demais linhas.",
+            "objectives": [
+              "Executar INSERT, SELECT, UPDATE e DELETE em registros específicos.",
+              "Conferir o alvo com SELECT antes de alterar ou remover.",
+              "Separar valores de usuário da sintaxe SQL usando parâmetros."
             ],
             "exercise": "3. Construir: adicione a lição Transações de 50 minutos, id 13, e marque somente ela como concluída. Confira a linha antes e depois.",
             "code": "PRAGMA foreign_keys = ON;\nCREATE TABLE trilhas (id INTEGER PRIMARY KEY, nome TEXT NOT NULL UNIQUE);\nCREATE TABLE licoes (\n  id INTEGER PRIMARY KEY,\n  trilha_id INTEGER NOT NULL REFERENCES trilhas(id),\n  titulo TEXT NOT NULL,\n  minutos INTEGER NOT NULL CHECK (typeof(minutos)='integer' AND minutos > 0),\n  concluida INTEGER NOT NULL DEFAULT 0 CHECK (concluida IN (0,1))\n);\nINSERT INTO trilhas (id,nome) VALUES (1,'Dados');\nINSERT INTO licoes (id,trilha_id,titulo,minutos)\nVALUES (10,1,'SELECT',30),(11,1,'JOIN',40);\nSELECT id,titulo,concluida FROM licoes WHERE id=10;\nUPDATE licoes SET concluida=1 WHERE id=10;\nSELECT id,titulo,minutos,concluida FROM licoes ORDER BY id;",
