@@ -4,7 +4,7 @@
 
 ## 1. Veredito
 
-O mapa torna explícitas as principais dependências entre as nove trilhas e impede que Python, Node.js ou Docker apareçam como requisitos silenciosos. Os atalhos para servidor local, SQLite e PostgreSQL reduzem reordenações desnecessárias. A Fase 2 permanece em andamento porque as preparações completas por sistema operacional ainda não foram publicadas.
+O mapa torna explícitas as principais dependências entre as nove trilhas e impede que Python, Node.js ou Docker apareçam como requisitos silenciosos. Os atalhos para servidor local, SQLite e PostgreSQL reduzem reordenações desnecessárias. Editor, Python, Git e Node.js/npm agora possuem preparações próprias; a Fase 2 permanece em andamento porque Docker/WSL e bancos ainda precisam do mesmo tratamento.
 
 ## 2. Contrato de aprendizagem
 
@@ -16,7 +16,7 @@ O mapa torna explícitas as principais dependências entre as nove trilhas e imp
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Alta | G | Python, Git, Qualidade e Entrega | FATO | As trilhas citam runtimes, mas a instalação completa ainda está distribuída nas primeiras aulas. | Criar preparações próprias para Python, Git e Node.js/npm. |
+| 1 | Baixa | P | `setup-editor`, `setup-python`, `setup-git`, `setup-node` | FATO | As quatro preparações essenciais foram publicadas com passos por sistema, verificação, recuperação e alternativa. | Manter as fontes oficiais e os comandos atualizados. |
 | 2 | Alta | G | Banco de Dados | FATO | Docker, PostgreSQL e demais motores possuem instruções, mas ainda não formam preparações separadas e uniformes. | Implementar a segunda parte da Fase 2. |
 | 3 | Média | P | `js-storage`, `js-modules` | RISCO | Python pode ser usado apenas como servidor local, levando o aluno a pensar que precisa concluir Python. | Manter o atalho mínimo explícito no mapa e nas aulas afetadas. |
 
@@ -28,10 +28,10 @@ O grafo completo está em `docs/MAPA_PRE_REQUISITOS.md`. Não foram encontradas 
 
 | Ferramenta | Completo? | Falta | Verificado? |
 |---|---|---|---|
-| Editor | Parcial | Preparação uniforme por sistema | Fontes oficiais verificadas |
-| Python | Parcial | Passos por sistema, PATH, parar/retomar e alternativa | Fonte oficial verificada |
-| Git | Parcial | Passos por sistema e diagnóstico | Fonte oficial verificada |
-| Node.js/npm | Parcial | Passos por sistema, LTS e distinção navegador/runtime | Fonte oficial verificada |
+| Editor | Sim, no conteúdo | Execução com aluno real | Fonte oficial verificada; instalação não executada |
+| Python | Sim, no conteúdo | Execução com aluno real | Fonte oficial verificada; instalação não executada |
+| Git | Sim, no conteúdo | Execução com aluno real | Fonte oficial verificada; instalação não executada |
+| Node.js/npm | Sim, no conteúdo | Execução com aluno real | Fonte oficial verificada; instalação não executada |
 | Docker/WSL e bancos | Não nesta entrega | Preparações completas e alternativas leves | Não verificado nesta entrega |
 
 ## 6. Fontes
@@ -49,9 +49,9 @@ O mapa permite escolher uma sequência coerente e reconhecer preparações míni
 
 ## 8. Próximos passos sugeridos
 
-1. Criar preparações de editor, Python, Git e Node.js/npm.
-2. Criar preparação de Docker/WSL e alternativa leve.
-3. Consolidar PostgreSQL e depois aprofundamentos de outros motores.
+1. Criar preparação de Docker/WSL e alternativa leve.
+2. Consolidar PostgreSQL e depois aprofundamentos de outros motores.
+3. Validar as quatro preparações essenciais com alunos e máquinas reais.
 
 ## 9. Limites desta auditoria
 

@@ -84,9 +84,9 @@ Outro serviço dentro da mesma rede Compose usa `db:5432`. Não substitua um end
 | Severidade | Aresta | Estado | Próxima implementação |
 |---|---|---|---|
 | Bloqueante | Etapa 0 → primeira aula | Resolvida | Validar com aluno real na Fase 11. |
-| Alta | Etapa 0 → instalação Python | Parcial | Criar preparação completa por sistema e saída esperada. |
-| Alta | Etapa 0 → instalação Git | Parcial | Criar preparação completa e primeiro diagnóstico de PATH. |
-| Alta | Etapa 0 → instalação Node.js/npm | Parcial | Criar preparação e distinguir navegador de Node.js. |
+| Alta | Etapa 0 → instalação Python | Resolvida | Manter a preparação `setup-python` atualizada com a documentação oficial. |
+| Alta | Etapa 0 → instalação Git | Resolvida | Manter a preparação `setup-git` atualizada com a documentação oficial. |
+| Alta | Etapa 0 → instalação Node.js/npm | Resolvida | Manter `setup-node` e a distinção navegador/runtime. |
 | Alta | Etapa 0 → Docker/WSL | Parcial | Criar preparação com virtualização e alternativa leve. |
 | Alta | Docker → PostgreSQL | Parcial | Consolidar instalação, clientes, serviço e conexão `55432`. |
 | Média | PostgreSQL → MariaDB/Firebird/MongoDB | Aberta como aprofundamento | Criar preparações separadas sem bloquear o caminho principal. |

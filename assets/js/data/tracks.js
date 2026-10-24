@@ -117,6 +117,61 @@
             "docs": []
           }
         ]
+      },
+      {
+        "id": "prep-environments",
+        "title": "Ambientes essenciais",
+        "level": "Nível 0 · instalação",
+        "number": "01",
+        "description": "Instalação, verificação, diagnóstico e alternativas para editor, Python, Git e Node.js/npm.",
+        "resources": [
+          {"kind": "doc", "title": "VS Code · Configuração oficial", "url": "https://code.visualstudio.com/docs/setup/setup-overview", "language": "EN"},
+          {"kind": "doc", "title": "Python · Downloads oficiais", "url": "https://www.python.org/downloads/", "language": "EN"},
+          {"kind": "doc", "title": "Git · Instalação oficial", "url": "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git", "language": "EN"},
+          {"kind": "doc", "title": "Node.js · Download oficial", "url": "https://nodejs.org/en/download", "language": "EN"}
+        ],
+        "lessons": [
+          {
+            "id": "setup-editor",
+            "title": "Preparar o editor de código",
+            "minutes": 50,
+            "concept": "Instalar ou escolher um editor, abrir uma pasta e verificar o comando opcional `code` sem depender de conta.",
+            "objectives": ["Instalar o VS Code por uma fonte oficial ou escolher alternativa leve.", "Abrir a pasta estudos-programacao como workspace.", "Verificar o editor e diagnosticar o comando `code` ausente."],
+            "exercise": "Abra uma pasta, crie ambiente-editor.txt, salve, feche e retome o trabalho pelo mesmo caminho.",
+            "code": "code --version\ncode .",
+            "docs": [{"kind": "doc", "title": "VS Code · Primeiros passos", "url": "https://code.visualstudio.com/docs/getstarted/overview", "language": "EN"}]
+          },
+          {
+            "id": "setup-python",
+            "title": "Instalar e verificar Python 3",
+            "minutes": 60,
+            "concept": "Instalar Python 3, identificar o comando do sistema e executar uma verificação mínima antes da trilha Python.",
+            "objectives": ["Instalar uma versão estável de Python 3 pela fonte adequada ao sistema.", "Distinguir `py`, `python` e `python3` sem adivinhar.", "Executar um arquivo simples e diagnosticar falha de PATH."],
+            "exercise": "Registre o comando reconhecido, a versão observada e a saída de um arquivo verificar_python.py.",
+            "code": "# Windows\npy --version\n# macOS/Linux\npython3 --version",
+            "docs": [{"kind": "doc", "title": "Python · Usando Python nos sistemas", "url": "https://docs.python.org/3/using/index.html", "language": "EN"}]
+          },
+          {
+            "id": "setup-git",
+            "title": "Instalar e verificar Git",
+            "minutes": 55,
+            "concept": "Instalar Git, verificar o executável, criar um repositório de laboratório e separar histórico local de publicação remota.",
+            "objectives": ["Instalar Git pela fonte oficial ou gerenciador da distribuição.", "Confirmar `git --version` em um terminal novo.", "Criar o primeiro repositório em uma pasta de laboratório e reconhecer a pasta `.git`."],
+            "exercise": "Crie laboratorio-git, inicialize o repositório, registre a saída de `git status` e explique por que ele ainda não foi publicado.",
+            "code": "git --version\nmkdir laboratorio-git\ncd laboratorio-git\ngit init\ngit status",
+            "docs": [{"kind": "doc", "title": "Pro Git · Instalando Git", "url": "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git", "language": "EN"}]
+          },
+          {
+            "id": "setup-node",
+            "title": "Instalar Node.js e npm",
+            "minutes": 60,
+            "concept": "Instalar a linha LTS do Node.js, verificar Node e npm e distingui-los do JavaScript executado no navegador.",
+            "objectives": ["Instalar uma versão LTS do Node.js por fonte oficial.", "Confirmar separadamente `node` e `npm`.", "Executar um script local e explicar a diferença para o navegador."],
+            "exercise": "Registre as duas versões e execute verificar_node.js pelo terminal na pasta correta.",
+            "code": "node --version\nnpm --version\nnode verificar_node.js",
+            "docs": [{"kind": "doc", "title": "Node.js · Downloads", "url": "https://nodejs.org/en/download", "language": "EN"}]
+          }
+        ]
       }
     ]
   },
