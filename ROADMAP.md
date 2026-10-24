@@ -134,12 +134,12 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Adicionar exercício de transferência em contexto diferente.
 - [x] Dividir a aula de funções JavaScript em blocos menores com prática intermediária.
 - [x] Mapear outras aulas com mais de quatro conceitos centrais sem prática intermediária.
-  - [ ] Prioridade 1: dividir ou intercalar prática nas cinco aulas fundamentais de banco.
+  - [x] Prioridade 1: dividir ou intercalar prática nas cinco aulas fundamentais de banco.
     - [x] `db-modeling`: separar entidades/relacionamentos de normalização/ausência.
     - [x] `db-ddl-crud`: separar estrutura/restrições de manipulação segura.
     - [x] `db-select`: separar filtros/`NULL` de agregações/agrupamentos.
     - [x] `db-joins`: separar junções/granularidade de subconsultas/CTEs.
-    - [ ] `db-transactions`.
+    - [x] `db-transactions`: separar unidade transacional de concorrência, repetição e efeitos externos.
   - [ ] Prioridade 2: revisar as dez aulas avançadas de banco mapeadas com seis seções.
   - [ ] Prioridade 3: revisar 11 aulas de HTML/JavaScript e distinguir aprofundamento legítimo de sobrecarga.
   - [ ] Prioridade 4: revisar 15 aulas de IA/Entrega, preservando o nível avançado quando os pré-requisitos forem suficientes.
@@ -419,6 +419,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Fase 3.4 — DDL e CRUD | Commit da Fase 3.4 | `db-ddl-constraints` passou a ensinar estrutura e regras; `db-ddl-crud` ficou focada em manipulação segura. |
 | 24/10/2026 | Fase 3.5 — consultas e agregações | Commit da Fase 3.5 | `db-select` ficou focada em linhas, filtros e `NULL`; `db-aggregation` recebeu medidas, grupos e `HAVING`. |
 | 24/10/2026 | Fase 3.6 — JOINs e CTEs | Commit da Fase 3.6 | `db-joins` ficou focada em junções e granularidade; `db-subqueries-ctes` recebeu consultas em etapas e prevenção de multiplicação. |
+| 24/10/2026 | Fase 3.7 — transações e concorrência | Commit da Fase 3.7 | `db-transactions` ficou focada na unidade atômica; `db-concurrency-boundaries` recebeu savepoints, repetição e efeitos externos. |
 
 ## Decisões e bloqueios
 

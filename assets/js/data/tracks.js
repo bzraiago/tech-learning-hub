@@ -2446,15 +2446,15 @@
           },
           {
             "id": "db-transactions",
-            "title": "Transações, integridade e concorrência",
-            "minutes": 120,
+            "title": "Transações: confirmar ou desfazer uma unidade",
+            "minutes": 90,
             "concept": "Transferir dez créditos exige retirar dez de Ana e adicionar dez a Beto. Se apenas metade acontecer, o total muda indevidamente. Uma transação transforma essas duas alterações em uma unidade que pode ser confirmada ou desfeita.",
             "objectives": [
               "Agrupe alterações dependentes em uma transação.",
               "COMMIT confirma; ROLLBACK descarta o que ainda não foi confirmado.",
               "Constraints e regras de negócio continuam necessárias."
             ],
-            "exercise": "3. Construir: partindo de 100 e 50, use SAVEPOINT para desfazer apenas um crédito provisório de 7 depois de um crédito de 5; confirme o primeiro crédito.",
+            "exercise": "Construir: transfira 20 créditos entre duas contas, confirme os dois movimentos juntos e confira que a soma não mudou.",
             "code": "CREATE TABLE contas (\n id INTEGER PRIMARY KEY, nome TEXT NOT NULL,\n saldo INTEGER NOT NULL CHECK(saldo>=0)\n);\nINSERT INTO contas VALUES(1,'Ana',100),(2,'Beto',50);\nBEGIN;\nUPDATE contas SET saldo=saldo-10 WHERE id=1;\nUPDATE contas SET saldo=saldo+10 WHERE id=2;\nSELECT nome,saldo FROM contas ORDER BY id;\nROLLBACK;\nSELECT nome,saldo FROM contas ORDER BY id;\nSELECT SUM(saldo) AS total FROM contas;",
             "docs": [
               {
@@ -2481,6 +2481,23 @@
                 "url": "https://www.sqlite.org/lang_transaction.html",
                 "language": "EN"
               }
+            ]
+          },
+          {
+            "id": "db-concurrency-boundaries",
+            "title": "Concorrência, repetição e limites da transação",
+            "minutes": 95,
+            "concept": "Uma transação protege alterações no mesmo banco, mas operações concorrentes podem disputar recursos e efeitos externos não voltam com ROLLBACK.",
+            "objectives": [
+              "Use SAVEPOINT apenas quando uma etapa puder ser desfeita separadamente.",
+              "Planeje repetição limitada da unidade completa diante de conflitos.",
+              "Reconheça efeitos externos que não pertencem à transação do banco."
+            ],
+            "exercise": "Construir: desfaça uma etapa opcional com SAVEPOINT, confirme a etapa principal e explique por que um e-mail exigiria outra estratégia.",
+            "code": "CREATE TABLE tarefas(id INTEGER PRIMARY KEY,titulo TEXT,status TEXT);\nINSERT INTO tarefas VALUES(1,'Publicar aula','pendente');\nBEGIN;\nUPDATE tarefas SET status='publicada' WHERE id=1;\nSAVEPOINT aviso;\nUPDATE tarefas SET titulo='Publicar aula e enviar aviso' WHERE id=1;\nROLLBACK TO aviso;\nRELEASE aviso;\nCOMMIT;\nSELECT id,titulo,status FROM tarefas;",
+            "docs": [
+              {"kind":"doc","title":"SQLite · transações","url":"https://www.sqlite.org/lang_transaction.html","language":"EN"},
+              {"kind":"doc","title":"SQLite · isolamento","url":"https://www.sqlite.org/isolation.html","language":"EN"}
             ]
           }
         ]

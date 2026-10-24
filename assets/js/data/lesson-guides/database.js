@@ -4,7 +4,7 @@
 Object.assign(LESSON_GUIDES, {
 "db-modeling": {
     "prerequisites": "Nenhuma experiência com bancos é necessária. Você precisa apenas distinguir um curso, uma aula e uma pessoa: vamos transformar esses objetos cotidianos em dados organizados.",
-    "setup": "Use uma base SQLite nova e descartável para cada aula. Você pode colar o SQL em uma ferramenta SQLite local e executar instrução por instrução. Alternativa sem instalar servidor: com Python 3, salve o SQL em aula.sql e o executor abaixo em executar.py, na mesma pasta; rode python executar.py (ou py executar.py no Windows). Ele cria uma base apenas em memória, imprime cada resultado de consulta e fecha a conexão ao terminar. Cada execução começa vazia. Exercícios usam o estado final do exemplo: acrescente apenas o exercício escolhido ao final de aula.sql e reinicie o executor. Não cole cercas de Markdown nos arquivos. Se faltar o módulo sqlite3, use uma distribuição de Python com esse módulo ou uma ferramenta SQLite. A página apenas guarda rascunhos; o SQL será executado na ferramenta local. Neste executor, não coloque duas instruções completas na mesma linha; cada instrução deve terminar em sua própria linha.",
+    "setup": "Reutilize o ambiente SQLite verificado nas aulas anteriores e crie uma base nova e descartável. Em um cliente SQLite, execute as instruções uma a uma para observar o estado antes e depois de ROLLBACK. Se usar o executor Python das aulas anteriores, mantenha isolation_level=None para que BEGIN, COMMIT e ROLLBACK do arquivo controlem a transação. A página guarda apenas rascunhos; o SQL é executado localmente. Reinicie a base antes de cada exercício para partir de 100 e 50.",
     "why": "Imagine que Ana e Beto estudam SQL. Se você guardar a conclusão na própria aula, marcar a aula como concluída para Ana também mudará o estado visto por Beto. Nesta aula o foco é reconhecer as coisas do domínio, identificá-las e representar as relações entre elas; normalização e ausência ficam na aula seguinte.",
     "sections": [
       {
@@ -849,13 +849,6 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "Concorrência e transações curtas",
-        "paragraphs": [
-          "Dois processos podem tentar consumir o mesmo saldo. Ler 100, calcular 90 na aplicação e depois sobrescrever o saldo pode perder atualizações concorrentes. Prefira operações relativas, como saldo=saldo-10, com filtros que exprimam condições e verificação do número de linhas afetadas. Quando a condição falha, reverta a operação completa.",
-          "SQLite permite apenas um escritor por vez; outros motores usam mecanismos e níveis de isolamento diferentes. Conflitos podem exigir repetição da transação inteira após nova leitura, com limites e tratamento de erro. Não mantenha a transação aberta enquanto espera o usuário preencher um formulário: prepare os dados antes e faça a alteração em um trecho curto."
-        ]
-      },
-      {
         "title": "Uma unidade de trabalho precisa de critérios de sucesso",
         "paragraphs": [
           "Escrever BEGIN e COMMIT não garante que a lógica esteja correta. A unidade de transferência tem pré-condições: valor positivo, origem diferente do destino, existência das duas contas e saldo suficiente. Também tem pós-condições: o débito e o crédito ocorreram exatamente uma vez, nenhum saldo ficou negativo e a soma foi preservada. No exemplo controlado, as contas são conhecidas; numa aplicação, verifique essas condições dentro da unidade de trabalho quando puderem mudar por concorrência. Se uma delas falhar, execute ROLLBACK e informe uma falha de negócio compreensível.",
@@ -863,29 +856,11 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "Erros, rollback explícito e pontos de salvamento",
+        "title": "Erro exige decisão explícita",
         "paragraphs": [
-          "Não suponha que qualquer erro executará ROLLBACK de toda a unidade. No SQLite, várias violações com a política padrão abortam a instrução que falhou, preservando mudanças anteriores da transação ainda aberta. Se o débito ocorreu e o crédito falhou, a aplicação deve descartar o conjunto. Em código de produção, use um bloco de tratamento que confirme apenas no caminho completo de sucesso e reverta em exceção. Depois de reverter, a conexão pode continuar sendo usada conforme o erro e o driver; confirme seu estado em vez de ocultar a falha com uma mensagem genérica de sucesso.",
-          "SAVEPOINT nome marca uma posição interna. ROLLBACK TO nome desfaz alterações posteriores a esse ponto, e RELEASE nome encerra o ponto de salvamento. Isso permite organizar operações compostas sem usar BEGIN dentro de outro BEGIN, que não cria uma transação aninhada no SQLite. Um savepoint é útil quando uma etapa opcional pode falhar sem invalidar uma etapa anterior autorizada. Entretanto, uma transferência indivisível normalmente deve reverter por completo: não use savepoint para aceitar metade da operação. O desenho da unidade é uma decisão do domínio, não uma escolha arbitrária de comando."
+          "Não suponha que qualquer erro desfaz toda a unidade. No SQLite, uma instrução pode falhar enquanto a transação continua aberta. Se o débito ocorreu e o crédito falhou, a aplicação deve executar ROLLBACK e não anunciar sucesso.",
+          "Confirme somente depois de verificar os critérios de sucesso. Em código de aplicação, o caminho completo confirma; o tratamento de falha reverte. Pontos de salvamento e concorrência ficam para a próxima aula."
         ]
-      },
-      {
-        "title": "Concorrência, efeitos externos e repetição",
-        "paragraphs": [
-          "Duas conexões podem ler e escrever em momentos diferentes. Isolamento define quais estados uma operação observa e quais conflitos impedem progresso. No SQLite há um escritor por vez; BEGIN IMMEDIATE tenta adquirir a possibilidade de escrita no início, podendo falhar se outro escritor estiver ativo. Ele não substitui validação nem torna uma operação longa desejável. Se receber erro de banco ocupado, uma aplicação pode tentar novamente com espera limitada, mas deve repetir a unidade inteira de forma controlada, não apenas um crédito cuja relação com o débito ficou incerta.",
-          "Uma transação do banco não inclui automaticamente enviar e-mail, chamar API ou gravar em outro serviço. Imagine confirmar o pagamento e falhar ao mandar recibo: reverter o e-mail não existe. Um padrão mais avançado registra a intenção de enviar dentro do banco e um processo separado a executa depois, com rastreamento e proteção contra duplicidade. Para esta etapa, basta reconhecer a fronteira: mantenha alterações dependentes no mesmo banco e descreva explicitamente os efeitos externos. Nunca prometa atomicidade entre sistemas só porque um trecho SQL usa BEGIN.",
-          "Durabilidade de COMMIT depende das garantias do motor, do armazenamento e das configurações. Ela não equivale a backup nem protege contra uma exclusão válida feita amanhã. Transações protegem unidades de alteração; backups e testes de restauração protegem a recuperação histórica. No laboratório, observe a diferença entre consultar dentro da transação e abrir outra conexão após confirmação. Termine sempre com COMMIT ou ROLLBACK e feche a conexão. Ao repetir o exercício, volte à base inicial: saldos esperados só são comparáveis quando o estado de partida e a sequência de operações são os mesmos."
-        ]
-      },
-      {
-        "title": "Executar e inspecionar este laboratório",
-        "paragraphs": [
-          "Crie os dois arquivos na mesma pasta. O programa abaixo é apenas o executor: o conteúdo da aula continua sendo SQL e fica em aula.sql. O modo isolation_level=None permite que os comandos BEGIN, COMMIT e ROLLBACK do arquivo controlem explicitamente as transações. O executor aceita os exemplos desta aula, com uma instrução por encerramento de linha; não é um analisador genérico para qualquer script SQL. Antes de cada exercício, preserve o exemplo e acrescente somente a solução que quer testar. Compare o resultado observado com a previsão, e guarde no rascunho a consulta, a saída e a explicação."
-        ],
-        "code": {
-          "language": "python",
-          "code": "# executar.py — Python 3, biblioteca padrão\nfrom pathlib import Path\nimport sqlite3\n\ncon = sqlite3.connect(\":memory:\", isolation_level=None)\ntry:\n    pendente = \"\"\n    for linha in Path(\"aula.sql\").read_text(encoding=\"utf-8\").splitlines():\n        pendente += linha + \"\\n\"\n        if sqlite3.complete_statement(pendente):\n            cursor = con.execute(pendente)\n            if cursor.description:\n                print(\" | \".join(coluna[0] for coluna in cursor.description))\n                for registro in cursor:\n                    print(\" | \".join(\"NULL\" if valor is None else str(valor) for valor in registro))\n            pendente = \"\"\n    if pendente.strip():\n        raise ValueError(\"Falta ponto e vírgula na última instrução\")\nexcept Exception:\n    if con.in_transaction:\n        con.rollback()\n    raise\nfinally:\n    con.close()\n"
-        }
       }
     ],
     "example": {
@@ -916,7 +891,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "1. Guiado: Partindo dos valores iniciais 100 e 50, credite provisoriamente 5 para Ana e desfaça.",
+        "prompt": "Prever: partindo dos valores iniciais 100 e 50, credite provisoriamente 5 para Ana e desfaça. Antes de executar, preveja o saldo final.",
         "hints": [
           "Envolva o UPDATE entre BEGIN e ROLLBACK.",
           "Use saldo=saldo+5, sem substituir por valor calculado fora do banco."
@@ -926,7 +901,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "100."
       },
       {
-        "prompt": "2. Adaptar: Em uma base inicial nova, transfira 20 de Ana para Beto e confirme; confira o total.",
+        "prompt": "Alterar: em uma base inicial nova, transfira 20 de Ana para Beto e confirme; confira o total.",
         "hints": [
           "Use dois UPDATE na mesma transação.",
           "O débito e o crédito precisam ter o mesmo valor."
@@ -936,17 +911,17 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Ana 80; Beto 70; soma 150."
       },
       {
-        "prompt": "3. Construir: partindo de 100 e 50, use SAVEPOINT para desfazer apenas um crédito provisório de 7 depois de um crédito de 5; confirme o primeiro crédito.",
+        "prompt": "Construir: partindo de 100 e 50, transfira 15 de Ana para Beto e reverta toda a unidade se o destino não existir.",
         "hints": [
-          "BEGIN engloba tudo; o savepoint fica após somar 5.",
-          "ROLLBACK TO desfaz o trecho posterior; finalize com RELEASE e COMMIT."
+          "Os dois UPDATE pertencem à mesma unidade.",
+          "Confira se cada operação afetou uma conta antes de confirmar."
         ],
-        "solution": "BEGIN;\nUPDATE contas SET saldo=saldo+5 WHERE id=1;\nSAVEPOINT tentativa;\nUPDATE contas SET saldo=saldo+7 WHERE id=1;\nROLLBACK TO tentativa;\nRELEASE tentativa;\nCOMMIT;\nSELECT saldo FROM contas WHERE id=1;",
-        "expected": "105.",
-        "explanation": "O ponto de salvamento separa a tentativa opcional. Isso é um crédito, não uma transferência; a soma cresce intencionalmente em 5."
+        "solution": "BEGIN;\nUPDATE contas SET saldo=saldo-15 WHERE id=1;\nUPDATE contas SET saldo=saldo+15 WHERE id=2;\nCOMMIT;\nSELECT nome,saldo FROM contas ORDER BY id;\nSELECT SUM(saldo) FROM contas;",
+        "expected": "Ana 85; Beto 65; soma 150. Se o segundo UPDATE afetar zero linhas, ROLLBACK preserva 100 e 50.",
+        "explanation": "O caminho de sucesso confirma os dois movimentos. Em uma aplicação, zero linhas no destino deve selecionar o caminho de ROLLBACK."
       },
       {
-        "prompt": "4. Depurar: uma transferência debita 10 e credita 11. Substitua por dois movimentos iguais e confirme que a soma permanece 150. Use base inicial nova.",
+        "prompt": "Investigar erro: uma transferência debita 10 e credita 11. Substitua por dois movimentos iguais e confirme que a soma permanece 150. Use base inicial nova.",
         "hints": [
           "Atomicidade não corrige um valor errado.",
           "Valide as duas contas e a soma."
@@ -998,6 +973,41 @@ Object.assign(LESSON_GUIDES, {
       "COMMIT confirma; ROLLBACK descarta o que ainda não foi confirmado.",
       "Constraints e regras de negócio continuam necessárias."
     ]
+  },
+"db-concurrency-boundaries": {
+    "prerequisites": "Conclua Transações: confirmar ou desfazer uma unidade (db-transactions). Saiba reconhecer sucesso e falha de uma operação de escrita.",
+    "setup": "Use uma base SQLite descartável. Para observar concorrência real, abra duas conexões para o mesmo arquivo em um cliente SQLite ou em dois processos Python; uma base em memória não é compartilhada. Execute o exemplo principal primeiro em uma conexão. Não é necessário instalar servidor.",
+    "why": "Uma transação local não elimina disputas entre processos nem desfaz um e-mail já enviado. Reconhecer essas fronteiras evita repetir somente metade de uma operação ou prometer atomicidade entre sistemas diferentes.",
+    "sections": [
+      {"title":"Ponto de salvamento tem escopo menor","paragraphs":["SAVEPOINT nome marca uma posição dentro da unidade. ROLLBACK TO nome desfaz o trecho posterior e RELEASE encerra o ponto sem confirmar a transação inteira.","Use-o apenas quando a etapa posterior for realmente opcional. Uma transferência indivisível deve reverter por completo, não conservar somente o débito."]},
+      {"title":"Concorrência exige transações curtas","paragraphs":["Duas conexões podem tentar escrever ao mesmo tempo. SQLite permite um escritor por vez; BEGIN IMMEDIATE tenta reservar a escrita no início e pode falhar quando outro escritor está ativo.","Prepare dados antes de abrir a transação. Não espere interação humana com a unidade aberta. Operações relativas e condições no UPDATE reduzem conflitos, mas ainda é preciso conferir quantas linhas foram afetadas."]},
+      {"title":"Repetir a unidade inteira","paragraphs":["Um conflito transitório pode permitir nova tentativa com espera e limite. Repita a unidade completa após reler o estado; não repita apenas o crédito ou outra metade cujo par ficou incerto.","A operação também precisa tolerar uma solicitação duplicada quando o domínio exigir. Identificadores únicos e registro do resultado ajudam a impedir o mesmo comando de negócio duas vezes."]},
+      {"title":"Efeitos externos ficam fora do ROLLBACK","paragraphs":["A transação do banco não desfaz e-mail, chamada de API ou gravação em outro serviço. Registre no banco a intenção de executar o efeito e processe-a separadamente, com rastreamento e proteção contra duplicidade.","COMMIT também não substitui backup. Transações protegem uma unidade de alteração; backup e restauração protegem recuperação histórica."]}
+    ],
+    "example": {
+      "language":"sql",
+      "code":"CREATE TABLE tarefas(id INTEGER PRIMARY KEY,titulo TEXT,status TEXT);\nINSERT INTO tarefas VALUES(1,'Publicar aula','pendente');\nBEGIN;\nUPDATE tarefas SET status='publicada' WHERE id=1;\nSAVEPOINT aviso;\nUPDATE tarefas SET titulo='Publicar aula e enviar aviso' WHERE id=1;\nROLLBACK TO aviso;\nRELEASE aviso;\nCOMMIT;\nSELECT id,titulo,status FROM tarefas;",
+      "explanation":["A mudança principal ocorre antes do ponto de salvamento.","A alteração opcional do título é desfeita.","COMMIT confirma apenas o estado restante da transação."],
+      "expected":"1 | Publicar aula | publicada"
+    },
+    "guided":[
+      {"instruction":"Execute até ROLLBACK TO aviso e consulte a tarefa.","result":"O status continua publicada, mas o título volta a Publicar aula."},
+      {"instruction":"Troque ROLLBACK TO por RELEASE e consulte antes de COMMIT.","result":"O título alterado continua visível; RELEASE não desfaz nem confirma a transação inteira."},
+      {"instruction":"Em duas conexões ao mesmo arquivo, mantenha uma escrita aberta e tente BEGIN IMMEDIATE na outra.","result":"A segunda conexão não obtém a escrita enquanto a primeira a mantém; a mensagem exata depende do cliente e da configuração de espera."}
+    ],
+    "exercises":[
+      {"prompt":"Prever: após ROLLBACK TO aviso no exemplo, quais mudanças permanecem provisoriamente?","hints":["Separe o que ocorreu antes e depois do SAVEPOINT."],"solution":"O status publicada permanece; a mudança do título é desfeita.","explanation":"ROLLBACK TO volta ao ponto interno, não ao início da transação.","expected":"Título Publicar aula; status publicada."},
+      {"prompt":"Alterar: mantenha a mudança opcional do título e confirme tudo.","hints":["Não use ROLLBACK TO; encerre o ponto antes do COMMIT."],"solution":"Substitua ROLLBACK TO aviso por RELEASE aviso e mantenha COMMIT.","explanation":"RELEASE encerra o savepoint sem desfazer o trecho posterior.","expected":"1 | Publicar aula e enviar aviso | publicada"},
+      {"prompt":"Construir: descreva um fluxo que registra no banco a publicação e uma intenção pendente de enviar aviso, sem afirmar que o e-mail pertence ao COMMIT.","hints":["Use duas tabelas alteradas na mesma transação.","O envio real ocorre depois e registra sucesso ou falha."],"solution":"Na mesma transação, atualize tarefas e insira um registro único em avisos_pendentes; confirme. Depois, um processo lê o registro, envia o aviso e marca o resultado, tolerando repetição.","explanation":"O banco confirma o estado e a intenção juntos, mas o efeito externo possui ciclo próprio.","expected":"Publicação e intenção persistem juntas; envio real tem estado observável e não é prometido pelo COMMIT."},
+      {"prompt":"Investigar erro: após conflito, um programa repetiu apenas o crédito e criou saldo. Explique o defeito e proponha a correção.","hints":["O débito e o crédito formam uma unidade.","Uma nova tentativa precisa reler o estado."],"solution":"A repetição parcial quebrou a unidade. Reverta ou confirme explicitamente a tentativa anterior e repita a transação inteira com limite, nova leitura e proteção contra solicitação duplicada.","explanation":"Repetir somente uma metade não conserva a regra do domínio.","expected":"Nenhum movimento isolado é repetido; a soma permanece invariável."}
+    ],
+    "mistakes":["Usar SAVEPOINT para aceitar metade de uma operação indivisível.","Repetir somente a instrução que falhou sem conhecer o estado da unidade.","Manter transação aberta enquanto espera o usuário.","Afirmar que ROLLBACK desfaz efeitos em outro serviço."],
+    "quiz":[
+      {"question":"O que ROLLBACK TO faz?","options":["Desfaz mudanças após um savepoint","Desfaz qualquer COMMIT antigo","Envia uma nova requisição"],"correctIndex":0,"explanation":"Ele retorna ao ponto interno dentro da transação aberta."},
+      {"question":"Após conflito transitório, qual parte deve ser repetida?","options":["A unidade completa, com limite e nova leitura","Somente o crédito","Qualquer instrução aleatória"],"correctIndex":0,"explanation":"A regra depende do conjunto, não de uma metade isolada."},
+      {"question":"Um ROLLBACK do banco desfaz um e-mail enviado?","options":["Não","Sempre","Somente no SQLite"],"correctIndex":0,"explanation":"O e-mail pertence a outro sistema e exige estratégia própria."}
+    ],
+    "summary":["Use SAVEPOINT somente para etapas separáveis.","Mantenha transações curtas e repita a unidade completa com limite.","Modele efeitos externos como processos observáveis e tolerantes a repetição."]
   },
 "db-docker-basics": {
     "prerequisites": "Conheça tabelas e consultas SQL do primeiro módulo. Os comandos desta aula são de terminal; não são SQL e não devem ser colados em um editor de consultas.",

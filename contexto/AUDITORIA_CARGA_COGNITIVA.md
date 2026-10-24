@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após quatro intervenções, a auditoria automática aponta 37: `db-modeling`, `db-ddl-crud`, `db-select` e `db-joins` preservaram seus IDs e receberam aulas complementares menores. `db-transactions` continua prioritária.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após cinco intervenções, a auditoria automática aponta 36: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores. A próxima prioridade são as dez aulas avançadas de banco com seis seções.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,17 +18,16 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Alta | G | `db-transactions` | FATO | O guia ainda possui sete seções e reúne fundamento, aprofundamento, diagnóstico e laboratório antes da prática final. | Dividir em uma sequência menor e inserir prática entre blocos. |
-| 2 | Alta | G | 10 aulas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma após os fundamentos e padronizar a progressão. |
-| 3 | Média | G | 5 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
-| 4 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
-| 5 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
+| 1 | Alta | G | 10 aulas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma após os fundamentos e padronizar a progressão. |
+| 2 | Média | G | 5 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
+| 3 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 4 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
 
 Grafo prioritário de banco:
 
-`setup-python` ou cliente SQLite → db-modeling → db-normalization → db-ddl-constraints → db-ddl-crud → db-select → db-aggregation → db-joins → db-subqueries-ctes → db-transactions`
+`setup-python` ou cliente SQLite → db-modeling → db-normalization → db-ddl-constraints → db-ddl-crud → db-select → db-aggregation → db-joins → db-subqueries-ctes → db-transactions → db-concurrency-boundaries`
 
 Arestas a preservar ao dividir:
 
@@ -58,7 +57,8 @@ Não foram encontradas dependências circulares nesse recorte. O risco atual é 
 | [SQLite — SELECT](https://www.sqlite.org/lang_select.html) | Oficial | OK | Consultada em 24/10/2026 | EN | Sustenta ordem lógica, agregação e diferenças entre `ON` e `WHERE` em junções externas. |
 | [SQLite — WITH](https://www.sqlite.org/lang_with.html) | Oficial | OK | Consultada em 24/10/2026 | EN | Referência primária para CTEs comuns, recursivas e restrições de uso. |
 | [SQLite — Aggregate Functions](https://www.sqlite.org/lang_aggfunc.html) | Oficial | OK | Consultada em 24/10/2026 | EN | Confirma comportamento de `COUNT`, `SUM`, `AVG` e valores nulos. |
-| [SQLite — Transactions](https://www.sqlite.org/lang_transaction.html) | Oficial | OK | Consultada em 24/10/2026 | EN | Referência primária para a futura divisão de transações. |
+| [SQLite — Transactions](https://www.sqlite.org/lang_transaction.html) | Oficial | OK | Consultada em 24/10/2026 | EN | Sustenta controle explícito, savepoints, erros e disputa por escrita usados nas duas aulas. |
+| [SQLite — Isolation](https://www.sqlite.org/isolation.html) | Oficial | OK | Consultada em 24/10/2026 | EN | Confirma visibilidade entre conexões, serialização de escritas e limites de concorrência. |
 
 As demais fontes das candidatas não foram revalidadas nesta etapa, pois o objetivo foi triagem estrutural, não revisão técnica integral.
 
@@ -72,7 +72,7 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 2. [Concluído] Dividir `db-ddl-crud` entre `db-ddl-constraints` e operações seguras.
 3. [Concluído] Separar filtros/`NULL` de agregações em `db-select` e `db-aggregation`.
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
-5. Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions`.
+5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
 
 ## 9. Limites desta auditoria
