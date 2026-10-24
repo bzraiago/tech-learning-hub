@@ -111,21 +111,27 @@ Ao revisar, nesta ordem: (1) o que está bom e por quê; (2) o defeito mais impo
 ## 5. Modo Mantenedor — regras do código
 
 ### 5.1 Arquitetura atual (não mude sem pedido explícito)
-- **Arquivo único**: `index.html` (cerca de 1,7 MB, ~21 mil linhas). **Sem build, sem bundler, sem framework de frontend.**
+- **Aplicação estática modularizada**: `index.html` contém a estrutura da página e carrega CSS e JavaScript de `assets/`. **Sem build, sem bundler, sem framework de frontend.**
 - Dependências externas apenas por CDN: Tailwind (`@tailwindcss/browser@4`) e fontes Google (DM Sans, Space Grotesk).
 - Tema escuro por padrão (`class="dark"`), `lang="pt-BR"`.
 - Ícones SVG internos via `<symbol id="i-...">`.
 
-Blocos principais dentro do `<script>`:
+Arquivos principais:
 
-| Estrutura | Função |
+| Arquivo ou diretório | Função |
 |---|---|
-| `R` | Catálogo de recursos externos (documentação, livros, vídeos) criados com `resource(tipo, título, url, idioma?)` |
-| `tracks` | Trilhas → módulos → aulas (`id`, `title`, `subtitle`, `modules[]`, `lessons[]` etc.) |
-| `LESSON_GUIDES` | Conteúdo detalhado por **id de aula**: `prerequisites`, `setup`, `why`, `sections[]`, exercícios (`prompt`, `solution`, ...), `quiz[]` |
-| `PROJECTS` | Projetos por módulo, com `brief`, `checks[]` (`mode: "auto"` ou manual), entregável e critérios |
-| `READINESS_EVIDENCE` | Evidências de prontidão profissional (Git, testes, dados, serviço, entrega) |
-| `state` | Progresso do aluno: `completed`, `notes`, `quizAttempts`, `projects`, `readiness`, `activeTrack`, `lastLesson` |
+| `index.html` | Estrutura semântica, componentes fixos, ícones SVG e ordem de carregamento dos assets |
+| `assets/css/global.css` | Estilos globais, componentes visuais e acessibilidade; o pequeno bloco `@theme` permanece no HTML porque o Tailwind Browser o processa como `text/tailwindcss` |
+| `assets/js/data/resources.js` | Catálogo `R` de documentação, livros e vídeos |
+| `assets/js/data/tracks.js` | `tracks`: trilhas → módulos → aulas (`id`, `title`, `modules[]`, `lessons[]` etc.) |
+| `assets/js/data/lesson-guides/` | `LESSON_GUIDES` separado por trilha, com pré-requisitos, seções, exercícios e quizzes |
+| `assets/js/data/projects.js` | `PROJECTS`, checks e associação dos guias às aulas |
+| `assets/js/core/state.js` | Índices, `READINESS_EVIDENCE`, estado, sanitização e persistência |
+| `assets/js/ui/render.js` | Renderização da navegação, progresso, módulos e aulas |
+| `assets/js/ui/dialogs.js` | Leitores, diálogos, recursos e validação de projetos |
+| `assets/js/app.js` | Eventos e inicialização da aplicação |
+
+Os scripts são clássicos e compartilham o mesmo escopo global, carregados na ordem declarada em `index.html`. Não troque a ordem sem conferir as dependências e não converta para módulos ES sem aprovação, pois o projeto deve continuar abrindo diretamente no navegador e sem build.
 
 Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workflow`, `quality`, `delivery`.
 
@@ -164,15 +170,8 @@ Manter: link "Pular para as lições", foco visível (`:focus-visible`), navega�
 Rode o que estiver disponível e **relate o resultado real** (inclusive falhas):
 
 ```bash
-# 1) Extrair o script principal e checar a sintaxe
-python3 - <<'PY'
-import re, pathlib
-html = pathlib.Path("index.html").read_text(encoding="utf-8")
-scripts = re.findall(r"<script>(.*?)</script>", html, re.S)
-pathlib.Path("/tmp/app.js").write_text("\n;\n".join(scripts), encoding="utf-8")
-print(f"{len(scripts)} bloco(s) de script extraído(s)")
-PY
-node --check /tmp/app.js && echo "Sintaxe JS ok"
+# 1) Checar a sintaxe de todos os arquivos JavaScript
+find assets/js -name '*.js' -print0 | xargs -0 -n1 node --check
 
 # 2) Checagens de consistência de conteúdo (adaptar ao que existir no repositório)
 #    - todo id de aula em `tracks` tem entrada em LESSON_GUIDES

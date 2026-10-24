@@ -1,0 +1,348 @@
+# Roadmap de evolução — Tech Learning Hub
+
+**Início do acompanhamento:** 24/10/2026  
+**Objetivo:** transformar o Tech Learning Hub em um percurso autoguiado, reproduzível e verificável que leve uma pessoa sem conhecimento prévio ao nível júnior e ofereça continuidade até os níveis intermediário e avançado.  
+**Fonte inicial:** `AGENTS.md` e `contexto/ANALISE_TECH_LEARNING_HUB.md`.
+
+> Este roadmap acompanha a evolução do produto e do conteúdo. Marcar uma implementação como concluída significa que ela passou pelos critérios de aceite e pelas verificações indicadas. Isso não significa, por si só, que um aluno dominou a competência.
+
+## Como usar este arquivo
+
+Estados:
+
+- `[ ]` Não iniciado
+- `[~]` Em andamento
+- `[x]` Concluído e verificado
+- `[!]` Bloqueado — registrar o motivo no histórico
+
+Ao concluir um item:
+
+1. Conferir todos os critérios de aceite do item.
+2. Executar as verificações automatizadas e manuais aplicáveis.
+3. Atualizar os números do curso quando a estrutura mudar.
+4. Marcar o item e suas subtarefas com `[x]`.
+5. Registrar a data, o commit e um resumo no histórico deste arquivo.
+6. Atualizar também o backlog do `AGENTS.md`, quando houver item equivalente.
+
+## Definição global de pronto
+
+Toda implementação só pode ser considerada pronta quando:
+
+- [ ] Mantém os ids existentes ou inclui migração compatível em `sanitizeState()`.
+- [ ] Preserva o funcionamento sem `localStorage` disponível.
+- [ ] Não introduz dados pessoais, segredos ou execução insegura de código do aluno.
+- [ ] Mantém navegação por teclado, foco visível, rótulos e atributos `aria-*` coerentes.
+- [ ] Respeita `prefers-reduced-motion` e funciona em aproximadamente 375 px de largura.
+- [ ] Possui linguagem adequada a iniciantes e explica termos técnicos no ponto de uso.
+- [ ] Mostra resultado esperado, critérios de aceite e exemplo antes da solução.
+- [ ] Informa o que é simulação e o que usa serviço real.
+- [ ] Passa na checagem de sintaxe JavaScript e nas verificações de consistência de conteúdo.
+- [ ] Foi aberta e conferida manualmente ao menos uma aula de cada trilha alterada.
+- [ ] Teve marcação de progresso, recarga e persistência verificadas quando o estado foi afetado.
+- [ ] Teve as fontes externas novas ou alteradas realmente verificadas.
+- [ ] Registra o que não foi possível testar.
+
+## Visão geral
+
+| Fase | Resultado principal | Dependências | Estado |
+|---|---|---|---|
+| 0 | Base de medição e proteção do projeto | — | [ ] |
+| 1 | Preparação digital antes das trilhas | Fase 0 | [ ] |
+| 2 | Pré-requisitos e ambientes reproduzíveis | Fase 1 | [ ] |
+| 3 | Aulas e exercícios com progressão verificável | Fase 2 | [ ] |
+| 4 | Avaliação de domínio e recuperação | Fase 3 | [ ] |
+| 5 | Projetos de fechamento e nível básico | Fase 4 | [ ] |
+| 6 | Backend completo com persistência | Fases 2 e 5 | [ ] |
+| 7 | Qualidade, CI, publicação e integração real | Fase 6 | [ ] |
+| 8 | Conclusão júnior/intermediária | Fase 7 | [ ] |
+| 9 | Experiência de estudo e portabilidade | Fases 3 e 4 | [ ] |
+| 10 | Engenharia de IA conectada e avaliada | Fases 7 e 8 | [ ] |
+| 11 | Validação final com alunos | Todas as fases aplicáveis | [ ] |
+
+---
+
+## Fase 0 — Base de medição e proteção
+
+**Meta:** conhecer o estado real do curso e impedir regressões estruturais durante as melhorias.
+
+- [ ] Criar verificador de consistência do conteúdo.
+  - [ ] Detectar ids duplicados de trilha, módulo, aula, projeto e check.
+  - [ ] Confirmar correspondência entre aulas de `tracks` e `LESSON_GUIDES`.
+  - [ ] Confirmar que toda aula contém exercícios, quiz e soluções.
+  - [ ] Contar trilhas, módulos, aulas, exercícios, questões e projetos diretamente do código.
+- [ ] Documentar o procedimento de checagem de sintaxe do JavaScript extraído de `index.html`.
+- [ ] Criar uma lista manual de regressão para desktop, largura móvel, teclado e persistência.
+- [ ] Registrar uma linha de base dos números atuais do curso.
+- [ ] Conferir e, se necessário, atualizar a descrição em `<meta name="description">`.
+
+**Aceite:** uma alteração estrutural inválida é detectada antes da publicação; os números divulgados são derivados do código e têm data de conferência.
+
+## Fase 1 — Etapa 0: alfabetização digital
+
+**Meta:** permitir que uma pessoa totalmente leiga chegue ao primeiro exercício sabendo onde criar, escrever, executar e observar.
+
+- [ ] Criar uma Etapa 0 acessível antes de qualquer trilha.
+- [ ] Ensinar pastas, arquivos, nomes e extensões visíveis.
+- [ ] Explicar editor, navegador, terminal e interpretador.
+- [ ] Ensinar a abrir a mesma pasta no editor e no terminal.
+- [ ] Ensinar a reconhecer a pasta atual.
+- [ ] Praticar o ciclo salvar → executar → observar → encerrar.
+- [ ] Ensinar a copiar uma mensagem de erro com comando, contexto e linha relevante.
+- [ ] Incluir passos para Windows, macOS e Linux.
+- [ ] Incluir alternativa mínima para computador limitado.
+- [ ] Criar uma prova prática curta da Etapa 0.
+
+**Aceite:** o aluno cria uma pasta e um arquivo `.html` correto, abre-o no navegador, executa um comando no terminal e registra um erro com contexto sem depender de uma solução pronta.
+
+## Fase 2 — Pré-requisitos e ambientes reproduzíveis
+
+**Meta:** remover dependências implícitas e tornar cada ferramenta instalável, verificável e retomável.
+
+- [ ] Criar mapa explícito de pré-requisitos entre trilhas, módulos e aulas.
+- [ ] Adicionar atalhos de preparação mínima sem obrigar o estudo antecipado de uma trilha inteira.
+- [ ] Criar preparação de editor e arquivos por sistema operacional.
+- [ ] Criar preparação de Python e seleção do interpretador.
+- [ ] Criar preparação de Git e primeiro repositório local.
+- [ ] Criar preparação de Node.js e npm, distinguindo navegador e terminal.
+- [ ] Criar preparação de Docker, WSL e virtualização no Windows.
+- [ ] Criar alternativa leve para práticas que usam Docker.
+- [ ] Criar preparação de PostgreSQL e clientes de conexão.
+- [ ] Criar preparação de MariaDB.
+- [ ] Criar preparação de Firebird.
+- [ ] Criar preparação de MongoDB e `mongosh`.
+- [ ] Padronizar cada preparação: objetivo → requisitos → passos por sistema → verificação → saída esperada → problemas comuns → parar e retomar → alternativa leve.
+- [ ] Definir SQLite e PostgreSQL como caminho principal da trilha de dados.
+- [ ] Posicionar MariaDB, Firebird e MongoDB como aprofundamentos explícitos.
+- [ ] Corrigir a inconsistência da porta PostgreSQL `55432` entre o laboratório Docker e o projeto relacional.
+- [ ] Revisar portas, bancos, usuários e nomes usados entre todos os laboratórios e projetos.
+
+**Aceite:** nenhuma aula exige silenciosamente terminal, runtime, servidor, cliente ou banco ainda não preparado; cada comando informa onde executá-lo, em qual pasta e qual saída esperar.
+
+## Fase 3 — Aulas e exercícios com progressão verificável
+
+**Meta:** reduzir carga cognitiva e fazer cada aula alternar explicação, previsão, execução e prática.
+
+- [ ] Padronizar aulas na ordem definida no `AGENTS.md`.
+- [ ] Tornar todos os objetivos observáveis.
+- [ ] Separar resultado esperado e critérios de aceite das soluções ocultas.
+- [ ] Garantir exemplos executáveis com saída ou comportamento visível.
+- [ ] Aplicar a progressão guiado → pistas → problema novo → mudança de requisito.
+- [ ] Garantir, em cada aula, atividades de prever, alterar, construir e investigar erro.
+- [ ] Adicionar erros comuns e como reconhecê-los pela mensagem ou comportamento.
+- [ ] Adicionar exercício de transferência em contexto diferente.
+- [ ] Dividir a aula de funções JavaScript em blocos menores com prática intermediária.
+- [ ] Mapear outras aulas com mais de quatro conceitos centrais sem prática intermediária.
+- [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
+- [ ] Adicionar demonstrações visuais de laços.
+- [ ] Adicionar diagramas de referências e cópias entre objetos.
+- [ ] Adicionar visualização de consultas e `JOIN`.
+- [ ] Adicionar sequência visual de uma requisição HTTP.
+- [ ] Criar glossário contextual para termos como runtime, schema, callback, endpoint, mock e inferência.
+
+**Aceite:** cada aula alterada permite prever antes de executar, observar o resultado esperado, praticar com ajuda decrescente e resolver uma tarefa nova.
+
+## Fase 4 — Avaliação de domínio e recuperação
+
+**Meta:** separar consumo de conteúdo de capacidade demonstrada.
+
+- [ ] Implementar os estados `Li`, `Pratiquei`, `Passei na revisão` e `Resolvi sozinho`.
+- [ ] Atualizar `state` e `sanitizeState()` com valores padrão e compatibilidade.
+- [ ] Explicar na interface que progresso mede acompanhamento, não domínio.
+- [ ] Criar revisões espaçadas após alguns dias.
+- [ ] Criar revisões acumulativas entre módulos.
+- [ ] Associar erros a aulas específicas para revisão.
+- [ ] Oferecer uma segunda tentativa diferente, sem repetir o mesmo exercício.
+- [ ] Exigir explicação das decisões nas provas de nível.
+- [ ] Evitar que quiz de múltipla escolha seja tratado como comprovação prática.
+- [ ] Criar evidências observáveis para passagem entre os níveis 0, 1, 2, 3 e 4.
+
+**Aceite:** o sistema distingue claramente leitura, prática, retenção e resolução autônoma; só `Resolvi sozinho`, com problema novo e explicação, conta como evidência de avanço.
+
+## Fase 5 — Projetos de fechamento e conclusão básica
+
+**Meta:** integrar conhecimentos em entregas observáveis antes de avançar para backend completo.
+
+- [ ] Criar projeto de fechamento da trilha Git e Colaboração.
+- [ ] Criar projeto de fechamento da trilha Qualidade e Manutenção.
+- [ ] Criar projeto de fechamento da trilha Integração e Entrega.
+- [ ] Garantir objetivo, pré-requisitos, entrega, checks, qualidade e mudança de requisito em cada projeto.
+- [ ] Preferir checks automáticos quando o comportamento puder ser verificado com segurança.
+- [ ] Criar o projeto de nível básico “Organizador pessoal de estudos”.
+  - [ ] Interface responsiva, acessível e utilizável por teclado.
+  - [ ] Cadastro, edição, conclusão, exclusão e filtro de tarefas.
+  - [ ] Persistência e tratamento de dados inválidos.
+  - [ ] Histórico Git compreensível e README reproduzível.
+  - [ ] Testes das funções principais e roteiro manual da interface.
+  - [ ] Relatório Python lendo JSON.
+  - [ ] Modelo SQLite e consultas de progresso.
+  - [ ] Mudança simples de requisito solicitada após a entrega inicial.
+- [ ] Criar rubrica que avalie funcionamento, explicação e manutenção.
+
+**Aceite:** outra pessoa executa o projeto pelo README e o aluno implementa uma mudança simples, explica as decisões e não consulta uma solução de referência.
+
+## Fase 6 — Backend completo com persistência
+
+**Meta:** fechar a maior lacuna curricular com uma sequência ponta a ponta.
+
+- [ ] Definir a linguagem e o caminho principal do backend sem adicionar complexidade desnecessária.
+- [ ] Ensinar interface → requisição HTTP → API.
+- [ ] Ensinar validação de entrada no servidor.
+- [ ] Separar validação, regra de negócio e acesso a dados.
+- [ ] Persistir dados em PostgreSQL.
+- [ ] Ensinar respostas de sucesso e erro coerentes.
+- [ ] Ensinar migrações e evolução do esquema.
+- [ ] Ensinar transação com mais de uma alteração.
+- [ ] Criar testes unitários da regra de negócio.
+- [ ] Criar testes de integração com banco de teste.
+- [ ] Integrar o frontend real à API.
+- [ ] Documentar configuração, inicialização, parada e retomada do ambiente.
+- [ ] Proteger exemplos contra segredos e dados pessoais reais.
+
+**Aceite:** o aluno constrói e explica um fluxo completo da interface ao banco e de volta, incluindo validação, regra, erro, persistência e testes.
+
+## Fase 7 — Qualidade, CI, publicação e integração real
+
+**Meta:** transformar conceitos de entrega em práticas executadas e recuperáveis.
+
+- [ ] Criar laboratório de reprodução de bug em código alheio.
+- [ ] Exigir teste que falha antes da correção e passa depois dela.
+- [ ] Criar ao menos um teste automatizado de fluxo no navegador.
+- [ ] Configurar CI em um repositório real.
+- [ ] Observar uma falha de CI e corrigi-la.
+- [ ] Integrar ao menos um serviço externo real com contrato documentado.
+- [ ] Simular falhas de rede, autenticação e resposta inválida sem expor credenciais.
+- [ ] Publicar uma aplicação de demonstração.
+- [ ] Conferir a URL final e o comportamento publicado.
+- [ ] Ensinar rollback para uma versão anterior.
+- [ ] Executar e comprovar backup e restauração.
+- [ ] Criar prática real ou revisão independente de colaboração.
+
+**Aceite:** existem evidências da execução remota da CI, da publicação acessível, da recuperação de versão e dados e da correção de uma falha protegida por regressão.
+
+## Fase 8 — Projeto de conclusão júnior/intermediário
+
+**Meta:** comprovar a capacidade de entregar, explicar e manter uma aplicação pequena completa.
+
+- [ ] Liberar somente após concluir ambientes, backend e entrega real.
+- [ ] Implementar “Plataforma de acompanhamento de estudos”.
+  - [ ] Frontend conectado a uma API real.
+  - [ ] PostgreSQL local com Docker e persistência.
+  - [ ] Cursos, tarefas e sessões de estudo.
+  - [ ] Validação no servidor e respostas de erro coerentes.
+  - [ ] Relatórios e uma transação com múltiplas alterações.
+  - [ ] Testes unitários, de integração e de interface.
+  - [ ] CI executada no repositório.
+  - [ ] Publicação sem dados pessoais reais.
+  - [ ] Backup e restauração comprovados.
+  - [ ] README capaz de reconstruir o ambiente.
+  - [ ] Mudança de requisito em branch, revisada e protegida por teste.
+- [ ] Criar avaliação final de funcionamento, testes, explicação e manutenção.
+- [ ] Exigir leitura e correção de um defeito em código não escrito pelo aluno.
+- [ ] Registrar claramente quais competências de nível júnior foram comprovadas.
+- [ ] Não declarar nível intermediário sem evidência de arquitetura, integração, CI, revisão e colaboração.
+
+**Aceite:** outra pessoa reconstrói o ambiente pelo README; o aluno corrige um bug e implementa uma mudança de requisito sem reescrever o sistema, justificando os trade-offs.
+
+## Fase 9 — Experiência de estudo e portabilidade
+
+**Meta:** reduzir perda de progresso e tornar aulas longas confortáveis e retomáveis.
+
+- [ ] Implementar exportação de progresso e anotações.
+- [ ] Implementar importação validada, com confirmação antes de substituir dados.
+- [ ] Documentar versão e compatibilidade do formato exportado.
+- [ ] Criar modo de leitura prolongada.
+- [ ] Adicionar sumário navegável por teclado.
+- [ ] Salvar e restaurar posição de leitura.
+- [ ] Adicionar ajustes de leitura sem prejudicar contraste e responsividade.
+- [ ] Garantir funcionamento quando o armazenamento local estiver bloqueado.
+- [ ] Testar perda, corrupção e recuperação do estado.
+
+**Aceite:** o aluno transfere seu progresso entre navegadores, recupera-se de dados inválidos e retoma uma aula longa no ponto salvo.
+
+## Fase 10 — Engenharia de IA conectada e avaliada
+
+**Meta:** criar uma ponte explícita entre simulações didáticas e sistemas reais com modelo.
+
+- [ ] Identificar e rotular todas as atividades simuladas da trilha de IA.
+- [ ] Criar preparação segura para uso de um provedor/modelo real sem expor chaves.
+- [ ] Conectar um fluxo mínimo a um modelo real.
+- [ ] Criar RAG simples sobre um conjunto pequeno de materiais.
+- [ ] Exigir citações de fontes e reconhecimento de ausência de evidência.
+- [ ] Adicionar ferramentas com permissões limitadas e validação de entrada.
+- [ ] Criar conjunto de avaliação reproduzível.
+- [ ] Avaliar separadamente simulação e versão conectada.
+- [ ] Testar falhas, conteúdo não sustentado, injeção de prompt e uso indevido de ferramentas.
+- [ ] Documentar custo, privacidade, limites e alternativa sem serviço pago.
+
+**Aceite:** o aluno executa um sistema real, mede resultados com casos definidos, identifica falhas e explica por que uma demonstração simulada não comprova operação real.
+
+## Fase 11 — Validação final com alunos
+
+**Meta:** substituir hipóteses de usabilidade e aprendizagem por evidências observadas.
+
+- [ ] Definir protocolo de teste sem induzir respostas.
+- [ ] Testar a Etapa 0 com pessoa sem experiência prévia.
+- [ ] Testar instalações em Windows, macOS e Linux quando houver acesso.
+- [ ] Observar pelo menos um aluno no projeto básico.
+- [ ] Observar pelo menos um aluno no projeto júnior.
+- [ ] Registrar pontos de abandono, dúvidas, erros recorrentes e tempo real.
+- [ ] Corrigir bloqueios de severidade alta ou bloqueante encontrados.
+- [ ] Reaplicar tarefas diferentes após as correções.
+- [ ] Atualizar o perfil do aluno e as dificuldades recorrentes no `AGENTS.md`.
+- [ ] Publicar um relatório final separando cobertura, uso e domínio comprovado.
+
+**Aceite:** os principais percursos foram executados por alunos reais, os bloqueios foram tratados e as afirmações de nível estão sustentadas por tarefas novas, explicação e manutenção — não apenas por conclusão de aulas.
+
+---
+
+## Verificações recorrentes por entrega
+
+### Automatizadas
+
+- [ ] Extrair todos os blocos `<script>` e executar `node --check`.
+- [ ] Executar o verificador de ids e referências cruzadas.
+- [ ] Confirmar exercícios, soluções e quizzes obrigatórios.
+- [ ] Confirmar que URLs adicionadas usam `https` quando disponível e `rel="noopener noreferrer"` na interface.
+- [ ] Conferir se a contagem estrutural mudou e atualizar documentação relacionada.
+
+### Manuais
+
+- [ ] Abrir uma aula de cada trilha alterada.
+- [ ] Navegar somente por teclado.
+- [ ] Testar em largura aproximada de 375 px.
+- [ ] Marcar e desmarcar conclusão, recarregar e conferir persistência.
+- [ ] Testar com `localStorage` indisponível quando o estado for alterado.
+- [ ] Conferir textos longos, código, tabelas e modais sem cortes.
+- [ ] Verificar a saída esperada de todos os comandos novos.
+
+## Dependências críticas
+
+```text
+Base de verificação
+  → Etapa 0
+    → Preparação de ambientes e mapa de pré-requisitos
+      → Padronização de aulas e exercícios
+        → Avaliação de domínio
+          → Projeto básico
+            → Backend com persistência
+              → CI, publicação e integração real
+                → Projeto júnior/intermediário
+                  → IA real como extensão opcional
+```
+
+O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não estiverem concluídas.
+
+## Histórico de implementações
+
+| Data | Fase/item | Commit | Resultado e verificação |
+|---|---|---|---|
+| 24/10/2026 | Criação do roadmap | A preencher após o commit | Roadmap consolidado a partir do backlog e da análise pedagógica. |
+| 24/10/2026 | Reorganização estrutural | Commit de reorganização | HTML, CSS, dados e funções separados por responsabilidade, sem mudança intencional de comportamento. |
+
+## Decisões e bloqueios
+
+Registre aqui mudanças de direção e impedimentos que afetem a sequência.
+
+| Data | Tipo | Decisão ou bloqueio | Motivo | Próxima ação |
+|---|---|---|---|---|
+| — | — | — | — | — |
