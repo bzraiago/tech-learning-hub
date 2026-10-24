@@ -4,7 +4,7 @@
 
 ## 1. Veredito
 
-O mapa torna explícitas as principais dependências entre as nove trilhas e impede que Python, Node.js ou Docker apareçam como requisitos silenciosos. Os atalhos para servidor local, SQLite e PostgreSQL reduzem reordenações desnecessárias. Editor, Python, Git e Node.js/npm agora possuem preparações próprias; a Fase 2 permanece em andamento porque Docker/WSL e bancos ainda precisam do mesmo tratamento.
+O mapa torna explícitas as principais dependências entre as nove trilhas e impede que Python, Node.js ou Docker apareçam como requisitos silenciosos. Os atalhos para servidor local, SQLite e PostgreSQL reduzem reordenações desnecessárias. Editor, Python, Git, Node.js/npm e Docker/WSL agora possuem preparações próprias; a Fase 2 permanece em andamento porque os bancos ainda precisam do mesmo tratamento.
 
 ## 2. Contrato de aprendizagem
 
@@ -32,7 +32,8 @@ O grafo completo está em `docs/MAPA_PRE_REQUISITOS.md`. Não foram encontradas 
 | Python | Sim, no conteúdo | Execução com aluno real | Fonte oficial verificada; instalação não executada |
 | Git | Sim, no conteúdo | Execução com aluno real | Fonte oficial verificada; instalação não executada |
 | Node.js/npm | Sim, no conteúdo | Execução com aluno real | Fonte oficial verificada; instalação não executada |
-| Docker/WSL e bancos | Não nesta entrega | Preparações completas e alternativas leves | Não verificado nesta entrega |
+| Docker/WSL | Sim, no conteúdo | Execução em máquinas reais | Fontes verificadas; instalação não executada |
+| Bancos | Não nesta entrega | Preparações completas e alternativas leves | Não verificado nesta entrega |
 
 ## 6. Fontes
 
@@ -49,9 +50,8 @@ O mapa permite escolher uma sequência coerente e reconhecer preparações míni
 
 ## 8. Próximos passos sugeridos
 
-1. Criar preparação de Docker/WSL e alternativa leve.
-2. Consolidar PostgreSQL e depois aprofundamentos de outros motores.
-3. Validar as quatro preparações essenciais com alunos e máquinas reais.
+1. Consolidar PostgreSQL e depois aprofundamentos de outros motores.
+2. Validar as preparações com alunos e máquinas reais.
 
 ## 9. Limites desta auditoria
 

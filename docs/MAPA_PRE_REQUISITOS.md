@@ -87,7 +87,7 @@ Outro serviço dentro da mesma rede Compose usa `db:5432`. Não substitua um end
 | Alta | Etapa 0 → instalação Python | Resolvida | Manter a preparação `setup-python` atualizada com a documentação oficial. |
 | Alta | Etapa 0 → instalação Git | Resolvida | Manter a preparação `setup-git` atualizada com a documentação oficial. |
 | Alta | Etapa 0 → instalação Node.js/npm | Resolvida | Manter `setup-node` e a distinção navegador/runtime. |
-| Alta | Etapa 0 → Docker/WSL | Parcial | Criar preparação com virtualização e alternativa leve. |
+| Alta | Etapa 0 → Docker/WSL | Resolvida | Manter `setup-docker` e `setup-docker-alternative` atualizadas. |
 | Alta | Docker → PostgreSQL | Parcial | Consolidar instalação, clientes, serviço e conexão `55432`. |
 | Média | PostgreSQL → MariaDB/Firebird/MongoDB | Aberta como aprofundamento | Criar preparações separadas sem bloquear o caminho principal. |
 

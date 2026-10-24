@@ -4,7 +4,7 @@
 
 ## 1. Veredito
 
-As aulas `setup-editor`, `setup-python`, `setup-git` e `setup-node` cumprem o padrão estrutural de instalação para iniciantes: objetivo, requisitos, caminhos por sistema, verificação, resultado esperado, diagnóstico, retomada e alternativa leve. Cada aula também separa disponibilidade da ferramenta de domínio prático. A entrega reduz um bloqueio importante, mas não comprova que os procedimentos funcionam em toda máquina; Docker/WSL e bancos permanecem fora deste escopo.
+As aulas `setup-editor`, `setup-python`, `setup-git` e `setup-node` cumprem o padrão estrutural de instalação para iniciantes: objetivo, requisitos, caminhos por sistema, verificação, resultado esperado, diagnóstico, retomada e alternativa leve. Cada aula também separa disponibilidade da ferramenta de domínio prático. Docker/WSL passou a ser coberto por `setup-docker` e auditado separadamente; os bancos continuam fora deste escopo.
 
 ## 2. Contrato de aprendizagem
 
@@ -16,7 +16,7 @@ As aulas `setup-editor`, `setup-python`, `setup-git` e `setup-node` cumprem o pa
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Alta | G | Fase 2 | FATO | Docker/WSL e bancos ainda não têm preparações equivalentes. | Implementar o próximo bloco sem marcar a fase completa. |
+| 1 | Alta | G | Fase 2 | FATO | Os bancos ainda não têm preparações equivalentes. | Implementar o próximo bloco sem marcar a fase completa. |
 | 2 | Média | M | Quatro aulas novas | RISCO | Passos não foram executados em máquinas reais dos três sistemas. | Fazer validação multiplataforma e registrar divergências. |
 | 3 | Baixa | P | `setup-node` | FATO | A aula recomenda a linha LTS sem fixar uma versão que ficará obsoleta. | Conferir periodicamente a página oficial. |
 
@@ -55,9 +55,8 @@ Ao executar as práticas, o aluno pode comprovar que localiza comandos, registra
 
 ## 8. Próximos passos sugeridos
 
-1. Criar a preparação de Docker/WSL com checagem de virtualização e alternativa leve.
-2. Criar as preparações de PostgreSQL e dos motores de aprofundamento.
-3. Realizar teste manual das quatro aulas em Windows, macOS e Linux.
+1. Criar as preparações de PostgreSQL e dos motores de aprofundamento.
+2. Realizar teste manual das quatro aulas em Windows, macOS e Linux.
 
 ## 9. Limites desta auditoria
 

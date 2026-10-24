@@ -170,6 +170,34 @@
             "exercise": "Registre as duas versões e execute verificar_node.js pelo terminal na pasta correta.",
             "code": "node --version\nnpm --version\nnode verificar_node.js",
             "docs": [{"kind": "doc", "title": "Node.js · Downloads", "url": "https://nodejs.org/en/download", "language": "EN"}]
+          },
+          {
+            "id": "setup-docker",
+            "title": "Preparar Docker, WSL e virtualização",
+            "minutes": 80,
+            "concept": "Verificar requisitos do computador, instalar o caminho adequado ao sistema e confirmar cliente, Engine e Compose separadamente.",
+            "objectives": ["Verificar WSL e virtualização antes de instalar Docker no Windows.", "Escolher Docker Desktop ou Docker Engine conforme o sistema.", "Comprovar que cliente, Engine e Compose estão acessíveis sem alterar permissões às cegas."],
+            "exercise": "Registre sistema, arquitetura e saídas de verificação; execute hello-world somente quando o Engine responder.",
+            "code": "# Windows: PowerShell\nwsl --status\nwsl --version\n# Todos os sistemas: terminal\ndocker version\ndocker compose version\ndocker run --rm hello-world",
+            "docs": [
+              {"kind": "doc", "title": "Docker Desktop · Windows", "url": "https://docs.docker.com/desktop/setup/install/windows-install/", "language": "EN"},
+              {"kind": "doc", "title": "Microsoft · Instalar WSL", "url": "https://learn.microsoft.com/windows/wsl/install", "language": "PT-BR"},
+              {"kind": "doc", "title": "Docker Desktop · macOS", "url": "https://docs.docker.com/desktop/setup/install/mac-install/", "language": "EN"},
+              {"kind": "doc", "title": "Docker Engine · Linux", "url": "https://docs.docker.com/engine/install/", "language": "EN"}
+            ]
+          },
+          {
+            "id": "setup-docker-alternative",
+            "title": "Seguir sem Docker em computador limitado",
+            "minutes": 45,
+            "concept": "Usar SQLite e laboratórios conceituais enquanto Docker não estiver disponível, registrando claramente o que foi simulado e o que foi executado.",
+            "objectives": ["Decidir com critérios quando adiar Docker.", "Executar a alternativa SQLite sem fingir que ela equivale a PostgreSQL em contêiner.", "Preparar evidências para retomar o caminho principal depois."],
+            "exercise": "Crie um banco SQLite local, execute uma consulta e registre quais competências de Docker/PostgreSQL continuam pendentes.",
+            "code": "python -c \"import sqlite3; print(sqlite3.sqlite_version)\"\npython -c \"import sqlite3; c=sqlite3.connect('estudos.db'); c.execute('create table if not exists marcador(texto)'); c.execute('insert into marcador values (?)', ('alternativa local',)); c.commit(); print(c.execute('select count(*) from marcador').fetchone()[0]); c.close()\"",
+            "docs": [
+              {"kind": "doc", "title": "Python · sqlite3", "url": "https://docs.python.org/3/library/sqlite3.html", "language": "EN"},
+              {"kind": "doc", "title": "Docker · instalação por plataforma", "url": "https://docs.docker.com/engine/install/", "language": "EN"}
+            ]
           }
         ]
       }

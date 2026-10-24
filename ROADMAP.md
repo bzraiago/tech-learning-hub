@@ -106,8 +106,8 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Criar preparação de Python e seleção do interpretador.
 - [x] Criar preparação de Git e primeiro repositório local.
 - [x] Criar preparação de Node.js e npm, distinguindo navegador e terminal.
-- [ ] Criar preparação de Docker, WSL e virtualização no Windows.
-- [ ] Criar alternativa leve para práticas que usam Docker.
+- [x] Criar preparação de Docker, WSL e virtualização no Windows.
+- [x] Criar alternativa leve para práticas que usam Docker.
 - [ ] Criar preparação de PostgreSQL e clientes de conexão.
 - [ ] Criar preparação de MariaDB.
 - [ ] Criar preparação de Firebird.
@@ -344,6 +344,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Fase 1 — Etapa 0 | Commit da Fase 1 | Cinco aulas de preparação digital, prova prática e auditoria pré-publicação adicionadas. |
 | 24/10/2026 | Fase 2.1 — pré-requisitos | Commit da Fase 2.1 | Grafo, dependências por trilha, atalhos mínimos e arestas abertas documentados. |
 | 24/10/2026 | Fase 2.2 — ambientes essenciais | Commit da Fase 2.2 | Preparações de editor, Python, Git e Node.js/npm adicionadas com diagnóstico e alternativas. |
+| 24/10/2026 | Fase 2.3 — Docker e alternativa leve | Commit da Fase 2.3 | Preparação de Docker/WSL/virtualização e percurso temporário com SQLite adicionados. |
 
 ## Decisões e bloqueios
 
