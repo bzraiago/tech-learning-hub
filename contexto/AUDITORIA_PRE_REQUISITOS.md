@@ -4,7 +4,7 @@
 
 ## 1. Veredito
 
-O mapa torna explícitas as principais dependências entre as nove trilhas e impede que Python, Node.js ou Docker apareçam como requisitos silenciosos. Os atalhos para servidor local, SQLite e PostgreSQL reduzem reordenações desnecessárias. As ferramentas essenciais e os bancos agora possuem preparações próprias; MariaDB, Firebird e MongoDB estão explicitamente posicionados como aprofundamentos. A Fase 2 permanece aberta para a revisão global de parâmetros.
+O mapa torna explícitas as principais dependências entre as nove trilhas e impede que Python, Node.js ou Docker apareçam como requisitos silenciosos. Os atalhos para servidor local, SQLite e PostgreSQL reduzem reordenações desnecessárias. As ferramentas essenciais e os bancos possuem preparações próprias; MariaDB, Firebird e MongoDB estão explicitamente posicionados como aprofundamentos. A revisão global de contratos e parâmetros concluiu a Fase 2.
 
 ## 2. Contrato de aprendizagem
 
@@ -51,8 +51,8 @@ O mapa permite escolher uma sequência coerente e reconhecer preparações míni
 
 ## 8. Próximos passos sugeridos
 
-1. Revisar globalmente portas, bancos, usuários e nomes dos laboratórios e projetos.
-2. Validar as preparações com alunos e máquinas reais.
+1. Validar as preparações com alunos e máquinas reais na Fase 11.
+2. Manter o validador de contratos ao alterar ambientes.
 
 ## 9. Limites desta auditoria
 

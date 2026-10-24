@@ -50,7 +50,7 @@ Toda implementação só pode ser considerada pronta quando:
 |---|---|---|---|
 | 0 | Base de medição e proteção do projeto | — | [x] |
 | 1 | Preparação digital antes das trilhas | Fase 0 | [x] |
-| 2 | Pré-requisitos e ambientes reproduzíveis | Fase 1 | [ ] |
+| 2 | Pré-requisitos e ambientes reproduzíveis | Fase 1 | [x] |
 | 3 | Aulas e exercícios com progressão verificável | Fase 2 | [ ] |
 | 4 | Avaliação de domínio e recuperação | Fase 3 | [ ] |
 | 5 | Projetos de fechamento e nível básico | Fase 4 | [ ] |
@@ -112,11 +112,11 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Criar preparação de MariaDB.
 - [x] Criar preparação de Firebird.
 - [x] Criar preparação de MongoDB e `mongosh`.
-- [ ] Padronizar cada preparação: objetivo → requisitos → passos por sistema → verificação → saída esperada → problemas comuns → parar e retomar → alternativa leve.
+- [x] Padronizar cada preparação: objetivo → requisitos → passos por sistema → verificação → saída esperada → problemas comuns → parar e retomar → alternativa leve.
 - [x] Definir SQLite e PostgreSQL como caminho principal da trilha de dados.
 - [x] Posicionar MariaDB, Firebird e MongoDB como aprofundamentos explícitos.
 - [x] Corrigir a inconsistência da porta PostgreSQL `55432` entre o laboratório Docker e o projeto relacional.
-- [ ] Revisar portas, bancos, usuários e nomes usados entre todos os laboratórios e projetos.
+- [x] Revisar portas, bancos, usuários e nomes usados entre todos os laboratórios e projetos.
 
 **Aceite:** nenhuma aula exige silenciosamente terminal, runtime, servidor, cliente ou banco ainda não preparado; cada comando informa onde executá-lo, em qual pasta e qual saída esperar.
 
@@ -347,6 +347,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Fase 2.3 — Docker e alternativa leve | Commit da Fase 2.3 | Preparação de Docker/WSL/virtualização e percurso temporário com SQLite adicionados. |
 | 24/10/2026 | Fase 2.4 — PostgreSQL e clientes | Commit da Fase 2.4 | Preparação de psql/pgAdmin e projeto relacional padronizados em `127.0.0.1:55432`. |
 | 24/10/2026 | Fase 2.5 — bancos de aprofundamento | Commit da Fase 2.5 | Preparações opcionais de MariaDB, Firebird e MongoDB/mongosh adicionadas. |
+| 24/10/2026 | Fase 2.6 — auditoria global de ambientes | Commit da Fase 2.6 | Contratos de preparação e parâmetros dos laboratórios protegidos pelo validador automático. |
 
 ## Decisões e bloqueios
 

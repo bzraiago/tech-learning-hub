@@ -79,6 +79,18 @@ usuário: aluno
 
 Outro serviço dentro da mesma rede Compose usa `db:5432`. Não substitua um endereço pelo outro sem identificar de onde parte a conexão.
 
+## Catálogo de ambientes de laboratório
+
+| Tecnologia | Origem do cliente | Endereço ou caminho | Banco/arquivo | Usuário | Papel no curso |
+|---|---|---|---|---|---|
+| PostgreSQL via Docker | Computador | `127.0.0.1:55432` | `estudos` | `aluno` | Caminho principal |
+| PostgreSQL via Docker | Rede Compose | `db:5432` | `estudos` | `aluno` | Caminho principal para futura API em container |
+| MariaDB local | Computador | `127.0.0.1:3306` | `hub_maria_aula` | `root` de laboratório | Aprofundamento |
+| Firebird 5 local | Host do servidor | arquivo `hub_fb_aula.fdb` em pasta autorizada | arquivo `.fdb` | `SYSDBA` de laboratório | Aprofundamento |
+| MongoDB Community | Computador | `127.0.0.1:27017` | `tech_hub_aula_*` ou `th_catalogo_lab` | conforme laboratório | Aprofundamento |
+
+Senhas nunca fazem parte deste catálogo: são locais, não entram em comandos publicados nem no repositório.
+
 ## Arestas atualmente abertas
 
 | Severidade | Aresta | Estado | Próxima implementação |

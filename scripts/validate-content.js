@@ -146,6 +146,69 @@ for (const lesson of lessons) {
   }
 }
 
+const preparationIds = [
+  'setup-editor',
+  'setup-python',
+  'setup-git',
+  'setup-node',
+  'setup-docker',
+  'setup-docker-alternative',
+  'setup-postgresql',
+  'setup-mariadb',
+  'setup-firebird',
+  'setup-mongodb',
+];
+const setupMarkers = [
+  'Objetivo:',
+  'Requisitos:',
+  'Windows:',
+  'macOS:',
+  'Linux:',
+  'Verificação:',
+  'Resultado esperado:',
+  'Problema comum:',
+  'Como parar e retomar:',
+  'Alternativa leve:',
+];
+const exerciseKinds = ['Prever:', 'Alterar:', 'Construir:', 'Investigar erro:'];
+
+for (const lessonId of preparationIds) {
+  const guide = LESSON_GUIDES[lessonId];
+  if (!guide) {
+    fail(`PreparaÃ§Ã£o obrigatÃ³ria ausente: ${lessonId}`);
+    continue;
+  }
+  for (const marker of setupMarkers) {
+    if (!guide.setup.includes(marker)) fail(`PreparaÃ§Ã£o ${lessonId} sem marcador de ambiente: ${marker}`);
+  }
+  const prompts = (guide.exercises || []).map((exercise) => exercise.prompt || '');
+  for (const kind of exerciseKinds) {
+    if (!prompts.some((prompt) => prompt.startsWith(kind))) {
+      fail(`PreparaÃ§Ã£o ${lessonId} sem exercÃ­cio do tipo ${kind}`);
+    }
+  }
+}
+
+const environmentContracts = [
+  ['PostgreSQL no host', LESSON_GUIDES['setup-postgresql'], ['127.0.0.1', '55432', 'estudos', 'aluno']],
+  ['PostgreSQL no projeto relacional', PROJECTS.find((project) => project.id === 'project-db-relational'), ['127.0.0.1', '55432', 'laboratorio_estoque', 'aluno']],
+  ['MariaDB local', LESSON_GUIDES['setup-mariadb'], ['127.0.0.1', '3306', 'hub_maria_aula', 'root']],
+  ['Firebird local', LESSON_GUIDES['setup-firebird'], ['localhost', 'hub_fb_aula.fdb', 'SYSDBA']],
+  ['MongoDB local', LESSON_GUIDES['setup-mongodb'], ['127.0.0.1', '27017', 'mongosh']],
+  ['MongoDB no projeto', PROJECTS.find((project) => project.id === 'project-db-mongo'), ['127.0.0.1', '27017', 'th_catalogo_lab', 'mongosh']],
+];
+
+for (const [label, content, expectedValues] of environmentContracts) {
+  if (!content) {
+    fail(`Contrato de ambiente ausente: ${label}`);
+    continue;
+  }
+  const serialized = JSON.stringify(content);
+  for (const expected of expectedValues) {
+    if (!serialized.includes(expected)) fail(`Contrato ${label} nÃ£o informa ${expected}`);
+  }
+}
+
 for (const [key, resource] of Object.entries(R)) {
   if (!resource.title?.trim()) fail(`Recurso sem título: ${key}`);
   try {
