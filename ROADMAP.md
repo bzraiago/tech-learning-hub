@@ -219,7 +219,62 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Executar e comprovar backup e restauração.
 - [ ] Criar prática real ou revisão independente de colaboração.
 
+### Fase 7.1 — Fundamentos de internet, hospedagem e DNS
+
+- [ ] Explicar cliente, servidor, hospedagem, região, CDN, domínio, registrador e provedor DNS.
+- [ ] Ensinar resolução DNS com registros `A`, `AAAA`, `CNAME` e `TXT`, TTL e propagação.
+- [ ] Explicar HTTPS, certificado TLS e redirecionamento de HTTP para HTTPS.
+- [ ] Comparar publicação estática, funções serverless, servidor persistente e serviço gerenciado.
+- [ ] Publicar uma página mínima na Vercel e verificar URL, status HTTP e HTTPS.
+- [ ] Conectar um domínio de laboratório, validar registros DNS e documentar como desfazer a configuração.
+
+### Fase 7.2 — Stack guiada de referência
+
+- [ ] Criar um projeto integrador guiado usando Vercel, Clerk e Supabase, sem tratar os fornecedores como única solução possível.
+- [ ] Preparar contas, projeto local e variáveis separadas para desenvolvimento, prévia e produção.
+- [ ] Implementar cadastro, login, logout, sessão expirada e estado de carregamento com Clerk.
+- [ ] Configurar login social do Google pelo Clerk e ensinar os conceitos transferíveis de OAuth 2.0/OpenID Connect, redirect URI, consentimento, escopos e `state`.
+- [ ] Conectar Clerk ao Supabase pela integração nativa atual, sem usar o template JWT legado.
+- [ ] Criar tabelas e migrações no PostgreSQL do Supabase.
+- [ ] Aplicar Row Level Security (RLS) e provar com duas contas que cada pessoa acessa somente seus próprios registros.
+- [ ] Diferenciar chave publicável, segredo de servidor e credenciais que nunca podem chegar ao navegador.
+- [ ] Publicar na Vercel, configurar variáveis por ambiente e atualizar URLs de redirecionamento permitidas.
+- [ ] Executar smoke test em produção: login, criação, leitura, edição, exclusão, logout e acesso negado.
+
+### Fase 7.3 — Segurança aplicada e privacidade
+
+- [ ] Criar threat model simples: ativos, entradas, fronteiras de confiança, ameaças e controles.
+- [ ] Ensinar OWASP Top 10 por meio de falhas reproduzíveis e correções verificadas, sem conteúdo ofensivo fora do laboratório.
+- [ ] Cobrir autenticação versus autorização, IDOR/BOLA, XSS, CSRF, SQL injection, abuso de API, rate limiting e gestão de dependências.
+- [ ] Implementar cabeçalhos de segurança, validação no servidor, mensagens de erro seguras e princípio do menor privilégio.
+- [ ] Ensinar rotação e revogação de segredo, auditoria de acesso e resposta inicial a incidente.
+- [ ] Introduzir LGPD com papéis, finalidade, base legal, minimização, retenção, direitos do titular e resposta a incidente.
+- [ ] Criar inventário de dados e fluxo de tratamento usando somente dados fictícios.
+- [ ] Implementar exportação, correção e exclusão de dados do usuário no projeto didático.
+- [ ] Deixar explícito que o conteúdo educacional não substitui avaliação jurídica ou de segurança profissional.
+
+### Fase 7.4 — Redis, desempenho e operação
+
+- [ ] Ensinar primeiro quando não usar Redis: PostgreSQL continua sendo a fonte de verdade do projeto.
+- [ ] Introduzir Redis como armazenamento em memória para cache, sessão, contador e limitação de requisições.
+- [ ] Implementar cache-aside com TTL, chave versionada e invalidação após escrita.
+- [ ] Demonstrar cache miss, dado obsoleto, indisponibilidade do Redis e fallback controlado.
+- [ ] Implementar rate limiting por identidade e IP sem armazenar dado pessoal além do necessário.
+- [ ] Medir antes e depois, registrar custo e latência e justificar se a complexidade compensa.
+- [ ] Não guardar tokens, senhas ou dados sensíveis desnecessários no cache.
+
+### Fase 7.5 — Operação e portabilidade
+
+- [ ] Configurar logs estruturados sem tokens nem dados pessoais desnecessários.
+- [ ] Adicionar monitoramento de disponibilidade e um alerta testável.
+- [ ] Ensinar limites, custos, quotas e risco de dependência de fornecedor (vendor lock-in).
+- [ ] Documentar exportação e backup dos dados, restauração e plano mínimo de migração de fornecedor.
+- [ ] Criar rollback da aplicação e migração de banco compatível com a versão anterior quando necessário.
+- [ ] Produzir runbook de deploy, falha de autenticação, falha de banco, incidente e recuperação.
+
 **Aceite:** existem evidências da execução remota da CI, da publicação acessível, da recuperação de versão e dados e da correção de uma falha protegida por regressão.
+
+**Aceite adicional da stack guiada:** duas contas reais de teste acessam somente seus próprios dados; o login Google usa URLs autorizadas; nenhum segredo aparece no repositório ou bundle do navegador; domínio e HTTPS funcionam; uma falha e um rollback são observados; o aluno explica o papel de Clerk, Supabase, Vercel, DNS e Redis e consegue indicar alternativas.
 
 ## Fase 8 — Projeto de conclusão júnior/intermediário
 
@@ -349,6 +404,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Fase 2.5 — bancos de aprofundamento | Commit da Fase 2.5 | Preparações opcionais de MariaDB, Firebird e MongoDB/mongosh adicionadas. |
 | 24/10/2026 | Fase 2.6 — auditoria global de ambientes | Commit da Fase 2.6 | Contratos de preparação e parâmetros dos laboratórios protegidos pelo validador automático. |
 | 24/10/2026 | Fase 3.1 — funções JavaScript | Commit da Fase 3.1 | Aula sobrecarregada dividida em contratos, escopo/pureza e callbacks/closures, preservando o id existente. |
+| 24/10/2026 | Planejamento da trilha de deploy | Próximo ciclo | Stack guiada Clerk + Supabase + Vercel e módulos transferíveis de DNS, OAuth/OIDC, segurança, LGPD, Redis e operação adicionados ao roadmap. |
 
 ## Decisões e bloqueios
 
