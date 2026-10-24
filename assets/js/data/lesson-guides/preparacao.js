@@ -1,0 +1,154 @@
+'use strict';
+
+// Guias detalhados da Etapa 0 — preparação digital.
+Object.assign(LESSON_GUIDES, {
+  "prep-tools": {
+    "prerequisites": "Nenhum. Você precisa apenas de acesso a um computador e permissão para criar uma pasta e um arquivo.",
+    "setup": "Não instale nada nesta aula. Identifique no seu computador um navegador e um editor de texto. Se já usa VS Code, abra-o; caso contrário, um editor simples é suficiente para observar a diferença entre editar e visualizar.",
+    "why": "Quem começa costuma digitar um comando no editor ou colar código no terminal sem saber por que nada acontece. Cada ferramenta tem uma responsabilidade. Reconhecer onde uma ação ocorre evita tentativas aleatórias e torna pedidos de ajuda mais precisos.",
+    "sections": [
+      {"title": "Editor e navegador", "paragraphs": ["O editor modifica o conteúdo de arquivos de texto. Ele não é a página nem a linguagem: é a ferramenta onde você escreve e salva. O navegador interpreta documentos web, mostra páginas e oferece ferramentas de inspeção.", "Salvar no editor altera o arquivo no disco. O navegador só mostra a nova versão depois de abrir ou atualizar esse arquivo. Duas janelas podem exibir o mesmo conteúdo, mas exercem papéis diferentes."]},
+      {"title": "Terminal e shell", "paragraphs": ["O terminal é uma interface de texto. Dentro dele, um shell lê comandos e pede ao sistema operacional que execute ações. PowerShell é comum no Windows; zsh é comum no macOS; bash aparece com frequência no Linux.", "O texto antes do cursor costuma indicar usuário, computador ou pasta atual. Ele é o prompt do terminal; normalmente você digita depois dele, sem copiar o prompt dos exemplos."]},
+      {"title": "Interpretador e runtime", "paragraphs": ["Um interpretador ou ambiente de execução, também chamado runtime, executa uma linguagem. Python executa programas Python; Node.js pode executar JavaScript fora do navegador. Instalar VS Code não instala automaticamente esses ambientes.", "Nesta etapa você não precisa instalar uma linguagem. Basta reconhecer a cadeia: o editor salva o arquivo, o terminal inicia um programa e o runtime entende a linguagem. O navegador também possui um runtime para JavaScript e interpreta HTML e CSS."]}
+    ],
+    "example": {"language": "Mapa de ferramentas", "code": "Escrever e salvar registro.txt → editor\nAbrir uma página local → navegador\nDigitar Get-Location ou pwd → terminal\nExecutar programa.py → interpretador Python", "explanation": ["A ação determina a ferramenta; a aparência do ícone não determina o papel.", "Terminal não significa linguagem: ele pode iniciar vários programas.", "Um arquivo não executa apenas porque foi salvo."], "expected": "Você aponta onde cada ação acontece e explica a diferença sem depender do nome de um aplicativo específico."},
+    "guided": [
+      {"instruction": "Localize um editor e um navegador sem abrir arquivos desconhecidos.", "result": "Você identifica duas aplicações diferentes e descreve o papel de cada uma."},
+      {"instruction": "Abra o terminal integrado do editor, se disponível, apenas para observar.", "result": "Um painel mostra um prompt aguardando comandos; nenhum comando é necessário ainda."},
+      {"instruction": "Diga em voz alta: editor salva; navegador apresenta; terminal recebe comandos; runtime executa a linguagem.", "result": "Você consegue repetir o mapa sem consultar a tela."}
+    ],
+    "exercises": [
+      {"prompt": "Prever: onde apareceria o resultado visual de um arquivo HTML aberto por duplo clique?", "hints": ["Pense na ferramenta que apresenta páginas."], "solution": "No navegador.", "explanation": "O editor mostra o texto do arquivo; o navegador interpreta e apresenta o documento.", "expected": "A resposta identifica navegador e explica a diferença para o editor."},
+      {"prompt": "Alterar: no mapa de ferramentas, troque Python por JavaScript executado fora do navegador. O que muda?", "hints": ["Procure o nome do runtime de JavaScript usado no terminal."], "solution": "O arquivo continua sendo escrito no editor e iniciado pelo terminal, mas o runtime passa a ser Node.js.", "explanation": "Ferramentas do fluxo podem permanecer iguais enquanto o executor da linguagem muda.", "expected": "A resposta cita Node.js sem afirmar que ele já está instalado."},
+      {"prompt": "Construir: escreva uma tabela de quatro linhas com uma tarefa real e a ferramenta correta para executá-la.", "hints": ["Use uma tarefa para editor, navegador, terminal e runtime."], "solution": "Editar registro.txt — editor; abrir index.html — navegador; listar arquivos — terminal; executar programa.py — Python.", "explanation": "Outros exemplos são válidos se o papel estiver correto.", "expected": "Quatro tarefas diferentes estão associadas às ferramentas adequadas."},
+      {"prompt": "Investigar erro: alguém digitou `python arquivo.py` dentro do conteúdo de arquivo.py. Explique o erro de contexto e onde o comando deveria ser digitado.", "hints": ["Separe código salvo de comando para iniciar o programa."], "solution": "`python arquivo.py` é um comando para o terminal. Dentro do arquivo, ele seria lido como código Python inválido ou sem sentido para a tarefa.", "explanation": "Antes de corrigir caracteres, confirme em qual ferramenta a instrução foi usada.", "expected": "A resposta indica o terminal e distingue comando de código."}
+    ],
+    "mistakes": ["Digitar comandos no editor: confirme se a instrução diz terminal.", "Esperar que o editor execute qualquer linguagem: verifique se o runtime existe.", "Confundir navegador com internet: um navegador também pode abrir arquivos locais."],
+    "quiz": [
+      {"question": "Onde normalmente se digita `python programa.py`?", "options": ["No terminal", "No nome do arquivo", "Na barra de endereço"], "correctIndex": 0, "explanation": "É um comando que pede ao runtime Python para executar um arquivo."},
+      {"question": "Instalar um editor instala automaticamente Python, Node.js e bancos?", "options": ["Sempre", "Não; são ferramentas separadas", "Somente no navegador"], "correctIndex": 1, "explanation": "O editor pode integrar ferramentas instaladas, mas não substitui seus runtimes."},
+      {"question": "Qual ferramenta apresenta uma página HTML?", "options": ["Navegador", "Gerenciador de arquivos", "Editor exclusivamente"], "correctIndex": 0, "explanation": "O navegador interpreta e apresenta o documento."}
+    ],
+    "summary": ["Editor salva arquivos; navegador apresenta páginas.", "Terminal recebe comandos; o shell os interpreta.", "Runtimes executam linguagens e são separados do editor."]
+  },
+
+  "prep-files": {
+    "prerequisites": "Concluir Editor, navegador, terminal e interpretador.",
+    "setup": "Escolha Documentos ou outra área pessoal onde você tenha permissão de escrita. Não use pastas do sistema. No Windows, abra o Explorador de Arquivos; no macOS, o Finder; no Linux, o gerenciador de arquivos da sua distribuição.",
+    "why": "Programas dependem do nome e da localização exatos dos arquivos. Extensões ocultas, cópias em pastas diferentes e nomes parecidos são causas frequentes de falhas que parecem problemas de código.",
+    "sections": [
+      {"title": "Pasta, arquivo e caminho", "paragraphs": ["Uma pasta agrupa arquivos e outras pastas. Um caminho descreve como chegar até um item. `estudos-programacao/registro.txt` indica o arquivo registro.txt dentro da pasta estudos-programacao.", "Crie projetos em uma pasta pessoal conhecida. Evite Área de Trabalho se ela estiver sincronizada ou desorganizada; Documentos é uma escolha comum. Você precisa conseguir encontrar a pasta novamente sem depender da lista de arquivos recentes."]},
+      {"title": "Nome e extensão", "paragraphs": ["Em registro.txt, registro é o nome base e .txt é a extensão. A extensão ajuda o sistema e as ferramentas a reconhecer o formato. Renomear foto.jpg para foto.py não transforma uma imagem em programa Python.", "No Windows 11, use Explorador de Arquivos → Exibir → Mostrar → Extensões de nomes de arquivos. Em versões com faixa de opções, procure Exibir → Extensões de nomes de arquivo. No macOS e Linux, confira o nome completo nas propriedades ou informações do arquivo."]},
+      {"title": "Nomes previsíveis", "paragraphs": ["Use nomes curtos, descritivos e consistentes: estudos-programacao, registro.txt e index.html. Evite caracteres que o sistema proíbe e, nos primeiros exercícios, prefira letras minúsculas, números e hífen.", "Se aparecer registro.txt.txt ou index.html.txt, corrija o nome real. Ver apenas o ícone não é suficiente: aplicativos podem associar ícones diferentes ao mesmo formato."]}
+    ],
+    "example": {"language": "Árvore de arquivos", "code": "Documentos/\n└── estudos-programacao/\n    └── registro.txt", "explanation": ["Documentos é a pasta externa.", "estudos-programacao concentra os exercícios.", "registro.txt é um arquivo de texto simples com extensão visível."], "expected": "Você localiza a pasta, vê o nome completo do arquivo e consegue descrevê-lo por caminho."},
+    "guided": [
+      {"instruction": "Crie a pasta estudos-programacao em uma área pessoal.", "result": "A pasta aparece e pode ser aberta novamente pelo gerenciador de arquivos."},
+      {"instruction": "Dentro dela, crie registro.txt com o texto `Minha pasta de estudos está pronta.`", "result": "O arquivo abre como texto simples e mantém a frase depois de fechar e reabrir."},
+      {"instruction": "Confirme a extensão visível e copie o caminho usando as propriedades do item.", "result": "O nome termina uma única vez em .txt e o caminho contém estudos-programacao."}
+    ],
+    "exercises": [
+      {"prompt": "Prever: qual arquivo é mais provável estar errado para uma aula HTML: `index.html` ou `index.html.txt`?", "hints": ["Observe a última extensão."], "solution": "`index.html.txt`.", "explanation": "A extensão final é .txt, então o nome não representa um documento HTML.", "expected": "A resposta identifica a extensão final."},
+      {"prompt": "Alterar: renomeie registro.txt para diario-estudos.txt e confirme que o conteúdo não mudou.", "hints": ["Renomear não deve editar o conteúdo."], "solution": "Use Renomear no gerenciador, mantenha .txt e reabra o arquivo.", "explanation": "Nome e conteúdo são propriedades diferentes.", "expected": "O novo nome aparece e a frase original permanece."},
+      {"prompt": "Construir: crie a subpasta exemplos e, dentro dela, notas.txt. Desenhe a árvore resultante.", "hints": ["A árvore deve mostrar dois níveis dentro de estudos-programacao."], "solution": "estudos-programacao/\n├── diario-estudos.txt\n└── exemplos/\n    └── notas.txt", "explanation": "A indentação representa pertencimento, não espaços no nome.", "expected": "A estrutura no disco corresponde ao desenho."},
+      {"prompt": "Investigar erro: você alterou notas.txt, mas ao reabrir encontrou o texto antigo. Liste duas hipóteses antes de editar de novo.", "hints": ["Pense em salvar e em arquivos com nomes iguais em pastas diferentes."], "solution": "O arquivo não foi salvo ou foi aberta outra cópia em outro caminho.", "explanation": "Conferir aba, caminho e indicador de salvamento evita sobrescrever a cópia errada.", "expected": "A resposta verifica salvamento e caminho."}
+    ],
+    "mistakes": ["Criar o arquivo em outra pasta: confira o caminho nas propriedades.", "Ocultar extensões: ative a exibição antes de renomear.", "Usar editor de documentos: salve como texto simples, não .docx."],
+    "quiz": [
+      {"question": "Qual é a extensão de `index.html.txt`?", "options": [".html", ".txt", ".index"], "correctIndex": 1, "explanation": "A extensão final é .txt."},
+      {"question": "O que um caminho informa?", "options": ["Como localizar um item", "A senha do arquivo", "A linguagem obrigatória"], "correctIndex": 0, "explanation": "O caminho descreve a localização na árvore de pastas."},
+      {"question": "Renomear foto.jpg para foto.py converte a imagem?", "options": ["Sim", "Não", "Somente no Windows"], "correctIndex": 1, "explanation": "Mudar o nome não converte o conteúdo."}
+    ],
+    "summary": ["Caminhos localizam arquivos dentro de uma árvore.", "A extensão final precisa estar visível e correta.", "Nome, formato e conteúdo não são a mesma coisa."]
+  },
+
+  "prep-workspace": {
+    "prerequisites": "Ter a pasta estudos-programacao e um arquivo de texto criado na aula anterior.",
+    "setup": "Use VS Code se já estiver disponível. Abra Arquivo → Abrir Pasta e escolha estudos-programacao. Se não puder instalar um editor, use um editor simples e abra separadamente PowerShell no Windows ou Terminal no macOS/Linux na mesma pasta.",
+    "why": "Com o editor e o terminal apontando para a mesma pasta, nomes relativos e comandos ficam previsíveis. Sem essa conferência, você pode editar uma cópia e executar outra.",
+    "sections": [
+      {"title": "Abrir a pasta como workspace", "paragraphs": ["No VS Code, escolha Arquivo → Abrir Pasta e selecione estudos-programacao. A pasta aparece no Explorador lateral. Um workspace é o contexto que reúne arquivos e ferramentas; nesta etapa ele contém uma pasta.", "Se surgir Workspace Trust, confie apenas em uma pasta criada por você. Código obtido de outra pessoa deve ser revisado antes de receber permissão para executar tarefas automaticamente."]},
+      {"title": "Abrir o terminal na pasta", "paragraphs": ["No VS Code, escolha Terminal → Novo Terminal. O terminal integrado normalmente começa na raiz do workspace. Fora do editor, você pode abrir um terminal pela pasta usando a opção disponível no seu sistema.", "O shell pode ser PowerShell, zsh ou bash. Use o comando correspondente ao shell mostrado, não apenas ao sistema operacional."]},
+      {"title": "Conferir antes de executar", "paragraphs": ["No PowerShell, `Get-Location` mostra a pasta atual e `Get-ChildItem` lista itens. Em zsh ou bash, use `pwd` e `ls`. O resultado deve conter estudos-programacao e o arquivo criado.", "O ponto em comandos futuros costuma significar pasta atual. Antes de copiar um comando de uma aula, confirme onde você está e quais arquivos aparecem."]}
+    ],
+    "example": {"language": "Terminal — escolha seu sistema", "code": "# PowerShell\nGet-Location\nGet-ChildItem\n\n# zsh ou bash\npwd\nls", "explanation": ["O primeiro comando informa a localização atual.", "O segundo lista o conteúdo visível da pasta.", "As duas observações precisam corresponder à pasta aberta no editor."], "expected": "A saída do primeiro comando termina em estudos-programacao e a listagem contém seu arquivo de texto."},
+    "guided": [
+      {"instruction": "Abra estudos-programacao como pasta no editor.", "result": "O nome da pasta aparece no Explorador do editor."},
+      {"instruction": "Abra um terminal integrado e execute somente o comando de localização adequado ao shell.", "result": "A saída aponta para estudos-programacao."},
+      {"instruction": "Liste os itens e compare com o Explorador lateral.", "result": "Os mesmos arquivos principais aparecem nos dois lugares."}
+    ],
+    "exercises": [
+      {"prompt": "Prever: se `Get-Location` ou `pwd` mostrar a pasta Downloads, um comando relativo encontrará automaticamente seu arquivo em Documentos?", "hints": ["Caminhos relativos partem da pasta atual."], "solution": "Não.", "explanation": "O terminal procurará a partir de Downloads, a menos que você informe outro caminho ou mude de pasta.", "expected": "A resposta relaciona o resultado à pasta atual."},
+      {"prompt": "Alterar: abra a subpasta exemplos no terminal e depois volte para estudos-programacao.", "hints": ["Use `cd exemplos` e depois `cd ..` em PowerShell, zsh ou bash."], "solution": "cd exemplos\n# confira a localização\ncd ..\n# confira novamente", "explanation": "`..` representa a pasta pai nesse contexto.", "expected": "A localização muda para exemplos e retorna à pasta principal."},
+      {"prompt": "Construir: registre o nome do shell, a pasta atual e os arquivos listados em três linhas.", "hints": ["O prompt ou menu do terminal informa o shell."], "solution": "Shell: PowerShell\nPasta: .../estudos-programacao\nArquivos: diario-estudos.txt, exemplos", "explanation": "Os valores reais variam; o formato preserva o contexto.", "expected": "O registro permite a outra pessoa saber onde e como o comando foi executado."},
+      {"prompt": "Investigar erro: o editor mostra diario-estudos.txt, mas a listagem do terminal não. Qual é a primeira verificação?", "hints": ["Compare as pastas, não reinstale ferramentas."], "solution": "Executar o comando de localização e comparar o caminho com a pasta aberta no editor.", "explanation": "A causa mais provável é contexto diferente.", "expected": "A investigação começa pelo caminho atual."}
+    ],
+    "mistakes": ["Abrir apenas um arquivo: reabra a pasta completa.", "Copiar o símbolo do prompt: digite somente o comando.", "Usar `ls` no PowerShell por memorização: ele pode funcionar como alias, mas aprenda também `Get-ChildItem` para reconhecer instruções do Windows."],
+    "quiz": [
+      {"question": "O que `pwd` informa em zsh ou bash?", "options": ["A pasta atual", "A senha", "A versão do navegador"], "correctIndex": 0, "explanation": "O nome vem de print working directory."},
+      {"question": "Qual comando lista itens no PowerShell de forma explícita?", "options": ["Get-ChildItem", "Get-Location", "Write-Output"], "correctIndex": 0, "explanation": "Get-ChildItem lista arquivos e pastas."},
+      {"question": "Por que abrir uma pasta como workspace?", "options": ["Para alinhar arquivos e ferramentas no mesmo contexto", "Para instalar linguagens automaticamente", "Para publicar na internet"], "correctIndex": 0, "explanation": "O workspace fornece contexto comum ao editor e terminal."}
+    ],
+    "summary": ["Abra a pasta inteira no editor.", "Confirme localização antes de executar comandos.", "Compare a listagem do terminal com o Explorador do editor."]
+  },
+
+  "prep-cycle": {
+    "prerequisites": "Concluir a aula sobre workspace e saber identificar a pasta atual.",
+    "setup": "Mantenha estudos-programacao aberta no editor e no terminal. Salve o arquivo antes de cada observação. Os comandos desta aula imprimem texto ou enviam pacotes somente para o próprio computador.",
+    "why": "Programar é repetir um ciclo curto: mudar uma coisa, salvar, executar, observar e decidir o próximo passo. Alterar muitas coisas antes de observar torna difícil saber qual mudança causou o resultado.",
+    "sections": [
+      {"title": "Salvar antes de observar", "paragraphs": ["Um ponto ou círculo na aba do editor costuma indicar alterações não salvas. Use Ctrl+S no Windows/Linux ou Command+S no macOS. Depois confirme fechando e reabrindo apenas quando isso for seguro.", "Salvar não executa o arquivo. É apenas a passagem do conteúdo do editor para o disco."]},
+      {"title": "Executar e comparar", "paragraphs": ["No PowerShell, `Write-Output \"teste concluído\"` deve imprimir teste concluído. Em zsh ou bash, `printf 'teste concluído\\n'` produz a mesma frase. Leia a saída antes de executar o próximo comando.", "Resultado esperado é a observação definida antes do teste. Se o texto diferir, copie o comando e a saída em vez de repetir às cegas."]},
+      {"title": "Encerrar e retomar", "paragraphs": ["Alguns programas continuam ativos. `ping 127.0.0.1 -t` no Windows ou `ping 127.0.0.1` no macOS/Linux testa o próprio computador continuamente. Pressione Ctrl+C para interromper.", "Após a interrupção, o prompt reaparece. Isso indica que o shell pode receber outro comando. Fechar toda a janela também encerra a sessão, mas Ctrl+C é a ação controlada que você usará com servidores locais e outros processos."]}
+    ],
+    "example": {"language": "Terminal", "code": "# PowerShell\nWrite-Output \"teste concluído\"\nping 127.0.0.1 -t\n\n# macOS/Linux\nprintf 'teste concluído\\n'\nping 127.0.0.1\n\n# Pressione Ctrl+C durante o ping", "explanation": ["O primeiro comando termina e devolve o prompt.", "O ping continua até ser interrompido.", "Ctrl+C envia um pedido de interrupção ao processo em primeiro plano."], "expected": "A frase aparece, o ping produz linhas e Ctrl+C faz o prompt reaparecer."},
+    "guided": [
+      {"instruction": "Acrescente uma segunda linha a diario-estudos.txt e salve.", "result": "O indicador de alteração não salva desaparece."},
+      {"instruction": "Execute o comando que imprime teste concluído.", "result": "A saída contém exatamente a frase prevista e o prompt retorna."},
+      {"instruction": "Inicie o ping local, observe duas respostas e pressione Ctrl+C.", "result": "O comando para e o terminal volta a aceitar entrada."}
+    ],
+    "exercises": [
+      {"prompt": "Prever: salvar diario-estudos.txt fará o terminal imprimir alguma coisa automaticamente?", "hints": ["Salvar e executar são ações distintas."], "solution": "Não.", "explanation": "O salvamento atualiza o arquivo; um comando ou ferramenta precisa ser executado para produzir outra saída.", "expected": "A resposta separa salvar de executar."},
+      {"prompt": "Alterar: mude a frase do comando para `segunda execução` e preveja a saída antes de rodar.", "hints": ["Altere somente o texto entre aspas."], "solution": "Write-Output \"segunda execução\"\n# ou\nprintf 'segunda execução\\n'", "explanation": "Uma mudança isolada permite relacionar entrada e saída.", "expected": "A saída é segunda execução e o prompt retorna."},
+      {"prompt": "Construir: escreva um registro de quatro linhas: mudança feita, salvamento, comando executado e resultado observado.", "hints": ["Use fatos, não apenas `funcionou`."], "solution": "Mudança: acrescentei a linha 2.\nSalvei: sim.\nComando: Write-Output \"segunda execução\".\nResultado: imprimiu segunda execução e retornou ao prompt.", "explanation": "O registro permite reproduzir o teste.", "expected": "As quatro etapas estão identificadas."},
+      {"prompt": "Investigar erro: o ping continua e você não consegue digitar outro comando. O que fazer e o que observar?", "hints": ["Não feche o computador nem reinicie o editor."], "solution": "Pressione Ctrl+C e observe o prompt reaparecer.", "explanation": "O processo ocupa o primeiro plano até ser interrompido.", "expected": "O ping encerra e um novo comando pode ser digitado."}
+    ],
+    "mistakes": ["Executar antes de salvar: confira o indicador na aba.", "Alterar várias coisas juntas: volte a uma mudança por ciclo.", "Confundir Ctrl+C no terminal com copiar: durante um processo, ele normalmente solicita interrupção."],
+    "quiz": [
+      {"question": "Qual é a ordem mais útil para uma mudança pequena?", "options": ["Editar, salvar, executar, observar", "Executar, apagar, instalar", "Observar, publicar, editar"], "correctIndex": 0, "explanation": "Essa ordem torna a causa do resultado rastreável."},
+      {"question": "O que indica o retorno do prompt após Ctrl+C?", "options": ["O terminal pode receber outro comando", "O computador foi desligado", "O arquivo foi publicado"], "correctIndex": 0, "explanation": "O processo em primeiro plano terminou ou foi interrompido."},
+      {"question": "Salvar um arquivo é o mesmo que executá-lo?", "options": ["Sim", "Não", "Somente no macOS"], "correctIndex": 1, "explanation": "Salvar grava conteúdo; executar inicia um programa ou interpretação."}
+    ],
+    "summary": ["Mude uma coisa por ciclo.", "Defina e compare o resultado esperado.", "Use Ctrl+C para interromper processos contínuos no terminal."]
+  },
+
+  "prep-errors": {
+    "prerequisites": "Concluir as quatro aulas anteriores e conseguir abrir estudos-programacao no editor e terminal.",
+    "setup": "Crie dentro de estudos-programacao a pasta prova-etapa-zero. Não copie a solução durante a primeira tentativa. Use somente comandos de localização, listagem, impressão, mudança de pasta e ping apresentados nesta etapa.",
+    "why": "Uma mensagem de erro contém evidências. Registrar comando, pasta, resultado esperado e mensagem completa permite formular uma hipótese e pedir ajuda sem expor informações sensíveis.",
+    "sections": [
+      {"title": "Erro não é diagnóstico completo", "paragraphs": ["A mensagem informa o que uma ferramenta percebeu, mas pode não explicar a causa final. `cd pasta-que-nao-existe` informa que o caminho não foi encontrado; a hipótese inicial é que essa pasta não existe dentro da pasta atual.", "Leia o começo e o fim da mensagem, identifique comando e caminho citados e não execute correções aleatórias antes de registrar o estado."]},
+      {"title": "Contexto mínimo para pedir ajuda", "paragraphs": ["Registre sistema operacional e shell, pasta atual, comando exato, mensagem completa, resultado esperado e o que já conferiu. Se houver arquivo envolvido, informe seu caminho e trecho mínimo relevante.", "Remova senhas, tokens, chaves, e-mails pessoais e caminhos que revelem dados desnecessários. Nunca publique um arquivo de configuração inteiro sem revisar seu conteúdo."]},
+      {"title": "Prova prática da Etapa 0", "paragraphs": ["Sem olhar a solução, crie prova-etapa-zero, abra-a no editor e terminal, crie evidencia.txt, confirme localização e listagem, execute uma saída curta, interrompa um ping e produza deliberadamente o erro de pasta inexistente.", "A prova verifica operação, não programação. Conclusão da aula e quiz medem acompanhamento; capacidade só é demonstrada quando você repete a tarefa com nomes diferentes e explica cada decisão."]}
+    ],
+    "example": {"language": "Relato de erro", "code": "Sistema e shell: Windows 11, PowerShell\nPasta atual: .../estudos-programacao\nComando: cd pasta-que-nao-existe\nEsperado: entrar na pasta\nObservado: caminho não encontrado\nHipótese: a pasta não existe dentro da pasta atual\nJá conferi: localização e listagem", "explanation": ["O comando pode ser reproduzido.", "Esperado e observado não são misturados.", "A hipótese vem depois das evidências e pode ser testada."], "expected": "Outra pessoa entende onde ocorreu a falha sem receber dados pessoais ou precisar adivinhar o comando."},
+    "guided": [
+      {"instruction": "Execute `cd pasta-que-nao-existe` dentro de estudos-programacao.", "result": "O shell informa que o caminho ou diretório não existe e permanece na pasta anterior."},
+      {"instruction": "Copie a mensagem para um arquivo chamado erro-estudo.txt e acrescente comando e pasta atual.", "result": "O relato contém fatos suficientes para reprodução."},
+      {"instruction": "Teste a hipótese listando os itens da pasta atual.", "result": "pasta-que-nao-existe não aparece na listagem."}
+    ],
+    "exercises": [
+      {"prompt": "Prever: depois de `cd pasta-que-nao-existe` falhar, a pasta atual deve mudar?", "hints": ["Um comando que não alcançou o destino não concluiu a mudança."], "solution": "Não; a pasta atual deve permanecer a mesma.", "explanation": "Confirme com Get-Location ou pwd.", "expected": "A localização antes e depois é igual."},
+      {"prompt": "Alterar: repita o relato usando o nome `pasta-ausente-teste` e atualize somente as evidências que mudaram.", "hints": ["Comando e mensagem mudam; o formato do relato permanece."], "solution": "Troque o comando e copie a nova mensagem real. Não invente a saída.", "explanation": "Uma segunda tentativa diferente verifica transferência.", "expected": "O novo relato corresponde ao novo comando."},
+      {"prompt": "Construir: execute a prova prática completa com a pasta prova-etapa-zero e escreva uma lista de critérios atendidos.", "hints": ["Inclua arquivo, editor, terminal, localização, listagem, saída, interrupção e erro."], "solution": "Critérios: pasta e evidencia.txt criados; pasta aberta no editor e terminal; localização e listagem conferidas; texto impresso; ping interrompido com Ctrl+C; erro produzido e relatado.", "explanation": "Compare comportamentos, não caminhos literais da solução.", "expected": "Todos os oito critérios possuem evidência observável."},
+      {"prompt": "Investigar erro: um relato contém apenas `não funcionou`. Reescreva as perguntas que faltam para torná-lo investigável.", "hints": ["Quem, onde, qual ação, qual expectativa e qual mensagem?"], "solution": "Qual sistema e shell? Qual pasta atual? Qual comando exato? O que esperava? Qual mensagem completa apareceu? O que já conferiu?", "explanation": "Perguntas concretas substituem adivinhação.", "expected": "O conjunto cobre ambiente, contexto, ação, expectativa, observação e tentativas."}
+    ],
+    "mistakes": ["Copiar apenas a última linha: preserve a mensagem relevante completa.", "Ocultar o comando: sem ele não há reprodução.", "Publicar dados sensíveis: revise e remova segredos antes de compartilhar.", "Marcar concluído sem repetir: faça a prova novamente com nomes diferentes."],
+    "quiz": [
+      {"question": "Qual informação deve acompanhar uma mensagem de erro?", "options": ["Comando e contexto de execução", "Senha da conta", "Somente a palavra erro"], "correctIndex": 0, "explanation": "Comando, pasta, ambiente e expectativa permitem reprodução."},
+      {"question": "Uma hipótese deve ser tratada como fato?", "options": ["Sim", "Não; deve ser testada", "Somente no terminal"], "correctIndex": 1, "explanation": "A hipótese orienta a próxima verificação."},
+      {"question": "O que comprova a Etapa 0?", "options": ["Marcar cinco aulas", "Resolver a prova prática com nomes diferentes e explicar as ações", "Acertar apenas o quiz"], "correctIndex": 1, "explanation": "Conclusão e quiz não substituem desempenho em tarefa nova."}
+    ],
+    "summary": ["Registre evidências antes de tentar correções aleatórias.", "Separe resultado esperado, observado e hipótese.", "A prova prática, repetida e explicada, é a evidência do Nível 0."]
+  }
+});

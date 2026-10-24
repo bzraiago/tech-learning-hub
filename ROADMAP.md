@@ -49,7 +49,7 @@ Toda implementação só pode ser considerada pronta quando:
 | Fase | Resultado principal | Dependências | Estado |
 |---|---|---|---|
 | 0 | Base de medição e proteção do projeto | — | [x] |
-| 1 | Preparação digital antes das trilhas | Fase 0 | [ ] |
+| 1 | Preparação digital antes das trilhas | Fase 0 | [x] |
 | 2 | Pré-requisitos e ambientes reproduzíveis | Fase 1 | [ ] |
 | 3 | Aulas e exercícios com progressão verificável | Fase 2 | [ ] |
 | 4 | Avaliação de domínio e recuperação | Fase 3 | [ ] |
@@ -83,16 +83,16 @@ Toda implementação só pode ser considerada pronta quando:
 
 **Meta:** permitir que uma pessoa totalmente leiga chegue ao primeiro exercício sabendo onde criar, escrever, executar e observar.
 
-- [ ] Criar uma Etapa 0 acessível antes de qualquer trilha.
-- [ ] Ensinar pastas, arquivos, nomes e extensões visíveis.
-- [ ] Explicar editor, navegador, terminal e interpretador.
-- [ ] Ensinar a abrir a mesma pasta no editor e no terminal.
-- [ ] Ensinar a reconhecer a pasta atual.
-- [ ] Praticar o ciclo salvar → executar → observar → encerrar.
-- [ ] Ensinar a copiar uma mensagem de erro com comando, contexto e linha relevante.
-- [ ] Incluir passos para Windows, macOS e Linux.
-- [ ] Incluir alternativa mínima para computador limitado.
-- [ ] Criar uma prova prática curta da Etapa 0.
+- [x] Criar uma Etapa 0 acessível antes de qualquer trilha.
+- [x] Ensinar pastas, arquivos, nomes e extensões visíveis.
+- [x] Explicar editor, navegador, terminal e interpretador.
+- [x] Ensinar a abrir a mesma pasta no editor e no terminal.
+- [x] Ensinar a reconhecer a pasta atual.
+- [x] Praticar o ciclo salvar → executar → observar → encerrar.
+- [x] Ensinar a copiar uma mensagem de erro com comando, contexto e linha relevante.
+- [x] Incluir passos para Windows, macOS e Linux.
+- [x] Incluir alternativa mínima para computador limitado.
+- [x] Criar uma prova prática curta da Etapa 0.
 
 **Aceite:** o aluno cria uma pasta e um arquivo `.html` correto, abre-o no navegador, executa um comando no terminal e registra um erro com contexto sem depender de uma solução pronta.
 
@@ -341,6 +341,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Criação do roadmap | `14126c8` | Roadmap consolidado a partir do backlog e da análise pedagógica. |
 | 24/10/2026 | Reorganização estrutural | `14126c8` | HTML, CSS, dados e funções separados por responsabilidade, sem mudança intencional de comportamento. |
 | 24/10/2026 | Fase 0 — base de medição | Commit da Fase 0 | Validador automático, linha de base e checklist manual de regressão adicionados. |
+| 24/10/2026 | Fase 1 — Etapa 0 | Commit da Fase 1 | Cinco aulas de preparação digital, prova prática e auditoria pré-publicação adicionadas. |
 
 ## Decisões e bloqueios
 

@@ -39,7 +39,7 @@ function renderReadiness() {
 }
 
 function sanitizeState(candidate) {
-  const clean = { version: 1, completed: {}, activeTrack: 'html', lastLesson: null, notes: {}, quizAttempts: {}, projects: {}, htmlCssRevision: 2, javascriptRevision: 2, pythonRevision: 2, databaseRevision: 2, aiRevision: 2, readiness: {} };
+  const clean = { version: 1, completed: {}, activeTrack: 'preparacao', lastLesson: null, notes: {}, quizAttempts: {}, projects: {}, htmlCssRevision: 2, javascriptRevision: 2, pythonRevision: 2, databaseRevision: 2, aiRevision: 2, readiness: {} };
   if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return clean;
   if (candidate.completed && typeof candidate.completed === 'object') {
     for (const id of lessonIndex.keys()) {

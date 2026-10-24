@@ -109,6 +109,20 @@ for (const guideId of guideIds) {
 for (const lesson of lessons) {
   const guide = LESSON_GUIDES[lesson.id];
   if (!guide) continue;
+  if (!Array.isArray(lesson.objectives) || lesson.objectives.length === 0) {
+    fail(`Aula sem objetivos observáveis: ${lesson.id}`);
+  }
+  for (const field of ['prerequisites', 'setup', 'why']) {
+    if (!guide[field]?.trim()) fail(`Aula sem ${field}: ${lesson.id}`);
+  }
+  for (const field of ['sections', 'guided', 'mistakes', 'summary']) {
+    if (!Array.isArray(guide[field]) || guide[field].length === 0) {
+      fail(`Aula sem ${field}: ${lesson.id}`);
+    }
+  }
+  if (!guide.example?.code?.trim() || !guide.example?.expected?.trim() || !Array.isArray(guide.example?.explanation) || guide.example.explanation.length === 0) {
+    fail(`Aula sem exemplo completo: ${lesson.id}`);
+  }
   if (!Array.isArray(guide.exercises) || guide.exercises.length === 0) {
     fail(`Aula sem exercícios: ${lesson.id}`);
   } else {

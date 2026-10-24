@@ -135,7 +135,7 @@ Os scripts são clássicos e compartilham o mesmo escopo global, carregados na o
 
 Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workflow`, `quality`, `delivery`.
 
-> Os números de referência (8 trilhas, 26 módulos, 92 aulas, 370 exercícios, 276 questões, 20 projetos) vêm da análise de 24/10/2026. **Confira no código antes de citá-los** e atualize `ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
+> Os números de referência (9 trilhas, 27 módulos, 97 aulas, 390 exercícios, 291 questões, 20 projetos) foram conferidos no código em 24/10/2026. **Confira no código antes de citá-los** e atualize `ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
 
 ### 5.2 Persistência e compatibilidade (cuidado máximo)
 - O progresso fica em `localStorage` na chave **`tech-learning-hub:v1`**.
@@ -250,7 +250,7 @@ A fase 7 (backend com persistência) é a **maior lacuna atual** do curso; prior
 
 Vem da análise em `ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima para baixo e marque aqui o que for concluído.
 
-1. [ ] **Etapa 0** de computador, arquivos, editor e terminal, disponível antes do primeiro exercício que dependa deles.
+1. [x] **Etapa 0** de computador, arquivos, editor e terminal, disponível antes do primeiro exercício que dependa deles.
 2. [ ] **Mapa de pré-requisitos** e instruções de instalação por sistema (Python, Git, Node.js + npm, Docker/WSL, PostgreSQL, MariaDB, Firebird, MongoDB/`mongosh`), seguindo o padrão 6.2.
 3. [ ] **Resultado esperado visível** separado da solução em todos os exercícios; checkpoints distintos para *li / pratiquei / revisão / resolvi sozinho*.
 4. [ ] **Projetos de fechamento** para as trilhas Git, Qualidade e Integração.

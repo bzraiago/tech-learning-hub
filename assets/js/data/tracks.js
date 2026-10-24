@@ -3,6 +3,124 @@
 // Estrutura das trilhas, módulos e aulas. IDs são persistidos e devem permanecer estáveis.
     const tracks = [
   {
+    "id": "preparacao",
+    "title": "Etapa 0",
+    "subtitle": "Prepare seu ambiente.",
+    "icon": "terminal",
+    "color": "#a78bfa",
+    "range": "Primeiro contato → Ambiente pronto",
+    "description": "Aprenda a localizar arquivos, distinguir as ferramentas e repetir com segurança o ciclo de trabalho antes de programar.",
+    "prerequisite": "Nenhum conhecimento prévio. Esta é a entrada recomendada para quem está começando do zero.",
+    "project": "Prova prática: preparar uma pasta, executar comandos seguros e registrar um erro com contexto.",
+    "modules": [
+      {
+        "id": "prep-digital",
+        "title": "Preparação digital para programar",
+        "level": "Nível 0 · preparação",
+        "number": "00",
+        "description": "Ferramentas, arquivos, editor, terminal, execução e leitura inicial de erros.",
+        "resources": [
+          {
+            "kind": "doc",
+            "title": "VS Code · Primeiros passos oficiais",
+            "url": "https://code.visualstudio.com/docs/getstarted/overview",
+            "language": "EN"
+          },
+          {
+            "kind": "doc",
+            "title": "VS Code · Introdução ao terminal integrado",
+            "url": "https://code.visualstudio.com/docs/terminal/getting-started",
+            "language": "EN"
+          },
+          {
+            "kind": "doc",
+            "title": "MDN · Introdução à linha de comando",
+            "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Environment_setup/Command_line",
+            "language": "EN"
+          },
+          {
+            "kind": "doc",
+            "title": "Microsoft · Extensões de nomes de arquivos no Windows",
+            "url": "https://support.microsoft.com/en-au/windows/experience/storage-filemanagement/common-file-name-extensions-in-windows",
+            "language": "EN"
+          }
+        ],
+        "lessons": [
+          {
+            "id": "prep-tools",
+            "title": "Editor, navegador, terminal e interpretador",
+            "minutes": 35,
+            "concept": "Distinguir as quatro ferramentas e escolher onde escrever, executar e observar cada ação.",
+            "objectives": [
+              "Identificar editor, navegador, terminal e interpretador pelo papel de cada um.",
+              "Escolher corretamente onde digitar texto, código e comandos.",
+              "Explicar por que instalar um editor não instala todas as linguagens."
+            ],
+            "exercise": "Diante de cinco tarefas, indique a ferramenta correta e justifique cada escolha.",
+            "code": "Editor: escreve e salva arquivos\nNavegador: apresenta páginas e ferramentas web\nTerminal: recebe comandos de texto\nInterpretador/runtime: executa uma linguagem, como Python ou Node.js",
+            "docs": []
+          },
+          {
+            "id": "prep-files",
+            "title": "Pastas, arquivos, nomes e extensões",
+            "minutes": 45,
+            "concept": "Criar uma pasta de estudo e reconhecer nome, caminho, formato e extensão sem esconder erros como .html.txt.",
+            "objectives": [
+              "Criar e localizar uma pasta exclusiva para estudos.",
+              "Distinguir nome, extensão e caminho de um arquivo.",
+              "Exibir extensões no Windows e conferir o nome real em qualquer sistema."
+            ],
+            "exercise": "Crie estudos-programacao, salve registro.txt e confirme seu nome e caminho completos.",
+            "code": "estudos-programacao/\n└── registro.txt",
+            "docs": []
+          },
+          {
+            "id": "prep-workspace",
+            "title": "A mesma pasta no editor e no terminal",
+            "minutes": 45,
+            "concept": "Abrir a pasta de estudo como workspace e confirmar no terminal que os dois contextos apontam para o mesmo lugar.",
+            "objectives": [
+              "Abrir uma pasta inteira no editor, não apenas um arquivo isolado.",
+              "Abrir o terminal integrado e identificar o shell em uso.",
+              "Conferir a pasta atual e listar seus arquivos no Windows, macOS ou Linux."
+            ],
+            "exercise": "Abra estudos-programacao no editor, confirme a pasta atual no terminal e encontre registro.txt na listagem.",
+            "code": "# PowerShell\nGet-Location\nGet-ChildItem\n\n# macOS ou Linux\npwd\nls",
+            "docs": []
+          },
+          {
+            "id": "prep-cycle",
+            "title": "Salvar, executar, observar e encerrar",
+            "minutes": 50,
+            "concept": "Repetir o ciclo mínimo de trabalho e interromper com segurança um comando que continua executando.",
+            "objectives": [
+              "Salvar um arquivo e confirmar que a alteração foi gravada.",
+              "Executar um comando simples e comparar a saída esperada com a observada.",
+              "Encerrar um comando contínuo com Ctrl+C e retomar a sessão."
+            ],
+            "exercise": "Altere registro.txt, execute o comando de teste do seu sistema, interrompa um ping e confirme que o terminal voltou a aceitar comandos.",
+            "code": "# PowerShell\nWrite-Output \"teste concluído\"\nping 127.0.0.1 -t\n\n# macOS ou Linux\nprintf 'teste concluído\\n'\nping 127.0.0.1\n\n# Interrompa o ping com Ctrl+C",
+            "docs": []
+          },
+          {
+            "id": "prep-errors",
+            "title": "Ler e registrar um erro com contexto",
+            "minutes": 60,
+            "concept": "Produzir um erro seguro, localizar a ação que falhou e registrar contexto suficiente para investigar sem adivinhar.",
+            "objectives": [
+              "Separar comando, mensagem de erro e hipótese inicial.",
+              "Copiar o texto do erro sem expor senhas, tokens ou dados pessoais.",
+              "Concluir a prova prática da Etapa 0 sem consultar a solução."
+            ],
+            "exercise": "Crie a pasta prova-etapa-zero, execute a prova prática e registre um erro de pasta inexistente com comando, local e hipótese.",
+            "code": "Comando executado: cd pasta-que-nao-existe\nPasta atual antes do comando: ...\nMensagem completa: ...\nO que eu esperava: entrar na pasta\nHipótese: a pasta não existe neste local",
+            "docs": []
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "html",
     "title": "HTML & CSS",
     "subtitle": "Dê forma às suas ideias.",

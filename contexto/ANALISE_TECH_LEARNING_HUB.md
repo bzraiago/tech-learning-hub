@@ -7,9 +7,9 @@
 
 ## Conclusão
 
-O Tech Learning Hub oferece um caminho de aprendizagem real, mas ainda não está totalmente preparado para conduzir uma pessoa absolutamente leiga até uma formação intermediária autônoma usando somente suas instruções. A base de conteúdo melhorou bastante; as maiores lacunas estão na preparação do computador, na progressão entre assuntos e na passagem dos exercícios isolados para aplicações completas.
+O Tech Learning Hub oferece um caminho de aprendizagem real, mas ainda não está totalmente preparado para conduzir uma pessoa absolutamente leiga até uma formação intermediária autônoma usando somente suas instruções. A preparação digital inicial foi implementada em 24/10/2026; as maiores lacunas restantes estão nas instalações das ferramentas, na progressão entre assuntos e na passagem dos exercícios isolados para aplicações completas.
 
-A aplicação contém **8 trilhas, 26 módulos, 92 aulas, 370 exercícios, 276 questões e 20 projetos**. Esses números descrevem o material disponível; não medem domínio do aluno.
+A aplicação contém **9 trilhas, 27 módulos, 97 aulas, 390 exercícios, 291 questões e 20 projetos** (contagem atualizada em 24/10/2026 após a inclusão da Etapa 0). Esses números descrevem o material disponível; não medem domínio do aluno.
 
 ## O que já funciona bem
 
@@ -26,9 +26,9 @@ A aplicação contém **8 trilhas, 26 módulos, 92 aulas, 370 exercícios, 276 q
 
 ## Onde uma pessoa totalmente leiga provavelmente vai travar
 
-### Falta uma etapa inicial de alfabetização digital para programar
+### Etapa inicial de alfabetização digital implementada
 
-A primeira aula de HTML considera suficiente saber criar pastas e arquivos. Isso é razoável para quem já tem familiaridade com computador, mas não cobre integralmente o público definido. Antes das trilhas, é necessário ensinar:
+A lacuna original foi tratada pela trilha `preparacao`, disponível antes de HTML. Ela ensina e pratica:
 
 - Diferença entre navegador, editor, terminal e interpretador.
 - Como criar, localizar, renomear e salvar arquivos.
@@ -167,7 +167,7 @@ A avaliação final deve combinar funcionamento, testes, explicação e manuten�
 
 ## Ordem recomendada para executar as melhorias
 
-1. Criar a etapa inicial de computador, arquivos, editor e terminal.
+1. ~~Criar a etapa inicial de computador, arquivos, editor e terminal.~~ Concluído em 24/10/2026.
 2. Corrigir o mapa de pré-requisitos e as instruções de instalação/configuração.
 3. Separar resultados esperados das soluções e melhorar os checkpoints de domínio.
 4. Criar projetos finais para Git, Qualidade e Integração.
