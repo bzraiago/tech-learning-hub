@@ -192,7 +192,7 @@ Toda implementação só pode ser considerada pronta quando:
 
 **Meta:** separar consumo de conteúdo de capacidade demonstrada.
 
-- [ ] Implementar os estados `Li`, `Pratiquei`, `Passei na revisão` e `Resolvi sozinho`.
+- [x] Implementar os estados `Li`, `Pratiquei`, `Passei na revisão` e `Resolvi sozinho` na aula, com autoavaliação e critérios explícitos.
 - [x] Atualizar `state` e `sanitizeState()` com `learningEvidence` aditivo, valores padrão e preservação de `completed`.
 - [x] Explicar na interface que progresso mede acompanhamento, não domínio.
 - [ ] Criar revisões espaçadas após alguns dias.

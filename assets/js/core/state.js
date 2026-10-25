@@ -55,7 +55,8 @@ function sanitizeState(candidate) {
     const entry = candidate.learningEvidence?.[id];
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
     const practicedAt = validEvidenceDate(entry.practicedAt);
-    const reviewedAt = validEvidenceDate(entry.reviewedAt);
+    const reviewDate = validEvidenceDate(entry.reviewedAt);
+    const reviewedAt = practicedAt && reviewDate && Date.parse(reviewDate) - Date.parse(practicedAt) >= 3 * 24 * 60 * 60 * 1000 ? reviewDate : null;
     const explanation = typeof entry.explanation === 'string' ? entry.explanation.slice(0, 2000).trim() : '';
     const solvedAt = explanation ? validEvidenceDate(entry.solvedAt) : null;
     if (practicedAt || reviewedAt || solvedAt) {

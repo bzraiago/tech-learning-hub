@@ -105,6 +105,10 @@ $('#lesson-sections').addEventListener('keydown', (event) => {
 document.addEventListener('click', (event) => {
   const button = event.target.closest('button');
   if (!button) return;
+  if (button.dataset.evidence) {
+    updateLearningEvidence(button.dataset.evidence);
+    return;
+  }
   if (button.dataset.lessonSection) {
     renderLessonSection(button.dataset.lessonSection, true);
   } else if (button.dataset.track) {
@@ -166,7 +170,10 @@ window.addEventListener('storage', (event) => {
   state.activeTrack = activeTrack;
   render();
   document.querySelectorAll('#study-dialog [data-complete]').forEach((input) => { input.checked = !!state.completed[input.dataset.complete]; });
-  if (dialogContext?.type === 'lesson') $('#modal-completion-label').textContent = state.completed[dialogContext.id] ? 'Lição concluída' : 'Marcar como concluída';
+  if (dialogContext?.type === 'lesson') {
+    $('#modal-completion-label').textContent = state.completed[dialogContext.id] ? 'Lição concluída' : 'Marcar como concluída';
+    if (activeLessonSection === 'review') renderLessonSection('review');
+  }
   if (dialogContext?.type === 'module') {
     const { module } = moduleIndex.get(dialogContext.id);
     $('#module-dialog-progress').textContent = `${stats(module.lessons).done} de ${module.lessons.length} lições concluídas`;
