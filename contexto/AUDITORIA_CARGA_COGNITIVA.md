@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de `delivery-http`, `delivery-forms`, `delivery-security`, `delivery-environments` e `delivery-ci`, a auditoria automática continua apontando 15: as cinco etapas de cada aula foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 10 aulas de IA e Entrega a revisar na prioridade 4.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de `delivery-http`, `delivery-forms`, `delivery-security`, `delivery-environments`, `delivery-ci` e `delivery-requirements`, a auditoria automática continua apontando 15: as cinco etapas de cada aula foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 9 aulas de IA a revisar na prioridade 4.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 10 aulas IA/Entrega ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 1 | Média | G | 9 aulas de IA ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
@@ -72,6 +72,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `delivery-requirements`
+
+- **Público e saída:** após os laboratórios de formulário e testes, o aluno deve converter um pedido vago em critérios observáveis, localizar os pontos afetados e documentar o que foi realmente implementado.
+- **FATO, alta, P:** o README da solução dizia que títulos duplicados eram recusados, mas o `server.js` da aula `delivery-forms` não contém essa regra. A solução agora descreve a verificação em `requisito.js` e marca a integração com a API como pendente. Os exercícios cobrem prever, alterar, construir e investigar erro.
+- **Julgamento didático:** cinco blocos foram mantidos por representar etapas distintas (critérios, mudança, revisão, documentação e transferência), com pausas que exigem previsão ou inspeção entre elas. A contagem estrutural continua sinalizando a aula para observação com aluno.
+- **Pré-requisitos e ambiente:** `setup-node`, `delivery-forms`, `delivery-ci` → `delivery-requirements`. A preparação nomeia pasta, terminal, comando, saída e retomada; o exemplo é local e não exige serviço externo.
+- **Fontes:** [GitHub Markdown](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax), [GitHub pull requests](https://docs.github.com/en/pull-requests/reference/pull-requests) e [Node.js Test Runner](https://nodejs.org/api/test.html) foram abertas em 25/10/2026 (fontes oficiais, EN, OK). O link de pull requests no catálogo redireciona para a página atual.
+- **Limite:** a função de duplicados retorna apenas um booleano; não altera a API nem garante unicidade em gravações concorrentes. Teste manual no navegador e observação com aluno não foram executados nesta revisão.
 
 ### Revisão localizada: `delivery-ci`
 

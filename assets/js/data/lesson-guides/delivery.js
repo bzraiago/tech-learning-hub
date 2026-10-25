@@ -791,36 +791,40 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "delivery-requirements": {
-    "prerequisites": "Ter um projeto pequeno existente e saber alterar funções e testes. O exemplo usa apenas Node.",
-    "setup": "Salve o exemplo como requisito.js e execute node requisito.js. Use a lista de estudos criada antes como projeto a manter. Escreva critérios antes de alterar a função ou a interface.",
+    "prerequisites": "Concluir setup-node, delivery-forms e delivery-ci; ter a lista de estudos do laboratório e saber alterar funções e testes. O exemplo usa apenas Node.",
+    "setup": "Na pasta da aula, salve o exemplo como requisito.js no editor. No terminal aberto nessa pasta, execute node requisito.js; a saída esperada é false e true em linhas separadas. O processo termina sozinho; para retomar, execute o mesmo comando. Se node não for reconhecido, revise setup-node. Use a lista de estudos da aula delivery-forms para planejar a integração, mas este arquivo não altera server.js. Escreva critérios antes de editar o projeto.",
     "why": "O trabalho raramente é criar tudo do zero com enunciado fechado. Saber traduzir um pedido, preservar o que já funciona e comunicar a entrega é uma competência central de entrada no mercado.",
     "sections": [
       {
         "title": "Da frase vaga ao comportamento observável",
         "paragraphs": [
           "“Melhore os títulos duplicados” não diz se espaços contam, se maiúsculas diferem, se o usuário recebe mensagem ou se dados antigos devem ser migrados. Transforme o pedido em exemplos: com HTML salvo, “  html  ” deve ser recusado; CSS deve ser aceito; título vazio continua recusado. Pergunte como tratar acentos e nomes iguais em contas diferentes antes de inventar regras. Cada exemplo vira critério de aceitação que alguém consegue verificar.",
-          "Distinguir hipótese de decisão é importante. Escreva “assumi comparação sem diferenciar maiúsculas após trim; confirmar tratamento de acentos” quando a resposta ainda não veio. Evite escopo escondido: não reescreva toda a lista para resolver uma regra pequena. Encontre a função, o teste, a API e a mensagem que dependem do comportamento; faça um mapa de impacto antes de editar."
+          "Distinguir hipótese de decisão é importante. Escreva “assumi comparação sem diferenciar maiúsculas após trim; confirmar tratamento de acentos” quando a resposta ainda não veio. Evite escopo escondido: não reescreva toda a lista para resolver uma regra pequena. Encontre a função, o teste, a API e a mensagem que dependem do comportamento; faça um mapa de impacto antes de editar.",
+          "Pausa: antes de executar, escreva o resultado esperado para HTML salvo com entrada '  html  ', para CSS novo e para título composto só de espaços."
         ]
       },
       {
         "title": "Implementar sem quebrar o projeto",
         "paragraphs": [
           "O exemplo normaliza títulos com trim e letras minúsculas e compara com alguns registros existentes. Ele retorna booleano e não grava dados; por isso é fácil de testar. Em uma aplicação real, a regra também deve existir no servidor se registros são compartilhados. Dois clientes podem tentar salvar simultaneamente: uma checagem só no navegador não garante unicidade. O banco ou serviço pode precisar de uma restrição adicional.",
-          "Antes da mudança, rode os testes existentes e registre o resultado. Faça a menor alteração compreensível. Adicione casos de “HTML” versus “ html ”, título novo, vazio e lista vazia. Depois teste o fluxo da interface e o comportamento da API. Se a solução exigir mudar contrato, comunique isso antes de considerar a tarefa encerrada."
+          "Antes da mudança, rode os testes existentes e registre o resultado. Faça a menor alteração compreensível. Adicione casos de “HTML” versus “ html ”, título novo, vazio e lista vazia. Depois teste o fluxo da interface e o comportamento da API. Se a solução exigir mudar contrato, comunique isso antes de considerar a tarefa encerrada.",
+          "Pausa: marque no mapa de impacto o que o arquivo requisito.js verifica e o que ainda precisaria mudar no server.js para impedir duplicados em uma API compartilhada."
         ]
       },
       {
         "title": "Revisão e comunicação",
         "paragraphs": [
           "Uma alteração pequena facilita revisar o diff. Descreva o problema, a regra adotada, o resultado visível e a evidência: comandos de teste e comportamento observado no navegador. Em equipe, uma pull request ou revisão pode apontar defeitos de nomenclatura, acessibilidade ou casos não pensados. Receba a observação como informação sobre o código e explique suas decisões com exemplos verificáveis.",
-          "Se descobrir uma dependência inesperada, informe cedo: “a API aceita duplicados, então a regra só no frontend pode ser contornada; preciso da mudança no endpoint”. Não esconda limitações sob uma interface polida. Um profissional júnior confiável torna riscos visíveis, pede contexto específico e entrega uma mudança que outra pessoa consegue entender e manter."
+          "Se descobrir uma dependência inesperada, informe cedo: “a API aceita duplicados, então a regra só no frontend pode ser contornada; preciso da mudança no endpoint”. Não esconda limitações sob uma interface polida. Um profissional júnior confiável torna riscos visíveis, pede contexto específico e entrega uma mudança que outra pessoa consegue entender e manter.",
+          "Pausa: escreva duas linhas de revisão: uma decisão tomada para comparar títulos e uma pendência que impediria dizer que a API já foi atualizada."
         ]
       },
       {
         "title": "README que permite reproduzir",
         "paragraphs": [
           "Um projeto de portfólio deve começar com o problema que resolve e o que a pessoa pode testar. Documente tecnologias, pré-requisitos, comandos exatos de execução e teste, configuração pública, dependência de API, dados de demonstração, critérios de aceitação e limitações. Inclua captura ou link quando houver publicação real, mas nunca invente uma URL. Uma pessoa avaliadora deve conseguir iniciar o projeto sem adivinhar passos.",
-          "Explique decisões técnicas de forma simples: por que normalizou títulos, como tratou erro de rede, que teste cobre regressão e qual parte ainda precisa de backend. Escreva “dados ficam só em memória e somem ao reiniciar” se for verdade. Honestidade técnica comunica maturidade melhor que chamar um mock de sistema completo."
+          "Explique decisões técnicas de forma simples: por que normalizou títulos, como tratou erro de rede, que teste cobre regressão e qual parte ainda precisa de backend. Escreva “dados ficam só em memória e somem ao reiniciar” se for verdade. Honestidade técnica comunica maturidade melhor que chamar um mock de sistema completo.",
+          "Pausa: confira cada afirmação do README contra um arquivo ou comando executado. Marque como planejada a regra de duplicados na API até ela existir e ser testada."
         ]
       },
       {
@@ -857,7 +861,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: escreva dois testes para duplicado e título novo.",
+        "prompt": "Prever: antes de executar, indique o resultado de HTML salvo com entrada ' html ' e de CSS novo. Depois escreva dois testes independentes. Aceite: primeira entrada → false; segunda → true; testes sem falhas.",
         "hints": [
           "Use os exemplos do código.",
           "Compare com false e true."
@@ -867,7 +871,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Nenhuma falha no Console."
       },
       {
-        "prompt": "Complete critérios de aceitação para lista vazia e título só de espaços.",
+        "prompt": "Alterar: amplie os critérios de aceitação para lista vazia e título só de espaços. Aceite: cada critério traz contexto, ação e resultado visível; entrada lista vazia e HTML → um registro; entrada '   ' → mensagem e lista inalterada.",
         "hints": [
           "Um caso deve aceitar e o outro recusar.",
           "Inclua resultado visível da interface."
@@ -877,7 +881,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Dois critérios verificáveis."
       },
       {
-        "prompt": "Construa regra que limita título a 60 caracteres após trim, preservando recusa de duplicados.",
+        "prompt": "Construir: acrescente à regra isolada um limite de 60 caracteres após trim, preservando recusa de duplicados. Aceite: entrada de 60 caracteres únicos → true; 61 caracteres ou título duplicado → false. Explique que a API ainda precisa da mesma validação.",
         "hints": [
           "Valide comprimento antes de consultar a lista.",
           "Use a regra anterior para comparação."
@@ -887,14 +891,14 @@ Object.assign(LESSON_GUIDES, {
         "expected": "61 caracteres rejeitados, 60 aceitos se únicos."
       },
       {
-        "prompt": "Prepare um README curto para a lista de estudos: execução local, teste, persistência, limitação e mudança de duplicados.",
+        "prompt": "Investigar erro: o README diz que o servidor já recusa duplicados, mas server.js da aula delivery-forms ainda aceita. Revise o README para separar comportamento comprovado e regra planejada. Aceite: comandos existentes, persistência em memória e pendência da API explícitos; entrada dois POSTs com HTML → duplicata ainda possível no servidor anterior.",
         "hints": [
           "Diga comandos exatos.",
           "Não prometa banco se houver só memória."
         ],
-        "solution": "# Lista de estudos\nExecute: node server.js; abra http://127.0.0.1:4178/.\nTeste: node --test regra.test.js.\nDados: memória do servidor; reiniciar apaga os registros.\nRegra: títulos iguais após trim e comparação sem maiúsculas são recusados.\nLimite: sem autenticação ou banco; projeto demonstrativo.",
-        "explanation": "Adapte caminhos e comandos ao repositório real antes de publicar.",
-        "expected": "Outra pessoa consegue executar e entende os limites."
+        "solution": "# Lista de estudos\nExecute: node server.js; abra http://127.0.0.1:4178/.\nVerifique a regra isolada: node requisito.js imprime false e true.\nDados: memória do servidor; reiniciar apaga os registros.\nPendente: integrar a recusa de duplicados ao server.js e testá-la pela API. O servidor anterior ainda aceita títulos repetidos.\nLimite: sem autenticação ou banco; projeto demonstrativo.",
+        "explanation": "Comandos e afirmações devem corresponder aos arquivos realmente executados; revise o README após integrar e testar a API.",
+        "expected": "Outra pessoa consegue executar e sabe que a regra de duplicados ainda não protege o servidor."
       }
     ],
     "mistakes": [
