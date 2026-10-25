@@ -891,3 +891,41 @@ Object.assign(LESSON_GUIDES, {
     ]
   }
 });
+
+// Recuperação após erro no quiz: novo contexto com evidência observável.
+(() => {
+  const retries = {
+    "quality-cases": {
+      prompt: "Crie uma função calcularFrete(peso) com contrato explícito: peso finito de 0 a 20; até 2 kg custa 5, acima disso custa 12; valor fora da faixa gera TypeError. Escreva testes de fronteira antes da implementação.",
+      expected: "Os testes cobrem 0, 2, um valor logo acima de 2, 20 e entradas inválidas; cada expectativa foi definida pelo contrato, e a suíte passa após implementar a regra.",
+      hint: "Escolha casos em que uma mudança de < para <= alteraria o resultado."
+    },
+    "quality-ui": {
+      prompt: "Teste manualmente um formulário de lembrete com campo de título e botão Salvar. Registre estado inicial, passos e resultados para título só com espaços, título válido e navegação apenas por teclado.",
+      expected: "O caso inválido preserva o texto e mostra orientação; o válido cria um item uma única vez e anuncia sucesso; Tab e Enter permitem concluir o fluxo, com foco visível.",
+      hint: "Observe DOM, mensagem, quantidade de itens e destino do foco após cada ação."
+    },
+    "quality-ci": {
+      prompt: "Uma suíte local passa, mas a CI falha antes de executar testes porque a instalação de dependências não terminou. Registre a etapa exata, reproduza a falha em ambiente limpo e proponha uma correção verificável.",
+      expected: "O relato distingue falha de preparação de teste reprovado; a correção é validada localmente e por nova execução da CI, sem declarar suíte aprovada quando ela não rodou.",
+      hint: "Leia o primeiro estágio com erro e compare versões, arquivos de dependências e comando executado."
+    },
+    "quality-debug": {
+      prompt: "Um filtro de pedidos pendentes inclui pedidos sem campo status. Reduza a entrada ao menor caso que reproduz o defeito, registre esperado e observado, corrija a regra e mantenha um teste de regressão.",
+      expected: "O pedido sem status não é tratado como pendente; o teste falha com a regra antiga e passa com a nova; o relatório explica a causa e o que ainda não foi verificado.",
+      hint: "Compare ausência de propriedade com o valor explícito que representa pendência."
+    },
+    "quality-refactor": {
+      prompt: "Uma função calcula o preço final e também altera o texto da página. Antes de separá-la em regra e apresentação, registre testes de preço normal, zero e entrada inválida. Faça a separação e execute os mesmos testes.",
+      expected: "Os resultados e erros acordados continuam iguais; a regra pode ser testada sem DOM; o comportamento visível da página permanece correto após a extração.",
+      hint: "Defina uma interface pequena para a regra e trate a escrita no DOM em outra função."
+    },
+    "quality-review": {
+      prompt: "Revise uma lista de avisos recebidos de um arquivo JSON. Um aviso contém '<b>urgente</b>' e a lista tem mil itens. Registre testes de texto, teclado e tempo de renderização antes de sugerir mudanças.",
+      expected: "O conteúdo aparece como texto, sem interpretar tags; a lista pode ser percorrida por teclado conforme seus controles; a observação de desempenho traz cenário e medida, não apenas impressão subjetiva.",
+      hint: "Confira textContent, semântica dos controles e um caso de medição reproduzível."
+    }
+  };
+
+  for (const [id, retry] of Object.entries(retries)) LESSON_GUIDES[id].retry = retry;
+})();
