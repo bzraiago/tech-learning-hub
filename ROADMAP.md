@@ -225,7 +225,7 @@ Toda implementação só pode ser considerada pronta quando:
 **Meta:** integrar conhecimentos em entregas observáveis antes de avançar para backend completo.
 
 - [x] Criar projeto de fechamento da trilha Git e Colaboração: issue, branch, histórico, remoto local, README, revisão e novo requisito.
-- [ ] Criar projeto de fechamento da trilha Qualidade e Manutenção.
+- [x] Criar projeto de fechamento da trilha Qualidade e Manutenção: defeito reproduzido, teste vermelho→verde, refatoração e revisão de interface.
 - [ ] Criar projeto de fechamento da trilha Integração e Entrega.
 - [ ] Garantir objetivo, pré-requisitos, entrega, checks, qualidade e mudança de requisito em cada projeto.
 - [ ] Preferir checks automáticos quando o comportamento puder ser verificado com segurança.
