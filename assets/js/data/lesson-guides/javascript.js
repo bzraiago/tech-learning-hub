@@ -700,23 +700,21 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "const dobro = (numero) => numero * 2 cria uma função de um parâmetro com retorno implícito da expressão. A forma equivalente para esse cálculo é const dobro = function(numero) { return numero * 2; };. Com um parâmetro simples os parênteses podem ser omitidos; com zero ou vários parâmetros eles são necessários. Prefira manter uma convenção legível enquanto aprende.",
           "Quando o corpo usa chaves, o retorno deixa de ser implícito: (numero) => { return numero * 2; }. Escrever (numero) => { numero * 2; } retorna undefined. Para devolver um objeto literal diretamente, envolva-o em parênteses: (nome) => ({ nome: nome }). Sem os parênteses, as chaves seriam interpretadas como bloco, não como o objeto desejado.",
-          "Arrow functions não possuem seu próprio this. this é um valor de contexto usado em determinados tipos de chamada; funções tradicionais e arrows diferem nessa regra. Por isso não substitua automaticamente métodos que dependem de this por arrows. Também não use arrow como função construtora com new. Para nossos callbacks de cálculo, que usam somente parâmetros, a forma curta é apropriada."
+          "Arrow functions não possuem seu próprio this. this é um valor de contexto usado em determinados tipos de chamada; funções tradicionais e arrows diferem nessa regra. Por isso não substitua automaticamente métodos que dependem de this por arrows. Também não use arrow como função construtora com new. Para nossos callbacks de cálculo, que usam somente parâmetros, a forma curta é apropriada.",
+          "Pausa de prática: antes de executar, preveja o retorno de (n) => n * 3 e (n) => { n * 3; } com n igual a 4. Confira no Console e localize o return ausente."
         ]
       },
       {
-        "title": "Extrair valores com destructuring",
+        "title": "Extrair, reunir, espalhar e copiar",
         "paragraphs": [
           "const { nome, meta } = perfil lê propriedades com esses nomes e cria variáveis locais. É equivalente, neste caso simples, a const nome = perfil.nome e const meta = perfil.meta. A ordem das propriedades não importa; o nome importa. Para renomear use const { nome: nomeExibido } = perfil. Isso cria nomeExibido, não uma nova variável chamada nome.",
           "Um padrão pode definir valor padrão: const { meta = 30 } = perfil. O padrão atua quando a propriedade é undefined, não quando vale null, zero ou false. A desestruturação de null ou undefined lança erro porque não existe objeto do qual extrair. Não use esse padrão como substituto de validar a origem dos dados.",
-          "Com arrays, a posição importa: const [primeiro, segundo] = [10,20] cria 10 e 20. const [inicio, ...restante] = tempos separa o primeiro item e reúne os demais em um novo array. Os três pontos nessa posição são rest: coletam o restante. Em parâmetros, function somar(...numeros) recebe uma quantidade variável de argumentos em um array. rest precisa ser o último elemento naquela lista."
-        ]
-      },
-      {
-        "title": "Espalhar e copiar sem prometer demais",
-        "paragraphs": [
+          "Com arrays, a posição importa: const [primeiro, segundo] = [10,20] cria 10 e 20. const [inicio, ...restante] = tempos separa o primeiro item e reúne os demais em um novo array. Os três pontos nessa posição são rest: coletam o restante. Em parâmetros, function somar(...numeros) recebe uma quantidade variável de argumentos em um array. rest precisa ser o último elemento naquela lista.",
+          "Pausa de prática: em const [inicio, ...restante] = [10, 20, 30], preveja os dois valores e confira no Console antes de avançar para spread.",
           "Spread usa ... para espalhar valores em outro literal ou chamada. const novos = [...tempos, 40] cria um array com os valores anteriores e um novo item. const atualizado = { ...perfil, meta: 60 } cria um objeto com as propriedades enumeráveis próprias copiadas e depois sobrescreve meta. A ordem importa: { meta:60, ...perfil } permite que a meta original sobrescreva o 60.",
           "A cópia é rasa. Se perfil contém preferencias: { tema:\"escuro\" }, a cópia do perfil continua apontando para o mesmo objeto preferencias. Para mudar tema preservando o original, copie também esse nível: { ...perfil, preferencias: { ...perfil.preferencias, tema:\"claro\" } }. Isso não é necessário para propriedades primitivas, mas é essencial quando a alteração chega a objetos aninhados.",
-          "Em uma chamada, Math.max(...tempos) passa cada item como argumento separado. Não use spread indiscriminadamente em coleções enormes para chamadas de função, porque há limites de quantidade de argumentos. Um reduce pode ser mais apropriado nesse cenário. Nesta aula usamos listas pequenas e foco na clareza sobre o que foi copiado e o que permaneceu compartilhado."
+          "Em uma chamada, Math.max(...tempos) passa cada item como argumento separado. Não use spread indiscriminadamente em coleções enormes para chamadas de função, porque há limites de quantidade de argumentos. Um reduce pode ser mais apropriado nesse cenário. Nesta aula usamos listas pequenas e foco na clareza sobre o que foi copiado e o que permaneceu compartilhado.",
+          "Pausa de prática: desenhe original → preferencias e copia → preferencias antes de executar const copia = { ...original }. Se alterar copia.preferencias.tema, preveja o tema no original e confira no Console."
         ]
       },
       {
@@ -724,7 +722,8 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "perfil.contato?.email tenta acessar email somente quando contato não é null nem undefined; caso contrário o resultado é undefined. Isso se chama optional chaining. Não verifica se o e-mail é válido e não transforma tipos incorretos no tipo esperado. A variável base precisa existir: escrever uma variável nunca declarada continua sendo erro, mesmo com ?..",
           "O operador ?? fornece um padrão somente quando o lado esquerdo é null ou undefined: perfil.meta ?? 30 preserva uma meta zero. O operador || também troca valores falsy como zero, false e string vazia. Escolha de acordo com o significado: zero pode ser um limite válido, e false pode ser uma preferência explicitamente desligada. Ausência é diferente de uma escolha negativa.",
-          "Combine com intenção: perfil.contato?.email ?? \"Não informado\" trata contato ausente e e-mail ausente. Se email for \"\", a saída será vazia porque ?? preserva essa string; caso vazio seja inválido, você precisa de uma validação adicional. Não misture ?? diretamente com && ou || sem parênteses. Parênteses também ajudam quem lê a entender qual regra deve acontecer primeiro."
+          "Combine com intenção: perfil.contato?.email ?? \"Não informado\" trata contato ausente e e-mail ausente. Se email for \"\", a saída será vazia porque ?? preserva essa string; caso vazio seja inválido, você precisa de uma validação adicional. Não misture ?? diretamente com && ou || sem parênteses. Parênteses também ajudam quem lê a entender qual regra deve acontecer primeiro.",
+          "Pausa de prática: para meta igual a 0, null e undefined, preveja separadamente meta || 30 e meta ?? 30. Confira no Console e explique por que 0 deve continuar 0 neste exemplo."
         ]
       },
       {
@@ -764,17 +763,17 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: converta function triplo(n) { return n * 3; } em arrow com retorno implícito. Teste com 4.",
+        "prompt": "Prever: antes de executar, diga o retorno de function triplo(n) { return n * 3; } para 4. Depois converta para arrow com retorno implícito, teste com 4 e compare.",
         "hints": [
           "A expressão vem diretamente depois de =>.",
           "Não use chaves se não pretende escrever return."
         ],
         "solution": "const triplo = (n) => n * 3;\ndocument.getElementById(\"saida\").textContent = String(triplo(4));",
         "explanation": "As duas formas produzem o mesmo cálculo porque só dependem do parâmetro. A concisão não muda o contrato.",
-        "expected": "12."
+        "expected": "Previsão registrada antes da execução; as duas versões devolvem 12."
       },
       {
-        "prompt": "Completar: extraia titulo como nomeCurso de { titulo:\"JS\", vagas:0 } e mostre vagas usando padrão 10 somente se ausente.",
+        "prompt": "Alterar: no script do exemplo, substitua temporariamente o perfil por um curso { titulo:\"JS\", vagas:0 }; extraia titulo como nomeCurso e mostre vagas usando padrão 10 somente se ausente. Depois restaure o exemplo.",
         "hints": [
           "Use titulo: nomeCurso no padrão.",
           "?? preserva zero."
@@ -794,7 +793,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "30 / 45; 20,30 / 20,30,15."
       },
       {
-        "prompt": "Depurar: const criar = nome => { nome: nome }; não devolve o objeto desejado. Corrija e verifique criar(\"Lia\").nome.",
+        "prompt": "Investigar erro: const criar = nome => { nome: nome }; não devolve o objeto desejado. Antes de corrigir, preveja o retorno e identifique se as chaves iniciam um bloco ou objeto. Corrija e verifique criar(\"Lia\").nome.",
         "hints": [
           "Chaves depois de => iniciam um bloco.",
           "Use parênteses ao redor do objeto ou return explícito."

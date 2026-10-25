@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `js-arrays`, a auditoria automática aponta 18: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 e as cinco aulas HTML da prioridade 3 foram concluídas; a revisão de JavaScript está em andamento.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `js-es6`, a auditoria automática aponta 17: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 e as cinco aulas HTML da prioridade 3 foram concluídas; a revisão de JavaScript está em andamento.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 3 aulas JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
+| 1 | Média | G | 2 aulas JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 2 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 3 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
@@ -73,6 +73,14 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `js-es6`
+
+- **Público e saída:** após arrays, objetos, funções e callbacks, o aluno deve reescrever callbacks curtos, extrair propriedades, criar cópias conscientes e preservar zero ao lidar com dados opcionais. Editor, navegador e Console já foram preparados.
+- **FATO, média, M:** cinco seções isolavam destructuring e spread apesar de ambos tratarem a passagem de valores entre estruturas. A revisão reuniu esses temas em um bloco e intercalou previsões de retorno, rest, referência aninhada e `??`. Os exercícios agora explicitam prever, alterar, construir e investigar erro. ID e exemplo principal foram preservados.
+- **Pré-requisitos:** `js-arrays` → `js-es6` → `js-debug`. Nenhuma dependência circular identificada neste recorte.
+- **Fontes:** [MDN sobre arrow functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions), [MDN sobre spread](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) e [MDN sobre `??`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing) foram conferidas em 24/10/2026 (fontes oficiais, EN, OK). Confirmam retorno implícito, cópia rasa e preservação de zero.
+- **Limite:** a contagem de blocos não garante que o aluno diferencie cópia rasa de profunda em contexto novo. Teste manual no navegador e observação com aluno não foram executados nesta revisão.
 
 ### Revisão localizada: `js-arrays`
 
