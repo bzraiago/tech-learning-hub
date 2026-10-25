@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega, `ai-llms`, `ai-prompts`, `ai-system`, `ai-data`, `ai-embeddings`, `ai-rag` e `ai-skills`, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 2 aulas de IA a revisar na prioridade 4.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega, `ai-llms`, `ai-prompts`, `ai-system`, `ai-data`, `ai-embeddings`, `ai-rag`, `ai-skills` e `ai-workflows`, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; resta 1 aula de IA a revisar na prioridade 4.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 2 aulas de IA ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 1 | Média | G | 1 aula de IA ainda não revisada | RISCO | Possui cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
@@ -72,6 +72,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `ai-workflows`
+
+- **Público e saída:** após `setup-python`, `ai-tools` e `ai-skills`, o aluno deve executar transições permitidas, prever recusas e explicar como lidar com um resultado incerto após timeout.
+- **FATO, média, P:** a preparação indicava `aula.py` e uma versão mínima sem necessidade para o exemplo; o segundo passo guiado não dizia o resultado concreto. A aula agora indica arquivo e saída próprios e os quatro exercícios cobrem prever, alterar, construir e investigar erro.
+- **Julgamento didático:** cinco blocos permanecem para escolha de autonomia, estados, aprovação, limites e retomada. Cada bloco ganhou uma pausa de previsão ou decisão. O número de seções continua como sinal de observação futura.
+- **Pré-requisitos e ambiente:** `setup-python`, `ai-tools`, `ai-skills` → `ai-workflows`. O exemplo roda em Python local com dados fictícios; a preparação cobre Windows, macOS e Linux, saída, diagnóstico e retomada.
+- **Fontes:** [Anthropic sobre agentes](https://www.anthropic.com/research/building-effective-agents) e [biblioteca padrão Python](https://docs.python.org/3/library/) foram abertas em 25/10/2026 (fontes primárias, EN, OK). O artigo da Anthropic informa que detalhes de ferramentas mudaram desde 2024; a aula usa a distinção conceitual entre fluxo e agente.
+- **Limite:** a máquina não implementa orçamento, idempotência, checkpoint ou aprovação vinculada à identidade real. O timeout é investigado em texto. Não houve teste com aluno nem teste manual no navegador.
 
 ### Revisão localizada: `ai-skills`
 

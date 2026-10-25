@@ -177,6 +177,7 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `ai-embeddings`: intercalar cálculos de cosseno e recuperação com decisões sobre relevância e acesso, sem atribuir semântica aos vetores fictícios.
     - [x] `ai-rag`: distinguir busca lexical vazia de ausência comprovada de evidência, verificar acesso e separar citação válida de suporte factual.
     - [x] `ai-skills`: criar um exemplo de `SKILL.md` com escopo e autorização explícitos, testar o validador local e distinguir instruções de execução real.
+    - [x] `ai-workflows`: intercalar previsões na máquina de estados, praticar cancelamento e eventos atrasados e delimitar o tratamento textual de timeout.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
 - [ ] Adicionar demonstrações visuais de laços.
 - [ ] Adicionar diagramas de referências e cópias entre objetos.

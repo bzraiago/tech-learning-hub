@@ -1227,43 +1227,48 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "ai-workflows": {
-    "prerequisites": "Python: funções, listas, dicionários, JSON, exceções e testes. Releia as aulas anteriores deste módulo antes de prosseguir.",
-    "setup": "Use Python 3.11 ou posterior. Salve o exemplo em aula.py e execute python aula.py (ou py aula.py no Windows). Os exemplos principais usam somente a biblioteca padrão, dados fictícios e nenhuma API. Exercícios de código reutilizam as funções do exemplo; acrescente-os ao final do mesmo arquivo. Atividades de projeto e especificação são resolvidas em texto e comparadas com os critérios fornecidos.",
+    "prerequisites": "Concluir setup-python e ai-tools; saber usar funções, dicionários, exceções e testes em Python. Revisar ai-skills para distinguir proposta, execução e autorização. JSON será necessário apenas na extensão de checkpoint, não no exemplo principal.",
+    "setup": "Na pasta ia-estudos, salve o exemplo como ai-workflows.py no editor. Abra o terminal nessa pasta e execute python ai-workflows.py (ou py ai-workflows.py no Windows, python3 ai-workflows.py no macOS/Linux, conforme setup-python). A saída esperada é aguardando, executando e concluido em três linhas. O processo termina sozinho; para retomar, execute o mesmo comando. Se Python não for reconhecido, revise setup-python. Acrescente os exercícios de código ao final do arquivo. O laboratório usa somente Python e dados fictícios; não chama modelo, API ou serviço de reserva.",
     "why": "Projete execução controlada com estados explícitos, limites e aprovação de efeitos.",
     "sections": [
       {
         "title": "Escolher a menor autonomia necessária",
         "paragraphs": [
           "Um workflow segue transições previstas pelo programador. Um agente pode usar um modelo para escolher próximos passos e ferramentas. Ambos podem conter chamadas de modelo, mas a origem da decisão muda. Se uma tarefa tem quatro etapas conhecidas, um fluxo explícito costuma ser mais fácil de testar e observar.",
-          "Autonomia aumenta a variedade de caminhos e pode ampliar custo, tempo e risco de repetição. Antes de adicioná-la, descreva por que um fluxo fixo não resolve. Um agente que sugere uma operação não deve ser o único componente que decide se ela é permitida."
+          "Autonomia aumenta a variedade de caminhos e pode ampliar custo, tempo e risco de repetição. Antes de adicioná-la, descreva por que um fluxo fixo não resolve. Um agente que sugere uma operação não deve ser o único componente que decide se ela é permitida.",
+          "Pausa: para validar um cadastro em três etapas conhecidas, escolha fluxo fixo ou decisão dinâmica e explique sua escolha antes de ler o código."
         ]
       },
       {
         "title": "Estados tornam o processo observável",
         "paragraphs": [
           "Defina estados como inicio, aguardando_aprovacao, executando, concluido e cancelado. Cada evento deve ter transições permitidas. Uma tentativa de executar diretamente a partir de inicio deve falhar, em vez de pular a revisão. Estados terminais não devem reiniciar silenciosamente ao receber eventos atrasados.",
-          "O exemplo implementa uma máquina de estados local, sem modelo. Essa base também serve para agentes: o modelo pode propor um evento, mas a máquina valida se ele é possível. Separar proposta e aplicação da decisão facilita explicar por que uma ação foi recusada."
+          "O exemplo implementa uma máquina de estados local, sem modelo. Essa base também serve para agentes: o modelo pode propor um evento, mas a máquina valida se ele é possível. Separar proposta e aplicação da decisão facilita explicar por que uma ação foi recusada.",
+          "Pausa: preveja o estado após propor e a exceção ao tentar finalizar diretamente a partir de inicio."
         ]
       },
       {
         "title": "Aprovação vem de um canal confiável",
         "paragraphs": [
           "A confirmação de uma pessoa deve ser registrada pela interface ou por outro mecanismo confiável. Uma resposta do modelo dizendo “o usuário aprovou” não é confirmação. Mostre exatamente o objeto, destinatário e efeito antes de pedir aprovação, e associe a aprovação àquela operação.",
-          "Se parâmetros mudarem depois da confirmação, peça nova aprovação para a operação alterada. No laboratório, um booleano passado pelo chamador representa a decisão confiável; uma aplicação real precisa de identidade, vínculo com a operação e proteção contra reutilização indevida."
+          "Se parâmetros mudarem depois da confirmação, peça nova aprovação para a operação alterada. No laboratório, um booleano passado pelo chamador representa a decisão confiável; uma aplicação real precisa de identidade, vínculo com a operação e proteção contra reutilização indevida.",
+          "Pausa: compare a proposta de reservar uma vaga com a de reservar duas. Uma aprovação para a primeira serve para a segunda?"
         ]
       },
       {
         "title": "Limites e falhas",
         "paragraphs": [
           "Defina número máximo de passos, chamadas, tempo e custo. Ao atingir um limite, pare com um estado explícito e preserve o que foi feito. Retentar uma leitura costuma ser diferente de retentar uma transferência ou envio de e-mail: a segunda pode duplicar um efeito.",
-          "Use uma chave de idempotência para identificar a mesma operação e registrar o resultado. Se houver timeout depois de executar, consulte o estado antes de repetir. Um loop infinito não é resolvido apenas por um prompt dizendo “seja eficiente”; o código precisa de um limite verificável."
+          "Use uma chave de idempotência para identificar a mesma operação e registrar o resultado. Se houver timeout depois de executar, consulte o estado antes de repetir. Um loop infinito não é resolvido apenas por um prompt dizendo “seja eficiente”; o código precisa de um limite verificável. A máquina do exemplo ainda não implementa orçamento, timeout nem idempotência.",
+          "Pausa: após um timeout de reserva, liste o que pode ter acontecido antes de decidir se vai repetir a operação."
         ]
       },
       {
         "title": "Retomada e revisão",
         "paragraphs": [
           "Um checkpoint armazena estado, versão e resultados necessários para continuar. Não salve segredos desnecessários. Ao retomar, revalide permissões e confirme que a operação ainda faz sentido; uma aprovação antiga pode ter expirado ou os dados podem ter mudado.",
-          "Teste eventos fora de ordem, cancelamento, limite e retomada. Registre a causa da parada e a próxima ação humana possível. No projeto do módulo, você implementará transições e limites; integrar um modelo ou MCP depois deve preservar esses testes."
+          "Teste eventos fora de ordem, cancelamento, limite e retomada. Registre a causa da parada e a próxima ação humana possível. No projeto do módulo, você implementará transições e limites; integrar um modelo ou MCP depois deve preservar esses testes.",
+          "Pausa: indique qual informação mínima salvaria para retomar sem executar duas vezes uma reserva incerta."
         ]
       }
     ],
@@ -1284,7 +1289,7 @@ Object.assign(LESSON_GUIDES, {
       },
       {
         "instruction": "Execute o exemplo e depois substitua uma entrada válida por uma entrada ausente ou inválida.",
-        "result": "Compare o comportamento com o contrato. Uma falha explícita ou uma abstenção pode ser o resultado correto; não a substitua por uma resposta inventada."
+        "result": "Sem confirmação, aprovar lança PermissionError: confirmacao necessaria; cancelar enquanto aguarda devolve cancelado. Nenhuma reserva real acontece."
       },
       {
         "instruction": "Resolva os quatro exercícios. Guarde código, previsão, saída e explicação do que mudou.",
@@ -1293,7 +1298,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Tente aprovar sem confirmação.",
+        "prompt": "Prever: antes de executar, tente aprovar sem confirmação e explique a recusa. Aceite: aguardando + aprovar sem confirmado → PermissionError com 'confirmacao necessaria'; nenhuma ação é executada.",
         "hints": [
           "Capture PermissionError.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -1303,17 +1308,17 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "Uma proposta do agente não equivale a uma aprovação."
       },
       {
-        "prompt": "Cancele enquanto aguarda.",
+        "prompt": "Alterar: acrescente um evento cancelar enquanto aguarda e execute. Aceite: aguardando + cancelar → cancelado; tentar propor depois desse estado → ValueError 'estado terminal'.",
         "hints": [
           "Use evento cancelar.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
         ],
-        "solution": "print(avancar('aguardando','cancelar'))",
-        "expected": "cancelado",
+        "solution": "estado = avancar('aguardando','cancelar')\nprint(estado)\ntry:\n    avancar(estado,'propor')\nexcept ValueError as e:\n    print(e)",
+        "expected": "cancelado\nestado terminal",
         "explanation": "Cancelamento termina o fluxo sem executar a ação."
       },
       {
-        "prompt": "Tente reiniciar um estado concluído.",
+        "prompt": "Construir: escreva um teste para o estado concluido que recebe um evento atrasado propor. Aceite: concluido + propor → ValueError 'estado terminal'; o estado não volta a aguardando.",
         "hints": [
           "O primeiro if protege terminais.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -1323,7 +1328,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "Eventos atrasados não devem reiniciar efeitos."
       },
       {
-        "prompt": "Defina como tratar timeout após uma reserva.",
+        "prompt": "Investigar erro: após uma reserva fictícia, ocorre timeout e não se sabe se o efeito aconteceu. Descreva o diagnóstico e o fluxo seguro de retomada; esta atividade é respondida em texto, pois o exemplo não chama serviço real. Aceite: mesma chave de operação → consultar estado → reutilizar resultado ou registrar incerteza, sem nova reserva automática.",
         "hints": [
           "Considere que o efeito pode ter ocorrido.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
