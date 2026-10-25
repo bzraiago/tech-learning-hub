@@ -48,6 +48,8 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Prévia HTML continua isolada e sem acesso à rede.
 - [ ] Testes JavaScript continuam isolados e encerram em caso de loop ou demora.
 - [ ] Checks automáticos e manuais atualizam o status da entrega.
+- [ ] Uma nova entrega exige explicação das decisões e da verificação; o texto persiste ao trocar de aba e recarregar.
+- [ ] Uma entrega antiga sem explicação permanece registrada e indica a pendência antes de novo registro.
 
 ## Acessibilidade e responsividade
 

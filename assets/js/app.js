@@ -25,7 +25,17 @@ dialog.addEventListener('click', (event) => {
 
 
 document.addEventListener('input', event => {
-  if (event.target.id !== 'project-source' || dialogContext?.type !== 'project') return;
+  if (dialogContext?.type !== 'project') return;
+  if (event.target.id === 'project-explanation') {
+    const entry = projectEntry(dialogContext.id);
+    entry.explanation = event.target.value.slice(0, 4000);
+    entry.delivered = false;
+    clearTimeout(notesSaveTimer); notesSaveTimer = setTimeout(() => { saveState(); renderModules(); }, 350);
+    $('#project-delivery-label').textContent = 'Projeto separado do progresso das aulas';
+    $('#project-status').textContent = 'Explicação alterada. Registre novamente a entrega após conferir os critérios.';
+    return;
+  }
+  if (event.target.id !== 'project-source') return;
   const entry=projectEntry(dialogContext.id);
   entry.source=event.target.value.slice(0,80000); entry.delivered=false; entry.manual={};
   clearTimeout(notesSaveTimer); notesSaveTimer=setTimeout(()=>{saveState();renderModules();},350);

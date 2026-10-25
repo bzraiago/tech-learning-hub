@@ -211,6 +211,8 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Engenharia de IA: dezoito casos novos, de modelos e prompts a avaliação, segurança e projeto final.
   - [x] Expandir as segundas tentativas para as demais aulas (114 de 114 guias).
 - [ ] Exigir explicação das decisões nas provas de nível.
+  - [x] Exigir explicação das decisões e da verificação ao registrar qualquer um dos 20 projetos atuais, preservando entregas anteriores.
+  - [ ] Aplicar a exigência às provas de nível quando os projetos de conclusão forem criados na fase 5.
 - [ ] Evitar que quiz de múltipla escolha seja tratado como comprovação prática.
 - [ ] Criar evidências observáveis para passagem entre os níveis 0, 1, 2, 3 e 4.
 

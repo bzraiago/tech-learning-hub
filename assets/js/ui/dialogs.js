@@ -232,7 +232,7 @@ function projectCard(module) {
 }
 
 function projectEntry(id) {
-  return state.projects[id] ||= { source: '', manual: {}, delivered: false };
+  return state.projects[id] ||= { source: '', manual: {}, explanation: '', delivered: false };
 }
 
 function structuralChecks(source) {
@@ -282,7 +282,15 @@ function previewMarkup(source, title) {
 function projectFooter() {
   const project = projectById(dialogContext.id);
   const entry = projectEntry(project.id);
-  $('#dialog-footer').innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3"><span class="text-xs text-slate-400">${entry.delivered ? 'Entrega registrada · autoavaliação' : 'Projeto separado do progresso das aulas'}</span><button data-action="project-submit" class="rounded-xl bg-amber-300 px-4 py-2.5 text-xs font-semibold text-slate-950 hover:bg-amber-200">Registrar entrega</button></div><p id="project-status" role="status" aria-live="polite" class="mt-2 text-xs leading-relaxed text-amber-100"></p>`;
+  $('#dialog-footer').innerHTML = `<label for="project-explanation" class="block text-sm font-semibold text-slate-100">Explique suas decisões para esta entrega</label><p class="mt-1 text-xs leading-relaxed text-slate-400">Qual escolha foi importante, por que você a fez e como verificou o resultado? Escreva com suas palavras. Este texto é autoavaliação e não é corrigido automaticamente.</p><textarea id="project-explanation" maxlength="4000" rows="3" class="mt-2 w-full rounded-xl border border-white/20 bg-[#0b101b] p-3 text-sm" placeholder="Escolhi... porque... Verifiquei com...">${escapeHTML(entry.explanation || '')}</textarea><div class="mt-3 flex flex-wrap items-center justify-between gap-3"><span id="project-delivery-label" class="text-xs text-slate-400">${entry.delivered ? entry.explanation?.trim() ? 'Entrega registrada · autoavaliação' : 'Entrega anterior registrada · explicação pendente' : 'Projeto separado do progresso das aulas'}</span><button data-action="project-submit" class="rounded-xl bg-amber-300 px-4 py-2.5 text-xs font-semibold text-slate-950 hover:bg-amber-200">Registrar entrega</button></div><p id="project-status" role="status" aria-live="polite" class="mt-2 text-xs leading-relaxed text-amber-100"></p>`;
+}
+
+function requireProjectExplanation(entry) {
+  entry.explanation = (entry.explanation || '').trim().slice(0, 4000);
+  if (entry.explanation) return true;
+  $('#project-status').textContent = 'Explique uma decisão, o motivo e como verificou o resultado antes de registrar a entrega.';
+  $('#project-explanation').focus();
+  return false;
 }
 
 function openProject(id) {
@@ -339,6 +347,7 @@ function submitProject() {
     $('#project-status').textContent = `Ainda há ${missing.length} critérios pendentes. Revise o código e realize os testes manuais antes de registrar.`;
     return;
   }
+  if (!requireProjectExplanation(entry)) return;
   entry.delivered = true;
   saveState();
   renderModules();
@@ -408,6 +417,7 @@ function submitJsProject() {
   const project=projectById(dialogContext.id),entry=projectEntry(project.id),report=jsReport(project,entry);
   const passed=!!entry.source.trim()&&!report?.error&&project.checks.every(c=>c.mode==='manual'?entry.manual[c.id]:report?.results?.find(r=>r.id===c.id)?.pass===true);
   if(!passed){renderProjectSection('checks');$('#project-status').textContent='Execute as verificações e confira todos os critérios manuais antes de registrar.';return;}
+  if (!requireProjectExplanation(entry)) return;
   entry.delivered=true;saveState();renderModules();projectFooter();$('#project-status').textContent='Entrega registrada: casos publicados conferidos e testes manuais autoavaliados.';
 }
 
@@ -441,6 +451,7 @@ function submitPythonProject() {
     $('#project-status').textContent = 'Cole sua implementação e execute os testes locais antes de marcar todos os critérios.';
     return;
   }
+  if (!requireProjectExplanation(entry)) return;
   entry.delivered = true;
   saveState();
   renderModules();
@@ -478,6 +489,7 @@ function submitDatabaseProject() {
     $('#project-status').textContent = 'Cole sua implementação e execute os testes locais antes de marcar todos os critérios.';
     return;
   }
+  if (!requireProjectExplanation(entry)) return;
   entry.delivered = true;
   saveState();
   renderModules();
@@ -515,6 +527,7 @@ function submitAiProject() {
     $('#project-status').textContent = 'Cole sua implementação e execute os testes locais antes de marcar todos os critérios.';
     return;
   }
+  if (!requireProjectExplanation(entry)) return;
   entry.delivered = true;
   saveState();
   renderModules();

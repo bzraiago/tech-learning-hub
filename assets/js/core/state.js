@@ -95,7 +95,9 @@ function sanitizeState(candidate) {
     const source = typeof entry.source === 'string' ? entry.source.slice(0,80000) : '';
     const manual = {};
     for (const check of project.checks.filter(item=>item.mode==='manual')) manual[check.id] = entry.manual?.[check.id] === true;
-    clean.projects[project.id] = {source,manual,delivered:entry.delivered === true && !!source.trim() && Object.values(manual).every(Boolean)};
+    const explanation = typeof entry.explanation === 'string' ? entry.explanation.slice(0, 4000) : '';
+    // Entregas anteriores continuam registradas; uma nova entrega exige explicação.
+    clean.projects[project.id] = {source,manual,explanation,delivered:entry.delivered === true && !!source.trim() && Object.values(manual).every(Boolean)};
   }
   if (candidate.htmlCssRevision !== 2) {
     for (const lesson of tracks.find(track=>track.id==='html').modules.flatMap(module=>module.lessons)) delete clean.quizAttempts[lesson.id];
