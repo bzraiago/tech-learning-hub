@@ -950,3 +950,41 @@ Object.assign(LESSON_GUIDES, {
     ]
   }
 });
+
+// Recuperação após erro no quiz: outra situação para demonstrar a competência.
+(() => {
+  const retries = {
+    "delivery-http": {
+      prompt: "No servidor local do laboratório, crie um recurso de livros com GET /api/livros e GET /api/livros/2. Antes de codar, registre método, rota, status, cabeçalho e formato do corpo para lista, item existente e ID ausente.",
+      expected: "A lista responde 200 com JSON em forma de array; o item 2 responde 200 com objeto; ID ausente responde 404 com corpo de erro coerente. A interface só acessa campos após validar a forma recebida.",
+      hint: "Escreva a tabela de contrato primeiro e compare cada resposta real na aba Rede ou em cliente HTTP."
+    },
+    "delivery-forms": {
+      prompt: "Adapte o formulário local para cadastrar uma sessão de estudo com título e minutos. Tente enviar minutos em texto, provoque falha de rede e repita um envio válido rapidamente; registre o estado do botão, os dados digitados e a lista.",
+      expected: "O servidor recusa minutos de tipo inválido sem criar sessão; falha de rede mostra erro e preserva o formulário; o envio válido cria um único registro e o botão volta a ficar disponível.",
+      hint: "Modele os estados ocioso, enviando, sucesso e falha; valide no servidor mesmo que o cliente também valide."
+    },
+    "delivery-security": {
+      prompt: "Uma API permite editar notas por ID. Desenhe a verificação no servidor para um usuário autenticado editar a própria nota e para outro tentar editar nota alheia. Teste também uma requisição sem identidade.",
+      expected: "A própria nota pode ser alterada; pedido sem autenticação recebe 401; usuário autenticado sem autorização recebe 403; nenhum segredo nem decisão de permissão depende apenas do navegador.",
+      hint: "Separe quem fez a requisição de quem é dono do registro; confira ambos antes da escrita."
+    },
+    "delivery-environments": {
+      prompt: "Planeje publicar uma interface estática que consome uma API e usa um banco. Liste onde cada parte rodará, quais configurações são públicas e como verificará a URL final, incluindo uma rota da API e um arquivo CSS.",
+      expected: "O plano indica destinos acessíveis ao visitante, mantém segredos fora do frontend e registra respostas reais da página, CSS e API na URL publicada; há um caminho documentado para voltar à versão anterior.",
+      hint: "Comece pelo inventário interface → API → banco e teste a partir do navegador de um visitante, não do localhost do desenvolvedor."
+    },
+    "delivery-ci": {
+      prompt: "Uma publicação altera a validação de minutos e o POST começa a aceitar -5. Defina um teste que falhe antes da correção, indique onde a CI deve executá-lo e descreva como conter a versão ruim enquanto investiga.",
+      expected: "O teste envia -5 e espera recusa sem novo registro; a execução da CI mostra a falha antes da correção e passa depois; o plano de contenção verifica a versão recuperada na URL final.",
+      hint: "Cubra a regra da API e o efeito no armazenamento, não apenas a mensagem da interface."
+    },
+    "delivery-requirements": {
+      prompt: "O cliente pede prioridade para sessões de estudo já cadastradas. Escreva critérios de aceite para valor padrão, valores permitidos, edição e registros antigos; depois proponha testes e uma atualização honesta do README.",
+      expected: "Cada critério informa entrada, ação e resultado visível; os testes incluem dados antigos sem prioridade e valor inválido; o README separa o que foi implementado do que ainda está planejado.",
+      hint: "Trate a mudança como alteração de contrato e avalie interface, API, dados e documentação."
+    }
+  };
+
+  for (const [id, retry] of Object.entries(retries)) LESSON_GUIDES[id].retry = retry;
+})();

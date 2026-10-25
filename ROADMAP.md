@@ -207,6 +207,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Banco de dados: 24 casos novos, de modelagem e SQL a operação, segurança e recuperação.
   - [x] Git e fluxo de trabalho: seis casos novos, do primeiro commit à revisão de mudança.
   - [x] Qualidade: seis casos novos sobre testes, interface, CI, depuração, refatoração e revisão.
+  - [x] Integração e entrega: seis casos novos sobre HTTP, formulários, acesso, ambientes, CI e requisitos.
   - [ ] Expandir as segundas tentativas para as demais aulas.
 - [ ] Exigir explicação das decisões nas provas de nível.
 - [ ] Evitar que quiz de múltipla escolha seja tratado como comprovação prática.

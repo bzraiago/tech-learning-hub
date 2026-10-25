@@ -37,7 +37,8 @@ function localAssetsFrom(html, tag, attribute) {
   const expression = new RegExp(`<${tag}\\b[^>]*\\b${attribute}="([^"]+)"`, 'gi');
   return [...html.matchAll(expression)]
     .map((match) => match[1])
-    .filter((source) => !/^(?:https?:)?\/\//i.test(source));
+    .filter((source) => !/^(?:https?:)?\/\//i.test(source))
+    .map((source) => source.split(/[?#]/, 1)[0]);
 }
 
 const html = fs.readFileSync(indexPath, 'utf8');
