@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de `delivery-http`, `delivery-forms`, `delivery-security` e `delivery-environments`, a auditoria automática continua apontando 15: as cinco etapas de cada aula foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 11 aulas de IA e Entrega a revisar na prioridade 4.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de `delivery-http`, `delivery-forms`, `delivery-security`, `delivery-environments` e `delivery-ci`, a auditoria automática continua apontando 15: as cinco etapas de cada aula foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 10 aulas de IA e Entrega a revisar na prioridade 4.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 11 aulas IA/Entrega ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 1 | Média | G | 10 aulas IA/Entrega ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
@@ -72,6 +72,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `delivery-ci`
+
+- **Público e saída:** após testes básicos de JavaScript, preparação Node e publicação, o aluno deve executar uma suíte, provocar uma regressão, interpretar a falha e descrever a contenção de um incidente.
+- **FATO, média, P:** a aula ensinava CI a partir de comando local, mas poderia ser lida como CI já configurada. O guia agora distingue explicitamente execução local de fluxo remoto. A preparação informa pasta, comando, saída e recuperação. Os quatro exercícios cobrem prever, alterar, construir e investigar erro.
+- **Julgamento didático:** mantidos cinco blocos distintos (camadas, CI, sinais, rollback e rotina), com pausas entre conceitos. A demonstração de regressão torna observável o efeito de remover `trim` sem confundir teste verde com cobertura completa.
+- **Pré-requisitos e ambiente:** `setup-node`, `js-debug`, `delivery-environments` → `delivery-ci`. Usa apenas `node:test` e `node:assert/strict`, sem pacote externo.
+- **Fontes:** [Node.js Test Runner](https://nodejs.org/api/test.html), [GitHub Actions](https://docs.github.com/en/actions/get-started/understand-github-actions) e [W3C WAI: verificações básicas](https://www.w3.org/WAI/test-evaluate/preliminary/) foram abertas em 24/10/2026 (fontes oficiais, EN, OK).
+- **Limite:** executei a suíte local e a regressão controlada (saídas de processo 0 e 1). Não há evidência nesta aula de pipeline remoto configurado ou de rollback em produção; navegador e observação com aluno não foram testados.
 
 ### Revisão localizada: `delivery-environments`
 

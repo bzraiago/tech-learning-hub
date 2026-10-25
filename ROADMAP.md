@@ -168,6 +168,7 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `delivery-forms`: preservar as etapas da integração, adicionar GET da coleção ao laboratório e verificar que POST inválido não altera os dados.
     - [x] `delivery-security`: distinguir 401 e 403 na simulação, reforçar fronteiras de autorização e praticar previsão, alteração, construção e diagnóstico.
     - [x] `delivery-environments`: relacionar publicação em subpasta aos caminhos reais dos assets e explicitar os limites de uma API local.
+    - [x] `delivery-ci`: praticar falha e recuperação de teste local, distinguir essa execução de CI remota e registrar evidências de incidente.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
 - [ ] Adicionar demonstrações visuais de laços.
 - [ ] Adicionar diagramas de referências e cópias entre objetos.

@@ -636,36 +636,40 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "delivery-ci": {
-    "prerequisites": "Saber executar Node no terminal e ter praticado testes de funções em JavaScript.",
-    "setup": "Salve o exemplo como regra.test.js e rode node --test regra.test.js. Não é preciso instalar pacote. Para simular regressão, troque return valor.trim() por return valor.",
+    "prerequisites": "Concluir setup-node, js-debug e delivery-environments; saber executar Node no terminal e ter praticado testes de funções em JavaScript.",
+    "setup": "Na pasta da aula, salve o exemplo como regra.test.js no editor. No terminal aberto nessa pasta, execute node --test regra.test.js; a saída esperada resume 2 testes aprovados e 0 falhas. Não é preciso instalar pacote. Para simular regressão, troque apenas return valor.trim() por return valor, rode novamente e observe 1 falha; restaure a linha e repita o comando. O processo termina sozinho; se node não for reconhecido, revise setup-node. Esta execução é local, sem serviço de CI remoto.",
     "why": "Publicar com confiança depende de repetir verificações e reconhecer rapidamente quando uma alteração quebrou algo. Uma rotina de integração contínua ajuda a aplicar a mesma regra a cada contribuição.",
     "sections": [
       {
         "title": "Camadas de verificação",
         "paragraphs": [
           "Um teste unitário verifica uma regra pequena com entrada e resultado conhecidos. Um teste de integração local cobre o encontro entre partes, por exemplo POST /api/estudos e resposta 201. Um roteiro de navegador confirma foco, mensagens, layout e um fluxo completo. Cada camada detecta falhas diferentes; nenhuma sozinha prova que todo o produto está correto. Escolha testes segundo os riscos reais da alteração.",
-          "A função normalizarTitulo é adequada a teste unitário porque não depende de rede nem relógio. O teste de espaços compara a saída com HTML; o teste de vazio exige TypeError. Se a implementação não recusar vazio, o segundo teste falha. Um teste precisa de expectativa independente da implementação; não calcule o esperado chamando a própria função. Acrescente casos de limite e regressão quando descobrir defeitos."
+          "A função normalizarTitulo é adequada a teste unitário porque não depende de rede nem relógio. O teste de espaços compara a saída com HTML; o teste de vazio exige TypeError. Se a implementação não recusar vazio, o segundo teste falha. Um teste precisa de expectativa independente da implementação; não calcule o esperado chamando a própria função. Acrescente casos de limite e regressão quando descobrir defeitos.",
+          "Pausa: antes de executar, preveja qual teste falhará se a linha de retorno deixar de usar trim. Explique por que o outro teste ainda passa."
         ]
       },
       {
         "title": "O que CI executa",
         "paragraphs": [
           "Integração contínua é uma rotina automatizada disparada quando código é enviado ou uma proposta de alteração é aberta. Um fluxo comum prepara a versão correta do ambiente, instala dependências se existirem, executa testes, construção e verificações de qualidade. Se um passo obrigatório falha, a alteração não deveria seguir como se estivesse verificada. Leia o log do primeiro erro relevante, reproduza localmente e corrija a causa.",
-          "O laboratório não precisa de conta remota para ensinar esse princípio: o comando node --test é o mesmo que uma rotina poderia executar. Ao escrever instruções de entrega, registre o comando exato e o resultado esperado. Em um projeto real, a configuração de CI fica versionada no repositório para que a equipe veja quais verificações acontecem. CI dá repetibilidade, mas não substitui revisão humana."
+          "O laboratório não precisa de conta remota para ensinar esse princípio: o comando node --test é o mesmo que uma rotina poderia executar. Ao escrever instruções de entrega, registre o comando exato e o resultado esperado. Em um projeto real, a configuração de CI fica versionada no repositório para que a equipe veja quais verificações acontecem. Nesta aula, executar o comando localmente não prova que uma CI remota esteja configurada. CI dá repetibilidade, mas não substitui revisão humana.",
+          "Pausa: marque em uma sequência evento → execução → resultado onde ocorre cada etapa no terminal local e onde ocorreria em um fluxo remoto."
         ]
       },
       {
         "title": "Sinais após a entrega",
         "paragraphs": [
           "Mesmo com testes passando, a produção pode ter configuração diferente, serviço indisponível ou dados inesperados. Observe sinais: taxa de erro, status HTTP, Console do navegador, relatos de usuários e registros do servidor que não vazem segredos. Uma mensagem genérica “não funciona” é difícil de investigar; capture horário aproximado, rota, ação, ambiente, resultado esperado e observado.",
-          "Reproduzir começa pelo menor caso que demonstra o defeito. Se a falha aparece apenas quando lista está vazia, crie esse cenário local. Compare versões anteriores e atuais, faça uma hipótese e teste-a. Depois da correção, acrescente um teste para a condição que antes falhava. Isso transforma um incidente em aprendizagem durável do projeto."
+          "Reproduzir começa pelo menor caso que demonstra o defeito. Se a falha aparece apenas quando lista está vazia, crie esse cenário local. Compare versões anteriores e atuais, faça uma hipótese e teste-a. Depois da correção, acrescente um teste para a condição que antes falhava. Isso transforma um incidente em aprendizagem durável do projeto.",
+          "Pausa: escreva um relato de uma linha para POST /api/estudos com status 500 contendo ambiente, ação, esperado e observado."
         ]
       },
       {
         "title": "Recuperação e rollback",
         "paragraphs": [
           "Rollback é voltar a uma versão que se sabe funcionar quando a versão nova causa problema grave. Ele precisa ser planejado: identifique a versão anterior, preserve artefato ou commit, saiba como restaurar e verifique o fluxo principal depois. Se houve mudança de dados incompatível, voltar só os arquivos pode não bastar; comunique a dependência. Em exercício local, copie a versão anterior e reproduza a volta sem apagar o histórico da falha.",
-          "Não confunda corrigir rapidamente com esconder o problema. Quando impacto é alto, restaurar primeiro pode reduzir dano; depois investigue com tempo. Registre causa, proteção adicionada e como o defeito foi detectado. Isso é parte da manutenção profissional de um projeto, mesmo em uma equipe pequena."
+          "Não confunda corrigir rapidamente com esconder o problema. Quando impacto é alto, restaurar primeiro pode reduzir dano; depois investigue com tempo. Registre causa, proteção adicionada e como o defeito foi detectado. Isso é parte da manutenção profissional de um projeto, mesmo em uma equipe pequena.",
+          "Pausa: ordene registrar versão, restaurar versão estável, verificar o fluxo principal e investigar a causa. Indique quando uma migração de dados exige cuidado adicional."
         ]
       },
       {
@@ -702,7 +706,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: adicione teste para entrada null.",
+        "prompt": "Prever: o que normalizarTitulo(null) faz antes de rodar? Depois acrescente um teste para esse caso. Aceite: entrada null → TypeError; execução da suíte → três testes aprovados.",
         "hints": [
           "Use assert.throws.",
           "A função lança TypeError para valor não textual."
@@ -712,7 +716,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Três testes aprovados."
       },
       {
-        "prompt": "Complete uma matriz de teste para POST /api/estudos: válido, vazio e serviço fora do ar.",
+        "prompt": "Alterar: amplie a matriz do laboratório delivery-forms com POST válido, título vazio e servidor desligado. Aceite: para cada entrada, anote resposta HTTP ou falha de rede, estado da interface e se o título permanece; entrada servidor desligado → erro de rede, sem status HTTP.",
         "hints": [
           "Não use o mesmo status para todas as linhas.",
           "Falha de rede pode não produzir status HTTP."
@@ -722,7 +726,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Três casos com resultado verificável."
       },
       {
-        "prompt": "Construa um teste para regra que remove duplicatas de uma lista de títulos sem alterar a entrada.",
+        "prompt": "Construir: implemente uma função que remove títulos duplicados sem alterar a entrada e escreva teste independente para saída e entrada. Aceite: entrada ['HTML','HTML','CSS'] → saída ['HTML','CSS']; array original mantém três elementos.",
         "hints": [
           "Prepare array original e cópia.",
           "Verifique saída e entrada."
@@ -732,7 +736,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Teste passa e entrada mantém três elementos."
       },
       {
-        "prompt": "Descreva resposta a incidente: nova versão gera 500 ao salvar. Quais evidências, contenção, correção e verificação?",
+        "prompt": "Investigar erro: após uma nova versão, POST /api/estudos retorna 500. Registre evidências, proponha contenção, reproduza com entrada mínima e descreva teste de regressão e verificação final. Aceite: informe versão, rota, resultado observado, ação de recuperação e nova prova; entrada título HTML → resposta esperada 201 após a correção.",
         "hints": [
           "Inclua versão e rota.",
           "Considere voltar à versão estável."
