@@ -78,6 +78,7 @@ document.addEventListener('change', (event) => {
     document.querySelectorAll('[data-quiz-feedback]').forEach(element => { element.hidden = true; });
     $('#quiz-result').textContent = '';
     saveState();
+    renderEvidenceSummary();
   }
 });
 

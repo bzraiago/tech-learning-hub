@@ -80,7 +80,7 @@ function quizMarkup(lesson) {
     const recovery = correct ? '' : `<p class="mt-3 text-xs text-slate-400">Aula para revisar: ${escapeHTML(lesson.title)}</p><button type="button" data-review-concept="${lesson.id}" class="mt-2 rounded-lg border border-violet-300/30 px-3 py-2 text-xs font-semibold text-violet-200 hover:bg-violet-300/10">Rever conceitos desta aula</button>${lesson.guide.retry && i === firstWrong ? '<button type="button" data-retry class="ml-2 mt-2 rounded-lg border border-sky-300/30 px-3 py-2 text-xs font-semibold text-sky-200 hover:bg-sky-300/10">Ir para segunda tentativa</button>' : ''}`;
     return `<fieldset class="mt-6"><legend class="mb-3 text-[15px] font-semibold leading-relaxed">${i + 1}. ${escapeHTML(question.question)}</legend><div class="space-y-2">${options}</div><div data-quiz-feedback ${attempt.checked ? '' : 'hidden'} class="mt-3 rounded-lg border border-white/10 p-3 text-sm leading-relaxed"><p class="font-semibold ${correct ? 'text-emerald-300' : 'text-amber-200'}">${correct ? 'Correto.' : `Ainda não. A resposta é: ${escapeHTML(question.options[question.correctIndex])}`}</p><p class="mt-2 text-slate-300">${escapeHTML(question.explanation)}</p>${recovery}</div></fieldset>`;
   }).join('');
-  return `<form id="lesson-quiz" class="mt-8 rounded-2xl border border-violet-400/20 bg-violet-400/5 p-4 sm:p-6"><h3 class="font-display text-xl font-semibold">Confira o que você entendeu</h3><p class="mt-2 text-sm leading-relaxed text-slate-400">Escolha uma resposta por questão. A correção explica os conceitos; você pode tentar novamente.</p>${items}<button type="submit" class="mt-6 rounded-xl bg-violet-500 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-400">Conferir respostas</button><p id="quiz-result" role="status" aria-live="polite" tabindex="-1" class="mt-4 text-sm leading-relaxed text-violet-200">${attempt.checked ? `${score} de ${questions.length} respostas corretas. ${score === questions.length ? 'Agora tente explicar os conceitos sem consultar a aula.' : 'Leia os comentários e volte aos conceitos que precisarem de revisão.'}` : ''}</p></form>`;
+  return `<form id="lesson-quiz" class="mt-8 rounded-2xl border border-violet-400/20 bg-violet-400/5 p-4 sm:p-6"><h3 class="font-display text-xl font-semibold">Confira o que você entendeu</h3><p class="mt-2 text-sm leading-relaxed text-slate-400">Escolha uma resposta por questão. A correção verifica conceitos; ela não executa seus exercícios nem comprova domínio prático.</p>${items}<button type="submit" class="mt-6 rounded-xl bg-violet-500 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-400">Conferir respostas</button><p id="quiz-result" role="status" aria-live="polite" tabindex="-1" class="mt-4 text-sm leading-relaxed text-violet-200">${attempt.checked ? `${score} de ${questions.length} respostas corretas. ${score === questions.length ? 'Conceitos conferidos no quiz. Execute os exercícios e explique uma solução para um problema novo; essas evidências são registradas separadamente.' : 'Leia os comentários e volte aos conceitos que precisarem de revisão.'}` : ''}</p></form>`;
 }
 
 function retryMarkup(lesson) {
@@ -151,6 +151,7 @@ function updateLearningEvidence(action) {
   state.learningEvidence[id] = evidence;
   saveState();
   renderReviewQueue();
+  renderEvidenceSummary();
   renderLessonSection('review');
   if (action !== 'solved' && action !== 'clear-solved' && draft !== undefined) $('#evidence-explanation').value = draft;
   const target = action === 'solved' ? '#evidence-explanation' : action === 'clear-solved' ? '#evidence-explanation' : `[data-evidence="${action}"]`;
@@ -213,6 +214,7 @@ function gradeQuiz() {
   attempt.checkedAt = new Date().toISOString();
   state.quizAttempts[lesson.id] = attempt;
   saveState();
+  renderEvidenceSummary();
   renderLessonSection('review');
   $('#quiz-result').scrollIntoView({ block: 'nearest' });
   $('#quiz-result').focus({ preventScroll: true });

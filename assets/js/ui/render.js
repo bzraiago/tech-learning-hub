@@ -44,6 +44,18 @@ function renderProgress() {
   $('#storage-status').textContent = storageAvailable ? 'Progresso salvo neste navegador' : 'Progresso apenas nesta sessão';
 }
 
+function renderEvidenceSummary() {
+  const lessons = [...lessonIndex.values()].map(({ lesson }) => lesson);
+  const concepts = lessons.filter((lesson) => {
+    const attempt = state.quizAttempts[lesson.id];
+    return attempt?.checked && lesson.guide.quiz.every((question, i) => attempt.answers[i] === question.correctIndex);
+  }).length;
+  const practiced = lessons.filter((lesson) => state.learningEvidence[lesson.id]?.practicedAt).length;
+  const reviewed = lessons.filter((lesson) => state.learningEvidence[lesson.id]?.reviewedAt).length;
+  const solved = lessons.filter((lesson) => state.learningEvidence[lesson.id]?.solvedAt).length;
+  $('#evidence-summary').textContent = `Conceitos conferidos no quiz: ${concepts} · Prática autoavaliada: ${practiced} · Revisão conceitual: ${reviewed} · Problema novo explicado (autoavaliação): ${solved}. O quiz não comprova execução prática.`;
+}
+
 function renderReviewQueue() {
   const now = Date.now();
   const queue = [...lessonIndex.values()].flatMap(({ track, lesson }) => {
@@ -118,6 +130,7 @@ function render() {
   const focusKey = document.activeElement?.dataset.focus;
   renderNavigation();
   renderProgress();
+  renderEvidenceSummary();
   renderReviewQueue();
   renderReadiness();
   renderModules();

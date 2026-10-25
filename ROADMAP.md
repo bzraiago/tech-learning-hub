@@ -213,7 +213,7 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Exigir explicação das decisões nas provas de nível.
   - [x] Exigir explicação das decisões e da verificação ao registrar qualquer um dos 20 projetos atuais, preservando entregas anteriores.
   - [ ] Aplicar a exigência às provas de nível quando os projetos de conclusão forem criados na fase 5.
-- [ ] Evitar que quiz de múltipla escolha seja tratado como comprovação prática.
+- [x] Evitar que quiz de múltipla escolha seja tratado como comprovação prática: contagens separadas para conceitos, prática, revisão e problema novo, com feedback explícito.
 - [ ] Criar evidências observáveis para passagem entre os níveis 0, 1, 2, 3 e 4.
 
 **Aceite:** o sistema distingue claramente leitura, prática, retenção e resolução autônoma; só `Resolvi sozinho`, com problema novo e explicação, conta como evidência de avanço.

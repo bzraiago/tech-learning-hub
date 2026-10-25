@@ -24,6 +24,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.
+- [ ] Acertar o quiz altera apenas a contagem de conceitos; prática e problema novo continuam separados até seus próprios registros.
 - [ ] Após uma resposta incorreta, o feedback indica a aula de revisão; o botão abre os conceitos e a orientação persiste após recarregar.
 - [ ] Nas aulas de preparação digital, um erro no quiz oferece uma tarefa diferente, com critério e pista; o rascunho permanece após recarregar.
 - [ ] Nas aulas de Ambientes essenciais, a segunda tentativa orienta diagnóstico ou retomada sem inventar saídas nem expor credenciais.
