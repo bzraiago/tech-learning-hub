@@ -163,19 +163,15 @@ Object.assign(LESSON_GUIDES, {
     "why": "Um programa útil precisa escolher o que fazer com dados diferentes. Também precisa repetir trabalho sem copiar instruções. Vamos construir um relatório de sessões de estudo e aprender a testar a regra nos valores que costumam revelar defeitos: zero, exatamente o limite e um valor acima dele. Antes de escrever o código, descreva em português as decisões e a condição de parada.",
     "sections": [
       {
-        "title": "Uma condição escolhe um caminho",
+        "title": "Decidir com condições simples e combinadas",
         "paragraphs": [
           "if (condicao) { instrucoes } executa o bloco apenas se a condição for truthy. else fornece o caminho alternativo. Em if (minutos >= 30), o número 30 pertence ao caminho verdadeiro; minutos > 30 excluiria esse limite. Use chaves mesmo para uma instrução: elas tornam o bloco visível e evitam que uma alteração posterior fique fora da condição por acidente.",
           "else if permite verificar outra condição quando a anterior falhou. A ordem importa: em uma classificação por pontuação, verificar primeiro pontos >= 50 antes de pontos >= 90 faz o segundo caso ficar inacessível para quem tem 90. Organize do mais específico para o mais amplo ou escreva intervalos claros. Apenas um ramo de uma cadeia if/else if/else é executado. Dois if independentes podem executar ambos.",
-          "A regra precisa definir o que acontece com entrada inválida antes de classificá-la. Um texto vazio não deve virar zero por acidente; uma quantidade negativa não deve entrar em uma contagem de sessões. Validar é decidir se o dado atende ao contrato. Aqui exigiremos um número inteiro entre 1 e 7, usando Number.isInteger para excluir frações e também NaN."
-        ]
-      },
-      {
-        "title": "Combinar condições",
-        "paragraphs": [
+          "A regra precisa definir o que acontece com entrada inválida antes de classificá-la. Um texto vazio não deve virar zero por acidente; uma quantidade negativa não deve entrar em uma contagem de sessões. Validar é decidir se o dado atende ao contrato. Aqui exigiremos um número inteiro entre 1 e 7, usando Number.isInteger para excluir frações e também NaN.",
           "&& significa que os dois lados precisam ser truthy para uma condição composta ser verdadeira. || aceita pelo menos um lado truthy e ! inverte a interpretação lógica. Para sessões válidas, Number.isInteger(sessoes) && sessoes >= 1 && sessoes \u003c= 7 descreve três exigências simultâneas. Leia a expressão em voz alta e use parênteses quando combinar operadores diferentes.",
           "Esses operadores fazem curto-circuito: && não avalia o lado direito quando o esquerdo já é falsy; || não avalia o direito quando o esquerdo já é truthy. Eles devolvem um dos valores avaliados, não necessariamente um boolean. Em uma condição isso é interpretado logicamente, mas fora dela não presuma que o resultado será true ou false. Boolean(expressao) pode tornar explícita essa conversão.",
-          "Para uma escolha simples de valor existe o condicional ternário: condicao ? valorSeVerdadeiro : valorSeFalso. const mensagem = minutos >= 30 ? \"Meta atingida\" : \"Continue\" é uma alternativa curta a atribuir nos dois ramos. Evite ternários aninhados: uma regra com várias etapas costuma ficar mais legível usando if. Clareza é mais importante do que reduzir linhas."
+          "Como aprofundamento, uma escolha simples de valor pode usar o condicional ternário: condicao ? valorSeVerdadeiro : valorSeFalso. const mensagem = minutos >= 30 ? \"Meta atingida\" : \"Continue\" é uma alternativa curta a atribuir nos dois ramos. Evite ternários aninhados: uma regra com várias etapas costuma ficar mais legível usando if. Clareza é mais importante do que reduzir linhas.",
+          "Pausa de prática: antes de executar, preveja o resultado para 0, 1, 7 e 8 sessões na condição de validade. Escreva qual comparação rejeita cada valor inválido e confira no Console."
         ]
       },
       {
@@ -183,15 +179,17 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "for (let dia = 1; dia \u003c= 3; dia += 1) tem inicialização, condição e atualização. Primeiro cria dia igual a 1. Antes de cada volta testa dia \u003c= 3. Se verdadeiro, executa o corpo; depois soma um. Os valores usados no corpo são 1, 2 e 3. Quando dia chega a 4, o teste falha e o laço termina. dia += 1 é uma forma curta de dia = dia + 1.",
           "Um acumulador guarda um resultado que cresce a cada volta. Declare let total = 0 antes do laço e use total += minutosPorSessao dentro dele. Se reiniciar total dentro do corpo, cada volta apaga a anterior. Uma string também pode acumular linhas: relatorio += `Dia ${dia}\n`. A sequência \n dentro da string representa uma quebra de linha; pre preserva essa quebra na tela.",
-          "Faça uma tabela de rastreamento com colunas volta, dia, total antes e total depois. Para três sessões de 20 minutos, os totais depois são 20, 40 e 60. Essa simulação manual revela se a condição deve usar \u003c ou \u003c=. A contagem de elementos de uma coleção começará em zero em uma aula futura; aqui os dias começam em um por escolha do problema."
+          "Faça uma tabela de rastreamento com colunas volta, dia, total antes e total depois. Para três sessões de 20 minutos, os totais depois são 20, 40 e 60. Essa simulação manual revela se a condição deve usar \u003c ou \u003c=. A contagem de elementos de uma coleção começará em zero em uma aula futura; aqui os dias começam em um por escolha do problema.",
+          "Pausa de prática: preencha a tabela para duas sessões antes de executar o for. Compare cada valor de dia e total com a saída e localize a primeira divergência."
         ]
       },
       {
         "title": "while, parada e desvios",
         "paragraphs": [
           "while (condicao) testa antes de cada repetição e é útil quando o número de voltas não está diretamente escrito no cabeçalho. let falta = 3; while (falta > 0) { falta -= 1; } termina em zero. O corpo precisa provocar uma mudança que aproxime a condição de falsa. Se esquecer a atualização, pode bloquear a aba em um laço infinito; feche a aba se necessário e corrija o arquivo antes de reabrir.",
-          "do { ... } while (condicao) executa pelo menos uma vez, porque testa no final. Escolha-o somente se essa primeira execução fizer parte da regra. break encerra o laço atual; continue pula o restante da volta atual. Em while, colocar continue antes da atualização pode impedir o avanço e criar um laço infinito. Nos primeiros exercícios prefira estruturas simples sem desvios desnecessários.",
-          "switch compara um valor com casos por igualdade estrita e pode ser útil para opções discretas, como \"manha\" ou \"noite\". Cada case normalmente termina em break para evitar continuar no próximo; default cobre valores não previstos. Não é uma substituição automática de intervalos numéricos: para faixas de pontuação, if costuma representar melhor o problema."
+          "Como aprofundamento, do { ... } while (condicao) executa pelo menos uma vez, porque testa no final. break encerra o laço atual; continue pula o restante da volta atual. Em while, colocar continue antes da atualização pode impedir o avanço e criar um laço infinito. Nos primeiros exercícios prefira estruturas simples sem desvios desnecessários.",
+          "Também como aprofundamento, switch compara um valor com casos por igualdade estrita e pode ser útil para opções discretas, como \"manha\" ou \"noite\". Cada case normalmente termina em break para evitar continuar no próximo; default cobre valores não previstos. Para faixas de pontuação, if costuma representar melhor o problema.",
+          "Pausa de prática: escreva os valores de falta em cada volta de let falta = 3; while (falta > 0) { falta -= 1; }. Marque o teste que impede uma quarta volta."
         ]
       },
       {
@@ -230,17 +228,17 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: classifique temperatura 18 como Frio abaixo de 20 e Agradável a partir de 20. Teste 19 e 20.",
+        "prompt": "Prever: antes de executar, classifique mentalmente 18, 19 e 20 como Frio abaixo de 20 e Agradável a partir de 20. Depois implemente a decisão e compare os três resultados.",
         "hints": [
           "São dois caminhos exclusivos.",
           "A palavra abaixo exclui o próprio limite."
         ],
         "solution": "const temperatura = 18;\nlet mensagem;\nif (temperatura \u003c 20) { mensagem = \"Frio\"; } else { mensagem = \"Agradável\"; }\ndocument.getElementById(\"saida\").textContent = mensagem;",
         "explanation": "Uma variável de saída reúne a decisão e evita duplicar a linha que escreve na página. Testar 20 comprova que a fronteira está no ramo correto.",
-        "expected": "18 e 19 mostram Frio; 20 mostra Agradável."
+        "expected": "Previsão registrada antes da execução; 18 e 19 mostram Frio e 20 mostra Agradável."
       },
       {
-        "prompt": "Completar: some os inteiros de 1 a 5 com um for e mostre a soma. Não escreva 1+2+3+4+5 diretamente.",
+        "prompt": "Alterar: no exemplo, substitua temporariamente o relatório de sessões por um for que some os inteiros de 1 a 5 e mostre a soma. Não escreva 1+2+3+4+5 diretamente; depois restaure o script.",
         "hints": [
           "O acumulador começa em zero antes do laço.",
           "Inclua 5 usando \u003c=."
@@ -260,7 +258,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Sete linhas de dias e total 5. Os dois últimos dias são Descanso."
       },
       {
-        "prompt": "Depurar: let n = 3; while (n > 0) { console.log(n); } não termina. Corrija e diga quantas voltas haverá.",
+        "prompt": "Investigar erro: let n = 3; while (n > 0) { console.log(n); } não termina. Sem executar o laço defeituoso no navegador, rastreie n em duas voltas, identifique a atualização ausente e escreva a correção. Diga quantas voltas haverá.",
         "hints": [
           "A condição depende de n.",
           "Uma atualização precisa aproximar n de zero."
