@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-nosql-models`, a auditoria automática aponta 29: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; sete das dez aulas avançadas foram condensadas sem mudar seus IDs. Restam três aulas avançadas de banco prioritárias.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-project`, a auditoria automática aponta 28: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; oito das dez aulas avançadas foram condensadas sem mudar seus IDs. Restam duas aulas avançadas de banco prioritárias.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Alta | G | 3 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
+| 1 | Alta | G | 2 aulas avançadas restantes da trilha `database` | FATO | Possuem seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar uma a uma e padronizar a progressão. |
 | 2 | Média | G | 5 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 3 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 4 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
@@ -136,6 +136,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 - **Ambiente:** desenho textual, sem serviço real e sem comandos. A saída esperada é uma escolha defendida por consulta, regra de atualização, custo e gatilho de revisão. Não há instalação a executar nesta aula.
 - **Fontes:** páginas oficiais [Redis](https://redis.io/docs/latest/), [Apache Cassandra](https://cassandra.apache.org/doc/latest/), [Neo4j](https://neo4j.com/docs/) e [MongoDB — modelagem](https://www.mongodb.com/docs/manual/data-modeling/) foram abertas em 24/10/2026 (EN, OK). As três primeiras são portais gerais, úteis para aprofundamento, não substituem a explicação da aula.
 - **Limite:** a atividade é modelagem em papel, não comprovação de desempenho, transações, recuperação ou operação dos motores. Sem observar uma decisão feita pelo aluno diante de requisito novo, autonomia permanece não comprovada.
+
+### Revisão localizada: `db-project`
+
+- **Público e saída:** após modelagem, constraints, JOIN e agregação, o aluno deve reconstruir um relatório de três matrículas em SQLite, identificar uma regra não garantida pelo esquema inicial e justificar a tecnologia escolhida para o laboratório.
+- **FATO, alta, M:** seis seções repetiam briefing, limite das FKs e entrega. A aula ficou com quatro blocos: critérios, relatório, reforço da regra e decisão/entrega. O exercício final, antes restrito às FKs, agora pede também alternativa, custo e gatilho de revisão para corresponder ao título da aula. A prática sinaliza prever, alterar, construir e investigar erro.
+- **Sequência:** `db-modeling` → `db-ddl-constraints` → `db-joins` e `db-aggregation` → `db-nosql-models` → `db-project`. A preparação SQLite é suficiente; serviço web, parâmetros e recuperação são extensões posteriores. Não se identificou ciclo nesse recorte.
+- **Ambiente:** base SQLite vazia, cliente preparado e `PRAGMA foreign_keys=ON` nesta conexão antes dos testes negativos. A aula usa dados fictícios e não implementa API. A execução do esquema inicial não prova que a pessoa está matriculada na trilha da lição; as duas FKs compostas são um desenho a testar em outra base. Nenhuma base local do usuário foi alterada nesta revisão.
+- **Fontes:** páginas oficiais [SQLite — usos apropriados](https://www.sqlite.org/whentouse.html), [PostgreSQL 17 — tutorial](https://www.postgresql.org/docs/17/tutorial.html), [MongoDB — modelagem](https://www.mongodb.com/docs/manual/data-modeling/), [MariaDB — guia inicial](https://mariadb.com/docs/server/mariadb-quickstart-guides/mariadb-usage-guide) e [Firebird 5 — referência](https://firebirdsql.org/file/documentation/chunk/en/refdocs/fblangref50/firebird-50-language-reference.html) foram abertas em 24/10/2026 (EN, OK). O link PostgreSQL foi fixado em 17, versão do laboratório do curso.
+- **Limite:** o validador comprova estrutura do conteúdo, não a implementação do esquema reforçado nem a autonomia do aluno para escolher um banco sob novos requisitos. A recuperação real e o teste em navegador não foram executados.
 
 ## 9. Limites desta auditoria
 

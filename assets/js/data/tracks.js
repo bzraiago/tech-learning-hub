@@ -3159,12 +3159,11 @@
             "minutes": 75,
             "concept": "A escolha do banco envolve formato dos dados, consultas, integridade, concorrência e operação. SQLite simplifica um aplicativo local; bancos cliente-servidor atendem compartilhamento e controle centralizado; documentos podem acomodar catálogos variáveis. Esses critérios não são regras absolutas. Relacionais também oferecem JSON, e bancos documentais podem ter transações: valide recursos na versão escolhida.",
             "objectives": [
-              "Justificar a escolha de banco a partir de requisitos concretos.",
-              "Comparar os resultados de duas modelagens e documentar limitações.",
-              "Valide requisitos com dados que exponham erros.",
-              "Verificar resultados e explicar os limites do laboratório com casos válidos e inválidos."
+              "Reproduzir o relatório de três matrículas com progresso individual e trilha vazia.",
+              "Identificar a regra de matrícula que as FKs iniciais não garantem e desenhar seu reforço.",
+              "Justificar SQLite para o laboratório e registrar quando reavaliar a escolha."
             ],
-            "exercise": "Desenhe o reforço do esquema que exige matrícula na trilha da lição. Declare as chaves necessárias e o caso inválido que deve falhar.",
+            "exercise": "Desenhe o reforço da matrícula por FKs compostas, indique o caso inválido e justifique a escolha de banco para o laboratório.",
             "code": "PRAGMA foreign_keys=ON;\nCREATE TABLE estudantes(id INTEGER PRIMARY KEY,nome TEXT NOT NULL);\nCREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT NOT NULL);\nCREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha_id INTEGER NOT NULL REFERENCES trilhas(id),titulo TEXT NOT NULL);\nCREATE TABLE matriculas(estudante_id INTEGER NOT NULL REFERENCES estudantes(id),trilha_id INTEGER NOT NULL REFERENCES trilhas(id),\n PRIMARY KEY(estudante_id,trilha_id));\nCREATE TABLE progresso(estudante_id INTEGER NOT NULL REFERENCES estudantes(id),licao_id INTEGER NOT NULL REFERENCES licoes(id),\n concluida INTEGER NOT NULL CHECK(concluida IN(0,1)),PRIMARY KEY(estudante_id,licao_id));\nINSERT INTO estudantes VALUES(1,'Ana'),(2,'Beto');\nINSERT INTO trilhas VALUES(1,'Dados'),(2,'Python');\nINSERT INTO licoes VALUES(10,1,'SELECT'),(11,1,'JOIN');\nINSERT INTO matriculas VALUES(1,1),(1,2),(2,1);\nINSERT INTO progresso VALUES(1,10,1),(2,10,0);\nSELECT e.nome AS estudante,t.nome AS trilha,COUNT(l.id) AS total,\n SUM(COALESCE(p.concluida,0)) AS concluidas,\n CASE WHEN COUNT(l.id)=0 THEN 0\n ELSE 100.0*SUM(COALESCE(p.concluida,0))/COUNT(l.id) END AS percentual\nFROM matriculas m\nJOIN estudantes e ON e.id=m.estudante_id\nJOIN trilhas t ON t.id=m.trilha_id\nLEFT JOIN licoes l ON l.trilha_id=t.id\nLEFT JOIN progresso p ON p.licao_id=l.id AND p.estudante_id=e.id\nGROUP BY e.id,e.nome,t.id,t.nome ORDER BY e.id,t.id;",
             "docs": [
               {
@@ -3176,7 +3175,7 @@
               {
                 "kind": "doc",
                 "title": "PostgreSQL · Tutorial oficial",
-                "url": "https://www.postgresql.org/docs/current/tutorial.html",
+                "url": "https://www.postgresql.org/docs/17/tutorial.html",
                 "language": "EN"
               },
               {

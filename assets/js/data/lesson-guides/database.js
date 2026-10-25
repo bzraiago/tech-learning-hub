@@ -2952,52 +2952,36 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "db-project": {
-    "prerequisites": "Conclua modelagem, chaves estrangeiras, JOIN e agregações. Use as aulas de parâmetros e recuperação para transformar este laboratório em uma aplicação posteriormente.",
-    "setup": "Execute uma vez em SQLite vazio. O script cria estudantes, trilhas, lições, matrículas e progresso. Primeiro validaremos o modelo e a consulta, sem construir uma API. Para repetir com os mesmos resultados, abra outra base de laboratório.",
+    "prerequisites": "Conclua db-modeling, db-ddl-constraints, db-joins e db-aggregation; revise db-nosql-models para comparar alternativas. A preparação SQLite da trilha de dados basta para esta aula. Parâmetros, serviço e recuperação serão necessários ao transformar o laboratório em aplicação, não para executar este exemplo.",
+    "setup": "No cliente SQLite preparado na trilha de dados, abra uma base de laboratório vazia e execute o script uma vez. Ele cria estudantes, trilhas, lições, matrículas e progresso; não é uma API nem deve ser usado com dados pessoais reais. Para repetir os mesmos resultados, abra outra base de laboratório em vez de apagar a anterior. Confira que PRAGMA foreign_keys=ON foi aplicado nesta conexão antes dos testes negativos.",
     "why": "Ana e Beto estudam Dados, mas concluir uma aula para Ana não pode alterar Beto. Também precisamos mostrar Python mesmo sem lições, pois o dashboard não deve esconder uma matrícula existente.",
     "sections": [
       {
-        "title": "Transformar requisitos em regras",
+        "title": "Critérios de aceite antes do esquema",
         "paragraphs": [
-          "ESTUDANTES e TRILHAS têm identidades próprias. LICOES aponta para uma trilha. MATRICULAS associa estudantes a trilhas e impede duplicar o mesmo par. PROGRESSO associa estudante a lição: sua chave composta permite que pessoas distintas tenham estados diferentes para a mesma aula, sem múltiplos estados contraditórios para uma pessoa.",
-          "As FKs verificam a existência das entidades referenciadas. Elas não garantem sozinhas que o estudante esteja matriculado na trilha da lição marcada. Essa regra adicional precisa de validação na aplicação ou implementação específica no esquema. Reconhecer o limite de cada constraint faz parte da entrega."
+          "O briefing mínimo é: uma pessoa pode se matricular em várias trilhas; uma trilha pode não ter lições; progresso é individual; o relatório inclui matrículas vazias; repetir uma conclusão não cria outra linha. Ana e Beto compartilham Dados, mas somente Ana tem Python vazio. Esses casos pequenos expõem vazamento entre usuários, duplicação e perda de linhas na junção antes de aumentar a carga.",
+          "ESTUDANTES e TRILHAS têm identidades próprias; LICOES aponta para uma trilha. MATRICULAS impede duplicar o par estudante/trilha. PROGRESSO tem chave composta estudante/lição, para permitir estados diferentes da mesma aula sem duplicar o estado de uma pessoa. As FKs atuais verificam existência, mas ainda não provam que a pessoa está matriculada na trilha da lição: registre esse limite como critério pendente."
         ]
       },
       {
-        "title": "Escolher a granularidade",
+        "title": "Relatório com granularidade de matrícula",
         "paragraphs": [
           "Cada linha final representa uma matrícula: um estudante em uma trilha. Começamos por MATRICULAS e juntamos os nomes. LEFT JOIN com LICOES preserva matrículas de trilhas vazias. Outra junção procura PROGRESSO usando simultaneamente estudante e lição, evitando misturar usuários ou multiplicar conclusões.",
-          "COUNT(l.id) mede lições reais. SUM(COALESCE(p.concluida,0)) trata ausência de registro como pendência. Quando não há lições, CASE define percentual zero e evita divisão por zero. O fator 100.0 produz cálculo decimal. Nesta convenção, uma trilha vazia não é considerada concluída automaticamente."
+          "COUNT(l.id) mede lições reais, não linhas vazias geradas pelo LEFT JOIN. SUM(COALESCE(p.concluida,0)) trata ausência de progresso como pendência. Quando não há lições, CASE define percentual zero e evita divisão por zero; 100.0 preserva cálculo decimal. Uma trilha vazia não é considerada concluída nesta convenção. Confira três linhas: Ana/Dados 50%, Ana/Python 0% e Beto/Dados 0%."
         ]
       },
       {
-        "title": "Justificar e testar a escolha",
+        "title": "Reforce a regra que as FKs isoladas não garantem",
         "paragraphs": [
-          "SQLite atende este exercício local sem servidor. Para acesso remoto compartilhado, uma API com banco cliente-servidor pode facilitar administração e concorrência. Isso não determina automaticamente um produto: compare volume de escrita, operação, integrações e experiência da equipe. Registre a decisão com requisitos concretos, evitando escolher apenas pela popularidade.",
-          "Uma alternativa documental pode incorporar pequenas lições ao catálogo, mas o progresso de muitos usuários não deve crescer indefinidamente no mesmo documento. Teste separação de pessoas, trilha vazia, duplicação de progresso e recuperação. Depois avalie índices e necessidade de outro motor. Primeiro demonstre comportamento correto, depois otimize."
+          "Uma FK isolada de PROGRESSO para ESTUDANTES e outra para LICOES permitem um progresso de uma lição válida mesmo sem matrícula naquela trilha. Não afirme que o esquema inicial impede isso. Desenhe PROGRESSO com estudante_id, trilha_id e licao_id: o par estudante/trilha referencia MATRICULAS, e lição/trilha referencia uma chave única equivalente em LICOES. O mesmo trilha_id une as duas regras.",
+          "Teste em uma base nova o caso inválido Beto/Python/SELECT: a lição pertence a Dados e Beto não está matriculado em Python. A solução por FKs compostas deve rejeitá-lo. Uma alternativa valida na aplicação com controle transacional adequado, mas requer cuidar de concorrência. A coluna extra tem custo; não aplique ALTER apressado sobre dados antigos sem examinar incompatibilidades e planejar migração."
         ]
       },
       {
-        "title": "Escrever critérios antes de escolher o motor",
+        "title": "Entregue, escolha e reavalie",
         "paragraphs": [
-          "O briefing mínimo é: uma pessoa pode se matricular em várias trilhas; uma trilha tem zero ou mais lições; o progresso é individual; o relatório inclui matrículas vazias; repetir o registro de conclusão não cria duas linhas. Transforme cada frase em um teste com dados pequenos. Ana e Beto compartilham Dados, Ana também possui Python vazio. Essas três matrículas revelam vazamento entre usuários e perda de linhas na junção. Não acrescente mil registros antes de conferir esses casos essenciais.",
-          "Acrescente requisitos de operação: quem abre o banco, quantas pessoas escrevem simultaneamente, se é necessário trabalhar offline e qual perda pode ser aceita. Um arquivo local atende bem o laboratório, mas compartilhar o arquivo diretamente entre navegadores não é uma arquitetura de API. Para um serviço web, uma camada de aplicação autentica o usuário e limita acesso aos dados. A escolha do motor deve conversar com essa arquitetura, com a experiência da equipe e com os procedimentos de recuperação."
-        ]
-      },
-      {
-        "title": "Uma regra que o primeiro modelo ainda não garante",
-        "paragraphs": [
-          "O esquema do exemplo verifica se estudante e lição existem, mas não relaciona automaticamente a matrícula à trilha daquela lição. Um aluno existente poderia receber progresso em uma lição de trilha na qual não se matriculou. Essa lacuna é propositalmente visível: um bom projeto não afirma garantir mais do que suas constraints fazem. Registre-a e proponha a solução antes de dizer que o sistema está pronto para vários usuários.",
-          "Uma solução relacional usa progresso com estudante_id, trilha_id e licao_id. O par estudante_id,trilha_id referencia matriculas; o par licao_id,trilha_id referencia uma chave única equivalente em licoes. Assim, a combinação da lição deve pertencer à mesma trilha da matrícula. Outra solução valida na aplicação dentro de uma estratégia transacional adequada, mas precisa tratar mudanças concorrentes. Para aprender a regra, desenhe as duas referências e tente ligar uma lição da trilha Dados a uma matrícula em Python; o banco deve rejeitar a inconsistência no modelo reforçado.",
-          "Essa mudança adiciona trilha_id ao progresso não por conveniência de exibição, mas para expressar uma relação composta verificável. O custo é manter mais uma coluna e duas referências coerentes. O benefício é fazer o banco rejeitar um estado que o esquema inicial aceita. Não execute apenas um ALTER apressado sobre dados existentes: construa uma nova base de teste, carregue os dados válidos e examine os inválidos antes de escrever uma migração."
-        ]
-      },
-      {
-        "title": "Entrega avaliável e mudança de requisito",
-        "paragraphs": [
-          "Entregue um arquivo com criação e carga, outro com consultas, um documento curto com a decisão de banco e uma lista de resultados esperados. O avaliador deve conseguir começar de uma base vazia e obter três linhas: Ana em Dados com cinquenta por cento, Ana em Python com zero e Beto em Dados com zero. Depois, executar casos negativos em separado e observar as constraints. Capturas de tela são apoio; os comandos reproduzíveis são a evidência principal.",
-          "Uma mudança de requisito útil é permitir desmarcar uma conclusão mantendo a matrícula. O UPDATE deve selecionar o par estudante e lição, não somente a lição. Ao desmarcar Ana em SELECT, Beto permanece como estava. Se registrar eventos de histórico for necessário, o booleano atual não basta: seria preciso um conjunto de eventos com instante e autor, além da política de consulta do estado atual. Identificar essa diferença mostra que você consegue analisar requisitos novos sem adicionar campos aleatórios.",
-          "Finalize com um ensaio de backup e restauração e uma leitura de plano de uma consulta relevante. A decisão pode continuar sendo SQLite para o estudo local; PostgreSQL, MariaDB ou Firebird podem ser avaliados para outro ambiente, e MongoDB exigiria uma modelagem documental com limites de crescimento e validação de referências. O objetivo é defender uma solução pequena e correta, mostrar testes de isolamento e reconhecer a operação necessária. Isso constrói base prática de desenvolvimento, sem equivaler a especialização em administração de todos os motores."
+          "Entregue criação/carga, consulta, resultados esperados, casos negativos em comandos separados e uma decisão curta de banco. Outra pessoa deve reconstruir uma base vazia e obter as três linhas do relatório. Capturas são apoio; SQL e instruções reproduzíveis são a evidência. Registre também quem escreve, necessidade offline, concorrência, operação e recuperação. SQLite atende este laboratório local; para serviço web compartilhado, avalie API, autenticação, volume de escrita e banco cliente-servidor. Uma alternativa documental pode incorporar catálogo pequeno, mas não deve fazer o progresso de muitos usuários crescer sem limite no mesmo documento.",
+          "Mudança de requisito: desmarcar a conclusão de Ana em SELECT sem alterar Beto nem sua matrícula. O UPDATE precisa filtrar estudante e lição. Se for necessário histórico de eventos, o booleano atual não basta; seriam necessários evento, instante, autor e política de estado atual. Finalize com ensaio de backup/restauração e leitura de plano em uma consulta relevante. Registre requisito, opção, alternativa, custo aceito e gatilho de revisão; não presuma que executar este laboratório equivale a operar todos os motores."
         ]
       }
     ],
@@ -3028,7 +3012,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Conclua JOIN para Ana e execute novamente o relatório.",
+        "prompt": "Prever: antes de concluir JOIN para Ana, diga quais percentuais mudarão e quais permanecerão iguais. Depois faça o INSERT e execute novamente o relatório.",
         "hints": [
           "O estudante é 1 e a lição é 11.",
           "Ainda não existe registro desse par: use INSERT."
@@ -3038,7 +3022,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Ana/Dados: 2 concluídas e 100%. Beto/Dados: 0%. Ana/Python: 0%."
       },
       {
-        "prompt": "Adicione Listas à trilha Python sem registrar conclusão. Repita o relatório.",
+        "prompt": "Alterar: adicione Listas à trilha Python sem registrar conclusão. Repita o relatório.",
         "hints": [
           "Python tem id 2; use id 12 para a nova lição.",
           "A ausência de progresso será convertida em zero."
@@ -3048,7 +3032,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Ana/Python: total 1, concluídas 0, percentual 0. Continuam existindo três linhas."
       },
       {
-        "prompt": "Na base original do exemplo, desmarque apenas SELECT para Ana. Reexecute o relatório e explique por que o WHERE precisa das duas identidades.",
+        "prompt": "Construir: na base original do exemplo, desmarque apenas SELECT para Ana. Reexecute o relatório e explique por que o WHERE precisa das duas identidades.",
         "hints": [
           "Execute em uma nova base original para obter os valores previstos.",
           "Não remova a matrícula."
@@ -3058,14 +3042,14 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Ana/Dados: 0 de 2 e 0%; Beto/Dados permanece 0%; Ana/Python permanece 0%."
       },
       {
-        "prompt": "Desenhe o reforço do esquema que exige matrícula na trilha da lição. Declare as chaves necessárias e o caso inválido que deve falhar.",
+        "prompt": "Investigar erro: o esquema inicial aceita progresso de uma lição fora da matrícula. Desenhe duas FKs compostas para impedir isso em uma base nova, declare o caso inválido que deve falhar e registre por que SQLite basta para o laboratório local e qual requisito levaria a reavaliá-lo.",
         "hints": [
           "A chave referenciada deve ser única.",
           "O desenho é uma especificação; implemente em base nova antes de migrar."
         ],
-        "solution": "LICOES: UNIQUE(id,trilha_id)\nMATRICULAS: PRIMARY KEY(estudante_id,trilha_id)\nPROGRESSO: estudante_id,trilha_id,licao_id,concluida\n  PRIMARY KEY(estudante_id,licao_id)\n  FOREIGN KEY(estudante_id,trilha_id) -> MATRICULAS(estudante_id,trilha_id)\n  FOREIGN KEY(licao_id,trilha_id) -> LICOES(id,trilha_id)\nTeste inválido: Beto (2), Python (2), SELECT (10, da trilha 1).",
+        "solution": "LICOES: UNIQUE(id,trilha_id)\nMATRICULAS: PRIMARY KEY(estudante_id,trilha_id)\nPROGRESSO: estudante_id,trilha_id,licao_id,concluida\n  PRIMARY KEY(estudante_id,licao_id)\n  FOREIGN KEY(estudante_id,trilha_id) -> MATRICULAS(estudante_id,trilha_id)\n  FOREIGN KEY(licao_id,trilha_id) -> LICOES(id,trilha_id)\nTeste inválido: Beto (2), Python (2), SELECT (10, da trilha 1).\nDecisão: SQLite local atende ao estudo individual sem serviço adicional; PostgreSQL com API é alternativa para acesso remoto centralizado, com custo de operação maior; reavaliar quando várias pessoas precisarem escrever de dispositivos diferentes.",
         "explanation": "A presença isolada de cada entidade não garante a relação correta. O par inclui a trilha nos dois lados e impede uma combinação incoerente.",
-        "expected": "Duas referências compostas: uma comprova matrícula e outra comprova a trilha da lição."
+        "expected": "Duas referências compostas rejeitam Beto/Python/SELECT no esquema reforçado; a decisão explicita requisito local, alternativa, custo e gatilho para revisão."
       }
     ],
     "mistakes": [
