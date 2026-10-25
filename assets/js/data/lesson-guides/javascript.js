@@ -1942,3 +1942,81 @@ Object.assign(LESSON_GUIDES, {
     ]
   }
 });
+
+// Recuperação após erro no quiz: aplicar o conceito em outro contexto.
+(() => {
+  const retries = {
+    "js-values": {
+      prompt: "Uma passagem custa 750 centavos e o campo quantidade contém a string \"3\". Preveja o tipo e o valor de quantidade + 1; depois calcule o preço total em reais usando conversão explícita.",
+      expected: "A primeira expressão produz a string \"31\"; o cálculo convertido produz o número 22.5 e distingue entrada inválida de zero.",
+      hint: "Inspecione typeof antes e depois de Number(quantidade)."
+    },
+    "js-flow": {
+      prompt: "Escreva uma função que percorra os números de 1 a 10 e conte apenas os múltiplos de 3. Antes de executar, preveja a contagem e descreva quando o laço termina.",
+      expected: "A contagem é 3, pelos valores 3, 6 e 9; o laço avança até sair do limite, sem execução infinita.",
+      hint: "Separe a condição de continuar do teste que decide incrementar o contador."
+    },
+    "js-functions": {
+      prompt: "Crie calcularDesconto(preco, percentual), que retorna o preço final para números finitos não negativos e retorna null para dados inválidos. Teste 80 com 25%, 0 com 0% e percentual acima de 100.",
+      expected: "Os dois primeiros testes retornam 60 e 0; percentual acima de 100 é recusado; a função retorna valores sem depender de console.log.",
+      hint: "Escreva o contrato de entrada e saída antes da fórmula."
+    },
+    "js-scope-pure": {
+      prompt: "Uma função calcularFrete(peso) lê uma variável global taxa e muda quando outra parte do script altera essa taxa. Reescreva a regra para receber peso e taxa como argumentos e compare duas chamadas iguais.",
+      expected: "A função não lê nem altera estado externo; chamadas com os mesmos argumentos retornam o mesmo valor mesmo após mudanças fora dela.",
+      hint: "Procure todos os nomes usados dentro da função que não são parâmetros nem variáveis locais."
+    },
+    "js-callbacks-closures": {
+      prompt: "Crie criarSaldo(inicial), que devolve uma função para acrescentar um valor e retornar o saldo atual. Crie duas instâncias e preveja o resultado de acrescentar 5 à primeira e 2 à segunda.",
+      expected: "Cada função preserva seu próprio saldo; atualizar uma instância não altera a outra; criarSaldo retorna uma função que só é executada quando chamada.",
+      hint: "Declare o saldo dentro da função criadora e retorne uma função que o use."
+    },
+    "js-arrays": {
+      prompt: "Você recebeu [{nome:'Lia', pontos:8},{nome:'Rui', pontos:3},{nome:'Bia', pontos:7}]. Crie uma lista de nomes com pelo menos 7 pontos sem alterar os registros originais; depois procure um nome ausente.",
+      expected: "A lista resultante contém Lia e Bia nessa ordem; a busca ausente é tratada sem acessar propriedade de undefined.",
+      hint: "Combine filter e map; verifique o resultado de find antes de usar suas propriedades."
+    },
+    "js-es6": {
+      prompt: "Dado pedido = {cliente:'Nina', entrega:{cidade:'Recife'}, cupom:0}, crie um pedido novo com outra cidade, sem alterar o original. Extraia cupom preservando o zero.",
+      expected: "A cidade do objeto original continua Recife; o novo pedido tem a cidade escolhida; cupom permanece 0 em vez de receber um padrão.",
+      hint: "Copie também o objeto aninhado e compare ?? com || para valores zero."
+    },
+    "js-debug": {
+      prompt: "Uma função media([4, 8, 12]) devolve 4, mas deveria devolver 8. Escreva esperado e observado, localize o primeiro cálculo divergente e crie um teste para lista vazia antes de corrigir.",
+      expected: "O defeito é reproduzível; um teste cobre o caso normal e outro define o comportamento de lista vazia; a correção faz ambos passarem.",
+      hint: "Inspecione separadamente soma e divisor, sem mudar os dois ao mesmo tempo."
+    },
+    "js-dom": {
+      prompt: "Renderize uma lista de três livros {titulo, lido} em uma ul e um contador de livros lidos. Execute a renderização duas vezes e teste um título contendo <b>texto</b>.",
+      expected: "A lista continua com três itens após renderizar de novo; o contador corresponde aos lidos; as tags do título aparecem como texto, sem virar HTML.",
+      hint: "Limpe a lista antes de recriar os nós e preencha títulos com textContent."
+    },
+    "js-events": {
+      prompt: "Crie um formulário de nova categoria com campo obrigatório. Após envio válido, adicione a categoria à lista; recuse nomes só com espaços e permita remover uma categoria pelo botão dentro do item.",
+      expected: "Enter envia como o botão; entrada inválida mostra orientação sem mudar a lista; o botão remove apenas seu item mesmo quando o clique atinge um elemento interno.",
+      hint: "Escute submit no formulário e use closest no alvo da lista."
+    },
+    "js-storage": {
+      prompt: "Salve um rascunho de preferência de leitura {tema, tamanho} em uma chave própria. Simule JSON inválido e armazenamento indisponível; mantenha a interface utilizável e permita apagar só esse rascunho.",
+      expected: "Um rascunho válido volta após recarregar; dados inválidos são ignorados; falha de armazenamento não interrompe a página; a exclusão preserva outras chaves.",
+      hint: "Isole parse e operações de localStorage em try/catch e valide a forma recuperada."
+    },
+    "js-promises": {
+      prompt: "Simule o carregamento assíncrono de uma lista de filmes com uma opção de falha. Mostre estado de espera, sucesso e erro; desabilite o botão só durante o carregamento.",
+      expected: "O botão volta a funcionar após sucesso ou falha; a mensagem final corresponde ao resultado e uma nova tentativa pode ser feita.",
+      hint: "Coloque a restauração da interface em finally."
+    },
+    "js-fetch": {
+      prompt: "Carregue um arquivo local eventos.json por fetch e apresente estados de carregamento, lista vazia e erro. Teste uma resposta HTTP sem sucesso e um item com texto parecido com HTML.",
+      expected: "Status sem sucesso gera erro tratado; lista vazia tem mensagem própria; texto externo aparece como texto; uma nova busca não reutiliza um controlador cancelado.",
+      hint: "Verifique response.ok, valide os dados e use textContent ao criar os itens."
+    },
+    "js-modules": {
+      prompt: "Separe uma função pura calcularTotal(itens) em totais.js, exporte-a e importe-a em app.js. Escreva testes para lista vazia, dois itens e quantidade inválida, servindo os arquivos por HTTP local.",
+      expected: "O import funciona no navegador pelo servidor local; os três testes têm expectativas explícitas; a função não depende do DOM.",
+      hint: "Confira o nome exportado, o caminho relativo do import e type=module no script da página."
+    }
+  };
+
+  for (const [id, retry] of Object.entries(retries)) LESSON_GUIDES[id].retry = retry;
+})();
