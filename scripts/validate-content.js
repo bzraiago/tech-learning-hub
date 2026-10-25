@@ -132,7 +132,9 @@ for (const lesson of lessons) {
       if (!exercise.solution?.trim()) fail(`Exercício sem solução: ${lesson.id}:${index}`);
     });
   }
-  if (guide.retry) {
+  if (!guide.retry) {
+    fail(`Aula sem segunda tentativa: ${lesson.id}`);
+  } else {
     for (const field of ['prompt', 'expected', 'hint']) {
       if (typeof guide.retry[field] !== 'string' || !guide.retry[field].trim()) fail(`Segunda tentativa sem ${field}: ${lesson.id}`);
     }

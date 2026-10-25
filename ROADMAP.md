@@ -198,7 +198,7 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Criar fila de revisões espaçadas três dias após a prática, com acesso direto à aula e confirmação pelo quiz.
 - [x] Criar recuperação ativa do módulo anterior na primeira aula de cada módulo posterior, com rascunho salvo e retorno à aula de origem.
 - [x] Associar cada erro de quiz à aula que o contém e oferecer acesso direto aos conceitos dessa aula.
-- [ ] Oferecer uma segunda tentativa diferente, sem repetir o mesmo exercício.
+- [x] Oferecer uma segunda tentativa diferente, sem repetir o mesmo exercício.
   - [x] Preparação digital: cinco casos novos com critério de aceite, pista e rascunho persistente após erro no quiz.
   - [x] Ambientes essenciais: dez casos novos de instalação, diagnóstico ou retomada, incluindo as alternativas leves.
   - [x] HTML e CSS: treze casos novos com resultado esperado e pista após erro no quiz.
@@ -208,7 +208,8 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Git e fluxo de trabalho: seis casos novos, do primeiro commit à revisão de mudança.
   - [x] Qualidade: seis casos novos sobre testes, interface, CI, depuração, refatoração e revisão.
   - [x] Integração e entrega: seis casos novos sobre HTTP, formulários, acesso, ambientes, CI e requisitos.
-  - [ ] Expandir as segundas tentativas para as demais aulas.
+  - [x] Engenharia de IA: dezoito casos novos, de modelos e prompts a avaliação, segurança e projeto final.
+  - [x] Expandir as segundas tentativas para as demais aulas (114 de 114 guias).
 - [ ] Exigir explicação das decisões nas provas de nível.
 - [ ] Evitar que quiz de múltipla escolha seja tratado como comprovação prática.
 - [ ] Criar evidências observáveis para passagem entre os níveis 0, 1, 2, 3 e 4.
