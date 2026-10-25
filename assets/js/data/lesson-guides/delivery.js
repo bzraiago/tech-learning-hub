@@ -12,8 +12,10 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "O navegador é um cliente. Ele faz uma requisição com método, endereço, cabeçalhos e, quando necessário, corpo. O servidor recebe, decide e devolve uma resposta com status, cabeçalhos e corpo. HTTP descreve esse protocolo de troca; a aplicação escolhe o significado dos seus caminhos e dados. A rota /api/estudos deste laboratório devolve uma coleção; a barra inicial pertence ao caminho, e a porta 4178 identifica o processo local.",
           "Uma URL não é por si só um banco de dados nem prova de que há persistência. Neste exemplo o array vive apenas na memória do processo Node. Quando você para o servidor, o estado volta ao valor escrito no arquivo. Antes de integrar uma interface, desenhe uma tabela com método, rota, pedido válido, resposta de sucesso e resposta de erro. Assim o contrato não muda escondido durante a implementação.",
-          "Pausa de prática: desenhe cliente → GET /api/estudos → servidor → status 200 + JSON → cliente. Antes de abrir a rota, preveja quantos registros virão e o que acontecerá após reiniciar o processo."
-        ]
+          "Pausa de prática: desenhe cliente → GET /api/estudos → servidor → status 200 + JSON → cliente. Antes de abrir a rota, preveja quantos registros virão e o que acontecerá após reiniciar o processo. Compare seu desenho com o mapa abaixo."
+        ],
+        "diagramTitle": "Sequência de GET /api/estudos no laboratório local",
+        "diagram": "NAVEGADOR                          SERVIDOR NODE (127.0.0.1:4178)\n   |                                            |\n1. |── GET /api/estudos ─────────────────────→|\n   |                                            | 2. Lê método e caminho\n   |                                            |    no callback createServer\n   |                                            | 3. Escolhe o array estudos\n4. |←─ status 200; Content-Type: application/json |\n   |   [{\"id\":1,\"titulo\":\"HTML\"},                |\n   |    {\"id\":2,\"titulo\":\"JavaScript\"}] ──────────|\n5. | Exibe o corpo; a aba Rede mostra status,    |\n   | cabeçalho e resposta.                      |\n   |                                            |\nGET /api/falha → volta 503: {\"erro\":\"Serviço indisponível\"}.\nGET /inexistente → volta 404: {\"erro\":\"Rota não encontrada\"}.\nO array está na memória do processo; reiniciar restaura os dois itens."
       },
       {
         "title": "Método e status expressam intenções diferentes",

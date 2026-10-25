@@ -94,6 +94,13 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 - **Fontes:** [SQLite sobre `SELECT`](https://www.sqlite.org/lang_select.html) e [SQLite sobre agregações](https://www.sqlite.org/lang_aggfunc.html) foram abertas em 25/10/2026 (documentação oficial, EN, OK). A referência de `SELECT` ressalta que sua descrição em etapas é ilustrativa, não uma promessa de ordem física do motor.
 - **Limite:** o mapa apresenta um conjunto pequeno e fixo; interpretar outra junção continua sendo tarefa do aluno. Teste visual manual no navegador e observação com aluno ainda não foram executados.
 
+### Sequência visual: `delivery-http`
+
+- **FATO, média, P:** a aula pedia para desenhar cliente → servidor → resposta, mas não mostrava uma sequência de comparação. O mapa agora acompanha `GET /api/estudos` pelo método, caminho, decisão no servidor, status, `Content-Type` e corpo JSON; também indica os ramos 503 e 404.
+- **Pré-requisitos e ambiente:** `setup-node` e `js-fetch` → `delivery-http`; o exemplo usa `127.0.0.1:4178`, dados em memória e a biblioteca nativa de Node, sem API externa.
+- **Fontes:** [Node.js HTTP](https://nodejs.org/api/http.html) e [MDN sobre HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview) foram abertas em 25/10/2026 (fontes primárias, EN, OK). O mapa representa o contrato do laboratório, não todos os detalhes da rede.
+- **Limite:** o diagrama é estático e não substitui observar uma requisição na aba Rede. Teste manual no navegador e observação com aluno ainda não foram executados.
+
 ### Revisão localizada: `ai-capstone`
 
 - **Público e saída:** após `ai-data`, `ai-rag`, `ai-evals` e as aulas de fluxo, o aluno deve testar o contrato de um gerador simulado, planejar recuperação autorizada e documentar avaliação factual separada.
