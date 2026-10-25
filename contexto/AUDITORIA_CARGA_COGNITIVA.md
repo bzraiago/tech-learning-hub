@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de `delivery-http`, `delivery-forms`, `delivery-security`, `delivery-environments`, `delivery-ci` e `delivery-requirements`, a auditoria automática continua apontando 15: as cinco etapas de cada aula foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 9 aulas de IA a revisar na prioridade 4.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega e `ai-llms`, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 8 aulas de IA a revisar na prioridade 4.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 9 aulas de IA ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 1 | Média | G | 8 aulas de IA ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
@@ -72,6 +72,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `ai-llms`
+
+- **Público e saída:** após preparação Python e programação básica, o aluno deve distinguir treinamento, inferência e contexto, calcular proporções e reconhecer que a simulação não mede verdade factual nem tokens reais.
+- **FATO, média, P:** os quatro exercícios não explicitavam prever, alterar, construir e investigar erro, e os cinco blocos não tinham pausas intermediárias. As tarefas agora têm esses tipos, entradas, saídas e critérios; cada bloco central traz previsão ou prática curta.
+- **Julgamento didático:** foram mantidos cinco blocos por tratar de fronteiras conceituais diferentes (famílias de IA, inferência, contexto, verificação factual e avaliação). A contagem estrutural permanece alerta para observação com aluno.
+- **Pré-requisitos e ambiente:** `setup-python` e Python básico → `ai-llms`. A preparação nomeia pasta, arquivo, terminal, comandos por sistema, saída, parada, retomada e alternativa leve sem modelo ou API.
+- **Fontes:** [Hugging Face LLM Course](https://huggingface.co/learn/llm-course/en/chapter1/1), [Hugging Face Tokenizers](https://huggingface.co/learn/llm-course/en/chapter2/4) e [biblioteca padrão Python](https://docs.python.org/3/library/) foram abertas em 25/10/2026 (fontes primárias, EN, OK).
+- **Limite:** o código usa pesos fictícios e unidades abstratas. Não executa modelo real, não mede tokenização nem comprova qualidade de respostas. Observação com aluno não foi executada.
 
 ### Revisão localizada: `delivery-requirements`
 

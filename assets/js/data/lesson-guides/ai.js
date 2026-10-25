@@ -3,43 +3,48 @@
 // Guias detalhados da trilha Engenharia de IA.
 Object.assign(LESSON_GUIDES, {
 "ai-llms": {
-    "prerequisites": "Python básico: variáveis, listas, dicionários, funções e execução de arquivos. Não é necessário contratar API ou possuir GPU.",
-    "setup": "Crie uma pasta ia-estudos e salve o exemplo como ai-llms.py em UTF-8. Execute python ai-llms.py (ou python3/py conforme a instalação). Os exemplos usam somente biblioteca padrão e dados fictícios. Eles demonstram componentes de engenharia, não executam um LLM real. Preveja a saída, execute e altere uma entrada antes de consultar a solução.",
+    "prerequisites": "Concluir setup-python e Python básico: variáveis, listas, dicionários, funções e execução de arquivos. Não é necessário contratar API ou possuir GPU.",
+    "setup": "No editor, crie a pasta ia-estudos e salve o exemplo como ai-llms.py em UTF-8. Abra o terminal nessa pasta e execute python ai-llms.py (ou py ai-llms.py no Windows, python3 ai-llms.py no macOS/Linux, conforme setup-python). A saída esperada está logo abaixo do exemplo: 60%, 30%, 10% e Cabe: True. O processo termina sozinho; para retomar, execute o mesmo comando. Se Python não for reconhecido, revise setup-python. O laboratório usa apenas Python local e dados fictícios, sem GPU, pacote ou API. Ele simula pesos e orçamento, não executa um LLM real.",
     "why": "Entenda o que um modelo aprende, o que acontece ao responder e por que texto convincente exige verificação.",
     "sections": [
       {
         "title": "O que estamos construindo",
         "paragraphs": [
           "Inteligência artificial é uma área ampla que inclui sistemas por regras e sistemas que aprendem padrões. Aprendizado de máquina, ou ML, ajusta um modelo a partir de exemplos: prever demanda com histórico de vendas é uma aplicação. Aprendizado profundo usa redes neurais com muitas camadas. Um grande modelo de linguagem, LLM, é um modelo dessa família treinado para trabalhar com sequências de tokens. IA generativa descreve sistemas capazes de produzir conteúdo; um classificador pode usar IA sem gerar texto longo. Esses nomes se sobrepõem, mas não são sinônimos.",
-          "Uma aplicação costuma incluir interface, código, dados, busca, modelo e validações. O modelo é um componente. Se o pedido é somar uma fatura, uma função determinística é fácil de verificar. Se o pedido é resumir linguagem variada, um modelo pode ajudar. Antes de escolher tecnologia, escreva entrada, saída e um exemplo correto. Um assistente de biblioteca pode sugerir leitura; disponibilidade de um exemplar deve vir do banco de dados."
+          "Uma aplicação costuma incluir interface, código, dados, busca, modelo e validações. O modelo é um componente. Se o pedido é somar uma fatura, uma função determinística é fácil de verificar. Se o pedido é resumir linguagem variada, um modelo pode ajudar. Antes de escolher tecnologia, escreva entrada, saída e um exemplo correto. Um assistente de biblioteca pode sugerir leitura; disponibilidade de um exemplar deve vir do banco de dados.",
+          "Pausa: classifique uma calculadora de saldo e um resumidor de relatos. Para cada um, escreva entrada, saída e como verificaria o resultado."
         ]
       },
       {
         "title": "Treinamento e inferência",
         "paragraphs": [
           "Durante o treinamento, o algoritmo compara previsões com exemplos e ajusta parâmetros numéricos para reduzir uma função de erro. Parâmetros são números aprendidos, não uma tabela confiável de fatos com fontes. Pré-treinamento costuma usar grandes coleções; etapas posteriores podem adaptar instruções e comportamento. Fine-tuning é novo treinamento de determinados parâmetros. Enviar um documento numa conversa normalmente altera o contexto daquela inferência, não os pesos. Políticas de uso de dados são uma questão separada a verificar no serviço escolhido.",
-          "Inferência utiliza parâmetros já preparados para calcular uma saída. Num modelo autoregressivo, calcula-se uma distribuição para o próximo token, escolhe-se um token e repete-se o processo. Uma regra de amostragem pode variar escolhas; temperatura modifica a distribuição usada na seleção. Temperatura menor não transforma resposta em verdade e o suporte desse parâmetro varia por modelo. Dois textos plausíveis podem nascer da mesma entrada. Testes devem verificar critérios de qualidade, não apenas igualdade literal."
+          "Inferência utiliza parâmetros já preparados para calcular uma saída. Num modelo autoregressivo, calcula-se uma distribuição para o próximo token, escolhe-se um token e repete-se o processo. Uma regra de amostragem pode variar escolhas; temperatura modifica a distribuição usada na seleção. Temperatura menor não transforma resposta em verdade e o suporte desse parâmetro varia por modelo. Dois textos plausíveis podem nascer da mesma entrada. Testes devem verificar critérios de qualidade, não apenas igualdade literal.",
+          "Pausa: preveja se anexar um texto a uma chamada muda os parâmetros treinados. Em seguida, explique o que muda naquela inferência."
         ]
       },
       {
         "title": "Tokens, contexto e memória",
         "paragraphs": [
           "Token é uma unidade do vocabulário do tokenizador: pode representar parte de palavra, palavra, pontuação ou outros segmentos. Contar palavras separadas por espaço não fornece a contagem exata de tokens de um modelo. Idioma e tokenizador influenciam o resultado. A janela de contexto limita o material considerado numa chamada; instruções, histórico, documentos e saída competem pelo orçamento conforme o provedor. Para medir de verdade, use o tokenizador ou relatório de uso correspondente.",
-          "Memória da aplicação exige armazenamento e seleção explícitos. Se um sistema lembra preferências entre sessões, algum mecanismo recuperou essas informações; não presuma que o modelo aprende permanentemente ao conversar. Histórico extenso tem custo e pode introduzir conflitos. Guarde fatos necessários, expiração e autorização. Se uma preferência for removida, retire também cópias relevantes em resumos e índices. Mais contexto não garante qualidade: trechos irrelevantes distraem e dificultam auditoria."
+          "Memória da aplicação exige armazenamento e seleção explícitos. Se um sistema lembra preferências entre sessões, algum mecanismo recuperou essas informações; não presuma que o modelo aprende permanentemente ao conversar. Histórico extenso tem custo e pode introduzir conflitos. Guarde fatos necessários, expiração e autorização. Se uma preferência for removida, retire também cópias relevantes em resumos e índices. Mais contexto não garante qualidade: trechos irrelevantes distraem e dificultam auditoria.",
+          "Pausa: conte as palavras de uma frase com split e anote por que o número obtido não é uma contagem de tokens do modelo."
         ]
       },
       {
         "title": "Probabilidade não é verdade",
         "paragraphs": [
           "O exemplo distribui pesos inventados entre três próximas palavras e calcula proporções. É uma tabela didática, não uma rede neural nem tokenizador. A palavra com maior probabilidade é a mais favorecida por esses pesos; não há evidência de que a frase seja factual. Essa distinção explica por que uma referência inventada pode parecer convincente. A aplicação deve conferir fatos contra uma fonte, pedir esclarecimento e poder informar ausência de evidência.",
-          "Um erro pode vir de fonte desatualizada, recuperação incompleta, ambiguidade ou geração sem suporte. Registre entrada, contexto usado e regra esperada. Evite interpretar uma explicação eloquente como diagnóstico comprovado. Para contas, execute contas; para estoque, consulte estoque. Uma justificativa final útil apresenta evidências e verificações breves, sem exigir acesso a raciocínio interno privado. Um resultado correto isolado não comprova que um processo é confiável."
+          "Um erro pode vir de fonte desatualizada, recuperação incompleta, ambiguidade ou geração sem suporte. Registre entrada, contexto usado e regra esperada. Evite interpretar uma explicação eloquente como diagnóstico comprovado. Para contas, execute contas; para estoque, consulte estoque. Uma justificativa final útil apresenta evidências e verificações breves, sem exigir acesso a raciocínio interno privado. Um resultado correto isolado não comprova que um processo é confiável.",
+          "Pausa: a tabela fictícia favorece estudo com 60%. Escreva uma pergunta factual que essa porcentagem não consegue responder e identifique a fonte necessária."
         ]
       },
       {
         "title": "Medir uma primeira aplicação",
         "paragraphs": [
           "Monte uma coleção de perguntas normais, ambíguas e sem resposta na base. Defina correto: fonte válida, campos obrigatórios, abstenção quando necessária. Compare uma solução simples com a baseada em modelo. Se ambas resolvem, considere custo, tempo, manutenção e risco. Guarde casos difíceis como regressão: melhorar um exemplo não pode quebrar silenciosamente outro. Repita avaliações ao trocar configuração, prompt, fontes ou modelo.",
-          "Para calcular orçamento, separe unidades de entrada, unidades de saída e preço por unidade; preços reais dependem do serviço e precisam de consulta no momento do uso. Aqui calculamos apenas unidades fictícias. Limite tamanho de entrada, número de tentativas e duração de chamadas. Ao terminar, explique por que um LLM pode ajudar a redigir resumo e ainda assim não deve determinar sozinho um saldo bancário."
+          "Para calcular orçamento, separe unidades de entrada, unidades de saída e preço por unidade; preços reais dependem do serviço e precisam de consulta no momento do uso. Aqui calculamos apenas unidades fictícias. Limite tamanho de entrada, número de tentativas e duração de chamadas. Ao terminar, explique por que um LLM pode ajudar a redigir resumo e ainda assim não deve determinar sozinho um saldo bancário.",
+          "Pausa: escreva um caso sem resposta na base e o comportamento esperado: pedir esclarecimento, consultar fonte ou declarar ausência de evidência."
         ]
       }
     ],
@@ -69,7 +74,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "1. Some pesos 2, 3 e 5 e imprima a proporção do primeiro.",
+        "prompt": "Prever: antes de executar, some os pesos 2, 3 e 5 e estime a proporção do primeiro. Depois confirme com Python. Aceite: entrada [2,3,5] → saída 0.2; explique por que a proporção não mede veracidade factual.",
         "hints": [
           "Divida 2 pela soma.",
           "Preveja o resultado antes de executar; depois compare com a saída indicada."
@@ -79,7 +84,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "Normalizar pesos não mede confiança factual."
       },
       {
-        "prompt": "2. Verifique se 800 unidades de entrada e 300 de saída cabem em 1000.",
+        "prompt": "Alterar: troque os valores do orçamento do exemplo para 800 unidades de entrada e 300 de saída, com limite 1000. Preveja antes de executar. Aceite: entrada 800 + 300, limite 1000 → saída False; descreva uma forma de reduzir o orçamento sem eliminar instruções essenciais.",
         "hints": [
           "Some antes de comparar.",
           "Preveja o resultado antes de executar; depois compare com a saída indicada."
@@ -89,7 +94,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "Reduza contexto ou reserva com avaliação; não corte instruções essenciais arbitrariamente."
       },
       {
-        "prompt": "3. Conte palavras em IA gera texto e identifique corretamente a métrica.",
+        "prompt": "Construir: conte as palavras da frase 'IA gera texto' com split e rotule a métrica corretamente. Aceite: entrada 'IA gera texto' → saída 'palavras: 3'; não apresente o resultado como contagem de tokens de um LLM.",
         "hints": [
           "Use split apenas para palavras.",
           "Preveja o resultado antes de executar; depois compare com a saída indicada."
@@ -99,7 +104,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "Essa contagem não substitui tokenização real."
       },
       {
-        "prompt": "4. Normalize pesos não negativos; trate [0,0] sem dividir por zero.",
+        "prompt": "Investigar erro: uma função que divide cada peso pelo total falha para [0,0]. Reproduza a causa e corrija para recusar total zero e peso negativo antes da divisão. Aceite: entrada [0,0] → None; entrada [1,3] → [0.25,0.75]; entrada [-1,2] → None.",
         "hints": [
           "Rejeite total não positivo.",
           "Preveja o resultado antes de executar; depois compare com a saída indicada."
