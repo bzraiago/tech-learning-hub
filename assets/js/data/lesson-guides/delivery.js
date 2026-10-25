@@ -3,29 +3,32 @@
 // Guias detalhados da trilha Integração & Entrega.
 Object.assign(LESSON_GUIDES, {
 "delivery-http": {
-    "prerequisites": "Concluir JavaScript até Fetch e saber abrir o terminal. Node.js instalado é a ferramenta de execução deste laboratório; não é necessário serviço ou conta.",
-    "setup": "Salve o exemplo como server.js, execute node server.js e abra as rotas no navegador. Para inspecionar o status, use a aba Rede do DevTools ou fetch no Console da mesma origem. Encerre com Ctrl+C.",
+    "prerequisites": "Concluir JavaScript até Fetch, saber abrir o terminal e concluir setup-node para executar Node.js. Não é necessário serviço ou conta.",
+    "setup": "Depois de setup-node, crie a pasta laboratorio-http e salve o exemplo como server.js nela. Abra o terminal nessa pasta e execute node server.js; a saída esperada é http://127.0.0.1:4178/api/estudos. No navegador, abra essa URL e as rotas /api/falha e /inexistente na mesma origem. Para inspecionar o status, use a aba Rede das ferramentas do navegador ou fetch no Console. Se node não for reconhecido, retome setup-node; se a porta estiver ocupada, escolha outra no código e use a mesma na URL. Encerre com Ctrl+C e retome com o mesmo comando na pasta. Nenhum serviço externo ou conta é necessário; em computador limitado, o servidor nativo Node evita instalar banco ou framework.",
     "why": "Uma interface bonita pode falhar quando os dados chegam em outro formato ou quando o servidor responde com erro. Um contrato explícito permite implementar, testar e discutir essas situações antes de depender de uma API remota.",
     "sections": [
       {
         "title": "O diálogo entre cliente e servidor",
         "paragraphs": [
           "O navegador é um cliente. Ele faz uma requisição com método, endereço, cabeçalhos e, quando necessário, corpo. O servidor recebe, decide e devolve uma resposta com status, cabeçalhos e corpo. HTTP descreve esse protocolo de troca; a aplicação escolhe o significado dos seus caminhos e dados. A rota /api/estudos deste laboratório devolve uma coleção; a barra inicial pertence ao caminho, e a porta 4178 identifica o processo local.",
-          "Uma URL não é por si só um banco de dados nem prova de que há persistência. Neste exemplo o array vive apenas na memória do processo Node. Quando você para o servidor, o estado volta ao valor escrito no arquivo. Antes de integrar uma interface, desenhe uma tabela com método, rota, pedido válido, resposta de sucesso e resposta de erro. Assim o contrato não muda escondido durante a implementação."
+          "Uma URL não é por si só um banco de dados nem prova de que há persistência. Neste exemplo o array vive apenas na memória do processo Node. Quando você para o servidor, o estado volta ao valor escrito no arquivo. Antes de integrar uma interface, desenhe uma tabela com método, rota, pedido válido, resposta de sucesso e resposta de erro. Assim o contrato não muda escondido durante a implementação.",
+          "Pausa de prática: desenhe cliente → GET /api/estudos → servidor → status 200 + JSON → cliente. Antes de abrir a rota, preveja quantos registros virão e o que acontecerá após reiniciar o processo."
         ]
       },
       {
         "title": "Método e status expressam intenções diferentes",
         "paragraphs": [
           "GET pede uma representação sem ser usado para criar registros; POST costuma enviar dados para processamento ou criação. O status 200 indica sucesso de leitura, 201 indica criação, 400 indica pedido inválido, 401 exige autenticação, 403 recusa uma ação autenticada, 404 indica rota ou recurso ausente e 503 indica indisponibilidade. Esses números devem acompanhar o resultado real. Não responda sempre 200 colocando apenas erro dentro do JSON.",
-          "O navegador pode mostrar uma página para 404 e outra para 503, mas ambas são falhas do contrato esperado. A API pode responder JSON com um campo erro curto para que a interface apresente uma mensagem. Erros internos detalhados pertencem ao registro do servidor; enviá-los indiscriminadamente expõe informações e confunde o usuário. Teste cada status separadamente e registre qual resposta o cliente deverá tratar."
+          "O navegador pode mostrar uma página para 404 e outra para 503, mas ambas são falhas do contrato esperado. A API pode responder JSON com um campo erro curto para que a interface apresente uma mensagem. Erros internos detalhados pertencem ao registro do servidor; enviá-los indiscriminadamente expõe informações e confunde o usuário. Teste cada status separadamente e registre qual resposta o cliente deverá tratar.",
+          "Pausa de prática: antes de acessar /api/falha e /inexistente, preveja o status e o campo erro de cada resposta. Confira os dois na aba Rede; não use apenas o texto visível na página."
         ]
       },
       {
         "title": "JSON, tipos e cabeçalhos",
         "paragraphs": [
           "JSON é uma representação textual de dados. Em nosso sucesso, a resposta é um array de objetos com id numérico e titulo textual. O cabeçalho Content-Type: application/json informa a representação. JSON.stringify transforma valores JavaScript em texto para envio; JSON.parse faz o caminho contrário. O cliente não deve assumir que qualquer resposta tem array válido: uma página de erro, um campo ausente ou um valor null exigem tratamento.",
-          "Descreva também as regras de cada campo: id positivo e único, titulo não vazio, ausência de campos sigilosos. Uma mudança de titulo para name quebra quem procura titulo mesmo que o status continue 200. Um teste de contrato verifica forma e tipos, não apenas se a URL abriu. Consumir APIs reais exige ler sua documentação, porque métodos, autenticação, paginação e limites variam."
+          "Descreva também as regras de cada campo: id positivo e único, titulo não vazio, ausência de campos sigilosos. Uma mudança de titulo para name quebra quem procura titulo mesmo que o status continue 200. Um teste de contrato verifica forma e tipos, não apenas se a URL abriu. Consumir APIs reais exige ler sua documentação, porque métodos, autenticação, paginação e limites variam.",
+          "Pausa de prática: anote o contrato [{id:number, titulo:string}] antes de ler o corpo. Depois imagine que titulo virou name; explique qual acesso do cliente deixa de funcionar apesar do status 200."
         ]
       },
       {
@@ -70,37 +73,37 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: acrescente GET /api/saude com status 200 e {\"ok\":true}.",
+        "prompt": "Prever: antes de editar, diga o status de GET /api/saude na versão inicial. Depois acrescente essa rota com status 200 e {\"ok\":true} e confira a mudança.",
         "hints": [
           "Coloque a nova condição antes do 404.",
           "Defina Content-Type JSON como nas outras rotas."
         ],
         "solution": "if (req.method === 'GET' && req.url === '/api/saude') { res.writeHead(200); res.end(JSON.stringify({ok:true})); return; }",
         "explanation": "Este trecho deve entrar no callback do servidor antes da resposta padrão.",
-        "expected": "/api/saude responde 200 com ok verdadeiro."
+        "expected": "Previsão registrada: inicialmente 404; após a alteração, /api/saude responde 200 com ok verdadeiro."
       },
       {
-        "prompt": "Complete o contrato: para /api/estudos, liste método, status, tipo de resposta e nomes/tipos de campos.",
+        "prompt": "Alterar: na tabela de contrato do laboratório, documente /api/estudos com método, status, tipo de resposta e nomes/tipos de campos. Depois mude temporariamente titulo para name no servidor e indique qual linha da tabela precisa mudar.",
         "hints": [
           "Método é GET e status 200.",
           "O corpo é array de objetos; id é número e titulo é texto."
         ],
         "solution": "GET /api/estudos; 200; Content-Type: application/json; corpo: [{id:number, titulo:string}].",
         "explanation": "Especificar tipos permite detectar mudanças incompatíveis.",
-        "expected": "Contrato tem rota, status, mídia e campos."
+        "expected": "Contrato tem rota, status, mídia e campos; a mudança temporária troca titulo:string por name:string e exige ajuste no cliente e nos testes."
       },
       {
-        "prompt": "Construa GET /api/estudos/1 que devolva apenas o primeiro item; id ausente devolve 404.",
+        "prompt": "Construir: crie GET /api/estudos/1 que devolva apenas o primeiro item; id ausente devolve 404.",
         "hints": [
           "Interprete o último segmento da URL.",
           "Procure no array antes de responder."
         ],
-        "solution": "const id = Number(req.url.match(/^/api/estudos/(d+)$/)?.[1]); if (req.method === 'GET' && id) { const item = estudos.find(e => e.id === id); res.writeHead(item ? 200 : 404); res.end(JSON.stringify(item || {erro:'Não encontrado'})); return; }",
+        "solution": "const match = req.url.match(/^\\/api\\/estudos\\/(\\d+)$/);\nif (req.method === 'GET' && match) {\n  const id = Number(match[1]);\n  const item = estudos.find(e => e.id === id);\n  res.writeHead(item ? 200 : 404);\n  res.end(JSON.stringify(item || { erro: 'Não encontrado' }));\n  return;\n}",
         "explanation": "Coloque antes da rota padrão 404. Use uma condição de caminho explícita para não aceitar entradas arbitrárias.",
         "expected": "/1 → 200 com HTML; /9 → 404."
       },
       {
-        "prompt": "Diagnostique: a interface espera dados[0].titulo, mas a API passa a enviar {items:[...]}. Descreva o defeito e duas correções possíveis.",
+        "prompt": "Investigar erro: a interface espera dados[0].titulo, mas a API passa a enviar {items:[...]}. Observe a forma real na aba Rede, descreva a divergência e proponha duas correções verificáveis.",
         "hints": [
           "Observe primeiro a forma real no painel Rede.",
           "O contrato e o cliente precisam concordar."

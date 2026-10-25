@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `js-modules`, a auditoria automática aponta 15: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. As prioridades 2 e 3 foram concluídas; a prioridade 4 reúne IA e Entrega.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `delivery-http`, a auditoria automática continua apontando 15: as cinco etapas do contrato HTTP foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 14 aulas de IA e Entrega a revisar na prioridade 4.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 15 aulas IA/Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 1 | Média | G | 14 aulas IA/Entrega ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
@@ -72,6 +72,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `delivery-http`
+
+- **Público e saída:** após JavaScript até Fetch e `setup-node`, o aluno deve executar uma API local em memória, identificar método, rota, status, cabeçalho e forma do JSON, e explicar uma incompatibilidade entre servidor e cliente.
+- **FATO, alta, M:** a solução de `Construir` para `/api/estudos/:id` tinha uma expressão regular incompleta e não era executável. Foi corrigida para reconhecer IDs numéricos e responder 200 ou 404; os dois casos foram executados em Node durante a revisão. Os exercícios agora explicitam prever, alterar, construir e investigar erro.
+- **Julgamento didático:** os cinco blocos foram mantidos porque seguem a troca HTTP do pedido ao contrato e cada um recebeu uma pausa de previsão ou observação. A contagem estrutural continua sinalizando a aula; a decisão de dividi-la depende de evidência com aluno, não apenas do número cinco.
+- **Pré-requisitos e ambiente:** `setup-node` e `js-fetch` → `delivery-http` → demais aulas de integração. O guia agora nomeia pasta, terminal, comando, saída esperada, parada, retomada e alternativa leve com servidor nativo. Sem dependência circular identificada neste recorte.
+- **Fontes:** [Node.js HTTP](https://nodejs.org/api/http.html), [MDN sobre status HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status) e [GitHub REST para repositórios](https://docs.github.com/en/rest/repos/repos) foram abertos em 24/10/2026 (fontes oficiais, EN, OK). A chamada pública ao GitHub permanece extensão opcional.
+- **Limite:** a API usa array em memória, não banco persistente. O teste manual em navegador ainda não foi executado; o progresso da aula não demonstra integração com serviço real.
 
 ### Revisão localizada: `js-modules`
 
