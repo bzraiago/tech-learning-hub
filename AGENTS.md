@@ -135,7 +135,7 @@ Os scripts são clássicos e compartilham o mesmo escopo global, carregados na o
 
 Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workflow`, `quality`, `delivery`.
 
-> Os números de referência (9 trilhas, 28 módulos, 114 aulas, 458 exercícios, 341 questões, 23 projetos) foram conferidos no código em 25/10/2026. **Confira no código antes de citá-los** e atualize `ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
+> Os números de referência (9 trilhas, 28 módulos, 114 aulas, 458 exercícios, 341 questões, 24 projetos) foram conferidos no código em 25/10/2026. **Confira no código antes de citá-los** e atualize `ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
 
 ### 5.2 Persistência e compatibilidade (cuidado máximo)
 - O progresso fica em `localStorage` na chave **`tech-learning-hub:v1`**.
@@ -256,7 +256,7 @@ Vem da análise em `ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima para baixo e
 4. [x] **Projetos de fechamento** para as trilhas Git, Qualidade e Integração (entregas de laboratório; publicação real permanece nas fases posteriores).
 5. [ ] **Sequência de backend com persistência**: interface → API → validação → regra de negócio → banco → resposta → testes → publicação.
 6. [ ] **CI, publicação e integração externa** como práticas guiadas e verificáveis (observar falha, corrigir, conferir URL final, voltar versão).
-7. [ ] Atividades gerais de conclusão (básica e intermediária) — ver seção 9.
+7. [ ] Atividades gerais de conclusão (prova básica disponível no curso; intermediária pendente) — ver seção 9.
 8. [x] Corrigir a inconsistência da porta do PostgreSQL (55432) entre laboratório Docker e projeto relacional.
 9. [ ] Dividir aulas com excesso de conceitos (a aula de funções em JavaScript já foi dividida; mapear as demais).
 10. [ ] Demonstrações visuais de execução (laços, referências, `JOIN`, requisições HTTP).

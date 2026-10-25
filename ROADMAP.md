@@ -216,7 +216,8 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Evitar que quiz de múltipla escolha seja tratado como comprovação prática: contagens separadas para conceitos, prática, revisão e problema novo, com feedback explícito.
 - [ ] Criar evidências observáveis para passagem entre os níveis 0, 1, 2, 3 e 4.
   - [x] Exibir no curso entregas e critérios de verificação para cada nível, sem confundir acompanhamento com certificação.
-  - [ ] Integrar as provas práticas ao registro de evidências quando os projetos de conclusão e as atividades de aprofundamento estiverem disponíveis.
+  - [x] Disponibilizar a prova básica com registro de entrega, rubrica e explicação, sem liberar nível automaticamente.
+  - [ ] Integrar as demais provas práticas ao registro de evidências quando os projetos de conclusão e as atividades de aprofundamento estiverem disponíveis.
 
 **Aceite:** o sistema distingue claramente leitura, prática, retenção e resolução autônoma; só `Resolvi sozinho`, com problema novo e explicação, conta como evidência de avanço.
 
@@ -229,16 +230,16 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Criar projeto de fechamento da trilha Integração e Entrega: adaptador testável, API e interface locais, falhas, novo requisito e plano de publicação.
 - [x] Garantir objetivo, pré-requisitos, entrega, checks, qualidade e mudança de requisito nos três projetos de fechamento.
 - [x] Usar checks automáticos nos contratos JavaScript de Qualidade e Integração; manter histórico Git, interface e execução local como verificações manuais identificadas.
-- [ ] Criar o projeto de nível básico “Organizador pessoal de estudos”.
-  - [ ] Interface responsiva, acessível e utilizável por teclado.
-  - [ ] Cadastro, edição, conclusão, exclusão e filtro de tarefas.
-  - [ ] Persistência e tratamento de dados inválidos.
-  - [ ] Histórico Git compreensível e README reproduzível.
-  - [ ] Testes das funções principais e roteiro manual da interface.
-  - [ ] Relatório Python lendo JSON.
-  - [ ] Modelo SQLite e consultas de progresso.
-  - [ ] Mudança simples de requisito solicitada após a entrega inicial.
-- [ ] Criar rubrica que avalie funcionamento, explicação e manutenção.
+- [x] Criar o projeto de nível básico “Organizador pessoal de estudos” com enunciado e critérios observáveis.
+  - [x] Exigir interface responsiva, acessível e utilizável por teclado.
+  - [x] Exigir cadastro, edição, conclusão, exclusão e filtro de tarefas.
+  - [x] Exigir persistência e tratamento de dados inválidos.
+  - [x] Exigir histórico Git compreensível e README reproduzível.
+  - [x] Exigir testes das funções principais e roteiro manual da interface.
+  - [x] Exigir relatório Python lendo JSON.
+  - [x] Exigir modelo SQLite e consultas de progresso.
+  - [x] Exigir mudança simples de requisito solicitada após a entrega inicial.
+- [x] Criar rubrica que avalie funcionamento, explicação e manutenção; o registro continua sendo autoavaliação, sem certificação automática.
 
 **Aceite:** outra pessoa executa o projeto pelo README e o aluno implementa uma mudança simples, explica as decisões e não consulta uma solução de referência.
 

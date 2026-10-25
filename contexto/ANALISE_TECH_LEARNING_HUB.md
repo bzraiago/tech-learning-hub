@@ -9,7 +9,7 @@
 
 O Tech Learning Hub oferece um caminho de aprendizagem real, mas ainda não está totalmente preparado para conduzir uma pessoa absolutamente leiga até uma formação intermediária autônoma usando somente suas instruções. A preparação digital inicial foi implementada em 24/10/2026; as maiores lacunas restantes estão nas instalações das ferramentas, na progressão entre assuntos e na passagem dos exercícios isolados para aplicações completas.
 
-A aplicação contém **9 trilhas, 28 módulos, 114 aulas, 458 exercícios, 341 questões e 23 projetos** (contagem atualizada em 25/10/2026 com os projetos de fechamento de Git, Qualidade e Integração). Esses números descrevem o material disponível; não medem domínio do aluno.
+A aplicação contém **9 trilhas, 28 módulos, 114 aulas, 458 exercícios, 341 questões e 24 projetos** (contagem atualizada em 25/10/2026 com a prova básica e os projetos de fechamento de Git, Qualidade e Integração). Esses números descrevem o material disponível; não medem domínio do aluno.
 
 ## O que já funciona bem
 
@@ -126,6 +126,8 @@ O resultado geral esperado é uma **formação básica consistente, com competê
 
 **Projeto: Organizador pessoal de estudos.**
 
+O enunciado e a rubrica desta prova estão disponíveis no curso. O registro no navegador é autoavaliação; a capacidade do aluno só pode ser conferida na execução e revisão independentes dos artefatos.
+
 Objetivo: construir uma ferramenta pequena e demonstrar fundamentos sem depender de uma solução pronta.
 
 Entregas obrigatórias:
@@ -173,6 +175,6 @@ A avaliação final deve combinar funcionamento, testes, explicação e manuten�
 4. Executar publicação real e recuperação após os projetos finais de Git, Qualidade e Integração.
 5. Ensinar a ligação completa entre interface, API e banco persistente.
 6. Tornar CI, publicação e integração externa práticas guiadas e verificáveis.
-7. Introduzir a conclusão básica; após as melhorias de integração, introduzir a conclusão intermediária.
+7. ~~Introduzir o enunciado da conclusão básica.~~ Concluído em 25/10/2026; após as melhorias de integração, introduzir a conclusão intermediária e verificar a prova básica com alunos reais.
 
 Essa ordem melhora mais a capacidade real de aprendizagem do que acrescentar novas trilhas neste momento.
