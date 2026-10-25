@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `html-semantic`, a auditoria automática aponta 21: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 foi concluída; as cinco aulas HTML da prioridade 3 foram revisadas.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `js-values`, a auditoria automática aponta 20: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 e as cinco aulas HTML da prioridade 3 foram concluídas; a revisão de JavaScript começou.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 6 aulas JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
+| 1 | Média | G | 5 aulas JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 2 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 3 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
@@ -73,6 +73,14 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `js-values`
+
+- **Público e saída:** após HTML básico, sem programação prévia, o aluno deve executar um script no navegador, prever valor e tipo, distinguir texto de número e reconhecer uma conversão inválida. Editor e navegador bastam; o Console é apresentado na própria preparação.
+- **FATO, alta, M:** o guia tinha cinco seções e apenas `Construir` como tipo padronizado. Agora quatro blocos separam execução, nomes, operações e conversão/comparação. Pausas curtas exigem previsão antes de executar, e os exercícios explicitam prever, alterar, construir e investigar erro. ID e exemplo principal foram preservados.
+- **Pré-requisitos:** `html-semantic` → `js-values` → `js-flow`. Nenhuma dependência circular identificada neste recorte.
+- **Fontes:** [MDN sobre gramática e tipos](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Grammar_and_types), [MDN sobre `Number.isNaN`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN) e [MDN sobre igualdade estrita](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality) foram abertas em 24/10/2026 (fontes oficiais, EN, OK). Confirmam declarações, conversão inválida e comparação sem coerção.
+- **Limite:** a aula ainda apresenta várias distinções difíceis para iniciantes; a contagem de seções não mede domínio. Uma sessão observada com aluno real deve informar se é necessário dividir a aula. O teste manual no navegador não foi executado nesta revisão.
 
 ### Revisão localizada: `html-semantic`
 

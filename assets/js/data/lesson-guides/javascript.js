@@ -12,14 +12,16 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "Um programa é uma sequência de instruções. O navegador lê o HTML e executa o JavaScript encontrado em script. Nosso script fica depois do pre: quando a instrução procura esse elemento, ele já existe. pre preserva quebras de linha. A expressão document.getElementById(\"saida\") encontra o elemento cujo id é saida; atribuir sua propriedade textContent substitui o texto mostrado. Por enquanto use essa linha como uma saída, assim como a tela de uma calculadora.",
           "Console.log(valor) seria incorreto: os nomes diferenciam maiúsculas de minúsculas. A grafia é console.log(valor). Ela registra um valor no Console das ferramentas do desenvolvedor, não na página. Abra esse painel e observe mensagens ao atualizar. Uma instrução inválida pode interromper o restante do script. Leia o primeiro erro e a linha indicada antes de alterar outras partes. Comentários começam com // até o fim da linha ou ficam entre /* e */.",
-          "O código também pode morar em app.js. Nesse caso retire as tags script do arquivo JavaScript e inclua no head do HTML \u003cscript src=\"app.js\" defer>\u003c/script>. defer adia a execução de um script clássico externo até a análise do documento terminar, mantendo a ordem entre esses scripts. Ele não tem esse efeito em script clássico inline. Aqui usaremos o script ao fim do body para manter os exemplos em um só arquivo."
+          "O código também pode morar em app.js. Nesse caso retire as tags script do arquivo JavaScript e inclua no head do HTML \u003cscript src=\"app.js\" defer>\u003c/script>. defer adia a execução de um script clássico externo até a análise do documento terminar, mantendo a ordem entre esses scripts. Ele não tem esse efeito em script clássico inline. Aqui usaremos o script ao fim do body para manter os exemplos em um só arquivo.",
+          "Pausa de prática: antes de atualizar a página, preveja em qual lugar aparecerá um console.log e em qual aparecerá uma atribuição a textContent. Execute e compare a página com o Console."
         ]
       },
       {
         "title": "Nomes para valores: const e let",
         "paragraphs": [
           "const preco = 12 cria um nome associado ao número 12. O sinal = atribui; não pergunta se duas coisas são iguais. Use nomes que expliquem o papel do dado, como quantidade, em vez de a. const exige um valor inicial e impede reatribuir esse nome. let permite reatribuição: let visitas = 0; visitas = visitas + 1; termina em 1. Evite var neste início porque suas regras de escopo são diferentes.",
-          "A expressão à direita é avaliada antes da atribuição. Portanto visitas = visitas + 1 não é uma equação matemática: lê o valor antigo, soma um e guarda o novo. Declare antes de usar. let e const são restritos ao bloco delimitado por chaves em que foram declarados; um nome criado dentro de um bloco não fica automaticamente disponível fora. Strings e números podem ser associados a um let em momentos diferentes, mas manter um significado e tipo coerentes facilita compreender o código."
+          "A expressão à direita é avaliada antes da atribuição. Portanto visitas = visitas + 1 não é uma equação matemática: lê o valor antigo, soma um e guarda o novo. Declare antes de usar. let e const são restritos ao bloco delimitado por chaves em que foram declarados; um nome criado dentro de um bloco não fica automaticamente disponível fora. Strings e números podem ser associados a um let em momentos diferentes, mas manter um significado e tipo coerentes facilita compreender o código.",
+          "Pausa de prática: escreva no papel os valores de visitas após let visitas = 0 e duas execuções de visitas = visitas + 1; depois confira no Console."
         ]
       },
       {
@@ -27,22 +29,19 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "Uma string é texto entre aspas simples, duplas ou crases. Um number representa números como 12 ou 2.5; no código a separação decimal usa ponto. Um boolean é true ou false, sem aspas. typeof valor informa uma categoria como \"number\" ou \"string\". JavaScript possui ainda bigint e symbol, que não serão necessários nestes exercícios. Objetos e arrays serão estudados em uma aula própria.",
           "Os operadores +, -, *, / e % fazem soma, subtração, multiplicação, divisão e resto. Parênteses tornam a intenção explícita: (2 + 3) * 4 resulta em 20; 2 + 3 * 4 resulta em 14. Com texto, + concatena: \"2\" + 3 resulta em \"23\". Não suponha que o computador adivinhará que você queria somar. Use números para o cálculo e transforme em texto apenas ao apresentar.",
-          "Uma template literal usa crases e insere expressões com ${expressao}: `Total: ${total}`. O trecho entre chaves é avaliado, enquanto o restante é texto. Strings oferecem recursos como trim(), que devolve uma versão sem espaços nas extremidades. Valores numéricos usam representação de ponto flutuante; algumas frações decimais não são exatas. Para estes preços simples, trabalharemos em centavos inteiros e evitaremos confundir formatação com precisão financeira."
+          "Uma template literal usa crases e insere expressões com ${expressao}: `Total: ${total}`. O trecho entre chaves é avaliado, enquanto o restante é texto. Strings oferecem recursos como trim(), que devolve uma versão sem espaços nas extremidades. Valores numéricos usam representação de ponto flutuante; algumas frações decimais não são exatas. Para estes preços simples, trabalharemos em centavos inteiros e evitaremos confundir formatação com precisão financeira.",
+          "Pausa de prática: preveja o valor e o tipo de \"2\" + 3 e de Number(\"2\") + 3. Execute no Console e localize a operação que mudou o tipo."
         ]
       },
       {
-        "title": "Ausência, conversão e valores inválidos",
+        "title": "Ausência, conversão e comparação",
         "paragraphs": [
           "undefined normalmente significa que um valor ainda não foi atribuído ou uma informação não existe. null pode representar ausência intencional, como nenhum item selecionado. São valores diferentes e ambos são diferentes de \"\", uma string existente porém vazia. typeof null devolve \"object\" por uma peculiaridade histórica; para detectar null compare diretamente com null.",
           "Number(\"3\") produz 3, mas Number(\"três\") produz NaN, um valor numérico especial que sinaliza resultado inválido. Use Number.isNaN(valor) para verificar NaN; NaN === NaN é false. Number.isFinite(valor) aceita somente números finitos, excluindo NaN e Infinity. Number(\"\") e Number(\"   \") resultam em zero. Por isso, quando vazio é inválido, verifique o texto com trim() antes de convertê-lo. Na próxima aula transformaremos essas verificações em decisões.",
-          "String(42) produz \"42\" e Boolean(0) produz false. Valores falsy são os que uma condição considera falsos: false, 0, -0, 0n, string vazia, null, undefined e NaN. Uma string contendo \"false\" ou \"0\" é truthy porque não está vazia. Conversão lógica não interpreta palavras humanas. Isso será importante quando um campo ou arquivo trouxer texto."
-        ]
-      },
-      {
-        "title": "Comparar com intenção",
-        "paragraphs": [
+          "String(42) produz \"42\" e Boolean(0) produz false. Valores falsy são os que uma condição considera falsos: false, 0, -0, 0n, string vazia, null, undefined e NaN. Uma string contendo \"false\" ou \"0\" é truthy porque não está vazia. Conversão lógica não interpreta palavras humanas. Isso será importante quando um campo ou arquivo trouxer texto.",
           "Use === para igualdade estrita e !== para diferença estrita. \"3\" === 3 é false porque os tipos diferem. == pode converter tipos antes de comparar, o que dificulta prever regras para iniciantes; prefira converter explicitamente e depois comparar com ===. Os operadores >, >=, \u003c e \u003c= expressam limites. quantidade >= 1 significa pelo menos uma unidade, incluindo o próprio valor 1.",
-          "Antes de executar um trecho, escreva sua previsão de valor e tipo. Depois compare com console.log(resultado, typeof resultado). Quando houver diferença, localize a primeira conversão ou operação que mudou sua expectativa. Essa rotina é mais útil do que apenas copiar uma saída correta: ela constrói um modelo de como a linguagem avalia cada expressão."
+          "Antes de executar um trecho, escreva sua previsão de valor e tipo. Depois compare com console.log(resultado, typeof resultado). Quando houver diferença, localize a primeira conversão ou operação que mudou sua expectativa. Essa rotina é mais útil do que apenas copiar uma saída correta: ela constrói um modelo de como a linguagem avalia cada expressão.",
+          "Pausa de prática: preveja Number(\"\"), Number(\"três\") e \"3\" === 3; execute cada expressão no Console e explique o primeiro resultado diferente da sua previsão."
         ]
       }
     ],
@@ -74,17 +73,17 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: calcule o total de dois ingressos de 1800 centavos, com a quantidade recebida como \"2\". Mostre na página.",
+        "prompt": "Prever: antes de executar, anote o total e o tipo do resultado ao multiplicar 1800 centavos por uma quantidade recebida como \"2\" depois de convertê-la. Então calcule o total de dois ingressos e mostre na página.",
         "hints": [
           "Declare preço e entrada com const.",
           "Converta com Number antes do cálculo."
         ],
         "solution": "const preco = 1800;\nconst entrada = \"2\";\nconst total = preco * Number(entrada);\ndocument.getElementById(\"saida\").textContent = `Total: ${total} centavos`;",
         "explanation": "Os dados de entrada têm papéis separados. A conversão fica explícita e a apresentação só ocorre depois de calcular. Confira também typeof total no Console.",
-        "expected": "Total: 3600 centavos."
+        "expected": "Previsão registrada antes da execução; a página mostra Total: 3600 centavos e o tipo do total é number."
       },
       {
-        "prompt": "Completar: descubra o resultado e o tipo de \"5\" + 2, Number(\"5\") + 2 e Boolean(\"false\"). Registre suas previsões antes de executar.",
+        "prompt": "Alterar: no script do exemplo, substitua temporariamente as expressões do Console por \"5\" + 2, Number(\"5\") + 2 e Boolean(\"false\"). Registre a previsão de resultado e tipo antes de executar, depois restaure o script.",
         "hints": [
           "O operador + pode concatenar.",
           "Texto não vazio é truthy, independentemente da palavra."
@@ -104,7 +103,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Total: 60; Faltam: 60; Meta atingida: false."
       },
       {
-        "prompt": "Depurar: const pontos = \"10\"; pontos = pontos + 5; deveria produzir 15. Explique os dois problemas e corrija.",
+        "prompt": "Investigar erro: const pontos = \"10\"; pontos = pontos + 5; deveria produzir 15. Leia o primeiro erro no Console, explique também o que aconteceria ao trocar apenas const por let e corrija as duas causas.",
         "hints": [
           "const não aceita reatribuição.",
           "Mudar const para let ainda deixa uma concatenação."

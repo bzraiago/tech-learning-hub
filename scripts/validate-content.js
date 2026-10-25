@@ -205,12 +205,15 @@ for (const lessonId of preparationIds) {
   }
 }
 
-const progressiveJavaScriptLessonIds = ['js-functions', 'js-scope-pure', 'js-callbacks-closures'];
+const progressiveJavaScriptLessonIds = ['js-functions', 'js-scope-pure', 'js-callbacks-closures', 'js-values'];
 for (const lessonId of progressiveJavaScriptLessonIds) {
   const guide = LESSON_GUIDES[lessonId];
   if (!guide) {
     fail(`Aula progressiva obrigatória ausente: ${lessonId}`);
     continue;
+  }
+  if (lessonId === 'js-values' && guide.sections.length > 4) {
+    fail(`Aula ${lessonId} ainda tem mais de quatro seções centrais.`);
   }
   const prompts = (guide.exercises || []).map((exercise) => exercise.prompt || '');
   for (const kind of exerciseKinds) {
