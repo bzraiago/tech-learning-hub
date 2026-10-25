@@ -68,8 +68,12 @@ function sanitizeState(candidate) {
   for(const item of READINESS_EVIDENCE)clean.readiness[item.id]=candidate.readiness?.[item.id]===true;
   if (tracks.some((track) => track.id === candidate.activeTrack)) clean.activeTrack = candidate.activeTrack;
   if (lessonIndex.has(candidate.lastLesson)) clean.lastLesson = candidate.lastLesson;
-  for (const { lesson } of lessonIndex.values()) {
+  for (const { track, module, lesson } of lessonIndex.values()) {
     if (!lesson.guide) continue;
+    if (track.modules.indexOf(module) > 0 && module.lessons[0].id === lesson.id) {
+      const key = `${lesson.id}:cumulative`;
+      if (typeof candidate.notes?.[key] === 'string') clean.notes[key] = candidate.notes[key].slice(0, 2000);
+    }
     lesson.guide.exercises.forEach((_, i) => {
       const key = `${lesson.id}:${i}`;
       if (typeof candidate.notes?.[key] === 'string') clean.notes[key] = candidate.notes[key].slice(0, 10000);
