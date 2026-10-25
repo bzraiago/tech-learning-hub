@@ -1462,7 +1462,8 @@ Object.assign(LESSON_GUIDES, {
           "O programa psql é um cliente de terminal. Fechá-lo encerra sua conexão, mas não desliga o servidor nem apaga os registros. O servidor PostgreSQL pode conter vários bancos separados; cada conexão seleciona um banco. Dentro dele, schemas agrupam objetos como tabelas. Nesta aula usamos o schema padrão de um banco recém-criado, e nomes simples em minúsculas para reduzir ambiguidades. Uma tabela chamada cursos em outro banco não é a mesma tabela deste laboratório.",
           "O comando CREATE DATABASE exige permissão para criar banco. Se ele falhar por autorização, não tente modificar usuários de um servidor compartilhado: peça um banco de treinamento ou use sua instalação local. Se a conexão falhar antes do prompt SQL, examine se o serviço iniciou e se host, porta, usuário e senha correspondem à instalação. A porta habitual é 5432, mas o instalador pode usar outra; acrescente -p seguido da porta correta quando necessário.",
           "No psql, \\dt lista tabelas e \\d cursos descreve colunas e restrições. Esses comandos são atalhos do cliente; não os coloque em uma consulta enviada pela aplicação. Já SELECT current_database() é SQL executado pelo servidor. Saber essa diferença evita procurar um defeito no banco quando apenas se usou um comando de cliente no lugar errado. Para repetir o laboratório, prefira outra base vazia em vez de apagar dados desconhecidos."
-        ]
+        ],
+        "terms": [{"term": "Schema", "meaning": "Agrupamento nomeado de objetos dentro de um banco PostgreSQL, como tabelas; não é outro banco."}]
       },
       {
         "title": "Tipos e regras formam um contrato",

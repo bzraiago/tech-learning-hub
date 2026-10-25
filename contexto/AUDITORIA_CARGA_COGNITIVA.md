@@ -101,6 +101,13 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 - **Fontes:** [Node.js HTTP](https://nodejs.org/api/http.html) e [MDN sobre HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview) foram abertas em 25/10/2026 (fontes primárias, EN, OK). O mapa representa o contrato do laboratório, não todos os detalhes da rede.
 - **Limite:** o diagrama é estático e não substitui observar uma requisição na aba Rede. Teste manual no navegador e observação com aluno ainda não foram executados.
 
+### Glossário contextual em seis conceitos
+
+- **FATO, média, P:** as definições de runtime, callback, schema, endpoint, mock e inferência estavam dispersas ou implícitas. O leitor agora mostra caixas curtas de termos nas seções correspondentes de `prep-tools`, `js-callbacks-closures`, `db-postgres`, `delivery-http` e `ai-llms`. Endpoint também é nomeado junto à rota no texto.
+- **Julgamento didático:** o termo aparece perto do exemplo que o utiliza, sem exigir navegação para um glossário separado. A definição complementa a atividade, mas não demonstra que o aluno sabe aplicá-la.
+- **Fontes:** [Node.js como ambiente de execução](https://nodejs.org/learn/getting-started/introduction-to-nodejs), [MDN sobre callback](https://developer.mozilla.org/en-US/docs/Glossary/Callback_function), [PostgreSQL sobre schemas](https://www.postgresql.org/docs/current/ddl-schemas.html) e [Google sobre inferência](https://developers.google.com/machine-learning/glossary/) foram abertos em 25/10/2026 (fontes primárias ou documentação de referência, EN, OK). Endpoint e mock são descritos pelo comportamento do laboratório, sem alegar uma definição universal.
+- **Limite:** esta etapa cobre seis termos exemplares da fase 3; outros jargões devem ser explicados ao surgirem. Teste manual no navegador e observação com aluno ainda não foram executados.
+
 ### Revisão localizada: `ai-capstone`
 
 - **Público e saída:** após `ai-data`, `ai-rag`, `ai-evals` e as aulas de fluxo, o aluno deve testar o contrato de um gerador simulado, planejar recuperação autorizada e documentar avaliação factual separada.

@@ -21,7 +21,8 @@ Object.assign(LESSON_GUIDES, {
           "Durante o treinamento, o algoritmo compara previsões com exemplos e ajusta parâmetros numéricos para reduzir uma função de erro. Parâmetros são números aprendidos, não uma tabela confiável de fatos com fontes. Pré-treinamento costuma usar grandes coleções; etapas posteriores podem adaptar instruções e comportamento. Fine-tuning é novo treinamento de determinados parâmetros. Enviar um documento numa conversa normalmente altera o contexto daquela inferência, não os pesos. Políticas de uso de dados são uma questão separada a verificar no serviço escolhido.",
           "Inferência utiliza parâmetros já preparados para calcular uma saída. Num modelo autoregressivo, calcula-se uma distribuição para o próximo token, escolhe-se um token e repete-se o processo. Uma regra de amostragem pode variar escolhas; temperatura modifica a distribuição usada na seleção. Temperatura menor não transforma resposta em verdade e o suporte desse parâmetro varia por modelo. Dois textos plausíveis podem nascer da mesma entrada. Testes devem verificar critérios de qualidade, não apenas igualdade literal.",
           "Pausa: preveja se anexar um texto a uma chamada muda os parâmetros treinados. Em seguida, explique o que muda naquela inferência."
-        ]
+        ],
+        "terms": [{"term": "Inferência", "meaning": "Uso de um modelo já treinado para produzir uma saída a partir de uma entrada; não é uma nova etapa de treinamento."}]
       },
       {
         "title": "Tokens, contexto e memória",

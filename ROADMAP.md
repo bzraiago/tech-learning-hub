@@ -184,7 +184,7 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Adicionar diagramas de referências e cópias rasas em `js-arrays` e `js-es6`.
 - [x] Adicionar visualização de consultas e `JOIN` em `db-joins`, da condição `ON` ao resultado e à contagem.
 - [x] Adicionar sequência visual de uma requisição HTTP em `delivery-http`, com método, rota, decisão do servidor, status, cabeçalho e corpo.
-- [ ] Criar glossário contextual para termos como runtime, schema, callback, endpoint, mock e inferência.
+- [x] Criar glossário contextual nas seções que introduzem runtime, schema, callback, endpoint, mock e inferência.
 
 **Aceite:** cada aula alterada permite prever antes de executar, observar o resultado esperado, praticar com ajuda decrescente e resolver uma tarefa nova.
 
