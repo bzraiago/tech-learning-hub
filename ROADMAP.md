@@ -205,6 +205,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] JavaScript: quatorze casos novos, da lógica e funções até DOM, armazenamento, requisições e módulos.
   - [x] Python: doze casos novos, dos tipos e coleções até arquivos, testes e consumo de serviços.
   - [x] Banco de dados: 24 casos novos, de modelagem e SQL a operação, segurança e recuperação.
+  - [x] Git e fluxo de trabalho: seis casos novos, do primeiro commit à revisão de mudança.
   - [ ] Expandir as segundas tentativas para as demais aulas.
 - [ ] Exigir explicação das decisões nas provas de nível.
 - [ ] Evitar que quiz de múltipla escolha seja tratado como comprovação prática.

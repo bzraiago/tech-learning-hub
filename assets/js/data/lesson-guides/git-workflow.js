@@ -861,3 +861,41 @@ Object.assign(LESSON_GUIDES, {
     ]
   }
 });
+
+// Recuperação após o quiz: novas situações com resultado verificável.
+(() => {
+  const retries = {
+    "git-start": {
+      prompt: "Em uma pasta de laboratório, crie plano.txt e rascunho.txt. Faça um commit apenas de plano.txt. Antes e depois, anote a raiz do repositório e o que git status mostra para cada arquivo.",
+      expected: "O commit contém só plano.txt; rascunho.txt continua fora do histórico; a raiz conferida é a pasta do laboratório e o status final confirma a separação.",
+      hint: "Confira a pasta atual e a raiz do Git antes de adicionar; inspecione o staging antes do commit."
+    },
+    "git-history": {
+      prompt: "Num repositório descartável, faça um commit que adiciona uma linha a agenda.txt e outro que adiciona uma linha a ideias.txt. Descubra qual commit alterou ideias.txt e desfaça seu efeito preservando o histórico.",
+      expected: "O histórico mostra os dois commits originais e o commit de reversão; agenda.txt mantém sua linha e ideias.txt volta ao conteúdo anterior.",
+      hint: "Inspecione log e diff do commit específico antes de usar revert; confirme o diff final."
+    },
+    "git-branches": {
+      prompt: "Crie uma branch para mudar a mensagem de boas-vindas de uma página. Enquanto isso, na branch principal, acrescente um rodapé em outra linha. Integre as mudanças e verifique a página resultante.",
+      expected: "A página final contém a nova mensagem e o rodapé; o histórico registra a integração; uma abertura no navegador confirma que ambas as mudanças funcionam.",
+      hint: "Compare as branches antes de integrar e teste o resultado mesmo quando o merge não relata conflito."
+    },
+    "git-remote": {
+      prompt: "Use dois clones de um repositório de laboratório. Publique uma alteração no clone A, faça apenas fetch no clone B e compare main com origin/main antes de integrar.",
+      expected: "No clone B, origin/main aponta para o commit recebido enquanto main permanece no commit anterior; após integração segura, ambos apontam para o mesmo trabalho.",
+      hint: "Leia o log das duas referências depois do fetch; não use push forçado para resolver divergência."
+    },
+    "git-requirements": {
+      prompt: "Uma issue diz 'a busca deve ser rápida e funcionar bem'. Reescreva o pedido para uma lista de estudos com critérios de aceite observáveis, incluindo lista vazia, erro de entrada e uso por teclado. Acrescente instruções de teste no README.",
+      expected: "Cada critério descreve entrada, ação e resultado que outra pessoa pode conferir; o README permite iniciar e testar o projeto sem depender de explicação oral.",
+      hint: "Troque adjetivos vagos por comportamento, dados de exemplo e condições de teste."
+    },
+    "git-review": {
+      prompt: "Uma mudança adiciona botão de excluir tarefa. Escreva a descrição de um PR com intenção e roteiro de teste. Revise um caso em que o filtro está ativo, peça uma correção e registre a nova verificação.",
+      expected: "A revisão identifica se o botão exclui a tarefa correta sob filtro; a descrição inclui passos reproduzíveis; depois da correção há evidência de reteste, não apenas 'resolvido'.",
+      hint: "Revise comportamento e identidade da tarefa além do estilo do código."
+    }
+  };
+
+  for (const [id, retry] of Object.entries(retries)) LESSON_GUIDES[id].retry = retry;
+})();
