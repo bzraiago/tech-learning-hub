@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `delivery-http`, a auditoria automática continua apontando 15: as cinco etapas do contrato HTTP foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 14 aulas de IA e Entrega a revisar na prioridade 4.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de `delivery-http` e `delivery-forms`, a auditoria automática continua apontando 15: as cinco etapas de cada aula foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 13 aulas de IA e Entrega a revisar na prioridade 4.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 14 aulas IA/Entrega ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 1 | Média | G | 13 aulas IA/Entrega ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
@@ -72,6 +72,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `delivery-forms`
+
+- **Público e saída:** após `delivery-http`, `setup-node` e Fetch, o aluno deve enviar um formulário à API local, interpretar 201 e 400, consultar a lista e explicar estados da interface.
+- **FATO, alta, M:** um exercício exigia `GET /api/estudos`, ausente do servidor de exemplo. A rota foi implementada com resposta 200 e array JSON. A tarefa de título numérico agora verifica status e tamanho da lista antes e depois. Os exercícios cobrem prever, alterar, construir e investigar erro.
+- **Julgamento didático:** as cinco seções foram mantidas porque seguem fases distintas do envio, estado, leitura da resposta, validação e observação. Pausas entre elas exigem previsão ou inspeção. A contagem estrutural continua sinalizando a aula para observação com aluno.
+- **Pré-requisitos e ambiente:** `setup-node`, `delivery-http` e `js-fetch` → `delivery-forms`. O guia identifica pasta, terminal, comando, saída, parada e retomada, com servidor nativo sem instalação de pacote adicional.
+- **Fontes:** [MDN sobre Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch), [Node.js HTTP](https://nodejs.org/api/http.html) e [MDN sobre 201](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/201) foram abertas em 24/10/2026 (fontes oficiais, EN, OK).
+- **Limite:** os dados continuam em memória. O laboratório foi verificado por simulação das requisições em Node; navegação manual, teclado e largura de celular ainda não foram testados nesta revisão.
 
 ### Revisão localizada: `delivery-http`
 

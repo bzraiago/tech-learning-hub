@@ -167,36 +167,40 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "delivery-forms": {
-    "prerequisites": "Ter executado a aula HTTP, saber manipular DOM e usar async/await.",
-    "setup": "Pare o servidor anterior, salve este exemplo como server.js e execute node server.js. Abra http://127.0.0.1:4178/. Use Rede para ver POST e Console para inspecionar erros.",
+    "prerequisites": "Concluir delivery-http e a preparação setup-node; saber manipular DOM e usar async/await (revisar js-fetch se necessário).",
+    "setup": "Na pasta da aula, pare o servidor anterior com Ctrl+C no terminal. Salve o exemplo como server.js nessa pasta e execute node server.js no terminal; a saída esperada é Abra http://127.0.0.1:4178/. Abra esse endereço no navegador e use a aba Rede para observar GET e POST. Para retomar, execute o mesmo comando; se a porta estiver ocupada, encerre o processo anterior. O exemplo usa o servidor nativo do Node.js, sem pacote adicional.",
     "why": "Uma integração real não termina quando Fetch retorna. O usuário precisa saber se o pedido está sendo enviado, se foi aceito, se falhou e se pode tentar outra vez.",
     "sections": [
       {
         "title": "Do formulário à requisição",
         "paragraphs": [
           "A interface lê o texto, remove espaços externos e interrompe o envio vazio. Em seguida transforma {titulo:valor} em JSON, anuncia application/json e faz POST para a rota local. Como a página e a API são servidas pela mesma origem, este laboratório não depende de configuração CORS. O corpo representa uma intenção; o servidor é quem decide se a criação é válida.",
-          "O valor de um input é sempre texto. Mesmo que o controle limite o tamanho, outro cliente pode enviar um corpo inválido diretamente para a API. Por isso a validação do servidor repete as regras essenciais. O navegador oferece orientação imediata; a API protege seu próprio contrato. Este exemplo usa uma lista em memória e não pretende guardar dados após reiniciar."
+          "O valor de um input é sempre texto. Mesmo que o controle limite o tamanho, outro cliente pode enviar um corpo inválido diretamente para a API. Por isso a validação do servidor repete as regras essenciais. O navegador oferece orientação imediata; a API protege seu próprio contrato. Este exemplo usa uma lista em memória e não pretende guardar dados após reiniciar.",
+          "Pausa: antes de executar, preveja o que acontece se o campo contiver apenas espaços. Depois compare a previsão com a aba Rede."
         ]
       },
       {
         "title": "Estados visíveis e ação coerente",
         "paragraphs": [
           "Antes de aguardar a rede, o parágrafo com role=status anuncia “Salvando…”. Quando a resposta é aceita, o item aparece e surge confirmação. Quando há erro, a mensagem fica visível. Em uma versão maior, acrescente uma variável enviando e desabilite temporariamente o botão para não criar dois registros por cliques repetidos; restaure no finally. Não remova o texto digitado em caso de falha, pois ele ajuda a tentar novamente.",
-          "A lista mostra o valor recebido do servidor por textContent. Inserir texto do usuário com innerHTML pode transformar caracteres em marcação e abrir caminho para injeção. Estados vazios também merecem mensagem: se GET retorna [], mostre “Nenhum estudo cadastrado”. A interface é uma máquina de estados pequena: pronto, validando, enviando, sucesso ou erro. Cada transição deve deixar a ação seguinte compreensível."
+          "A lista mostra o valor recebido do servidor por textContent. Inserir texto do usuário com innerHTML pode transformar caracteres em marcação e abrir caminho para injeção. Estados vazios também merecem mensagem: se GET retorna [], mostre “Nenhum estudo cadastrado”. A interface é uma máquina de estados pequena: pronto, validando, enviando, sucesso ou erro. Cada transição deve deixar a ação seguinte compreensível.",
+          "Pausa: desenhe as transições ao enviar um título válido e ao desligar o servidor durante o envio. Em qual estado o botão deve voltar a ficar disponível?"
         ]
       },
       {
         "title": "Fetch resolve em muitos erros HTTP",
         "paragraphs": [
           "Fetch normalmente rejeita a Promise em falhas de rede, mas um status 400 ou 500 produz um objeto Response. Por isso o código lê o corpo, verifica resposta.ok e lança um erro com mensagem apropriada. Não confunda resposta.json() com sucesso da operação: JSON pode conter uma descrição de falha. O servidor envia 201 quando registra o item e 400 quando o título é inválido.",
-          "Mesmo a leitura do JSON pode falhar se o servidor responder HTML inesperado ou corpo malformado. O catch lida com essa falha, porém a mensagem técnica pode não ser adequada ao usuário; em produção, traduza a falha para orientação clara e registre detalhes no ambiente de diagnóstico. Considere tempos longos, indisponibilidade e reenvio deliberado; não presuma que rede local equivale a rede confiável."
+          "Mesmo a leitura do JSON pode falhar se o servidor responder HTML inesperado ou corpo malformado. O catch lida com essa falha, porém a mensagem técnica pode não ser adequada ao usuário; em produção, traduza a falha para orientação clara e registre detalhes no ambiente de diagnóstico. Considere tempos longos, indisponibilidade e reenvio deliberado; não presuma que rede local equivale a rede confiável.",
+          "Pausa: preveja se um POST que recebe 400 entra no catch sem verificar resposta.ok. Confirme a resposta na aba Rede."
         ]
       },
       {
         "title": "Validação e limites do laboratório",
         "paragraphs": [
           "O servidor aceita título textual não vazio com até sessenta caracteres depois de trim. Responde 400 com erro caso contrário. Isso já cria um contrato testável: título “  HTML  ” vira “HTML”; título de espaços é recusado. Exercite chamadas inválidas pelo Console ou por script para comprovar que não depende só da interface. Uma regra de negócio pertence à API quando protege dados compartilhados.",
-          "O exemplo mantém dados só em memória. O próximo passo para um produto é adicionar persistência, autenticação quando houver contas e tratamento de concorrência. Não substitua essas responsabilidades por localStorage achando que um serviço remoto passou a existir. LocalStorage serve ao navegador atual; a API é acessível a clientes diferentes e precisa tratar seus próprios erros e segurança."
+          "O exemplo mantém dados só em memória. O próximo passo para um produto é adicionar persistência, autenticação quando houver contas e tratamento de concorrência. Não substitua essas responsabilidades por localStorage achando que um serviço remoto passou a existir. LocalStorage serve ao navegador atual; a API é acessível a clientes diferentes e precisa tratar seus próprios erros e segurança.",
+          "Pausa: envie um título numérico diretamente pelo Console e observe status, corpo e quantidade de itens antes e depois."
         ]
       },
       {
@@ -209,18 +213,22 @@ Object.assign(LESSON_GUIDES, {
     ],
     "example": {
       "language": "js",
-      "code": "// Salve como server.js e execute: node server.js\nconst http = require('node:http');\nconst html = String.raw`\u003c!doctype html>\u003chtml lang=\"pt-BR\">\u003cmeta charset=\"utf-8\">\u003ctitle>Cadastro local\u003c/title>\n\u003clabel>Título \u003cinput id=\"titulo\" maxlength=\"60\">\u003c/label>\u003cbutton id=\"salvar\">Salvar\u003c/button>\n\u003cp id=\"estado\" role=\"status\">Pronto\u003c/p>\u003cul id=\"lista\">\u003c/ul>\n\u003cscript>\nconst titulo = document.querySelector('#titulo');\nconst estado = document.querySelector('#estado');\nconst lista = document.querySelector('#lista');\ndocument.querySelector('#salvar').addEventListener('click', async () => {\n  const valor = titulo.value.trim();\n  if (!valor) { estado.textContent = 'Informe um título.'; titulo.focus(); return; }\n  estado.textContent = 'Salvando…';\n  try {\n    const resposta = await fetch('/api/estudos', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({titulo:valor}) });\n    const dados = await resposta.json();\n    if (!resposta.ok) throw new Error(dados.erro || 'Falha ao salvar');\n    const item = document.createElement('li'); item.textContent = dados.titulo; lista.append(item);\n    titulo.value = ''; estado.textContent = 'Salvo com sucesso.';\n  } catch (erro) { estado.textContent = erro.message; }\n});\n\u003c/script>\u003c/html>`;\nconst dados = [];\nhttp.createServer((req, res) => {\n  if (req.method === 'GET' && req.url === '/') { res.writeHead(200, {'Content-Type':'text/html; charset=utf-8'}); res.end(html); return; }\n  if (req.method === 'POST' && req.url === '/api/estudos') {\n    let corpo = '';\n    req.on('data', trecho => { corpo += trecho; if (corpo.length > 4096) req.destroy(); });\n    req.on('end', () => {\n      let titulo;\n      try { titulo = JSON.parse(corpo).titulo; } catch { titulo = null; }\n      res.setHeader('Content-Type', 'application/json; charset=utf-8');\n      if (typeof titulo !== 'string' || !titulo.trim() || titulo.trim().length > 60) {\n        res.writeHead(400); res.end(JSON.stringify({erro:'Título inválido'})); return;\n      }\n      const registro = {id:dados.length + 1, titulo:titulo.trim()}; dados.push(registro);\n      res.writeHead(201); res.end(JSON.stringify(registro));\n    }); return;\n  }\n  res.writeHead(404); res.end('Não encontrado');\n}).listen(4178, '127.0.0.1', () => console.log('Abra http://127.0.0.1:4178/'));",
+      "code": "// Salve como server.js e execute: node server.js\nconst http = require('node:http');\nconst html = String.raw`\u003c!doctype html>\u003chtml lang=\"pt-BR\">\u003cmeta charset=\"utf-8\">\u003ctitle>Cadastro local\u003c/title>\n\u003clabel>Título \u003cinput id=\"titulo\" maxlength=\"60\">\u003c/label>\u003cbutton id=\"salvar\">Salvar\u003c/button>\n\u003cp id=\"estado\" role=\"status\">Pronto\u003c/p>\u003cul id=\"lista\">\u003c/ul>\n\u003cscript>\nconst titulo = document.querySelector('#titulo');\nconst estado = document.querySelector('#estado');\nconst lista = document.querySelector('#lista');\ndocument.querySelector('#salvar').addEventListener('click', async () => {\n  const valor = titulo.value.trim();\n  if (!valor) { estado.textContent = 'Informe um título.'; titulo.focus(); return; }\n  estado.textContent = 'Salvando…';\n  try {\n    const resposta = await fetch('/api/estudos', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({titulo:valor}) });\n    const dados = await resposta.json();\n    if (!resposta.ok) throw new Error(dados.erro || 'Falha ao salvar');\n    const item = document.createElement('li'); item.textContent = dados.titulo; lista.append(item);\n    titulo.value = ''; estado.textContent = 'Salvo com sucesso.';\n  } catch (erro) { estado.textContent = erro.message; }\n});\n\u003c/script>\u003c/html>`;\nconst dados = [];\nhttp.createServer((req, res) => {\n  if (req.method === 'GET' && req.url === '/') { res.writeHead(200, {'Content-Type':'text/html; charset=utf-8'}); res.end(html); return; }\n  if (req.method === 'GET' && req.url === '/api/estudos') { res.writeHead(200, {'Content-Type':'application/json; charset=utf-8'}); res.end(JSON.stringify(dados)); return; }\n  if (req.method === 'POST' && req.url === '/api/estudos') {\n    let corpo = '';\n    req.on('data', trecho => { corpo += trecho; if (corpo.length > 4096) req.destroy(); });\n    req.on('end', () => {\n      let titulo;\n      try { titulo = JSON.parse(corpo).titulo; } catch { titulo = null; }\n      res.setHeader('Content-Type', 'application/json; charset=utf-8');\n      if (typeof titulo !== 'string' || !titulo.trim() || titulo.trim().length > 60) {\n        res.writeHead(400); res.end(JSON.stringify({erro:'Título inválido'})); return;\n      }\n      const registro = {id:dados.length + 1, titulo:titulo.trim()}; dados.push(registro);\n      res.writeHead(201); res.end(JSON.stringify(registro));\n    }); return;\n  }\n  res.writeHead(404); res.end('Não encontrado');\n}).listen(4178, '127.0.0.1', () => console.log('Abra http://127.0.0.1:4178/'));",
       "explanation": [
         "O mesmo processo serve a página e o endpoint para evitar configuração adicional.",
         "O cliente mantém estados claros e usa textContent na lista.",
-        "O servidor valida independentemente e responde 201 ou 400."
+        "O servidor valida independentemente, responde 201 ou 400 no POST e devolve a lista em GET /api/estudos."
       ],
-      "expected": "Título vazio: “Informe um título.” e nenhum POST. Título HTML: POST 201, lista ganha HTML e aparece “Salvo com sucesso.”"
+      "expected": "GET /api/estudos antes de cadastrar: 200 e []. Título vazio: “Informe um título.” e nenhum POST. Título HTML: POST 201, lista ganha HTML e aparece “Salvo com sucesso.”; novo GET retorna o registro."
     },
     "guided": [
       {
         "instruction": "Envie um título válido e observe a aba Rede.",
         "result": "POST /api/estudos, corpo JSON, status 201."
+      },
+      {
+        "instruction": "No Console, consulte fetch('/api/estudos').then(r => r.json()).then(console.log) antes e depois do cadastro.",
+        "result": "Antes: []; depois: array com o registro criado."
       },
       {
         "instruction": "Envie espaços apenas.",
@@ -233,7 +241,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: desabilite o botão durante o POST e reabilite ao terminar, com sucesso ou falha.",
+        "prompt": "Prever: se você clicar duas vezes rapidamente em Salvar, quantos registros podem surgir? Depois altere o código para desabilitar o botão durante o POST e reabilitá-lo ao terminar, com sucesso ou falha. Aceite: um clique repetido não cria outro registro; entrada: HTML; saída: um item HTML e botão disponível ao final.",
         "hints": [
           "Guarde referência ao botão.",
           "Use finally para a restauração."
@@ -243,27 +251,27 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Enquanto aguarda, botão indisponível; ao terminar, disponível."
       },
       {
-        "prompt": "Complete o estado vazio de uma lista GET: diferencie [] de falha da requisição.",
+        "prompt": "Alterar: consulte GET /api/estudos ao abrir a página e mostre uma mensagem para a lista vazia. Diferencie [] de falha da requisição. Aceite: entrada [] → Nenhum estudo cadastrado; erro HTTP → Falha ao carregar.",
         "hints": [
           "Confira resposta.ok antes de usar os dados.",
           "Array vazio é sucesso."
         ],
-        "solution": "const resposta = await fetch('/api/estudos'); if (!resposta.ok) throw new Error('Falha ao carregar'); const itens = await resposta.json(); estado.textContent = itens.length ? 'Estudos carregados.' : 'Nenhum estudo cadastrado.';",
+        "solution": "(async () => { try { const resposta = await fetch('/api/estudos'); if (!resposta.ok) throw new Error('Falha ao carregar'); const itens = await resposta.json(); estado.textContent = itens.length ? 'Estudos carregados.' : 'Nenhum estudo cadastrado.'; } catch { estado.textContent = 'Falha ao carregar.'; } })();",
         "explanation": "Uma resposta válida com zero itens não é erro de rede.",
         "expected": "[] mostra mensagem de vazio, não falha."
       },
       {
-        "prompt": "Construa uma verificação no servidor para recusar um corpo JSON que tenha titulo numérico. Escreva a resposta esperada.",
+        "prompt": "Construir: no Console da página, escreva uma verificação que envie {titulo:123} à API e compare a quantidade de estudos antes e depois. Aceite: POST retorna 400 com erro e a lista não cresce; entrada: título numérico 123; saída: erro Título inválido.",
         "hints": [
           "A rota já faz typeof titulo.",
           "Teste com fetch usando body JSON.stringify({titulo:123})."
         ],
-        "solution": "fetch('/api/estudos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({titulo:123})}).then(async r => console.log(r.status, await r.json()));",
+        "solution": "(async () => { const antes = await (await fetch('/api/estudos')).json(); const resposta = await fetch('/api/estudos', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({titulo:123})}); const erro = await resposta.json(); const depois = await (await fetch('/api/estudos')).json(); console.assert(resposta.status === 400 && depois.length === antes.length, 'Recusa ou lista divergente'); console.log(resposta.status, erro); })().catch(console.error);",
         "explanation": "Execute no Console da página local; a proteção está no servidor.",
         "expected": "400 e {erro:\"Título inválido\"}; nada é adicionado."
       },
       {
-        "prompt": "Depure o caso em que o servidor retorna 400 com JSON, mas a UI diz sucesso. Indique a linha lógica ausente e corrija.",
+        "prompt": "Investigar erro: o servidor retorna 400 com JSON, mas a UI diz sucesso. Localize a verificação ausente, corrija e confirme que a lista não muda. Aceite: entrada {titulo:123} → mensagem de erro e nenhum item novo.",
         "hints": [
           "Fetch não rejeita automaticamente por 400.",
           "Leia o corpo e verifique ok."
