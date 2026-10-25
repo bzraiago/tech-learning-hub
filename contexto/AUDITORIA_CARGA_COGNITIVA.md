@@ -80,6 +80,13 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 - **Fontes:** [MDN sobre `for`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for) e [MDN sobre `while`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/while) foram abertas em 25/10/2026 (documentação de referência, EN, OK).
 - **Limite:** as tabelas mostram casos fixos, não uma execução interativa. A compreensão e a transferência para outro laço dependem da atividade do aluno; teste manual no navegador e observação com aluno ainda não foram executados.
 
+### Diagramas de referências: `js-arrays` e `js-es6`
+
+- **FATO, média, P:** as aulas descreviam o compartilhamento de referências e pediam um desenho, mas o leitor não mostrava nenhum. Foram adicionados mapas textuais com setas para alias, `slice()` e spread de objeto com propriedade aninhada, seguidos de previsões sobre mutação.
+- **Pré-requisitos:** `js-functions` e `js-callbacks-closures` → `js-arrays` → `js-es6`; editor e Console do navegador já são preparados nas aulas.
+- **Fontes:** [MDN sobre `slice()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) e [MDN sobre spread](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) foram abertas em 25/10/2026 (documentação de referência, EN, OK). Ambas descrevem a cópia rasa usada nos exemplos.
+- **Limite:** os mapas representam apenas os objetos do exemplo e usam texto rolável para preservar a leitura por teclado. Resultado com aluno e teste visual manual no navegador ainda não foram observados.
+
 ### Revisão localizada: `ai-capstone`
 
 - **Público e saída:** após `ai-data`, `ai-rag`, `ai-evals` e as aulas de fluxo, o aluno deve testar o contrato de um gerador simulado, planejar recuperação autorizada e documentar avaliação factual separada.

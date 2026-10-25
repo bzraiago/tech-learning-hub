@@ -573,8 +573,11 @@ Object.assign(LESSON_GUIDES, {
           "Primitivos como números são copiados por valor em atribuições. Objetos e arrays são acessados por referências: const copia = original associa outro nome ao mesmo array, sem duplicá-lo. Se copia.push(10) acrescenta um item, original também passa a mostrar esse item. const impede reatribuir o nome, mas não congela o conteúdo do objeto associado.",
           "push adiciona no fim e pop remove o último item. splice pode remover ou inserir posições e modifica o próprio array; slice cria um novo array com uma faixa, sem modificar o original. original.slice() copia todas as posições. Essa cópia é rasa: se os itens forem objetos, ambos os arrays ainda apontam para os mesmos objetos internos. Na próxima aula veremos spread e cópias de objetos.",
           "Escolha conscientemente se uma operação altera a entrada. Quando uma função calcula um relatório, normalmente é mais previsível preservar o catálogo recebido. Você pode construir objetos novos em map para transformar propriedades. Copiar apenas o array e depois escrever copia[0].preco = 0 ainda altera o objeto compartilhado no original.",
-          "Mapa de referências: original → array A → objeto X; alias → array A → objeto X; original.slice() → array B → objeto X. Desenhe essas três setas antes de prever qual alteração fica visível por mais de um nome. Depois confira no Console com um catálogo pequeno."
-        ]
+          "Mapa de referências: original → array A → objeto X; alias → array A → objeto X; original.slice() → array B → objeto X. Desenhe essas três setas antes de prever qual alteração fica visível por mais de um nome. Depois confira no Console com um catálogo pequeno.",
+          "No mapa abaixo, preveja antes de executar: alias.push({ nome: \"Pasta\" }) muda o comprimento de copia? E copia[0].nome = \"Lápis\" muda o primeiro objeto visto por original? Confira as duas respostas no Console."
+        ],
+        "diagramTitle": "Referências compartilhadas e cópia rasa de array",
+        "diagram": "const original = [{ nome: \"Caneta\" ];\nconst alias = original;\nconst copia = original.slice();\n\noriginal ──┐\n           ├──→ array A ──→ objeto X { nome: \"Caneta\" }\nalias ────┘                       ↑\ncopia ────────→ array B ──────────┘\n\npush em alias altera array A; copia continua com 1 item.\nAlterar copia[0].nome altera objeto X, visto por ambos os arrays."
       },
       {
         "title": "Percorrer e transformar",
@@ -735,7 +738,9 @@ Object.assign(LESSON_GUIDES, {
           "A cópia é rasa. Se perfil contém preferencias: { tema:\"escuro\" }, a cópia do perfil continua apontando para o mesmo objeto preferencias. Para mudar tema preservando o original, copie também esse nível: { ...perfil, preferencias: { ...perfil.preferencias, tema:\"claro\" } }. Isso não é necessário para propriedades primitivas, mas é essencial quando a alteração chega a objetos aninhados.",
           "Em uma chamada, Math.max(...tempos) passa cada item como argumento separado. Não use spread indiscriminadamente em coleções enormes para chamadas de função, porque há limites de quantidade de argumentos. Um reduce pode ser mais apropriado nesse cenário. Nesta aula usamos listas pequenas e foco na clareza sobre o que foi copiado e o que permaneceu compartilhado.",
           "Pausa de prática: desenhe original → preferencias e copia → preferencias antes de executar const copia = { ...original }. Se alterar copia.preferencias.tema, preveja o tema no original e confira no Console."
-        ]
+        ],
+        "diagramTitle": "Dois objetos externos compartilham o mesmo objeto interno",
+        "diagram": "const original = { preferencias: { tema: \"escuro\" } };\nconst copia = { ...original };\n\noriginal ──→ objeto A ──┐\n                       ├──→ preferencias P { tema: \"escuro\" }\ncopia ────→ objeto B ──┘\n\ncopia.preferencias.tema = \"claro\";\noriginal.preferencias.tema também é \"claro\".\nPara isolar, copie preferencias ao criar o novo objeto."
       },
       {
         "title": "Dados opcionais: ?. e ??",
