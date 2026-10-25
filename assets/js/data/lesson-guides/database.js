@@ -2792,52 +2792,38 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "db-recovery": {
-    "prerequisites": "Revise SQLite com Python, transações e constraints. Saiba abrir uma conexão e executar consultas antes de experimentar cópias e mudanças de estrutura.",
-    "setup": "Use Python 3. O laboratório mantém origem e cópia em bancos SQLite separados na memória, evitando sobrescrever arquivos reais. Depois você poderá trocar :memory: por nomes novos de arquivos de teste para verificar persistência em disco.",
+    "prerequisites": "Conclua setup-python, db-ddl-constraints e db-transactions. Saiba abrir SQLite com Python, executar consultas e distinguir COMMIT de ROLLBACK antes de experimentar cópias e mudanças de estrutura.",
+    "setup": "No editor, crie uma pasta nova de laboratório e salve o exemplo em recovery_lab.py. No terminal aberto nessa pasta, confirme python --version e execute python recovery_lab.py. O exemplo mantém origem e cópia em bancos SQLite separados na memória, portanto não sobrescreve arquivos reais e desaparece ao encerrar. Para praticar persistência depois, use dois nomes novos dentro da pasta, nunca o caminho de um banco importante; a API de backup substitui o conteúdo do destino. Pare com Ctrl+C se o processo não terminar e retome com uma pasta de laboratório limpa.",
     "why": "Uma cópia nunca aberta pode estar vazia ou impossível de restaurar. Recuperação significa demonstrar que dados e regras voltam a funcionar em outro ambiente dentro de um prazo conhecido, não apenas afirmar que um arquivo existe.",
     "sections": [
       {
-        "title": "Perda e prazo precisam de números",
+        "title": "Defina perda, prazo e conteúdo protegido",
         "paragraphs": [
           "RPO é o limite de perda aceitável medido no tempo. Se você aceita perder no máximo uma hora de alterações, um backup diário isolado não satisfaz a meta. RTO é o tempo máximo planejado para restabelecer o serviço. Uma cópia que leva dois dias para restaurar não atende um RTO de uma hora.",
-          "Essas metas influenciam frequência de backup, retenção, automação e estratégias por logs. Não existe frequência universal correta. Para um laboratório pessoal, comece com uma cópia antes de mudar a estrutura e um teste de restauração. Para um serviço compartilhado, registre requisitos e ensaie com volume representativo."
+          "Essas metas orientam frequência, retenção, automação e uso de logs; não existe frequência universal. Defina também o que a cópia inclui: esquema, dados, índices, regras e configuração necessária. Réplica pode repetir uma exclusão acidental, e CSV geralmente não recria constraints e relações; nenhum deles substitui automaticamente um backup histórico testado."
         ]
       },
       {
-        "title": "Cópia consistente e teste independente",
+        "title": "Faça uma cópia consistente e teste o destino",
         "paragraphs": [
           "Copiar um arquivo de banco em uso sem conhecer seu modo de operação pode ignorar arquivos auxiliares ou produzir estado inconsistente. A API backup do SQLite coordena a cópia através do motor. Neste exemplo, origem.backup(copia) copia para outra conexão após confirmarmos a carga inicial.",
-          "O teste deve consultar o destino. Repetir a leitura da origem não demonstra que a cópia funciona. Compare quantidade, valores relevantes e regras de integridade. Contagens iguais não detectam todo problema: dois bancos podem conter três linhas diferentes. Inclua consultas de domínio e tentativas controladas de dados inválidos."
+          "O teste precisa consultar o destino: comparar somente a origem não demonstra recuperação. Valide quantidade, título conhecido e rejeição de um valor NULL. Contagens iguais não bastam. PRAGMA integrity_check normalmente devolve ok quando não encontra problemas; foreign_key_check vazio indica ausência de violações de referência. Essas verificações técnicas ainda precisam ser combinadas com consultas do domínio.",
+          "O backup em memória demonstra consistência e isolamento, mas desaparece com o processo. Para comprovar durabilidade, use dois arquivos novos na pasta, feche as conexões e abra o destino em outra execução. Registre horário da cópia, último dado recuperado e duração: um arquivo íntegro pode estar antigo demais para o RPO."
         ]
       },
       {
-        "title": "Migração é mudança versionada",
+        "title": "Ensaie restauração, retenção e acesso",
         "paragraphs": [
-          "Migrações modificam esquema ou dados de maneira planejada e reproduzível. Acrescentar uma coluna opcional permite preencher valores antes de exigir uma nova regra. Aqui adicionamos resumo ao destino e preenchemos a lição existente. A origem fica intacta, permitindo comparar os estados antes e depois.",
-          "Não suponha que toda alteração estrutural seja reversível em qualquer motor. PostgreSQL, MariaDB, SQLite e Firebird têm regras próprias. Uma migração pode exigir compatibilidade temporária com a aplicação antiga e a nova. Registre a ordem, os critérios de sucesso e como recuperar o serviço se a mudança falhar."
+          "O roteiro é: identificar cópia e horário, preparar destino isolado, restaurar, abrir a aplicação de teste, consultar dados conhecidos, testar regras e medir duração. O destino precisa recuperar SQL e continuar rejeitando titulo NULL. Compare o tempo observado ao RTO e a idade do último dado ao RPO.",
+          "Retenção define quantas versões ficam disponíveis e por quanto tempo. Uma única cópia substituída pode eliminar o último estado bom antes de um erro ser percebido. Mantenha acesso restrito e uma versão independente do local principal. Com dados pessoais, retenção e descarte precisam seguir a necessidade e a política do produto. Nesta aula use apenas dados fictícios e descreva a política; administrar produção não faz parte do exercício."
         ]
       },
       {
-        "title": "Backup, réplica e exportação não são sinônimos",
+        "title": "Migre por expansão e planeje a falha",
         "paragraphs": [
-          "Uma réplica pode melhorar disponibilidade, mas também reproduzir rapidamente uma exclusão acidental. Por isso ela não substitui uma cópia histórica recuperável. Uma exportação CSV pode preservar valores de uma tabela, mas normalmente não carrega todas as constraints, índices, tipos e relações necessários para recriar o serviço. Defina o que está incluído no backup: esquema, dados, objetos auxiliares e configuração necessária para restauração. A documentação do procedimento é parte da proteção.",
-          "No laboratório, o backup em memória demonstra cópia consistente e isolamento do ensaio; ele desaparece ao fechar o processo. Para exercitar durabilidade, use dois caminhos novos de arquivos, feche ambas as conexões e abra o arquivo de destino em outro processo. Consulte a tabela novamente. Esse passo distingue uma demonstração transitória de uma cópia persistente. Não transforme o nome de um arquivo importante em destino de teste: a operação de backup escreve no banco de destino."
-        ]
-      },
-      {
-        "title": "Um ensaio de restauração verificável",
-        "paragraphs": [
-          "Escreva um roteiro: identificar a cópia e seu horário, preparar destino isolado, restaurar, abrir a aplicação de teste, executar consultas de conferência e medir a duração. Use dados conhecidos, como uma lição de título SQL e uma restrição NOT NULL. Verifique tanto valores presentes quanto rejeição de entradas inválidas. O banco restaurado precisa continuar protegendo regras, não apenas conter o mesmo número de linhas.",
-          "No SQLite, PRAGMA integrity_check examina a estrutura e normalmente devolve ok quando não encontra problemas; PRAGMA foreign_key_check verifica violações de referências e retorna vazio quando não há violações. Essas verificações têm escopos distintos e não provam que o relatório de negócio está certo. Combine verificação técnica com consultas de domínio. Um backup pode ser estruturalmente íntegro e estar antigo demais para o RPO, por isso registre horário da cópia e último dado recuperado.",
-          "Retenção define quantas versões ficam disponíveis e por quanto tempo. Uma única cópia substituída diariamente pode eliminar o último estado bom antes que um erro antigo seja percebido. Considere versões, acesso restrito e uma cópia independente do local principal. Se o arquivo tem dados pessoais, a política de retenção também precisa respeitar as necessidades do produto. Para esta aula basta explicar a política e ensaiá-la com dados fictícios; não é necessário administrar infraestrutura de produção."
-        ]
-      },
-      {
-        "title": "Migrar sem quebrar a versão em uso",
-        "paragraphs": [
-          "Uma estratégia de expansão adiciona primeiro uma coluna compatível, faz a aplicação entender ambos os formatos e preenche dados antigos. Depois de verificar a transição, uma etapa posterior pode exigir a nova regra ou retirar o campo antigo. Por exemplo, adicionar resumo opcional não exige que todas as linhas tenham texto imediatamente. Torná-lo obrigatório no mesmo instante pode falhar ou obrigar a inventar dados. Planeje o significado de cada valor de preenchimento.",
+          "Migração é uma mudança versionada e reproduzível. A expansão adiciona primeiro resumo opcional, permite que versões antiga e nova convivam e preenche somente dados conhecidos. Depois de conferir consumidores e registros, outra etapa pode endurecer a regra. Exigir texto imediatamente pode falhar ou criar conteúdo fictício. A origem intacta permite comparar antes e depois do ensaio.",
           "Versione migrações com identificador, ordem, pré-condições e verificação final. A execução deve registrar o que já foi aplicado para impedir repetir um ALTER TABLE que acrescenta a mesma coluna. Idempotência significa que repetir a operação preserva o resultado, mas nem toda migração é naturalmente idempotente. Um controle de versões evita a repetição indevida; não basta suprimir toda exceção, porque um erro real poderia ser confundido com migração já executada.",
-          "Rollback de transação desfaz mudanças não confirmadas dentro das garantias do motor; restauração recupera uma cópia; uma migração inversa tenta desfazer uma transformação já aplicada. São mecanismos diferentes. Remover uma coluna com dados não é recuperado apenas recriando-a vazia. No plano de falha, explique se será possível reverter código, desfazer esquema ou restaurar dados, e o que poderá se perder. PostgreSQL, MariaDB e Firebird oferecem ferramentas próprias; teste o procedimento específico em vez de copiar comandos de outro produto."
+          "Rollback desfaz mudanças não confirmadas; restauração recupera uma cópia; migração inversa tenta desfazer transformação já aplicada. Remover uma coluna e recriá-la vazia não recupera seus dados. No plano de falha, explique se reverte código, esquema ou dados e o que pode se perder. Cada motor tem ferramentas próprias: não copie comandos entre SQLite, PostgreSQL, MariaDB e Firebird."
         ]
       }
     ],
@@ -2868,7 +2854,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Acrescente uma verificação automática do título na cópia.",
+        "prompt": "Prever: antes de executar, diga qual título deve existir somente na cópia restaurada; depois acrescente uma verificação automática no destino.",
         "hints": [
           "Não consulte origem para validar o destino.",
           "Filtre a chave conhecida e compare o texto."
@@ -2878,7 +2864,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Nenhuma exceção: o título recuperado é SQL."
       },
       {
-        "prompt": "A última cópia foi às 10h e a falha ocorreu às 10h45. Sem logs de recuperação, um RPO de 15 minutos foi cumprido?",
+        "prompt": "Alterar: a última cópia foi às 10h e a falha ocorreu às 10h45. Sem logs de recuperação, calcule a perda potencial e avalie um RPO de 15 minutos.",
         "hints": [
           "Calcule a janela desde a cópia até a falha.",
           "Compare 45 minutos com o limite de 15."
@@ -2888,7 +2874,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "A janela excede o limite em 30 minutos."
       },
       {
-        "prompt": "Depois do backup e antes da migração, confira a integridade da cópia e prove que NOT NULL foi preservado. Use somente a conexão copia do laboratório.",
+        "prompt": "Construir: depois do backup e antes da migração, confira a integridade da cópia e prove que NOT NULL foi preservado. Use somente a conexão copia do laboratório.",
         "hints": [
           "Faça a tentativa após a carga ter sido confirmada.",
           "Capture especificamente IntegrityError."
@@ -2898,7 +2884,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "ok; NOT NULL preservado; 1."
       },
       {
-        "prompt": "Escreva um plano para acrescentar resumo sem exigir texto de todas as linhas imediatamente e inclua teste de recuperação.",
+        "prompt": "Investigar erro: uma migração torna resumo obrigatório imediatamente e falha em linhas antigas. Escreva um plano de expansão que preserve compatibilidade e inclua teste de recuperação.",
         "hints": [
           "Uma coluna nova pode começar opcional.",
           "Defina como reconhecer a migração aplicada."

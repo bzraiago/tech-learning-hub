@@ -149,7 +149,8 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `db-performance`: ligar ao laboratório PostgreSQL 17 e separar hipótese, medição, escolha do índice e correção.
     - [x] `db-nosql-models`: partir de perguntas de acesso e registrar escolhas sem sugerir instalação de quatro motores.
     - [x] `db-project`: alinhar o projeto SQLite à decisão de banco, explicitar regra ainda não garantida e tornar a entrega verificável.
-    - [ ] Revisar as duas aulas avançadas de banco restantes.
+    - [x] `db-recovery`: organizar metas, restauração, retenção e migração segura em um ensaio verificável.
+    - [ ] Revisar a última aula avançada de banco restante.
   - [ ] Prioridade 3: revisar 11 aulas de HTML/JavaScript e distinguir aprofundamento legítimo de sobrecarga.
   - [ ] Prioridade 4: revisar 15 aulas de IA/Entrega, preservando o nível avançado quando os pré-requisitos forem suficientes.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
@@ -437,6 +438,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Fase 3.13 — desempenho SQL | Revisão da sexta aula da prioridade 2 | `db-performance` ficou com quatro blocos, preparação PostgreSQL 17 explícita, fontes alinhadas à versão e relatório baseado em evidências. |
 | 24/10/2026 | Fase 3.14 — modelagem NoSQL | Revisão da sétima aula da prioridade 2 | `db-nosql-models` ficou com quatro blocos, atividade conceitual sem instalação e decisão registrada com custos e gatilho de revisão. |
 | 24/10/2026 | Fase 3.15 — projeto de dados | Revisão da oitava aula da prioridade 2 | `db-project` ficou com quatro blocos, casos verificáveis, limite das FKs explícito e decisão de banco na entrega. |
+| 24/10/2026 | Fase 3.16 — recuperação de dados | Revisão da nona aula da prioridade 2 | `db-recovery` ficou com quatro blocos, laboratório isolado, RPO/RTO observáveis e migração por expansão com plano de falha. |
 
 ## Decisões e bloqueios
 

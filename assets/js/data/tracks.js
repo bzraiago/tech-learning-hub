@@ -3125,18 +3125,17 @@
             "minutes": 75,
             "concept": "Um backup só é confiável quando a restauração é testada. Defina RPO, a perda máxima de dados aceitável, e RTO, o tempo máximo de recuperação. Versione migrações e ensaie mudanças de esquema em uma base de teste. Backups lógicos, físicos e recuperação por logs têm propósitos diferentes; siga a ferramenta de cada banco e não copie arquivos em uso sem um procedimento consistente.",
             "objectives": [
-              "Restaurar uma cópia em outra base e validar seu conteúdo.",
-              "Planejar migrações com verificação e estratégia de recuperação.",
-              "Backup precisa de teste de recuperação.",
-              "Verificar resultados e explicar os limites do laboratório com casos válidos e inválidos."
+              "Relacionar frequência e duração do ensaio às metas RPO e RTO.",
+              "Validar dados e constraints em uma cópia SQLite independente.",
+              "Planejar uma migração por expansão com verificação e estratégia de falha."
             ],
-            "exercise": "Escreva um plano para acrescentar resumo sem exigir texto de todas as linhas imediatamente e inclua teste de recuperação.",
+            "exercise": "Corrija o plano que torna resumo obrigatório imediatamente e inclua restauração, compatibilidade e verificação.",
             "code": "import sqlite3\nfrom contextlib import closing\n\nwith closing(sqlite3.connect(\":memory:\")) as origem, closing(sqlite3.connect(\":memory:\")) as copia:\n    with origem:\n        origem.execute(\"CREATE TABLE licoes(id INTEGER PRIMARY KEY,titulo TEXT NOT NULL)\")\n        origem.execute(\"INSERT INTO licoes VALUES(1,'SQL')\")\n    origem.backup(copia)\n    print(copia.execute(\"SELECT id,titulo FROM licoes ORDER BY id\").fetchall())\n    with copia:\n        copia.execute(\"ALTER TABLE licoes ADD COLUMN resumo TEXT\")\n        copia.execute(\"UPDATE licoes SET resumo=? WHERE id=?\", (\"Primeiras consultas\",1))\n    print(copia.execute(\"SELECT titulo,resumo FROM licoes WHERE id=1\").fetchone())\n    print([coluna[1] for coluna in origem.execute(\"PRAGMA table_info(licoes)\")])\n",
             "docs": [
               {
                 "kind": "doc",
                 "title": "PostgreSQL · Backup e restauração com SQL dump",
-                "url": "https://www.postgresql.org/docs/current/backup-dump.html",
+                "url": "https://www.postgresql.org/docs/17/backup-dump.html",
                 "language": "EN"
               },
               {
