@@ -63,6 +63,7 @@ document.addEventListener('change', (event) => {
     const attempt = state.quizAttempts[id] || { answers: [], checked: false };
     attempt.answers[question] = Number(event.target.value);
     attempt.checked = false;
+    attempt.checkedAt = null;
     state.quizAttempts[id] = attempt;
     document.querySelectorAll('[data-quiz-feedback]').forEach(element => { element.hidden = true; });
     $('#quiz-result').textContent = '';
@@ -105,6 +106,11 @@ $('#lesson-sections').addEventListener('keydown', (event) => {
 document.addEventListener('click', (event) => {
   const button = event.target.closest('button');
   if (!button) return;
+  if (button.dataset.reviewLesson) {
+    openLesson(button.dataset.reviewLesson);
+    renderLessonSection('review', true);
+    return;
+  }
   if (button.dataset.evidence) {
     updateLearningEvidence(button.dataset.evidence);
     return;

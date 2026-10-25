@@ -44,6 +44,22 @@ function renderProgress() {
   $('#storage-status').textContent = storageAvailable ? 'Progresso salvo neste navegador' : 'Progresso apenas nesta sessão';
 }
 
+function renderReviewQueue() {
+  const now = Date.now();
+  const queue = [...lessonIndex.values()].flatMap(({ track, lesson }) => {
+    const evidence = state.learningEvidence[lesson.id];
+    if (!evidence?.practicedAt || evidence.reviewedAt) return [];
+    return [{ track, lesson, due: reviewDueAt(evidence.practicedAt) }];
+  }).filter((item) => Number.isFinite(item.due)).sort((a, b) => a.due - b.due);
+  const dueCount = queue.filter((item) => item.due <= now).length;
+  $('#review-queue-count').textContent = `${dueCount} ${dueCount === 1 ? 'revisão pendente' : 'revisões pendentes'}`;
+  $('#review-queue').innerHTML = queue.length ? queue.slice(0, 5).map(({ track, lesson, due }) => {
+    const ready = due <= now;
+    const date = new Date(due).toLocaleDateString('pt-BR');
+    return `<li class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-[#101522] p-3"><span class="min-w-0"><strong class="block text-sm text-slate-100">${escapeHTML(lesson.title)}</strong><span class="mt-1 block text-xs text-slate-400">${escapeHTML(track.title)} · ${ready ? 'Disponível desde' : 'Disponível em'} ${date}</span></span><button data-review-lesson="${lesson.id}" class="rounded-lg border border-sky-300/30 px-3 py-2 text-xs font-semibold text-sky-200 hover:bg-sky-300/10">${ready ? 'Revisar aula' : 'Abrir aula'}</button></li>`;
+  }).join('') + (queue.length > 5 ? `<li class="text-xs text-slate-400">Mais ${queue.length - 5} aulas na fila. Conclua as primeiras para ver as próximas.</li>` : '') : '<li class="text-sm text-slate-400">Nenhuma revisão agendada. Registre a prática na aba Revisão de uma aula para começar.</li>';
+}
+
 function lessonRow(lesson, prefix) {
   const done = !!state.completed[lesson.id];
   return `<div class="lesson-row group flex items-center gap-1 border-t border-white/[.055] transition hover:bg-white/[.025]">
@@ -102,6 +118,7 @@ function render() {
   const focusKey = document.activeElement?.dataset.focus;
   renderNavigation();
   renderProgress();
+  renderReviewQueue();
   renderReadiness();
   renderModules();
   if (focusKey) document.querySelector(`[data-focus="${focusKey}"]`)?.focus({ preventScroll: true });

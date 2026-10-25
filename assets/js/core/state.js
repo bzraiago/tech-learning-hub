@@ -12,6 +12,8 @@ for (const track of tracks) {
 }
 
 const STORAGE_KEY = 'tech-learning-hub:v1';
+const REVIEW_DELAY_MS = 3 * 24 * 60 * 60 * 1000;
+const reviewDueAt = (practicedAt) => Date.parse(practicedAt) + REVIEW_DELAY_MS;
 // completed permanece como marcação de acompanhamento; evidências posteriores ficam separadas.
 const $ = (selector) => document.querySelector(selector);
 const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (char) => ({
@@ -56,7 +58,7 @@ function sanitizeState(candidate) {
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
     const practicedAt = validEvidenceDate(entry.practicedAt);
     const reviewDate = validEvidenceDate(entry.reviewedAt);
-    const reviewedAt = practicedAt && reviewDate && Date.parse(reviewDate) - Date.parse(practicedAt) >= 3 * 24 * 60 * 60 * 1000 ? reviewDate : null;
+    const reviewedAt = practicedAt && reviewDate && Date.parse(reviewDate) >= reviewDueAt(practicedAt) ? reviewDate : null;
     const explanation = typeof entry.explanation === 'string' ? entry.explanation.slice(0, 2000).trim() : '';
     const solvedAt = explanation ? validEvidenceDate(entry.solvedAt) : null;
     if (practicedAt || reviewedAt || solvedAt) {
@@ -75,7 +77,8 @@ function sanitizeState(candidate) {
     const attempt = candidate.quizAttempts?.[lesson.id];
     if (attempt && Array.isArray(attempt.answers)) {
       const answers = lesson.guide.quiz.map((question, i) => Number.isInteger(attempt.answers[i]) && attempt.answers[i] >= 0 && attempt.answers[i] < question.options.length ? attempt.answers[i] : null);
-      clean.quizAttempts[lesson.id] = { answers, checked: attempt.checked === true && answers.every(Number.isInteger) };
+      const checked = attempt.checked === true && answers.every(Number.isInteger);
+      clean.quizAttempts[lesson.id] = { answers, checked, checkedAt: checked ? validEvidenceDate(attempt.checkedAt) : null, reviewStartedAt: validEvidenceDate(attempt.reviewStartedAt) };
     }
   }
   for (const project of PROJECTS) {

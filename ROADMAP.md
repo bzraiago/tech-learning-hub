@@ -195,7 +195,7 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Implementar os estados `Li`, `Pratiquei`, `Passei na revisão` e `Resolvi sozinho` na aula, com autoavaliação e critérios explícitos.
 - [x] Atualizar `state` e `sanitizeState()` com `learningEvidence` aditivo, valores padrão e preservação de `completed`.
 - [x] Explicar na interface que progresso mede acompanhamento, não domínio.
-- [ ] Criar revisões espaçadas após alguns dias.
+- [x] Criar fila de revisões espaçadas três dias após a prática, com acesso direto à aula e confirmação pelo quiz.
 - [ ] Criar revisões acumulativas entre módulos.
 - [ ] Associar erros a aulas específicas para revisão.
 - [ ] Oferecer uma segunda tentativa diferente, sem repetir o mesmo exercício.
