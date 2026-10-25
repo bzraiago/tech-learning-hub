@@ -1072,43 +1072,48 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "ai-skills": {
-    "prerequisites": "Funções, dicionários, exceções e testes em Python; conhecer instruções reutilizáveis e a diferença entre ferramenta e autorização.",
-    "setup": "Salve o exemplo como skills_locais.py e execute python skills_locais.py no terminal. O exemplo usa só dados fictícios e biblioteca padrão; demonstra um manifesto e um validador, sem carregar SKILL.md ou acionar agente.",
+    "prerequisites": "Concluir setup-python e conhecer funções, dicionários, exceções e testes em Python; revisar ai-tools e ai-mcp para distinguir ferramenta, protocolo e autorização.",
+    "setup": "Na pasta ia-estudos, salve o exemplo como skills_locais.py no editor. Abra o terminal nessa pasta e execute python skills_locais.py (ou py skills_locais.py no Windows, python3 skills_locais.py no macOS/Linux, conforme setup-python). A saída esperada é validar-catalogo, [], e ['linha 0: preco invalido'] em três linhas. O processo termina sozinho; para retomar, execute o mesmo comando. Se Python não for reconhecido, revise setup-python. O exemplo usa biblioteca padrão e dados fictícios; não carrega SKILL.md nem aciona um agente.",
     "why": "Empacote um procedimento com escopo, exemplos e verificações, mantendo permissões fora do texto.",
     "sections": [
       {
         "title": "O que uma skill acrescenta",
         "paragraphs": [
           "Uma skill organiza conhecimento de procedimento para uma tarefa recorrente: revisar um CSV, preparar um relatório ou validar uma resposta. Ela pode incluir instruções, exemplos, scripts e referências. Não é um novo modelo e não concede acesso por si só. O host precisa carregar o material e disponibilizar ferramentas compatíveis.",
-          "Um prompt é uma instrução em uma interação; uma skill empacota um procedimento reutilizável; uma ferramenta executa uma operação; MCP padroniza comunicação entre participantes compatíveis. Uma skill pode instruir o uso de uma ferramenta exposta por MCP, mas esses componentes cumprem funções diferentes."
+          "Um prompt é uma instrução em uma interação; uma skill empacota um procedimento reutilizável; uma ferramenta executa uma operação; MCP padroniza comunicação entre participantes compatíveis. Uma skill pode instruir o uso de uma ferramenta exposta por MCP, mas esses componentes cumprem funções diferentes.",
+          "Pausa: classifique o manifesto do exemplo, a função validar_catalogo e o protocolo MCP. Qual deles executa a regra de preço?"
         ]
       },
       {
         "title": "Definir quando usar",
         "paragraphs": [
           "Escreva uma descrição que identifique a tarefa e seus limites. “Ajuda com dados” é amplo demais; “valida CSV de catálogo com colunas sku e preco, sem alterar o arquivo original” fornece uma condição de uso verificável. Inclua exemplos em que a skill deve ser usada e outros em que deve recusar ou pedir esclarecimento.",
-          "Defina pré-requisitos: formato, tamanho, codificação, ferramentas necessárias e quem autoriza alterações. Um arquivo que contém instruções deve ser tratado como dado quando a tarefa é analisá-lo; ele não deve substituir as instruções confiáveis da skill. Esse cuidado vale também para textos recuperados da internet."
+          "Defina pré-requisitos: formato, tamanho, codificação, ferramentas necessárias e quem autoriza alterações. Um arquivo que contém instruções deve ser tratado como dado quando a tarefa é analisá-lo; ele não deve substituir as instruções confiáveis da skill. Esse cuidado vale também para textos recuperados da internet.",
+          "Pausa: compare os pedidos 'validar CSV de produtos' e 'publicar preços'. Em qual deles a descrição permite acionar a skill sem ampliar sua autoridade?"
         ]
       },
       {
         "title": "Estrutura e divulgação progressiva",
         "paragraphs": [
           "O formato aberto Agent Skills usa um diretório com SKILL.md e metadados iniciais, incluindo nome e descrição. Recursos auxiliares podem ficar em arquivos separados. O host deve carregar somente o necessário, evitando colocar todos os manuais no contexto a cada tarefa. Compatibilidade e campos adicionais dependem do host e da especificação adotada.",
-          "Exemplo de SKILL.md: um bloco YAML entre delimitadores --- com name: validar-catalogo e description: Valida CSV com sku e preco sem modificar a origem. No corpo, descreva entrada, passos, validações e saída. Inclua um exemplo válido e um inválido. Versione o diretório no Git e registre a revisão usada em cada avaliação."
+          "Exemplo de validar-catalogo/SKILL.md: um bloco YAML entre delimitadores --- com name: validar-catalogo e description que diga o que valida e quando usar. O nome da pasta corresponde ao campo name. No corpo, descreva entrada, passos, validações e saída. Inclua um exemplo válido e um inválido. Versione o diretório no Git e registre a revisão usada em cada avaliação.",
+          "Pausa: preveja se um arquivo chamado validar-catalogo/SKILL.md instala automaticamente um validador no programa Python. Confira o papel do host."
         ]
       },
       {
         "title": "Código determinístico como apoio",
         "paragraphs": [
           "Para regras exatas, use funções testáveis. A skill pode explicar que preços devem ser positivos, mas o script deve aplicar essa regra. Não execute automaticamente scripts recebidos de uma fonte desconhecida. Avalie origem e permissões; a descrição de uma skill não é uma autorização do usuário para enviar dados ou alterar arquivos.",
-          "O exemplo representa um pequeno manifesto e executa um validador de catálogo já definido no programa. Ele não implementa um carregador de SKILL.md nem um agente. Essa separação permite testar a regra de negócio antes de conectar um host que interprete a skill."
+          "O exemplo representa um pequeno manifesto e executa um validador de catálogo já definido no programa. Ele não implementa um carregador de SKILL.md nem um agente. Essa separação permite testar a regra de negócio antes de conectar um host que interprete a skill.",
+          "Pausa: preveja as saídas para preço 10, preço zero e preço True antes de rodar a função."
         ]
       },
       {
         "title": "Avaliar o procedimento",
         "paragraphs": [
           "Teste três níveis: acionamento para a tarefa correta, execução dos passos e qualidade do resultado. Um procedimento pode ter sido escolhido corretamente e ainda assim esquecer um campo obrigatório. Um script pode passar nos testes e a skill descrevê-lo de forma incorreta. Revise os dois.",
-          "Registre casos de entrada inválida, tarefa fora do escopo e efeito que exige confirmação. Ao atualizar, mantenha testes de regressão e notas de mudança. O critério de pronto é outra pessoa conseguir seguir as instruções, executar as verificações e explicar o limite do resultado."
+          "Registre casos de entrada inválida, tarefa fora do escopo e efeito que exige confirmação. Ao atualizar, mantenha testes de regressão e notas de mudança. O critério de pronto é outra pessoa conseguir seguir as instruções, executar as verificações e explicar o limite do resultado.",
+          "Pausa: escreva três pedidos, um dentro do escopo, um fora e um que inclui publicação; indique qual etapa precisa de autorização separada."
         ]
       }
     ],
@@ -1138,7 +1143,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Teste um SKU repetido.",
+        "prompt": "Prever: antes de executar, o que validar_catalogo devolve para dois itens com SKU A e preços válidos? Confirme. Aceite: entrada A/1 e A/2 → ['linha 1: sku invalido']; nenhum arquivo é alterado.",
         "hints": [
           "Use dois itens A.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -1148,7 +1153,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "Duplicatas podem gerar atualização ambígua no catálogo."
       },
       {
-        "prompt": "Recuse True como preço.",
+        "prompt": "Alterar: acrescente ao roteiro um item com preço True e confirme a recusa. Aceite: entrada sku A, preco True → ['linha 0: preco invalido']; explique por que a checagem usa type.",
         "hints": [
           "bool é subtipo de int, por isso usamos type.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -1158,20 +1163,20 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "O contrato exige número, não valor lógico."
       },
       {
-        "prompt": "Escreva um SKILL.md mínimo para essa tarefa.",
+        "prompt": "Construir: escreva um exemplo mínimo de validar-catalogo/SKILL.md com nome da pasta igual ao campo name, descrição que diga quando usar, passos e saída observável. Aceite: entrada CSV de produtos → relatório de linhas inválidas; publicar ou corrigir arquivos fica fora do escopo. Esta atividade é respondida em texto.",
         "hints": [
           "Inclua metadados e uma verificação concreta.",
-          "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
+          "Esta atividade é um arquivo de instruções em texto; compare-o com a especificação antes de abrir a solução."
         ],
-        "solution": "---\nname: validar-catalogo\ndescription: Valida catálogo com sku e preco sem alterar a origem.\n---\n# Procedimento\n1. Confirmar colunas sku e preco.\n2. Converter preço com tratamento de erro.\n3. Rejeitar SKU vazio ou repetido e preço não positivo.\n4. Relatar linha e motivo.\n5. Não corrigir nem salvar sem uma solicitação separada.",
-        "expected": "Arquivo com metadados, escopo, passos e saída verificável.",
-        "explanation": "O host precisa suportar o formato; o texto sozinho não instala a skill."
+        "solution": "---\nname: validar-catalogo\ndescription: Valida CSV de produtos com sku e preco e relata linhas inválidas. Use ao revisar um catálogo sem modificar o arquivo.\n---\n# Procedimento\n1. Confirmar colunas sku e preco.\n2. Converter preço com tratamento de erro.\n3. Rejeitar SKU vazio ou repetido e preço não positivo.\n4. Relatar linha e motivo.\n5. Não corrigir nem publicar sem solicitação e autorização próprias.",
+        "expected": "Diretório e campo name coincidem; descrição indica quando usar; passos produzem relatório sem alterar a origem.",
+        "explanation": "Salve o texto em validar-catalogo/SKILL.md. O host precisa suportar o formato; o texto sozinho não instala a skill."
       },
       {
-        "prompt": "Defina três casos de acionamento da skill.",
+        "prompt": "Investigar erro: uma solicitação pede validar e publicar preços, e o procedimento só cobre validação. Defina três casos de acionamento (dentro do escopo, fora, e com efeito não autorizado) e indique o passo que deve parar. Aceite: validação pode gerar relatório; publicação não acontece sem autorização específica. Esta atividade é respondida em texto.",
         "hints": [
           "Inclua tarefa adequada, fora de escopo e alteração não autorizada.",
-          "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
+          "Compare as três decisões com os limites da skill antes de abrir a solução."
         ],
         "solution": "Referência: validar CSV de produtos → usar; resumir contrato jurídico → fora do escopo; validar e publicar preços → validar, mas publicação exige fluxo e autorização específicos.",
         "expected": "Três casos com decisão e justificativa.",

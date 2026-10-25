@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega, `ai-llms`, `ai-prompts`, `ai-system`, `ai-data`, `ai-embeddings` e `ai-rag`, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 3 aulas de IA a revisar na prioridade 4.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega, `ai-llms`, `ai-prompts`, `ai-system`, `ai-data`, `ai-embeddings`, `ai-rag` e `ai-skills`, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 2 aulas de IA a revisar na prioridade 4.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 3 aulas de IA ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 1 | Média | G | 2 aulas de IA ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
@@ -72,6 +72,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `ai-skills`
+
+- **Público e saída:** após `setup-python`, `ai-tools` e `ai-mcp`, o aluno deve distinguir instrução, ferramenta e autorização; criar um `SKILL.md` simples; e testar uma regra determinística de catálogo.
+- **FATO, média, P:** a preparação e o resultado guiado já apontavam para o validador correto, mas os exercícios não cobriam explicitamente previsão, alteração, construção e investigação de erro. As quatro tarefas agora têm entradas, saídas ou critérios observáveis.
+- **Julgamento didático:** os cinco blocos cobrem propósito, acionamento, formato, apoio por código e avaliação. Foram mantidos com pausas curtas de classificação e previsão.
+- **Pré-requisitos e ambiente:** o laboratório usa apenas Python local e dados fictícios. A aula indica pasta, arquivo, comandos por sistema, saída esperada, diagnóstico e retomada. A construção textual usa `validar-catalogo/SKILL.md`, cujo nome de diretório coincide com `name`.
+- **Fontes:** [Agent Skills Specification](https://agentskills.io/specification), [Anthropic sobre agentes](https://www.anthropic.com/research/building-effective-agents) e [biblioteca padrão Python](https://docs.python.org/3/library/) foram abertas em 25/10/2026 (fontes primárias, EN, OK).
+- **Limite:** o exemplo Python não carrega a skill nem representa um host real. A avaliação de acionamento permanece textual; observação com aluno não foi executada.
 
 ### Revisão localizada: `ai-rag` e correção de referências entre aulas
 
