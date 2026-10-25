@@ -41,6 +41,7 @@
         { question: 'Uma versão impressa prova domínio da ferramenta?', options: ['Sim', 'Não; prova apenas que o comando foi encontrado', 'Prova publicação na internet'], correctIndex: 1, explanation: 'Capacidade exige executar tarefas novas, não apenas mostrar versão.' },
         { question: config.quizQuestion, options: config.quizOptions, correctIndex: config.quizCorrect, explanation: config.quizExplanation }
       ],
+      retry: config.retry,
       summary: [`${config.name} deve ser obtido por fonte oficial e verificado em terminal novo.`, 'PATH é investigado depois de conferir instalação e reiniciar o terminal.', config.distinction]
     };
   }
@@ -48,6 +49,7 @@
   Object.assign(LESSON_GUIDES, {
     'setup-editor': criarGuiaInstalacao({
       name: 'VS Code',
+      retry: { prompt: 'Você está em um computador emprestado sem permissão para instalar VS Code. Descreva como criar e salvar uma página HTML com um editor de texto já disponível, abri-la no navegador e registrar quais tarefas futuras ainda exigirão terminal ou runtime local.', expected: 'O plano produz um arquivo .html verificável no navegador e distingue a alternativa de edição das ferramentas locais ainda pendentes.', hint: 'Para uma página HTML simples, um editor de texto e um navegador já permitem começar.' },
       objective: 'instalar ou escolher um editor e abrir a pasta de estudos.',
       windows: 'Use o instalador User Setup do VS Code; conclua a instalação e abra o aplicativo pelo menu.',
       macos: 'Baixe o arquivo .dmg oficial, arraste o aplicativo para Applications e abra-o; o comando code pode ser instalado depois pela Command Palette.',
@@ -71,6 +73,7 @@
     }),
     'setup-python': criarGuiaInstalacao({
       name: 'Python 3',
+      retry: { prompt: 'Você praticou um script Python em um ambiente educacional no navegador e agora precisa usar um arquivo SQLite local. Explique quais resultados já observou, qual verificação de Python 3 precisa fazer no computador e por que a prática no navegador não comprova o ambiente local.', expected: 'A resposta separa execução no navegador de runtime e arquivos locais e registra a verificação ainda pendente, sem inventar uma versão.', hint: 'Observe onde o código foi executado e onde o arquivo de banco precisará existir.' },
       objective: 'instalar Python 3 e descobrir qual comando inicia o runtime.',
       windows: 'Use a opção oficial indicada em python.org para Windows. Após instalar, teste primeiro py --version e depois python --version.',
       macos: 'Use o instalador oficial para macOS e verifique com python3 --version em um terminal novo.',
@@ -94,6 +97,7 @@
     }),
     'setup-git': criarGuiaInstalacao({
       name: 'Git',
+      retry: { prompt: 'Uma colega executou `git init` em um projeto de aula e afirmou que seus arquivos já estão publicados no GitHub. Descreva duas evidências locais que pode conferir e o que ainda seria necessário para demonstrar publicação remota, sem pedir acesso à conta dela.', expected: 'A resposta distingue repositório e histórico local de serviço remoto e não afirma publicação apenas por causa de git init.', hint: 'Instalar e inicializar Git não criam automaticamente um remoto.' },
       objective: 'instalar Git, criar um repositório local de laboratório e diferenciá-lo de um serviço remoto.',
       windows: 'Use o instalador oficial Git for Windows e mantenha uma opção que disponibilize Git ao terminal; abra um terminal novo ao terminar.',
       macos: 'Execute git --version; se o sistema oferecer as Command Line Tools, conclua a instalação, ou use o instalador oficial indicado pelo Git.',
@@ -117,6 +121,7 @@
     }),
     'setup-node': criarGuiaInstalacao({
       name: 'Node.js e npm',
+      retry: { prompt: 'Um script que altera `document.body` funciona no console do navegador, mas mostra `document is not defined` quando executado com Node.js. Explique qual ambiente oferece document e proponha um teste mínimo de JavaScript que possa rodar em Node sem instalar pacote novo.', expected: 'A resposta identifica DOM como API do navegador e propõe um teste Node simples, como console.log, sem tratar o erro como falha da instalação.', hint: 'A linguagem é a mesma; as APIs disponíveis mudam conforme o ambiente.' },
       objective: 'instalar a linha LTS e verificar runtime e gerenciador de pacotes separadamente.',
       windows: 'Baixe o instalador LTS oficial para Windows, conclua-o e abra um terminal novo.',
       macos: 'Use o instalador LTS oficial para macOS ou um gerenciador de versões já adotado por você; não misture métodos na primeira instalação.',

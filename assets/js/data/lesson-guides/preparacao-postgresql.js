@@ -62,6 +62,7 @@ Object.assign(LESSON_GUIDES, {
       { question: 'Qual endereço outro serviço na mesma rede Compose usa?', options: ['db:5432', '127.0.0.1:55432 sempre', 'estudos:80'], correctIndex: 0, explanation: 'Na rede Compose, o nome do serviço é db e a porta interna é 5432.' },
       { question: 'Uma interface gráfica substitui o registro dos parâmetros de conexão?', options: ['Sim', 'Não', 'Somente no Windows'], correctIndex: 1, explanation: 'Host, porta, banco e usuário continuam sendo necessários para reproduzir e diagnosticar.' }
     ],
+    retry: { prompt: 'Um segundo serviço no mesmo arquivo Compose tenta acessar PostgreSQL por `127.0.0.1:55432` e não consegue. Explique qual host e porta esse serviço deve usar na rede Compose e como confirmar banco e usuário depois de conectar, sem registrar senha.', expected: 'A resposta usa db:5432 entre serviços, diferencia essa rota da porta 55432 no computador e confirma estudos/aluno por consulta.', hint: 'Dentro de outro container, 127.0.0.1 aponta para ele próprio.' },
     summary: [
       'Servidor e cliente são componentes diferentes.',
       'Cliente no computador: 127.0.0.1:55432; serviço na rede Compose: db:5432.',

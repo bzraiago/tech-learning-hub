@@ -26,6 +26,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.
 - [ ] Após uma resposta incorreta, o feedback indica a aula de revisão; o botão abre os conceitos e a orientação persiste após recarregar.
 - [ ] Nas aulas de preparação digital, um erro no quiz oferece uma tarefa diferente, com critério e pista; o rascunho permanece após recarregar.
+- [ ] Nas aulas de Ambientes essenciais, a segunda tentativa orienta diagnóstico ou retomada sem inventar saídas nem expor credenciais.
 - [ ] Anotação é salva após aguardar e continua presente após recarregar.
 - [ ] Fechar o diálogo devolve o foco ao controle que o abriu.
 

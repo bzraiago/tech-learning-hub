@@ -59,6 +59,7 @@
         { question: config.quizQuestion, options: config.quizOptions, correctIndex: config.quizCorrect, explanation: config.quizExplanation },
         { question: 'Uma versão impressa do cliente comprova que o servidor está acessível?', options: ['Não', 'Sim', 'Somente no Windows'], correctIndex: 0, explanation: 'É necessário executar uma conexão ou comando de verificação no servidor.' }
       ],
+      retry: config.retry,
       summary: [
         `${config.name} permanece um aprofundamento opcional.`,
         `Servidor e cliente ${config.client} são componentes diferentes.`,
@@ -71,6 +72,7 @@
   Object.assign(LESSON_GUIDES, {
     'setup-mariadb': criarPreparacao({
       name: 'MariaDB',
+      retry: { prompt: 'Um cliente conecta ao MariaDB local, mas você não sabe se alcançou o laboratório correto. Descreva uma verificação de versão, usuário e banco ativo antes de criar qualquer tabela; indique o que registrar sem expor senha.', expected: 'A resposta usa uma consulta de identificação, confirma o banco de laboratório e registra resultado real sem credencial.', hint: 'Conexão bem-sucedida ainda pode apontar para outra instância ou banco.' },
       slug: 'mariadb',
       client: 'mariadb',
       prerequisites: 'Faça esta preparação imediatamente antes de db-mariadb.',
@@ -116,6 +118,7 @@
 
     'setup-firebird': criarPreparacao({
       name: 'Firebird 5',
+      retry: { prompt: 'Uma equipe quer criar `hub_fb_aula.fdb` dentro da pasta pessoal de quem usa o cliente, mas o servidor Firebird roda como serviço. Explique como escolher um caminho autorizado no host do servidor e como confirmar que o isql utilizado pertence ao Firebird antes da criação.', expected: 'A resposta diferencia máquina/conta do cliente e do servidor, exige pasta permitida e identifica o isql correto sem abrir acesso amplo ao disco.', hint: 'O arquivo é aberto pelo processo do servidor, não pelo editor da pessoa.' },
       slug: 'firebird',
       client: 'isql do Firebird',
       prerequisites: 'Faça esta preparação imediatamente antes de db-firebird e use uma pasta de laboratório autorizada.',
@@ -161,6 +164,7 @@
 
     'setup-mongodb': criarPreparacao({
       name: 'MongoDB Community',
+      retry: { prompt: 'Um tutorial sugere usar uma URI remota com credenciais, mas sua atividade é apenas verificar o MongoDB Community local. Descreva a URI do laboratório, a sequência de conexão e ping e o que deve permanecer fora do repositório.', expected: 'A resposta usa 127.0.0.1:27017, verifica ping com ok: 1 e não copia credenciais nem URI privada para arquivos públicos.', hint: 'O laboratório da aula é local; não precisa criar conta remota para esta verificação.' },
       slug: 'mongodb',
       client: 'mongosh',
       prerequisites: 'Faça esta preparação imediatamente antes de db-mongo-crud. Docker é opcional para este aprofundamento.',

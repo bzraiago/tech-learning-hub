@@ -63,6 +63,7 @@ Object.assign(LESSON_GUIDES, {
       { question: 'Qual comando verifica o plugin Compose moderno?', options: ['docker compose version', 'docker-compose-file', 'wsl compose'], correctIndex: 0, explanation: 'O formato atual usa docker compose com espaço.' },
       { question: 'O grupo docker no Linux deve ser tratado como acesso de alto privilégio?', options: ['Sim', 'Não', 'Apenas quando há banco'], correctIndex: 0, explanation: 'O acesso ao socket do daemon permite operações com grande impacto no sistema.' }
     ],
+    retry: { prompt: 'No Windows, a verificação inicial de WSL indica um requisito ausente e o computador é administrado por outra pessoa. Proponha um plano de estudo que registre o bloqueio, evite alterar virtualização sem autorização e use a rota SQLite até poder retomar Docker.', expected: 'O plano não força instalação nem mudança de firmware, registra o requisito observado e mantém Docker/PostgreSQL como pendências explícitas.', hint: 'O diagnóstico de requisitos vem antes de instalar ou conceder permissões.' },
     summary: [
       'No Windows, verifique WSL 2 e virtualização antes de instalar Docker Desktop.',
       'Confirme cliente, Engine e Compose separadamente.',
@@ -131,6 +132,7 @@ Object.assign(LESSON_GUIDES, {
       { question: 'Onde os dados deste laboratório persistem?', options: ['No arquivo estudos.db', 'Em um volume Docker', 'No navegador'], correctIndex: 0, explanation: 'SQLite grava no arquivo local indicado na conexão.' },
       { question: 'Quando retomar o caminho Docker?', options: ['Antes do projeto real com PostgreSQL', 'Nunca', 'Somente depois do nível avançado'], correctIndex: 0, explanation: 'O projeto intermediário exige persistência real com PostgreSQL e Docker.' }
     ],
+    retry: { prompt: 'Você não pode executar Docker em um computador administrado, mas consegue abrir Python 3. Descreva uma consulta pequena em SQLite e registre separadamente duas capacidades de PostgreSQL com Compose que continuarão pendentes.', expected: 'A resposta inclui uma consulta local observável e deixa Docker, rede ou backup do PostgreSQL como pendência explícita.', hint: 'A alternativa permite praticar SQL, mas não substitui um servidor.' },
     summary: [
       'SQLite mantém a prática de SQL acessível sem servidor.',
       'A alternativa não comprova Docker, Compose nem PostgreSQL.',
