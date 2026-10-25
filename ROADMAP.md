@@ -154,6 +154,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [ ] Prioridade 3: revisar 11 aulas de HTML/JavaScript e distinguir aprofundamento legítimo de sobrecarga.
     - [x] `html-accessibility`: reunir conteúdo, navegação e revisão em quatro blocos; explicitar previsão, alteração, construção e investigação de erro.
     - [x] `html-tables`: organizar escolha dos dados, marcação, mesclagens e conferência em quatro blocos com quatro tipos de prática.
+    - [x] `html-forms`: reunir controles e agrupamentos, explicitar quatro tipos de prática e preservar o aviso de envio demonstrativo.
   - [ ] Prioridade 4: revisar 15 aulas de IA/Entrega, preservando o nível avançado quando os pré-requisitos forem suficientes.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
 - [ ] Adicionar demonstrações visuais de laços.

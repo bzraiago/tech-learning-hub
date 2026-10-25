@@ -327,22 +327,17 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "2. Escolher o controle correto",
+        "title": "2. Controles, grupos e instruções",
         "paragraphs": [
           "input type=\"text\" serve para texto curto. email acrescenta verificação básica de formato e pode adaptar o teclado virtual. password oculta visualmente os caracteres, mas não criptografa uma transmissão. number representa quantidades numéricas, com limites min, max e passo step quando necessário; não é uma boa escolha para telefone ou documento, que são identificadores e podem ter zeros iniciais.",
           "type=\"date\" oferece seleção de data, cuja aparência varia entre navegadores. checkbox representa uma opção independente; radio permite escolher uma alternativa de um grupo de mesmo name. select apresenta opções: o texto de option é o rótulo mostrado, enquanto seu value é o valor enviado. textarea recebe texto de várias linhas; seu conteúdo inicial fica entre as tags, não em um atributo value.",
-          "button type=\"submit\" tenta enviar o formulário. button type=\"button\" não envia automaticamente e costuma receber comportamento por JavaScript, que não será necessário nesta aula. Dentro de form, omitir type pode causar um envio inesperado. Um botão reset apaga alterações dos campos e é fácil de acionar sem querer; não o adicione só para preencher a interface."
-        ]
-      },
-      {
-        "title": "3. Agrupamento e instruções",
-        "paragraphs": [
+          "button type=\"submit\" tenta enviar o formulário. button type=\"button\" não envia automaticamente e costuma receber comportamento por JavaScript, que não será necessário nesta aula. Dentro de form, omitir type pode causar um envio inesperado. Um botão reset apaga alterações dos campos e é fácil de acionar sem querer; não o adicione só para preencher a interface.",
           "fieldset reúne controles relacionados e legend descreve o grupo. Use grupos como Dados pessoais e Preferências em vez de uma lista longa sem organização. Em grupos de radio, uma legend específica pode descrever a pergunta comum enquanto cada label nomeia uma alternativa. Os parágrafos do exemplo separam campos para facilitar a leitura sem exigir CSS.",
           "autocomplete informa a finalidade de campos usuais, como name e email, para que o navegador possa oferecer preenchimento. Não garante que o preenchimento ocorrerá e não substitui name. Escreva instruções antes do erro: marque visivelmente campos obrigatórios e explique limites relevantes. Não peça dados que não serão usados. Uma página de exercício pode trabalhar inteiramente com nomes e endereços fictícios."
         ]
       },
       {
-        "title": "4. Validação nativa: o que testar",
+        "title": "3. Validação nativa: o que testar",
         "paragraphs": [
           "required torna o preenchimento obrigatório em controles compatíveis. minlength e maxlength definem limites de comprimento em campos de texto compatíveis. email verifica uma forma sintática, não se o endereço existe. min e max restringem valores e datas em tipos compatíveis. pattern permite um padrão de texto, mas regras complexas mal explicadas dificultam o uso; nesta base priorizamos restrições simples e justificáveis.",
           "O navegador geralmente verifica as restrições ao tentar enviar e leva o foco ao primeiro campo inválido. O texto exato da mensagem varia conforme navegador e idioma; teste o comportamento, não uma frase específica. Para minlength, digite manualmente um valor curto ao testar. Restrições nativas podem ter diferenças quando valores são definidos por código. Uma entrada aceita pelo navegador ainda pode estar errada para as regras do negócio.",
@@ -350,7 +345,7 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "5. GET, POST e o que não existe neste laboratório",
+        "title": "4. GET, POST e o que não existe neste laboratório",
         "paragraphs": [
           "action informa o destino do envio e method escolhe o método. GET inclui dados na parte de consulta da URL e costuma ser apropriado para buscas e filtros. POST normalmente envia dados no corpo da requisição e é usado para operações que mudam estado. POST não torna os dados secretos por si só: proteção durante o transporte depende de HTTPS, além das demais práticas do sistema.",
           "Nosso action=\"#resultado\" usa a própria página como destino demonstrativo. Não há backend, banco, mensagem automática nem confirmação real de inscrição. A URL pode exibir nome e e-mail fictícios depois do envio GET; isso mostra por que não devemos colocar segredos na consulta. Ao testar localmente, não confunda uma recarga com cadastro concluído. A interface deve dizer claramente que é um laboratório.",
@@ -386,17 +381,17 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: acrescente um campo opcional de data de início, com rótulo e name.",
+        "prompt": "Prever: antes de editar, diga se um campo de data sem required impede o envio quando está vazio. Depois acrescente o campo opcional de data de início, com rótulo e name, e confira sua previsão.",
         "hints": [
           "Use type=\"date\".",
           "Opcional significa não acrescentar required."
         ],
         "solution": "\u003cp>\u003clabel for=\"inicio\">Data de início desejada (opcional)\u003c/label>\u003cinput id=\"inicio\" name=\"inicio\" type=\"date\">\u003c/p>",
         "explanation": "Insira dentro de form. O seletor varia visualmente, mas continua representando uma data.",
-        "expected": "O rótulo foca o campo e o formulário permite deixá-lo vazio."
+        "expected": "Previsão registrada antes do teste; o rótulo foca o campo e o formulário permite deixá-lo vazio."
       },
       {
-        "prompt": "Completar: faça o select de turno exigir uma escolha explícita, começando com Selecione um turno.",
+        "prompt": "Alterar: no formulário do exemplo, faça o select de turno exigir uma escolha explícita, começando com Selecione um turno. Preserve as opções Manhã e Tarde.",
         "hints": [
           "A primeira option deve ter value vazio.",
           "O select precisa de required e rótulo que avise a obrigatoriedade."
@@ -416,7 +411,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Campos vazios, e-mail inválido e mensagem curta são recusados; os rótulos funcionam por clique."
       },
       {
-        "prompt": "Depurar: corrija \u003clabel for=\"mail\">E-mail\u003c/label>\u003cinput id=\"email\" type=\"email\" required=\"false\"> para um e-mail opcional que participe do envio.",
+        "prompt": "Investigar erro: em \u003clabel for=\"mail\">E-mail\u003c/label>\u003cinput id=\"email\" type=\"email\" required=\"false\">, identifique por que o rótulo não foca o campo, por que vazio é recusado e por que o dado não é enviado. Depois corrija para um e-mail opcional que participe do envio.",
         "hints": [
           "O for deve corresponder ao id.",
           "Remova o booleano e acrescente name."

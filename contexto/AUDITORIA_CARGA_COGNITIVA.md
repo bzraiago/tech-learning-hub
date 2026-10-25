@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `html-tables`, a auditoria automática aponta 24: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 foi concluída e a prioridade 3 começou.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `html-forms`, a auditoria automática aponta 23: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 foi concluída e a prioridade 3 começou.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 3 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
+| 1 | Média | G | 2 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 2 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 3 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
@@ -73,6 +73,14 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `html-forms`
+
+- **Público e saída:** após `html-semantic` e `html-links-media`, o aluno deve criar um formulário com rótulos, controles e restrições nativas, testar entradas válidas e inválidas e explicar por que o laboratório não cria cadastro. Editor e navegador bastam.
+- **FATO, média, M:** o guia tinha cinco seções, com escolha de controles e agrupamento separados apesar de ambos orientarem a mesma construção. Eles foram reunidos em quatro blocos. Os exercícios agora pedem previsão, alteração, construção e investigação de erro com comportamento esperado antes da solução. O ID e o exemplo principal foram preservados.
+- **Pré-requisitos:** `html-semantic` → `html-links-media` → `html-forms` → `html-tables`. Sem dependência circular identificada neste recorte.
+- **Fontes:** [MDN sobre `form`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/form) e [MDN sobre validação no cliente](https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation) foram abertas em 24/10/2026 (fontes oficiais, EN, OK). Confirmam o uso de controles para envio e a necessidade de validar novamente no servidor real.
+- **Limite:** o envio local pode variar entre navegadores. A revisão estrutural e o validador não comprovam que um aluno consiga construir ou depurar um formulário novo sem ajuda; o teste manual no navegador não foi executado nesta etapa.
 
 ### Revisão localizada: `html-tables`
 
