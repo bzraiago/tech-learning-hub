@@ -853,18 +853,14 @@ Object.assign(LESSON_GUIDES, {
     "why": "Um programa mostrar uma saída plausível não prova que a regra está correta. Depurar é descobrir por que a execução divergiu da intenção; testar é criar verificações repetíveis dessa intenção. As duas atividades fazem parte de programar desde o primeiro projeto. Nesta aula construiremos um pequeno conjunto de testes para uma função de média e aprenderemos a diferenciar um erro tratado de um erro escondido.",
     "sections": [
       {
-        "title": "Três classes de problema",
+        "title": "Reconhecer e investigar problemas",
         "paragraphs": [
           "Um erro de sintaxe impede interpretar o script, como faltar um fechamento de parêntese. Um erro de execução surge quando uma instrução tenta algo inválido, como ler propriedade de undefined. Um erro lógico executa sem necessariamente lançar exceção, mas produz resultado errado: dividir uma soma pelo número errado de itens é um exemplo. Cada classe pede uma observação diferente.",
-          "Leia a primeira mensagem de erro e a linha indicada, depois inspecione também as linhas anteriores. Um fechamento ausente pode ser apontado somente mais adiante. ReferenceError costuma indicar nome inexistente ou uso antes da inicialização; TypeError costuma envolver uma operação incompatível com o valor recebido. O nome da categoria é uma pista, não uma explicação completa do defeito."
-        ]
-      },
-      {
-        "title": "Um método para investigar",
-        "paragraphs": [
+          "Leia a primeira mensagem de erro e a linha indicada, depois inspecione também as linhas anteriores. Um fechamento ausente pode ser apontado somente mais adiante. ReferenceError costuma indicar nome inexistente ou uso antes da inicialização; TypeError costuma envolver uma operação incompatível com o valor recebido. O nome da categoria é uma pista, não uma explicação completa do defeito.",
           "Primeiro reproduza o problema com o menor conjunto de dados possível. Escreva o que esperava e o que ocorreu. Depois identifique a primeira etapa em que o dado deixa de corresponder à previsão. console.log(\"antes\", valor, typeof valor) ajuda a observar, mas espalhar dezenas de mensagens sem hipótese torna a investigação ruidosa. Faça uma alteração por vez e execute novamente.",
           "As ferramentas do navegador oferecem breakpoints, pontos onde a execução pausa. Abra o painel Sources ou Fontes, localize seu arquivo HTML e clique no número da linha dentro da função. Atualize a página para executar novamente. Ao pausar, examine os valores de parâmetros e variáveis no painel de escopo. Use avançar uma instrução para acompanhar o próximo passo; continuar retoma até o próximo ponto de parada.",
-          "Uma instrução debugger; também solicita pausa quando as ferramentas estão abertas e a depuração está habilitada. Remova-a quando terminar a investigação. A pilha de chamadas mostra quais funções levaram à linha atual, ajudando a localizar quem forneceu um argumento inválido. Evite editar vários pontos com base apenas no sintoma final: confirme a origem dos dados antes de corrigir a fórmula."
+          "Uma instrução debugger; também solicita pausa quando as ferramentas estão abertas e a depuração está habilitada. Remova-a quando terminar a investigação. A pilha de chamadas mostra quais funções levaram à linha atual, ajudando a localizar quem forneceu um argumento inválido. Evite editar vários pontos com base apenas no sintoma final: confirme a origem dos dados antes de corrigir a fórmula.",
+          "Pausa de prática: antes de corrigir soma / (notas.length - 1) para [6, 8], anote o valor esperado, o observado e a primeira expressão suspeita. Só então use um breakpoint ou console.log para confirmar a hipótese."
         ]
       },
       {
@@ -872,29 +868,27 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "Uma função deve dizer quais entradas aceita. Nossa media aceita um array não vazio de números finitos entre 0 e 10. Isso exclui strings, NaN, Infinity, valores negativos e notas acima de 10. O retorno é um número. Como não existe média válida para uma lista vazia neste contrato, vamos lançar um erro em vez de inventar zero.",
           "throw new Error(\"mensagem\") interrompe o fluxo normal e comunica uma exceção. TypeError é apropriado aqui quando a estrutura ou tipo não corresponde ao esperado; RangeError pode representar valor fora da faixa definida. Essas categorias ajudam a explicar o contrato, mas o texto da mensagem também deve orientar. Uma exceção não tratada interrompe aquele fluxo; não significa necessariamente que todo o navegador parou.",
-          "try { ... } catch (erro) { ... } permite tratar uma exceção lançada dentro da execução síncrona do bloco try. O catch recebe o objeto de erro; erro.message contém a mensagem para erros comuns. finally, quando presente, executa ao sair dessa estrutura e serve para limpeza. Evite retornar de finally, pois pode substituir retornos ou erros anteriores. Erros de operações assíncronas exigirão tratamento próprio na aula de Promises."
+          "try { ... } catch (erro) { ... } permite tratar uma exceção lançada dentro da execução síncrona do bloco try. O catch recebe o objeto de erro; erro.message contém a mensagem para erros comuns. finally, quando presente, executa ao sair dessa estrutura e serve para limpeza. Evite retornar de finally, pois pode substituir retornos ou erros anteriores. Erros de operações assíncronas exigirão tratamento próprio na aula de Promises.",
+          "Pausa de prática: para media([]), preveja se haverá um número, TypeError ou RangeError. Execute dentro de try/catch e confira a categoria e a mensagem sem fabricar uma média."
         ]
       },
       {
         "title": "Tratar não é esconder",
         "paragraphs": [
           "Não envolva tudo em um catch vazio. Se a regra falhar e o código continuar mostrando um sucesso antigo, o usuário receberá uma informação falsa. Tratar significa escolher um comportamento adequado: apresentar uma mensagem, permitir correção ou interromper uma ação dependente. Um erro inesperado durante desenvolvimento também deve ser investigado, mesmo quando há mensagem amigável na interface.",
-          "Validação de entrada e erro inesperado não são exatamente a mesma coisa. O formulário pode orientar uma pessoa sobre um campo obrigatório antes de chamar a função. A função ainda valida seu contrato porque pode ser chamada por outros caminhos. Essa duplicação de fronteiras tem propósito: a interface orienta; a regra protege sua própria consistência. Evite converter qualquer valor silenciosamente dentro da função se o contrato exige números."
+          "Validação de entrada e erro inesperado não são exatamente a mesma coisa. O formulário pode orientar uma pessoa sobre um campo obrigatório antes de chamar a função. A função ainda valida seu contrato porque pode ser chamada por outros caminhos. Essa duplicação de fronteiras tem propósito: a interface orienta; a regra protege sua própria consistência. Evite converter qualquer valor silenciosamente dentro da função se o contrato exige números.",
+          "Pausa de prática: compare um catch vazio com outro que mostre erro.message para media([]). Escreva o que o usuário observa em cada caso e por que o primeiro esconde a falha."
         ]
       },
       {
-        "title": "Testes pequenos e independentes",
+        "title": "Testes independentes, cobertura e regressão",
         "paragraphs": [
           "console.assert(condicao, mensagem) registra uma falha no Console quando a condição é falsa, mas não lança uma exceção por si só. É útil para verificações rápidas, porém você precisa olhar o Console. No exemplo criaremos verificar, que acumula linhas PASSOU ou FALHOU e lança Error quando uma expectativa não é atendida. Assim o resultado fica também visível na página.",
           "Um teste escolhe entrada, executa a função e compara com um resultado esperado definido a partir da regra. Para média de [6,8], a expectativa é 7 porque somamos 14 e dividimos por dois. Não calcule a expectativa chamando a própria função novamente: isso apenas compara o programa com ele mesmo e repete o possível defeito.",
-          "Para testar uma exceção, precisamos verificar que ela realmente aconteceu. Uma função auxiliar pode executar uma operação dentro de try e retornar false se nada foi lançado; catch retorna true. Passamos uma função callback para que a operação seja executada dentro do try, e não antes. Um teste mais rigoroso também pode verificar o tipo do erro para evitar considerar qualquer falha acidental como sucesso."
-        ]
-      },
-      {
-        "title": "Cobertura de comportamento e correção",
-        "paragraphs": [
+          "Para testar uma exceção, precisamos verificar que ela realmente aconteceu. Uma função auxiliar pode executar uma operação dentro de try e retornar false se nada foi lançado; catch retorna true. Passamos uma função callback para que a operação seja executada dentro do try, e não antes. Um teste mais rigoroso também pode verificar o tipo do erro para evitar considerar qualquer falha acidental como sucesso.",
           "Escolha casos normais, limites e inválidos: duas notas comuns, uma nota única, zero e dez, lista vazia, texto e número fora da faixa. Isso não garante ausência de todos os defeitos, mas cobre partes diferentes do contrato. Quando corrigir um bug, acrescente um teste que falhava antes e passa depois. Esse teste de regressão ajuda a não reintroduzir o mesmo problema.",
-          "Faça uma experiência controlada: altere o divisor da média para notas.length + 1 e veja os testes normais falharem. Depois restaure. Um conjunto que nunca acusa uma mudança claramente errada não está verificando a regra com força suficiente. Preserve as funções puras sempre que possível, pois elas podem ser testadas sem montar uma interface ou depender de rede, relógio e cliques."
+          "Faça uma experiência controlada: altere o divisor da média para notas.length + 1 e veja os testes normais falharem. Depois restaure. Um conjunto que nunca acusa uma mudança claramente errada não está verificando a regra com força suficiente. Preserve as funções puras sempre que possível, pois elas podem ser testadas sem montar uma interface ou depender de rede, relógio e cliques.",
+          "Pausa de prática: preveja qual teste falhará primeiro ao mudar o divisor para notas.length + 1. Execute, registre a primeira falha e restaure a regra; confira que os mesmos testes voltam a passar."
         ]
       }
     ],
@@ -926,17 +920,17 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: escreva dois console.assert para uma função dobro(n) que retorna n*2, usando entradas 3 e 0. Depois altere a função para n+2 e observe a falha.",
+        "prompt": "Prever: antes de executar, diga o retorno de dobro(n) para 3 e 0 quando a regra é n*2. Escreva dois console.assert para esses casos; depois mude temporariamente a função para n+2 e observe as falhas.",
         "hints": [
           "A expectativa deve ser um valor conhecido.",
           "Zero é um caso importante, não apenas números positivos."
         ],
         "solution": "function dobro(n) { return n*2; }\nconsole.assert(dobro(3) === 6, \"dobro de 3\");\nconsole.assert(dobro(0) === 0, \"dobro de 0\");",
         "explanation": "Os testes normais não precisam mostrar uma mensagem de sucesso. A alteração controlada demonstra que as expectativas detectam uma regra errada. Restaure a multiplicação após a experiência.",
-        "expected": "Sem falhas com n*2; os dois testes falham com n+2."
+        "expected": "Previsão registrada antes da execução; nenhuma falha com n*2 e duas falhas com n+2."
       },
       {
-        "prompt": "Completar: usando media do exemplo, trate a chamada media([]) e mostre a mensagem do erro na página. Não substitua a média inválida por zero.",
+        "prompt": "Alterar: no script do exemplo, substitua o relatório de testes por uma chamada a media([]) tratada em try/catch e mostre a mensagem do erro na página. Mantenha a função media e não substitua a média inválida por zero.",
         "hints": [
           "A chamada deve estar dentro do try.",
           "O catch recebe o objeto de erro e pode ler message."
@@ -956,7 +950,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Quatro verificações sem falhas. Os retornos válidos são 5 e 0."
       },
       {
-        "prompt": "Depurar: uma função calcula soma / (notas.length - 1). Para [6,8] devolve 14. Descreva a hipótese, corrija e acrescente um teste de regressão com uma nota única.",
+        "prompt": "Investigar erro: uma função calcula soma / (notas.length - 1). Para [6,8] devolve 14. Registre esperado e observado, localize a expressão divergente, corrija e acrescente um teste de regressão com uma nota única.",
         "hints": [
           "O número de notas é length, não o último índice.",
           "Com uma nota, length - 1 produz divisor zero."

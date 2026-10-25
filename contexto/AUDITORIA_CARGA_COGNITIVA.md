@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `js-es6`, a auditoria automática aponta 17: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 e as cinco aulas HTML da prioridade 3 foram concluídas; a revisão de JavaScript está em andamento.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `js-debug`, a auditoria automática aponta 16: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 e as cinco aulas HTML da prioridade 3 foram concluídas; a revisão de JavaScript está em andamento.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 2 aulas JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
+| 1 | Média | G | 1 aula JavaScript | RISCO | Possui cinco seções; já tem passos guiados, mas nem todos os tipos de exercício estão explicitamente identificados. | Manter ID e priorizar intercalação/prática antes de criar nova aula. |
 | 2 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 3 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
@@ -73,6 +73,14 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `js-debug`
+
+- **Público e saída:** após funções, arrays e controle de fluxo, o aluno deve reproduzir uma divergência, registrar hipótese, usar Console ou breakpoint, corrigir uma regra e acrescentar teste de regressão. Editor e navegador já foram preparados.
+- **FATO, alta, M:** o guia tinha seis seções com diagnóstico e cobertura separados em blocos longos. A revisão reuniu reconhecimento com investigação e testes com cobertura, deixando quatro blocos e pausas de previsão antes da execução. Os exercícios explicitam prever, alterar, construir e investigar erro. ID e exemplo principal foram preservados.
+- **Pré-requisitos:** `js-flow` e `js-arrays` → `js-debug` → `js-dom`. Nenhuma dependência circular identificada neste recorte.
+- **Fontes:** [MDN sobre fluxo e erros](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Control_flow_and_error_handling), [MDN sobre `try...catch`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch) e [MDN sobre `console.assert`](https://developer.mozilla.org/en-US/docs/Web/API/console/assert_static) foram abertas em 24/10/2026 (fontes oficiais, EN, OK). Confirmam tratamento síncrono de exceções e que `console.assert` registra falha no Console.
+- **Limite:** executar os testes fornecidos não comprova que um aluno consiga formular a própria hipótese ou detectar um bug novo. Teste manual no navegador e observação com aluno não foram executados nesta revisão.
 
 ### Revisão localizada: `js-es6`
 
