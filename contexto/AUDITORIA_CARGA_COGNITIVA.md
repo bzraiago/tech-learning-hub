@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega e `ai-llms`, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 8 aulas de IA a revisar na prioridade 4.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega, `ai-llms` e `ai-prompts`, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 7 aulas de IA a revisar na prioridade 4.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 8 aulas de IA ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 1 | Média | G | 7 aulas de IA ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
@@ -72,6 +72,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `ai-prompts`
+
+- **Público e saída:** após fundamentos de LLM e Python básico, o aluno deve montar uma estrutura de prompt, testar entrada inválida, preservar dados em JSON e planejar comparação de respostas em casos independentes.
+- **FATO, média, P:** a prática guiada sugeria abstenção para entrada inválida, mas a função lança `ValueError`. O resultado agora descreve essa falha e situa abstenção em uma futura etapa com modelo. Os exercícios cobrem prever, alterar, construir e investigar erro com critérios observáveis.
+- **Julgamento didático:** os cinco blocos (contrato, exemplos, explicação, dados não confiáveis e avaliação) foram preservados com pausas de previsão e desenho. A contagem estrutural continua alerta para observação com aluno.
+- **Pré-requisitos e ambiente:** `setup-python`, `ai-llms` e Python com JSON/exceções → `ai-prompts`. A preparação nomeia pasta, arquivo, terminal, comando por sistema, saída e retomada; não usa API.
+- **Fontes:** [Anthropic sobre contexto](https://www.anthropic.com/research/effective-context-engineering-for-ai-agents), [Python json](https://docs.python.org/3/library/json.html) e [biblioteca padrão Python](https://docs.python.org/3/library/) foram abertas em 25/10/2026 (fontes primárias, EN, OK). O link antigo da Anthropic no catálogo redireciona para a página de pesquisa.
+- **Limite:** o código constrói e serializa dados; não executa inferência nem mede melhora de qualidade, abstenção ou resistência a prompt injection. Observação com aluno não foi executada.
 
 ### Revisão localizada: `ai-llms`
 
