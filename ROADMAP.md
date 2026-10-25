@@ -193,8 +193,8 @@ Toda implementação só pode ser considerada pronta quando:
 **Meta:** separar consumo de conteúdo de capacidade demonstrada.
 
 - [ ] Implementar os estados `Li`, `Pratiquei`, `Passei na revisão` e `Resolvi sozinho`.
-- [ ] Atualizar `state` e `sanitizeState()` com valores padrão e compatibilidade.
-- [ ] Explicar na interface que progresso mede acompanhamento, não domínio.
+- [x] Atualizar `state` e `sanitizeState()` com `learningEvidence` aditivo, valores padrão e preservação de `completed`.
+- [x] Explicar na interface que progresso mede acompanhamento, não domínio.
 - [ ] Criar revisões espaçadas após alguns dias.
 - [ ] Criar revisões acumulativas entre módulos.
 - [ ] Associar erros a aulas específicas para revisão.

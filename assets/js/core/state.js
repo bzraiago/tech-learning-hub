@@ -12,6 +12,7 @@ for (const track of tracks) {
 }
 
 const STORAGE_KEY = 'tech-learning-hub:v1';
+// completed permanece como marcação de acompanhamento; evidências posteriores ficam separadas.
 const $ = (selector) => document.querySelector(selector);
 const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (char) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -38,12 +39,27 @@ function renderReadiness() {
   $('#readiness-items').innerHTML = READINESS_EVIDENCE.map(item => `<li class="rounded-xl border border-white/10 bg-[#101522] p-4"><label class="flex cursor-pointer items-start gap-3"><input type="checkbox" data-readiness="${item.id}" ${state.readiness[item.id] ? 'checked' : ''} class="mt-1 h-4 w-4 shrink-0 accent-emerald-400"><span><strong class="block text-sm text-slate-100">${item.title}</strong><span class="mt-1 block text-xs leading-6 text-slate-400">${item.detail}</span></span></label><button data-track="${item.track}" data-focus="card-${item.track}" class="mt-3 pl-7 text-xs font-semibold text-violet-300 hover:text-violet-100">Abrir trilha relacionada →</button></li>`).join('');
 }
 
+function validEvidenceDate(value) {
+  return typeof value === 'string' && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString() === value ? value : null;
+}
+
 function sanitizeState(candidate) {
-  const clean = { version: 1, completed: {}, activeTrack: 'preparacao', lastLesson: null, notes: {}, quizAttempts: {}, projects: {}, htmlCssRevision: 2, javascriptRevision: 3, pythonRevision: 2, databaseRevision: 3, aiRevision: 2, readiness: {} };
+  const clean = { version: 1, completed: {}, learningEvidence: {}, activeTrack: 'preparacao', lastLesson: null, notes: {}, quizAttempts: {}, projects: {}, htmlCssRevision: 2, javascriptRevision: 3, pythonRevision: 2, databaseRevision: 3, aiRevision: 2, readiness: {} };
   if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return clean;
   if (candidate.completed && typeof candidate.completed === 'object') {
     for (const id of lessonIndex.keys()) {
       if (candidate.completed[id] === true) clean.completed[id] = true;
+    }
+  }
+  for (const id of lessonIndex.keys()) {
+    const entry = candidate.learningEvidence?.[id];
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
+    const practicedAt = validEvidenceDate(entry.practicedAt);
+    const reviewedAt = validEvidenceDate(entry.reviewedAt);
+    const explanation = typeof entry.explanation === 'string' ? entry.explanation.slice(0, 2000).trim() : '';
+    const solvedAt = explanation ? validEvidenceDate(entry.solvedAt) : null;
+    if (practicedAt || reviewedAt || solvedAt) {
+      clean.learningEvidence[id] = { practicedAt, reviewedAt, solvedAt, explanation: solvedAt ? explanation : '' };
     }
   }
   for(const item of READINESS_EVIDENCE)clean.readiness[item.id]=candidate.readiness?.[item.id]===true;
