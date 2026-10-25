@@ -9,7 +9,7 @@
 
 O Tech Learning Hub oferece um caminho de aprendizagem real, mas ainda não está totalmente preparado para conduzir uma pessoa absolutamente leiga até uma formação intermediária autônoma usando somente suas instruções. A preparação digital inicial foi implementada em 24/10/2026; as maiores lacunas restantes estão nas instalações das ferramentas, na progressão entre assuntos e na passagem dos exercícios isolados para aplicações completas.
 
-A aplicação contém **9 trilhas, 28 módulos, 114 aulas, 458 exercícios, 341 questões e 22 projetos** (contagem atualizada em 25/10/2026 com os projetos de fechamento de Git e Qualidade). Esses números descrevem o material disponível; não medem domínio do aluno.
+A aplicação contém **9 trilhas, 28 módulos, 114 aulas, 458 exercícios, 341 questões e 23 projetos** (contagem atualizada em 25/10/2026 com os projetos de fechamento de Git, Qualidade e Integração). Esses números descrevem o material disponível; não medem domínio do aluno.
 
 ## O que já funciona bem
 
@@ -78,7 +78,7 @@ Padrão recomendado para qualquer preparação de ambiente: **objetivo → requi
 4. **Reduzir gradualmente a ajuda.** Começar com exercício guiado, seguir com pistas, depois um enunciado novo e finalmente uma mudança inesperada de requisito. A progressão ainda não é uniforme entre módulos.
 5. **Separar progresso de domínio.** Marcar uma aula como concluída não exige demonstrar competência. Diferenciar “li”, “pratiquei”, “passei na revisão” e “resolvi sozinho”. Os percentuais atuais representam acompanhamento, não domínio comprovado.
 6. **Ampliar a avaliação de transferência.** Três questões por aula ajudam a conferir conceitos, mas não demonstram capacidade de programar. É necessário resolver problemas com dados e contextos diferentes, explicar decisões e corrigir uma falha inédita.
-7. **Criar projeto de fechamento para Integração.** Git e Colaboração já tem projeto formal com histórico, remoto local e revisão por autoavaliação. Qualidade e Manutenção já tem projeto com teste de regressão e verificações isoladas. Integração ainda precisa de entrega observável com publicação e alteração de requisito.
+7. **Executar publicação real após os projetos de laboratório.** Git, Qualidade e Integração já têm projetos de fechamento. O de Integração usa API local, verificações isoladas e plano de publicação; ainda falta conferir uma URL real, CI e recuperação em produção.
 8. **Adicionar revisão acumulativa e recuperação de dificuldades.** Após alguns módulos, pedir uma tarefa que reutilize conhecimentos anteriores. Quando o aluno errar, indicar a aula a revisar e oferecer uma segunda tentativa diferente.
 
 ## Conteúdos e recursos que faltam
@@ -170,7 +170,7 @@ A avaliação final deve combinar funcionamento, testes, explicação e manuten�
 1. ~~Criar a etapa inicial de computador, arquivos, editor e terminal.~~ Concluído em 24/10/2026.
 2. Corrigir o mapa de pré-requisitos e as instruções de instalação/configuração.
 3. Separar resultados esperados das soluções e melhorar os checkpoints de domínio.
-4. Criar projeto final para Integração (Git e Qualidade concluídos).
+4. Executar publicação real e recuperação após os projetos finais de Git, Qualidade e Integração.
 5. Ensinar a ligação completa entre interface, API e banco persistente.
 6. Tornar CI, publicação e integração externa práticas guiadas e verificáveis.
 7. Introduzir a conclusão básica; após as melhorias de integração, introduzir a conclusão intermediária.

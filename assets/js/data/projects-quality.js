@@ -19,6 +19,7 @@ PROJECTS.push({
   ],
   exampleOutput: 'Entrada: [{status:"concluida",minutos:25},{status:"pendente",minutos:40}] → {concluidas:1,minutos:25}.\nEntrada: [{status:"pausada",minutos:15}] após a mudança de requisito → {concluidas:0,minutos:0}.\nEntrada: [{status:"concluida",minutos:-1}] → TypeError.\nAntes da correção: o teste com status ausente falha porque o código herdado o conta como concluído. Depois: o mesmo teste passa e a suíte permanece verde.',
   testCommand: 'node --test relatorio.test.cjs',
+  testFile: 'relatorio.test.cjs',
   testsCode: 'const { test } = require("node:test");\nconst assert = require("node:assert/strict");\nconst { resumirSessoes } = require("./relatorio.cjs");\n\ntest("soma apenas sessões concluídas", () => {\n  assert.deepEqual(resumirSessoes([{status:"concluida",minutos:25},{status:"pendente",minutos:40}]), {concluidas:1,minutos:25});\n});\ntest("regressão: status ausente é inválido", () => {\n  assert.throws(() => resumirSessoes([{minutos:10}]), TypeError);\n});\ntest("novo requisito: sessão pausada não conta", () => {\n  assert.deepEqual(resumirSessoes([{status:"pausada",minutos:15}]), {concluidas:0,minutos:0});\n});',
   checks: [
     { id: 'normal', mode: 'auto', label: 'Conta e soma apenas sessões concluídas.', body: 'const r=resumirSessoes([{status:"concluida",minutos:25},{status:"pendente",minutos:40},{status:"concluida",minutos:0}]); return r.concluidas===2 && r.minutos===25;' },

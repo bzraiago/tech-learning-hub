@@ -28,6 +28,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] A seção "O que demonstrar em cada nível" apresenta as cinco provas, é legível em celular e não libera níveis por conclusão de aula ou quiz.
 - [ ] O projeto de fechamento de Git aparece em Fluxo de trabalho em equipe; as cinco abas abrem, a entrega vazia é recusada e o registro permanece identificado como autoavaliação.
 - [ ] O projeto de Qualidade aparece em Manutenção de projetos e revisão; a função final passa nos testes isolados e o roteiro vermelho→verde continua identificado como verificação local.
+- [ ] O projeto de Integração aparece em Publicação e trabalho em projeto; os testes isolados cobrem sucesso, vazio, falhas e 401, e o plano de publicação não é apresentado como deploy executado.
 - [ ] Após uma resposta incorreta, o feedback indica a aula de revisão; o botão abre os conceitos e a orientação persiste após recarregar.
 - [ ] Nas aulas de preparação digital, um erro no quiz oferece uma tarefa diferente, com critério e pista; o rascunho permanece após recarregar.
 - [ ] Nas aulas de Ambientes essenciais, a segunda tentativa orienta diagnóstico ou retomada sem inventar saídas nem expor credenciais.

@@ -211,7 +211,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Engenharia de IA: dezoito casos novos, de modelos e prompts a avaliação, segurança e projeto final.
   - [x] Expandir as segundas tentativas para as demais aulas (114 de 114 guias).
 - [ ] Exigir explicação das decisões nas provas de nível.
-  - [x] Exigir explicação das decisões e da verificação ao registrar qualquer um dos 20 projetos atuais, preservando entregas anteriores.
+  - [x] Exigir explicação das decisões e da verificação ao registrar os 20 projetos existentes naquela etapa, preservando entregas anteriores; os projetos de fechamento usam o mesmo registro.
   - [ ] Aplicar a exigência às provas de nível quando os projetos de conclusão forem criados na fase 5.
 - [x] Evitar que quiz de múltipla escolha seja tratado como comprovação prática: contagens separadas para conceitos, prática, revisão e problema novo, com feedback explícito.
 - [ ] Criar evidências observáveis para passagem entre os níveis 0, 1, 2, 3 e 4.
@@ -226,9 +226,9 @@ Toda implementação só pode ser considerada pronta quando:
 
 - [x] Criar projeto de fechamento da trilha Git e Colaboração: issue, branch, histórico, remoto local, README, revisão e novo requisito.
 - [x] Criar projeto de fechamento da trilha Qualidade e Manutenção: defeito reproduzido, teste vermelho→verde, refatoração e revisão de interface.
-- [ ] Criar projeto de fechamento da trilha Integração e Entrega.
-- [ ] Garantir objetivo, pré-requisitos, entrega, checks, qualidade e mudança de requisito em cada projeto.
-- [ ] Preferir checks automáticos quando o comportamento puder ser verificado com segurança.
+- [x] Criar projeto de fechamento da trilha Integração e Entrega: adaptador testável, API e interface locais, falhas, novo requisito e plano de publicação.
+- [x] Garantir objetivo, pré-requisitos, entrega, checks, qualidade e mudança de requisito nos três projetos de fechamento.
+- [x] Usar checks automáticos nos contratos JavaScript de Qualidade e Integração; manter histórico Git, interface e execução local como verificações manuais identificadas.
 - [ ] Criar o projeto de nível básico “Organizador pessoal de estudos”.
   - [ ] Interface responsiva, acessível e utilizável por teclado.
   - [ ] Cadastro, edição, conclusão, exclusão e filtro de tarefas.
