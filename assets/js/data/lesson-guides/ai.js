@@ -2570,43 +2570,48 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "ai-capstone": {
-    "prerequisites": "Python: funções, listas, dicionários, JSON, exceções e testes. Releia as aulas anteriores deste módulo antes de prosseguir.",
-    "setup": "Use Python 3.11 ou posterior. Salve o exemplo em aula.py e execute python aula.py (ou py aula.py no Windows). Os exemplos principais usam somente a biblioteca padrão, dados fictícios e nenhuma API. Exercícios de código reutilizam as funções do exemplo; acrescente-os ao final do mesmo arquivo. Atividades de projeto e especificação são resolvidas em texto e comparadas com os critérios fornecidos.",
+    "prerequisites": "Concluir setup-python, ai-data, ai-rag e ai-evals; revisar ai-workflows para estados e falhas. Saber usar funções, listas, dicionários, exceções e testes em Python. O projeto project-ai-capstone exige também os projetos anteriores de recuperação e avaliação.",
+    "setup": "Na pasta ia-estudos, salve o exemplo como ai-capstone.py no editor. Abra o terminal nessa pasta e execute python ai-capstone.py (ou py ai-capstone.py no Windows, python3 ai-capstone.py no macOS/Linux, conforme setup-python). A saída esperada é ok e sem_evidencia em duas linhas. O processo termina sozinho; para retomar, execute o mesmo comando. Se Python não for reconhecido, revise setup-python. Acrescente os exercícios de código ao final do arquivo. Para o projeto completo, use assistente.py e test_assistente.py conforme project-ai-capstone; o exemplo desta aula não chama API nem modelo real.",
     "why": "Integre requisitos, dados, recuperação, contrato de resposta, testes e documentação em um projeto de portfólio.",
     "sections": [
       {
         "title": "Escopo de uma primeira entrega",
         "paragraphs": [
           "Construa um assistente para perguntas sobre um pequeno catálogo de políticas fictícias. Ele deve responder com evidências autorizadas, abster-se quando faltar informação e sinalizar falhas. Esse escopo é suficiente para integrar Python, estruturas de dados, testes, Git e decisões de IA. Não adicione pagamentos, execução de comandos ou dados pessoais para tornar o projeto aparentemente mais completo.",
-          "Escreva histórias verificáveis: como Ana, quero consultar o prazo público; como Bia, não devo receber o documento exclusivo de Ana; como usuário, quero saber quando a base não tem a resposta. Cada história vira um teste. Uma interface bonita só comprova apresentação; a qualidade depende do comportamento nos casos difíceis."
+          "Escreva histórias verificáveis: como Ana, quero consultar o prazo público; como Bia, não devo receber o documento exclusivo de Ana; como usuário, quero saber quando a base não tem a resposta. Cada história vira um teste. Uma interface bonita só comprova apresentação; a qualidade depende do comportamento nos casos difíceis.",
+          "Pausa: escreva a entrada e a saída esperadas para uma pergunta sem evidência antes de examinar a função do exemplo."
         ]
       },
       {
         "title": "Arquitetura com fronteiras",
         "paragraphs": [
           "Separe corpus, recuperador, gerador, validador e interface. O recuperador devolve trechos com IDs; o gerador recebe pergunta e trechos; o validador confere campos e referências. A interface recebe um estado explícito. Evite espalhar chamadas de provedor por todas as funções, pois isso dificulta simular falhas e trocar a implementação.",
-          "Use injeção de dependência: passe a função geradora como argumento. Nos testes, uma função local devolve resposta válida, referência falsa ou timeout. Na integração real, um adaptador chama o modelo. Os mesmos testes de contrato permanecem, mas não substituem avaliações de conteúdo gerado."
+          "Use injeção de dependência: passe a função geradora como argumento. Nos testes, uma função local devolve resposta válida, referência falsa ou timeout. Na integração real, um adaptador chama o modelo. Os mesmos testes de contrato permanecem, mas não substituem avaliações de conteúdo gerado.",
+          "Pausa: identifique o argumento que pode ser substituído por um gerador simulado e diga como provar que ele não foi chamado sem evidência."
         ]
       },
       {
         "title": "Validar e reconhecer limites",
         "paragraphs": [
           "Verifique que a resposta é texto não vazio e que as fontes são IDs presentes nas evidências fornecidas. Rejeite campos ausentes ou tipos errados. Uma estrutura válida ainda pode conter uma afirmação incorreta; compare conteúdo e evidência numa avaliação separada. Não anuncie “resposta verificada” apenas porque o JSON passou no parser.",
-          "A função desta aula demonstra somente a fronteira do gerador, com evidências já selecionadas. O projeto ao final do módulo acrescenta recuperação com autorização e uma suíte de testes. Ambos usam geradores simulados por padrão. Ao apresentar o portfólio, identifique claramente o que foi implementado, simulado e avaliado com modelo real."
+          "A função desta aula demonstra somente a fronteira do gerador, com evidências já selecionadas. O projeto ao final do módulo acrescenta recuperação com autorização e uma suíte de testes. Ambos usam geradores simulados por padrão. Ao apresentar o portfólio, identifique claramente o que foi implementado, simulado e avaliado com modelo real.",
+          "Pausa: preveja o estado para fonte X quando o único ID disponível é A; depois explique por que estado ok ainda não comprova a frase gerada."
         ]
       },
       {
         "title": "Plano de avaliação",
         "paragraphs": [
           "Monte uma tabela com pergunta, usuário, documentos permitidos, resposta ou estado esperado e motivo. Inclua pergunta direta, paráfrase, ausência de resposta, documento privado, fonte contraditória, timeout e referência inventada. Execute a suíte a cada mudança e registre versões.",
-          "Para um modelo real, avalie amostras representativas repetidas quando houver variabilidade. Meça suporte factual, utilidade, abstenção, custo e latência, além de contrato válido. Não ajuste os critérios depois de ver o resultado apenas para aprovar a versão. Defina antes quais falhas impedem a entrega."
+          "Para um modelo real, avalie amostras representativas repetidas quando houver variabilidade. Meça suporte factual, utilidade, abstenção, custo e latência, além de contrato válido. Não ajuste os critérios depois de ver o resultado apenas para aprovar a versão. Defina antes quais falhas impedem a entrega.",
+          "Pausa: para uma resposta com ID permitido mas afirmação contraditória, anote separadamente o resultado do teste de contrato e o da avaliação factual."
         ]
       },
       {
         "title": "Entrega e evolução",
         "paragraphs": [
           "O repositório deve conter README com instalação, comando de testes, arquitetura, exemplos de entrada e saída, origem dos dados e limitações. Inclua um arquivo de exemplo de variáveis de ambiente sem segredos, caso haja integração opcional. Grave uma demonstração ou capturas de casos de sucesso e falha; uma execução feliz isolada não mostra robustez.",
-          "Depois da versão local, adicione um requisito novo: revogar acesso, atualizar uma política ou trocar o gerador. Demonstre que os testes anteriores continuam passando. Esse exercício de manutenção aproxima o projeto do trabalho de desenvolvimento: não basta construir uma vez, é preciso modificar com evidências de que o comportamento esperado foi preservado."
+          "Depois da versão local, adicione um requisito novo: revogar acesso, atualizar uma política ou trocar o gerador. Demonstre que os testes anteriores continuam passando. Esse exercício de manutenção aproxima o projeto do trabalho de desenvolvimento: não basta construir uma vez, é preciso modificar com evidências de que o comportamento esperado foi preservado.",
+          "Pausa: escolha uma mudança de requisito e indique um teste antigo e um teste novo que devem passar após a alteração."
         ]
       }
     ],
@@ -2627,7 +2632,7 @@ Object.assign(LESSON_GUIDES, {
       },
       {
         "instruction": "Execute o exemplo e depois substitua uma entrada válida por uma entrada ausente ou inválida.",
-        "result": "Compare o comportamento com o contrato. Uma falha explícita ou uma abstenção pode ser o resultado correto; não a substitua por uma resposta inventada."
+        "result": "Sem evidências, o estado é sem_evidencia e gerar não é chamado; com fonte X fora do conjunto {A}, o estado é revisar."
       },
       {
         "instruction": "Resolva os quatro exercícios. Guarde código, previsão, saída e explicação do que mudou.",
@@ -2636,7 +2641,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Simule uma referência inventada.",
+        "prompt": "Prever: antes de executar, simule uma referência inventada X quando a evidência tem apenas ID A. Aceite: fonte X → estado revisar; explique que o teste valida IDs, não o sentido da resposta.",
         "hints": [
           "Retorne fonte X.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -2646,7 +2651,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "O validador recusa referências fora do contexto."
       },
       {
-        "prompt": "Simule timeout.",
+        "prompt": "Alterar: substitua o gerador por uma função que lança TimeoutError. Aceite: evidência A + timeout → estado indisponivel, sem resposta inventada.",
         "hints": [
           "Levante TimeoutError no gerador.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -2656,7 +2661,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "Falha técnica é diferente de ausência de evidência."
       },
       {
-        "prompt": "Prove que nenhuma geração ocorre sem evidências.",
+        "prompt": "Construir: escreva um gerador que falha se for chamado e teste a pergunta sem evidências. Aceite: lista vazia → sem_evidencia; AssertionError não ocorre porque gerar não é chamado.",
         "hints": [
           "Use um gerador que falha se chamado.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -2666,7 +2671,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "A decisão de abstenção antecede a chamada."
       },
       {
-        "prompt": "Escreva um critério de aceitação para revogação de acesso no projeto completo.",
+        "prompt": "Investigar erro: no projeto completo, a permissão de Ana para o documento A foi revogada, mas A ainda aparece no contexto enviado ao gerador. Escreva critério de aceite e diagnóstico para índice, cache e contexto. Aceite: nova consulta de Ana → A ausente dos candidatos, do contexto e da resposta; teste observa os IDs enviados. Esta atividade é respondida em texto.",
         "hints": [
           "Considere índice, cache e contexto enviado.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."

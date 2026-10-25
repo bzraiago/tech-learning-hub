@@ -163,7 +163,7 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `js-es6`: reunir extração e cópias, intercalar previsões sobre retorno, referências e valores ausentes e explicitar quatro tipos de exercício.
     - [x] `js-debug`: reunir diagnóstico e testes em quatro blocos, praticar hipótese antes da correção e explicitar quatro tipos de exercício.
     - [x] `js-modules`: ligar o laboratório à preparação do servidor local, reunir teste e diagnóstico e explicitar quatro tipos de exercício.
-  - [ ] Prioridade 4: revisar 15 aulas de IA/Entrega, preservando o nível avançado quando os pré-requisitos forem suficientes.
+  - [x] Prioridade 4: revisar 15 aulas de IA/Entrega, preservando o nível avançado quando os pré-requisitos forem suficientes.
     - [x] `delivery-http`: manter cinco etapas do contrato HTTP com práticas intermediárias, explicitar a preparação Node e corrigir a solução da rota por ID.
     - [x] `delivery-forms`: preservar as etapas da integração, adicionar GET da coleção ao laboratório e verificar que POST inválido não altera os dados.
     - [x] `delivery-security`: distinguir 401 e 403 na simulação, reforçar fronteiras de autorização e praticar previsão, alteração, construção e diagnóstico.
@@ -178,6 +178,7 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `ai-rag`: distinguir busca lexical vazia de ausência comprovada de evidência, verificar acesso e separar citação válida de suporte factual.
     - [x] `ai-skills`: criar um exemplo de `SKILL.md` com escopo e autorização explícitos, testar o validador local e distinguir instruções de execução real.
     - [x] `ai-workflows`: intercalar previsões na máquina de estados, praticar cancelamento e eventos atrasados e delimitar o tratamento textual de timeout.
+    - [x] `ai-capstone`: ligar o exemplo ao projeto completo, intercalar previsões e separar teste de contrato de avaliação factual.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
 - [ ] Adicionar demonstrações visuais de laços.
 - [ ] Adicionar diagramas de referências e cópias entre objetos.

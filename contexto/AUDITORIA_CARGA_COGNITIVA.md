@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega, `ai-llms`, `ai-prompts`, `ai-system`, `ai-data`, `ai-embeddings`, `ai-rag`, `ai-skills` e `ai-workflows`, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; resta 1 aula de IA a revisar na prioridade 4.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega e nove aulas de IA, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2, 3 e 4 foram concluídas. A contagem estrutural permanece como sinal para observação com aluno.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 1 aula de IA ainda não revisada | RISCO | Possui cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 1 | Média | M | 15 aulas revisadas com cinco seções | RISCO | A revisão adicionou pausas, mas ainda não há observação com alunos para confirmar que o ritmo é adequado. | Observar uma sessão por nível e dividir onde houver travamento recorrente. |
 | 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
@@ -72,6 +72,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `ai-capstone`
+
+- **Público e saída:** após `ai-data`, `ai-rag`, `ai-evals` e as aulas de fluxo, o aluno deve testar o contrato de um gerador simulado, planejar recuperação autorizada e documentar avaliação factual separada.
+- **FATO, média, P:** a preparação apontava para `aula.py` e o segundo passo guiado não tinha resultado específico. A revisão nomeia `ai-capstone.py`, apresenta saídas e quatro práticas explícitas: prever, alterar, construir e investigar erro.
+- **Julgamento didático:** cinco blocos foram mantidos para escopo, fronteiras, validação, avaliação e entrega. Cada bloco inclui uma pausa de previsão ou decisão. O projeto completo é `project-ai-capstone`, com testes e README próprios.
+- **Pré-requisitos e ambiente:** `setup-python`, `ai-data`, `ai-rag`, `ai-evals`, `ai-workflows` → `ai-capstone` → `project-ai-capstone`. O exemplo usa Python local e gerador simulado; a preparação indica arquivo, comandos por sistema, saída e retomada.
+- **Fontes:** [Anthropic sobre agentes](https://www.anthropic.com/research/building-effective-agents), [Anthropic sobre engenharia de contexto](https://www.anthropic.com/research/effective-context-engineering-for-ai-agents) e [biblioteca padrão Python](https://docs.python.org/3/library/) foram abertas em 25/10/2026 (fontes primárias, EN, OK). O primeiro artigo sinaliza que detalhes de ferramentas mudaram desde sua publicação.
+- **Limite:** `ok` comprova apenas estrutura e IDs aceitos. O exemplo não recupera documentos, autentica usuários nem mede se a frase é sustentada. O teste manual no navegador e a observação com aluno não foram executados.
 
 ### Revisão localizada: `ai-workflows`
 

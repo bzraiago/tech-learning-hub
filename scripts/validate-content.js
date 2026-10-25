@@ -281,7 +281,7 @@ for (const lessonId of reviewedDeliveryLessonIds) {
   }
 }
 
-const reviewedAiLessonIds = ['ai-llms', 'ai-prompts', 'ai-system', 'ai-data', 'ai-embeddings', 'ai-rag', 'ai-skills', 'ai-workflows'];
+const reviewedAiLessonIds = ['ai-llms', 'ai-prompts', 'ai-system', 'ai-data', 'ai-embeddings', 'ai-rag', 'ai-skills', 'ai-workflows', 'ai-capstone'];
 for (const lessonId of reviewedAiLessonIds) {
   const guide = LESSON_GUIDES[lessonId];
   if (!guide) {
@@ -302,6 +302,7 @@ const aiLessonSpecificGuidance = {
   'ai-rag': ['ai-rag.py', 'carlos'],
   'ai-skills': ['skills_locais.py', 'Preço zero'],
   'ai-workflows': ['ai-workflows.py', 'confirmacao necessaria'],
+  'ai-capstone': ['ai-capstone.py', 'sem_evidencia'],
 };
 for (const [lessonId, [filename, guidedTerm]] of Object.entries(aiLessonSpecificGuidance)) {
   const guide = LESSON_GUIDES[lessonId];
