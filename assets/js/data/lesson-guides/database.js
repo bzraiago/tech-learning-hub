@@ -679,8 +679,11 @@ Object.assign(LESSON_GUIDES, {
         "title": "Desenhar a junção com poucos registros",
         "paragraphs": [
           "Escreva as duas linhas de TRILHAS e as duas de LICOES em papel. Para cada trilha, compare t.id com l.trilha_id. Dados combina com as duas; Python não combina com nenhuma. INNER JOIN mantém apenas combinações encontradas. LEFT JOIN produz essas combinações e acrescenta uma linha de ausência para Python. A coluna l.id nessa linha é NULL, enquanto t.id continua sendo 2. Os aliases são nomes locais que deixam explícito de qual tabela vem cada campo e evitam ambiguidade quando ambas têm coluna id.",
-          "O lado esquerdo deve ser o conjunto que o relatório precisa preservar. Se o pedido é listar toda trilha, comece por trilhas. Se o pedido é listar toda lição e seu nome de trilha, comece pelas lições e reflita sobre a integridade referencial. Uma FK obrigatória corretamente aplicada evita lições órfãs, mas consultas de diagnóstico podem lidar com importações antigas ou relações opcionais. Não confunda uma junção que encontrou correspondência com uma FK que impede dados inválidos: a consulta lê o estado atual; a restrição protege futuras escritas."
-        ]
+          "O lado esquerdo deve ser o conjunto que o relatório precisa preservar. Se o pedido é listar toda trilha, comece por trilhas. Se o pedido é listar toda lição e seu nome de trilha, comece pelas lições e reflita sobre a integridade referencial. Uma FK obrigatória corretamente aplicada evita lições órfãs, mas consultas de diagnóstico podem lidar com importações antigas ou relações opcionais. Não confunda uma junção que encontrou correspondência com uma FK que impede dados inválidos: a consulta lê o estado atual; a restrição protege futuras escritas.",
+          "Pausa de previsão: antes de olhar o mapa, desenhe as duas tabelas do exemplo e anote quantas linhas INNER JOIN e LEFT JOIN devolvem. Depois compare suas linhas com o mapa e execute as consultas."
+        ],
+        "diagramTitle": "Da condição ON às linhas e à contagem",
+        "diagram": "TRILHAS t                 LICOES l\nid  nome                  id  trilha_id  titulo\n1   Dados ─────────────→  10  1          SELECT\n         └─────────────→  11  1          JOIN\n2   Python ─────────────→  sem lição correspondente\n\nON l.trilha_id = t.id\nINNER JOIN → Dados | SELECT\n             Dados | JOIN\nLEFT JOIN  → Dados | SELECT | l.id 10\n             Dados | JOIN   | l.id 11\n             Python | NULL | l.id NULL\n\nGROUP BY t.id, t.nome; COUNT(l.id)\nDados → 2 lições     Python → 0 lições\nCOUNT(*) contaria a linha preservada de Python como 1."
       }
     ],
     "example": {

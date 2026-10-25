@@ -182,7 +182,7 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes; observar com alunos as 15 aulas que mantiveram cinco seções.
 - [x] Adicionar demonstrações visuais de laços com rastreamento de `for` e `while` em `js-flow`.
 - [x] Adicionar diagramas de referências e cópias rasas em `js-arrays` e `js-es6`.
-- [ ] Adicionar visualização de consultas e `JOIN`.
+- [x] Adicionar visualização de consultas e `JOIN` em `db-joins`, da condição `ON` ao resultado e à contagem.
 - [ ] Adicionar sequência visual de uma requisição HTTP.
 - [ ] Criar glossário contextual para termos como runtime, schema, callback, endpoint, mock e inferência.
 

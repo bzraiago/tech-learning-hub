@@ -87,6 +87,13 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 - **Fontes:** [MDN sobre `slice()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) e [MDN sobre spread](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) foram abertas em 25/10/2026 (documentação de referência, EN, OK). Ambas descrevem a cópia rasa usada nos exemplos.
 - **Limite:** os mapas representam apenas os objetos do exemplo e usam texto rolável para preservar a leitura por teclado. Resultado com aluno e teste visual manual no navegador ainda não foram observados.
 
+### Visualização de consultas: `db-joins`
+
+- **FATO, média, P:** a aula pedia que o aluno desenhasse a junção, mas o leitor não oferecia um mapa para comparação. Foi incluído um diagrama com as duas tabelas do exemplo, pares formados por `ON`, linhas de `INNER` e `LEFT JOIN`, `NULL` e `COUNT(l.id)`.
+- **Pré-requisitos:** `db-select`, `db-aggregation` e chaves estrangeiras → `db-joins`; a aula mantém SQLite local descartável como ambiente.
+- **Fontes:** [SQLite sobre `SELECT`](https://www.sqlite.org/lang_select.html) e [SQLite sobre agregações](https://www.sqlite.org/lang_aggfunc.html) foram abertas em 25/10/2026 (documentação oficial, EN, OK). A referência de `SELECT` ressalta que sua descrição em etapas é ilustrativa, não uma promessa de ordem física do motor.
+- **Limite:** o mapa apresenta um conjunto pequeno e fixo; interpretar outra junção continua sendo tarefa do aluno. Teste visual manual no navegador e observação com aluno ainda não foram executados.
+
 ### Revisão localizada: `ai-capstone`
 
 - **Público e saída:** após `ai-data`, `ai-rag`, `ai-evals` e as aulas de fluxo, o aluno deve testar o contrato de um gerador simulado, planejar recuperação autorizada e documentar avaliação factual separada.
