@@ -181,7 +181,17 @@ Object.assign(LESSON_GUIDES, {
           "Um acumulador guarda um resultado que cresce a cada volta. Declare let total = 0 antes do laço e use total += minutosPorSessao dentro dele. Se reiniciar total dentro do corpo, cada volta apaga a anterior. Uma string também pode acumular linhas: relatorio += `Dia ${dia}\n`. A sequência \n dentro da string representa uma quebra de linha; pre preserva essa quebra na tela.",
           "Faça uma tabela de rastreamento com colunas volta, dia, total antes e total depois. Para três sessões de 20 minutos, os totais depois são 20, 40 e 60. Essa simulação manual revela se a condição deve usar \u003c ou \u003c=. A contagem de elementos de uma coleção começará em zero em uma aula futura; aqui os dias começam em um por escolha do problema.",
           "Pausa de prática: preencha a tabela para duas sessões antes de executar o for. Compare cada valor de dia e total com a saída e localize a primeira divergência."
-        ]
+        ],
+        "trace": {
+          "title": "Rastreamento do for: 3 sessões de 20 minutos",
+          "columns": ["Teste", "dia", "total antes", "Ação", "total depois"],
+          "rows": [
+            ["1 ≤ 3: sim", "1", "0", "somar 20", "20"],
+            ["2 ≤ 3: sim", "2", "20", "somar 20", "40"],
+            ["3 ≤ 3: sim", "3", "40", "somar 20", "60"],
+            ["4 ≤ 3: não", "4", "60", "parar", "60"]
+          ]
+        }
       },
       {
         "title": "while, parada e desvios",
@@ -190,7 +200,17 @@ Object.assign(LESSON_GUIDES, {
           "Como aprofundamento, do { ... } while (condicao) executa pelo menos uma vez, porque testa no final. break encerra o laço atual; continue pula o restante da volta atual. Em while, colocar continue antes da atualização pode impedir o avanço e criar um laço infinito. Nos primeiros exercícios prefira estruturas simples sem desvios desnecessários.",
           "Também como aprofundamento, switch compara um valor com casos por igualdade estrita e pode ser útil para opções discretas, como \"manha\" ou \"noite\". Cada case normalmente termina em break para evitar continuar no próximo; default cobre valores não previstos. Para faixas de pontuação, if costuma representar melhor o problema.",
           "Pausa de prática: escreva os valores de falta em cada volta de let falta = 3; while (falta > 0) { falta -= 1; }. Marque o teste que impede uma quarta volta."
-        ]
+        ],
+        "trace": {
+          "title": "Rastreamento do while: faltam 3 repetições",
+          "columns": ["Teste", "falta antes", "Ação", "falta depois"],
+          "rows": [
+            ["3 > 0: sim", "3", "subtrair 1", "2"],
+            ["2 > 0: sim", "2", "subtrair 1", "1"],
+            ["1 > 0: sim", "1", "subtrair 1", "0"],
+            ["0 > 0: não", "0", "parar", "0"]
+          ]
+        }
       },
       {
         "title": "Pensar em casos antes do código",

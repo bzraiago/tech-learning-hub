@@ -71,7 +71,14 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 3. [Concluído] Separar filtros/`NULL` de agregações em `db-select` e `db-aggregation`.
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
-6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+6. [Concluído] Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4. As 15 aulas restantes com cinco seções foram mantidas após revisão; o julgamento do ritmo ainda exige observação com aluno.
+
+### Demonstração visual: `js-flow`
+
+- **FATO, média, P:** o texto já pedia uma tabela de rastreamento, mas o leitor não mostrava uma. Foram incluídas tabelas de `for` e `while` com teste, estado antes, ação e estado depois, incluindo o teste final que interrompe cada laço.
+- **Pré-requisitos:** `js-values` → `js-flow`; não há ferramenta nova. As tabelas acompanham o exemplo local e permitem comparar previsão e saída.
+- **Fontes:** [MDN sobre `for`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for) e [MDN sobre `while`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/while) foram abertas em 25/10/2026 (documentação de referência, EN, OK).
+- **Limite:** as tabelas mostram casos fixos, não uma execução interativa. A compreensão e a transferência para outro laço dependem da atividade do aluno; teste manual no navegador e observação com aluno ainda não foram executados.
 
 ### Revisão localizada: `ai-capstone`
 
