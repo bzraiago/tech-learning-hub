@@ -1,12 +1,12 @@
 # Auditoria didática — carga cognitiva das aulas
 
 **Data:** 24/10/2026  
-**Verificação de fontes:** parcial; fontes SQLite, Docker e MongoDB CRUD das candidatas revisadas conferidas
+**Verificação de fontes:** parcial; fontes SQLite, Docker, MongoDB CRUD e acessibilidade HTML das candidatas revisadas conferidas
 **Escopo:** aulas com mais de quatro seções conceituais em `LESSON_GUIDES`
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-security`, a auditoria automática aponta 26: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 foi concluída.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `html-accessibility`, a auditoria automática aponta 25: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 foi concluída e a prioridade 3 começou.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 5 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
+| 1 | Média | G | 4 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 2 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 3 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
@@ -73,6 +73,14 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `html-accessibility`
+
+- **Público e saída:** após documento, links, formulários e tabelas HTML, o aluno deve construir uma página com estrutura, nomes e instruções claros, percorrê-la pelo teclado e registrar problemas observáveis. Editor e navegador bastam; a aula não exige instalação nova.
+- **FATO, média, M:** o guia tinha seis seções centrais e exercícios identificados como `Construir` e rótulos informais. Ele agora organiza os mesmos conceitos em quatro blocos e explicita prever, alterar, construir e investigar erro, com resultado esperado antes da solução. O ID `html-accessibility` e o exemplo principal foram preservados.
+- **Pré-requisitos:** `html-semantic` → `html-links-media` → `html-forms` → `html-tables` → `html-accessibility`. Nenhuma dependência circular identificada neste recorte.
+- **Fontes:** [MDN sobre `details`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details) e [MDN sobre acesso por teclado](https://developer.mozilla.org/en-US/docs/Web/Accessibility/Guides/Understanding_WCAG/Keyboard) foram abertas em 24/10/2026 (fontes oficiais, EN, OK); sustentam o uso de controles nativos e foco perceptível. A documentação externa complementa a explicação interna.
+- **Limite:** a validação automatizada e a leitura do guia não substituem o teste com aluno real. A navegação manual por teclado e o zoom no navegador não foram executados nesta revisão.
 
 ### Revisão localizada: `db-docker-basics`
 

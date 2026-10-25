@@ -172,6 +172,22 @@ const setupMarkers = [
 ];
 const exerciseKinds = ['Prever:', 'Alterar:', 'Construir:', 'Investigar erro:'];
 
+const progressiveHtmlLessonIds = ['html-accessibility'];
+for (const lessonId of progressiveHtmlLessonIds) {
+  const guide = LESSON_GUIDES[lessonId];
+  if (!guide) {
+    fail(`Aula progressiva obrigatória ausente: ${lessonId}`);
+    continue;
+  }
+  if (guide.sections.length > 4) fail(`Aula ${lessonId} ainda tem mais de quatro seções centrais.`);
+  const prompts = (guide.exercises || []).map((exercise) => exercise.prompt || '');
+  for (const kind of exerciseKinds) {
+    if (!prompts.some((prompt) => prompt.startsWith(kind))) {
+      fail(`Aula ${lessonId} sem exercício do tipo ${kind}`);
+    }
+  }
+}
+
 for (const lessonId of preparationIds) {
   const guide = LESSON_GUIDES[lessonId];
   if (!guide) {

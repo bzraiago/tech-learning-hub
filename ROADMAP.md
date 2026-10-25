@@ -152,6 +152,7 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `db-recovery`: organizar metas, restauração, retenção e migração segura em um ensaio verificável.
     - [x] `db-security`: separar parametrização, autorização, escopo de alteração e fronteira operacional.
   - [ ] Prioridade 3: revisar 11 aulas de HTML/JavaScript e distinguir aprofundamento legítimo de sobrecarga.
+    - [x] `html-accessibility`: reunir conteúdo, navegação e revisão em quatro blocos; explicitar previsão, alteração, construção e investigação de erro.
   - [ ] Prioridade 4: revisar 15 aulas de IA/Entrega, preservando o nível avançado quando os pré-requisitos forem suficientes.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
 - [ ] Adicionar demonstrações visuais de laços.

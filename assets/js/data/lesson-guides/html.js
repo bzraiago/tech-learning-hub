@@ -638,22 +638,17 @@ Object.assign(LESSON_GUIDES, {
     "why": "Acessibilidade significa permitir que pessoas com diferentes formas de perceber e interagir consigam compreender e operar o conteúdo. Uma estrutura clara beneficia também quem usa teclado por preferência, está com mobilidade limitada temporariamente ou amplia a página. Não é uma camada colocada no fim: as escolhas de títulos, links, imagens e formulários das aulas anteriores já constroem essa base.",
     "sections": [
       {
-        "title": "1. Conteúdo compreensível antes de qualquer técnica",
+        "title": "1. Conteúdo, estrutura e atalhos que orientam",
         "paragraphs": [
           "Pergunte o que a pessoa precisa fazer e quais informações permitem essa tarefa. Títulos descritivos, instruções no momento certo e linguagem direta reduzem esforço. Não dependa apenas de cor, posição ou forma: a instrução clique no botão verde à direita fica ambígua quando a apresentação muda. Prefira o nome da ação, como Testar formulário.",
-          "O idioma em html ajuda a interpretar e pronunciar o conteúdo. Quando uma expressão longa estiver em outro idioma, lang pode identificar esse trecho. Informações importantes precisam existir como texto, alternativa ou estrutura acessível, não só como desenho. Uma foto de um aviso com todos os horários exige que esses horários também sejam oferecidos de forma textual."
-        ]
-      },
-      {
-        "title": "2. Estrutura que permite orientação",
-        "paragraphs": [
+          "O idioma em html ajuda a interpretar e pronunciar o conteúdo. Quando uma expressão longa estiver em outro idioma, lang pode identificar esse trecho. Informações importantes precisam existir como texto, alternativa ou estrutura acessível, não só como desenho. Uma foto de um aviso com todos os horários exige que esses horários também sejam oferecidos de forma textual.",
           "Um documento organizado pode ser entendido como um sumário: o h1 apresenta o assunto, h2 divide os tópicos e h3 detalha cada tópico. Regiões como main e nav oferecem outras formas de orientação. Não transforme toda caixa em section nem adicione títulos vazios só para preencher uma regra; a divisão deve corresponder a assuntos reais.",
           "O link Pular para o conteúdo principal permite evitar a navegação repetida. Seu href aponta para id=\"conteudo\". No exemplo, main recebe tabindex=\"-1\" para poder receber foco quando direcionado, sem entrar na sequência comum de Tab. O link permanece visível porque ainda estamos estudando HTML; esconder e mostrar um atalho com CSS exige preservar seu acesso quando focado.",
           "Quando há várias navegações, nomes distintos ajudam a identificar seus papéis. aria-label=\"Principal\" acrescenta um nome à nav do exemplo. Isso não substitui o texto dos links nem é necessário em todos os elementos. Cada atributo ARIA deve responder a uma necessidade real, e atributos mal aplicados podem piorar a informação fornecida."
         ]
       },
       {
-        "title": "3. Navegação por teclado e foco",
+        "title": "2. Navegação por teclado e foco",
         "paragraphs": [
           "Foco é o elemento que recebe a interação do teclado naquele momento. Tab costuma avançar entre controles interativos; Shift + Tab retorna. Enter ativa links e botões; Espaço ativa botões e checkboxes conforme o controle. Setas têm funções em grupos de radio e seletores. Essas convenções vêm dos elementos nativos: preservá-las economiza trabalho e mantém previsibilidade.",
           "O indicador de foco permite saber onde você está. Sem CSS personalizado, o navegador oferece um indicador padrão. Depois, ao estilizar, não remova outline sem oferecer outro indicador perceptível. A ordem do foco normalmente acompanha a ordem do documento. Não tente consertar uma ordem de leitura ruim com tabindex positivo; reorganize o HTML para que a sequência faça sentido.",
@@ -661,7 +656,7 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "4. Nome, função, descrição e estado",
+        "title": "3. Nome, função, descrição e estado",
         "paragraphs": [
           "Um controle precisa comunicar o que é e para que serve. Em \u003cbutton>Salvar rascunho\u003c/button>, o elemento fornece a função de botão e o texto fornece seu nome. Em um input, label normalmente fornece o nome. Uma descrição acrescenta ajuda além desse nome. No exemplo, aria-describedby=\"orientacao\" conecta o campo ao parágrafo com instruções, sem esconder a orientação de quem enxerga.",
           "Não coloque aria-label em todos os elementos automaticamente. Ele pode substituir um nome calculado de conteúdo em contextos compatíveis, criando diferença entre o texto visível e o que é anunciado. Isso confunde pessoas que usam comandos por voz e procuram o nome que está na tela. Primeiro use o HTML adequado e um rótulo visível; recorra a ARIA para complementar uma necessidade que realmente exista.",
@@ -669,16 +664,11 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "5. Uma rotina de testes manuais",
+        "title": "4. Uma rotina de testes manuais e validação",
         "paragraphs": [
           "Comece sem mouse. Recarregue a página e pressione Tab até o primeiro link. Observe o foco e ative o atalho. Depois percorra links, detalhes e formulário. Verifique se a ordem acompanha a leitura e se você consegue sair de cada controle, sem ficar preso. Os detalhes devem abrir e fechar pelo teclado; o formulário deve levar a um campo inválido quando necessário.",
           "Aumente o zoom para 200% e confira se informações e controles continuam disponíveis. Esse teste não prova acessibilidade completa, mas revela cortes e sobreposições frequentes. No HTML simples o texto tende a quebrar naturalmente; quando o CSS for aplicado, será necessário repetir o teste. Não bloqueie zoom com parâmetros restritivos no viewport.",
-          "Leia apenas títulos e textos de links. O conjunto ainda explica a organização e os destinos? Clique nos rótulos e confira se o campo correspondente recebe foco. Verifique imagens informativas e decorativas separadamente. Registre problemas com ação, resultado observado e resultado esperado: isso produz uma correção verificável, não uma avaliação vaga como parece acessível."
-        ]
-      },
-      {
-        "title": "6. Validar ajuda, mas não substitui julgamento",
-        "paragraphs": [
+          "Leia apenas títulos e textos de links. O conjunto ainda explica a organização e os destinos? Clique nos rótulos e confira se o campo correspondente recebe foco. Verifique imagens informativas e decorativas separadamente. Registre problemas com ação, resultado observado e resultado esperado: isso produz uma correção verificável, não uma avaliação vaga como parece acessível.",
           "Um verificador de HTML pode encontrar tags mal aninhadas, atributos inválidos e alguns ids duplicados. Uma auditoria de acessibilidade pode detectar certos rótulos ausentes e problemas de contraste quando houver CSS. Essas ferramentas são complementares ao conteúdo da aula, não leituras obrigatórias. Nenhuma delas sabe automaticamente se uma alternativa textual descreve bem uma imagem ou se uma instrução faz sentido para iniciantes.",
           "Uma boa revisão combina estrutura, testes de interação e avaliação humana do conteúdo. Se você ainda não testou com leitor de tela ou usuários, registre esse limite em vez de declarar conformidade completa. Nesta etapa, o objetivo verificável é construir uma página semanticamente organizada, percorrível por teclado e com nomes e instruções explícitos. O próximo módulo acrescentará contraste, apresentação e adaptação visual."
         ]
@@ -712,24 +702,24 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: acrescente uma terceira pergunta expansível sobre custo, usando apenas details e summary.",
+        "prompt": "Prever: antes de executar, diga se uma terceira pergunta feita com details e summary abre pelo teclado sem JavaScript. Depois acrescente a pergunta sobre custo e teste com Enter e Espaço.",
         "hints": [
           "Coloque summary primeiro.",
           "A resposta fica no mesmo details, depois de summary."
         ],
         "solution": "\u003cdetails>\u003csummary>Os encontros têm custo?\u003c/summary>\u003cp>Não. Os encontros deste exemplo são gratuitos.\u003c/p>\u003c/details>",
         "explanation": "Insira na seção de dúvidas. O comportamento de abrir e fechar não exige eventos manuais.",
-        "expected": "A pergunta aparece na ordem de leitura e abre por teclado."
+        "expected": "Previsão registrada antes da execução; a pergunta aparece na ordem de leitura e abre e fecha pelo teclado."
       },
       {
-        "prompt": "Completar: um campo com id=\"nome\" precisa da instrução visível Use seu nome de preferência. Escreva rótulo, controle e conexão da descrição.",
+        "prompt": "Alterar: no formulário do exemplo, acrescente um campo com id=\"nome\" e a instrução visível Use seu nome de preferência. Escreva rótulo, controle e conexão da descrição sem remover o campo de e-mail.",
         "hints": [
           "label associa por for.",
           "aria-describedby aponta para o id do texto de ajuda."
         ],
         "solution": "\u003clabel for=\"nome\">Nome de preferência\u003c/label>\n\u003cinput id=\"nome\" name=\"nome\" aria-describedby=\"ajuda-nome\">\n\u003cp id=\"ajuda-nome\">Use seu nome de preferência.\u003c/p>",
         "explanation": "O nome e a descrição têm funções distintas; a instrução não fica presa a um placeholder.",
-        "expected": "O label foca o input e o id de ajuda existe uma única vez."
+        "expected": "Os dois campos continuam presentes; o novo label foca o input e o id de ajuda existe uma única vez."
       },
       {
         "prompt": "Construir: faça uma página de perguntas frequentes com h1, duas seções h2 e ao menos três detalhes expansíveis. Inclua atalho para main e navegação por fragmentos. Execute uma revisão somente com teclado.",
@@ -742,7 +732,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Todas as perguntas funcionam pelo teclado; os links chegam a ids existentes e os títulos formam um sumário coerente."
       },
       {
-        "prompt": "Depurar: uma interface mostra \u003cdiv tabindex=\"0\">Abrir ajuda\u003c/div> e nenhuma resposta. Substitua por um controle nativo que revele uma orientação sem JavaScript.",
+        "prompt": "Investigar erro: uma interface mostra \u003cdiv tabindex=\"0\">Abrir ajuda\u003c/div> e nenhuma resposta. Primeiro descreva o que acontece ao focar e pressionar Enter. Depois substitua por um controle nativo que revele uma orientação sem JavaScript.",
         "hints": [
           "Só receber foco não implementa uma ação.",
           "details resolve a interação específica de revelar conteúdo."
