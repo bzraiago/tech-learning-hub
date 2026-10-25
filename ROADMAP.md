@@ -174,6 +174,7 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `ai-prompts`: separar erros da função de abstenção por modelo, praticar desenho de prompt e avaliação com casos reservados.
     - [x] `ai-system`: exercitar filtro de evidências antes da montagem de contexto e distinguir memória externa de treinamento.
     - [x] `ai-data`: verificar origem e acesso herdados pelos chunks e planejar troca de versão sem resultados antigos.
+    - [x] `ai-embeddings`: intercalar cálculos de cosseno e recuperação com decisões sobre relevância e acesso, sem atribuir semântica aos vetores fictícios.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
 - [ ] Adicionar demonstrações visuais de laços.
 - [ ] Adicionar diagramas de referências e cópias entre objetos.

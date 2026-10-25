@@ -1067,8 +1067,8 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "ai-skills": {
-    "prerequisites": "Python: funções, listas, dicionários, JSON, exceções e testes. Releia as aulas anteriores deste módulo antes de prosseguir.",
-    "setup": "Use Python 3.11 ou posterior. Salve o exemplo em aula.py e execute python aula.py (ou py aula.py no Windows). Os exemplos principais usam somente a biblioteca padrão, dados fictícios e nenhuma API. Exercícios de código reutilizam as funções do exemplo; acrescente-os ao final do mesmo arquivo. Atividades de projeto e especificação são resolvidas em texto e comparadas com os critérios fornecidos.",
+    "prerequisites": "Concluir setup-python e ai-data; saber usar funções, listas, dicionários e exceções em Python. Esta aula usa vetores numéricos desenhados à mão.",
+    "setup": "Na pasta ia-estudos, salve o exemplo como ai-embeddings.py no editor. Abra o terminal nessa pasta e execute python ai-embeddings.py (ou py ai-embeddings.py no Windows, python3 ai-embeddings.py no macOS/Linux, conforme setup-python). A saída esperada é A 0.80 e B 0.00 em duas linhas. O processo termina sozinho; para retomar, execute o mesmo comando. Se Python não for reconhecido, revise setup-python. Acrescente os exercícios ao fim do arquivo. Usa só biblioteca padrão e vetores fictícios, sem modelo de embeddings, API ou banco vetorial.",
     "why": "Empacote um procedimento com escopo, exemplos e verificações, mantendo permissões fora do texto.",
     "sections": [
       {
@@ -1124,7 +1124,7 @@ Object.assign(LESSON_GUIDES, {
       },
       {
         "instruction": "Execute o exemplo e depois substitua uma entrada válida por uma entrada ausente ou inválida.",
-        "result": "Compare o comportamento com o contrato. Uma falha explícita ou uma abstenção pode ser o resultado correto; não a substitua por uma resposta inventada."
+        "result": "Vetor nulo lança ValueError vetor nulo; dimensão diferente lança ValueError dimensoes invalidas. A função calcula números e não gera uma resposta de modelo."
       },
       {
         "instruction": "Resolva os quatro exercícios. Guarde código, previsão, saída e explicação do que mudou.",
@@ -1530,35 +1530,40 @@ Object.assign(LESSON_GUIDES, {
         "title": "O que um vetor representa",
         "paragraphs": [
           "Um vetor é uma sequência de números. Um embedding é uma representação numérica produzida por um modelo para que relações úteis possam ser comparadas. Textos de significados próximos podem receber vetores próximos, dependendo do modelo e do treinamento. As dimensões de embeddings reais não costumam ter nomes interpretáveis como “preço” ou “devolução”.",
-          "No exemplo usamos vetores desenhados à mão para estudar a matemática. Eles não são embeddings calculados de textos e não demonstram compreensão semântica. Para uma busca real, documentos e consultas precisam de representações compatíveis, geradas pelo mesmo sistema e com o pré-processamento apropriado. Trocar o modelo de embedding normalmente exige reindexar o corpus."
+          "No exemplo usamos vetores desenhados à mão para estudar a matemática. Eles não são embeddings calculados de textos e não demonstram compreensão semântica. Para uma busca real, documentos e consultas precisam de representações compatíveis, geradas pelo mesmo sistema e com o pré-processamento apropriado. Trocar o modelo de embedding normalmente exige reindexar o corpus.",
+          "Pausa: aponte uma propriedade que o vetor [1,0] permite calcular e uma afirmação sobre significado do texto que ele não permite fazer."
         ]
       },
       {
         "title": "Produto escalar, norma e cosseno",
         "paragraphs": [
           "O produto escalar soma multiplicações das coordenadas correspondentes. Para [1, 0] e [0.8, 0.6], o produto é 0.8. A norma é o comprimento: raiz da soma dos quadrados. A similaridade do cosseno divide o produto escalar pelo produto das normas; compara direção e reduz a influência do comprimento.",
-          "Com vetores não nulos, o valor fica entre -1 e 1, salvo pequenas imprecisões numéricas. Vetores iguais têm cosseno 1; ortogonais têm 0. Isso não significa “100% de chance de resposta correta” ou “0% de relevância” universal. Um limiar precisa ser calibrado em dados da tarefa. Vetor nulo não tem direção: o exemplo o rejeita em vez de dividir por zero."
+          "Com vetores não nulos, o valor fica entre -1 e 1, salvo pequenas imprecisões numéricas. Vetores iguais têm cosseno 1; ortogonais têm 0. Isso não significa “100% de chance de resposta correta” ou “0% de relevância” universal. Um limiar precisa ser calibrado em dados da tarefa. Vetor nulo não tem direção: o exemplo o rejeita em vez de dividir por zero.",
+          "Pausa: preveja o cosseno entre [1,0] e [1,0], [0,1] e [-1,0] antes de executar."
         ]
       },
       {
         "title": "Escolher uma estratégia de busca",
         "paragraphs": [
           "Busca lexical compara termos e é útil para nomes, códigos e expressões exatas. Busca semântica pode encontrar paráfrases com poucas palavras em comum, mas pode errar detalhes como negações, números e identificadores. Busca híbrida combina sinais lexicais e vetoriais; precisa de uma regra de combinação, não apenas de somar números de escalas incompatíveis.",
-          "Reranking reordena candidatos com um critério adicional, potencialmente mais caro. Primeiro recupere um conjunto pequeno, depois reavalie relevância. Bancos vetoriais ajudam a armazenar vetores, metadados e índices; não são obrigatórios para uma coleção pequena. Índices aproximados trocam alguma exatidão da busca por velocidade e memória. Meça antes de aumentar a complexidade."
+          "Reranking reordena candidatos com um critério adicional, potencialmente mais caro. Primeiro recupere um conjunto pequeno, depois reavalie relevância. Bancos vetoriais ajudam a armazenar vetores, metadados e índices; não são obrigatórios para uma coleção pequena. Índices aproximados trocam alguma exatidão da busca por velocidade e memória. Meça antes de aumentar a complexidade.",
+          "Pausa: para procurar um código de produto exato e para encontrar uma paráfrase, escolha um sinal inicial de busca para cada caso e justifique."
         ]
       },
       {
         "title": "Top-k e acesso",
         "paragraphs": [
           "Top-k seleciona os k melhores candidatos segundo uma pontuação. Sempre existe um primeiro lugar, mesmo quando todos são ruins. Defina quando retornar nenhum resultado e pedir esclarecimento. Um documento semelhante pode estar desatualizado ou não ter a resposta pedida.",
-          "Filtre permissões antes de entregar candidatos ao gerador. Não envie documentos privados esperando que o modelo os ignore. Faça testes com dois usuários e conjuntos de acesso diferentes. O ranking matemático não tem conhecimento de autorização: esse filtro é responsabilidade do sistema."
+          "Filtre permissões antes de entregar candidatos ao gerador. Não envie documentos privados esperando que o modelo os ignore. Faça testes com dois usuários e conjuntos de acesso diferentes. O ranking matemático não tem conhecimento de autorização: esse filtro é responsabilidade do sistema.",
+          "Pausa: se A tem o maior score mas pertence a outra pessoa, preveja quais IDs podem seguir para o gerador depois do filtro de acesso."
         ]
       },
       {
         "title": "Medir recuperação",
         "paragraphs": [
           "Crie perguntas com IDs de documentos relevantes definidos por revisão humana. Recall@k mede qual fração dos relevantes foi recuperada entre os k resultados; precision@k mede qual fração dos resultados recuperados é relevante, com convenção explícita quando há menos de k. Para uma pergunta com dois documentos relevantes e apenas um recuperado, recall é 1/2.",
-          "Separe qualidade de recuperação da geração: se a evidência nunca entrou no contexto, alterar o estilo do prompt dificilmente resolve a causa. Inclua sinônimos, códigos exatos, pergunta sem resposta e conteúdo privado na avaliação. Registre coleção, modelo e parâmetros para reproduzir a comparação."
+          "Separe qualidade de recuperação da geração: se a evidência nunca entrou no contexto, alterar o estilo do prompt dificilmente resolve a causa. Inclua sinônimos, códigos exatos, pergunta sem resposta e conteúdo privado na avaliação. Registre coleção, modelo e parâmetros para reproduzir a comparação.",
+          "Pausa: com relevantes A e C e recuperados A e B, preveja recall e precisão. Quem definiu a relevância não foi o score, e sim o conjunto de referência."
         ]
       }
     ],
@@ -1588,7 +1593,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Compare vetores iguais e opostos.",
+        "prompt": "Prever: antes de executar, compare [1,0] com [1,0] e [-1,0]. Aceite: saídas 1.0 e -1.0; explique por que não são probabilidades de verdade factual.",
         "hints": [
           "Use [1,0] e [-1,0].",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -1598,7 +1603,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "A orientação muda o sinal; não é uma probabilidade."
       },
       {
-        "prompt": "Verifique que multiplicar um vetor por 10 preserva a direção.",
+        "prompt": "Alterar: multiplique [0.8,0.6] por 10 e compare com a consulta [1,0]. Aceite: entrada [8,6] → cosseno arredondado 0.8; o ranking por direção não muda por esse fator positivo.",
         "hints": [
           "Compare com [8,6].",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -1608,7 +1613,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "O cosseno normaliza o comprimento."
       },
       {
-        "prompt": "Teste vetor nulo.",
+        "prompt": "Investigar erro: a comparação com [0,0] não tem direção e causaria divisão por zero. Reproduza o caso e capture a falha definida pela função. Aceite: entrada [0,0] e [1,0] → ValueError vetor nulo; nenhum score é usado no ranking.",
         "hints": [
           "Capture ValueError.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -1618,7 +1623,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "A divisão por norma zero não é definida."
       },
       {
-        "prompt": "Calcule recall e precisão se os relevantes são A e C e os recuperados são A e B.",
+        "prompt": "Construir: calcule recall e precisão usando relevantes A e C e recuperados A e B. Depois explique por que A com score alto ainda precisaria de filtro de acesso. Aceite: entrada relevantes {A,C}, recuperados {A,B} → recall 0.5 e precisão 0.5; score não concede permissão.",
         "hints": [
           "Use interseção de conjuntos.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
