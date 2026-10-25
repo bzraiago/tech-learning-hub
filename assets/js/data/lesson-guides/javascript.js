@@ -543,7 +543,8 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "Um objeto literal usa chaves: const curso = { titulo: \"HTML\", minutos: 30 };. titulo e minutos são propriedades; curso.titulo lê \"HTML\". Também podemos usar curso[\"titulo\"], útil quando o nome da propriedade vem de uma variável. Uma propriedade inexistente devolve undefined. Um objeto representa um conjunto de características relacionadas, não uma sequência numerada de posições.",
           "Um array usa colchetes: const tempos = [20, 30, 40]. A primeira posição é índice 0; tempos[1] é 30 e tempos.length é 3. O último índice é length - 1, portanto tempos[3] é undefined. Um array vazio [] tem length zero e é truthy: para verificar se tem itens, use tempos.length > 0. Array.isArray(valor) distingue arrays de outros objetos.",
-          "Podemos ter um array de objetos: cada posição aponta para um registro. No catálogo, um id identifica o item mesmo se sua posição mudar depois de ordenar ou filtrar. Não confunda identidade com índice. Adicionar ou remover itens desloca posições, mas o id pode continuar representando o mesmo produto."
+          "Podemos ter um array de objetos: cada posição aponta para um registro. No catálogo, um id identifica o item mesmo se sua posição mudar depois de ordenar ou filtrar. Não confunda identidade com índice. Adicionar ou remover itens desloca posições, mas o id pode continuar representando o mesmo produto.",
+          "Pausa de prática: antes de executar, preveja tempos[0], tempos[3] e tempos.length para [20, 30, 40]. Confira no Console e explique por que a posição 3 não existe."
         ]
       },
       {
@@ -551,7 +552,8 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "Primitivos como números são copiados por valor em atribuições. Objetos e arrays são acessados por referências: const copia = original associa outro nome ao mesmo array, sem duplicá-lo. Se copia.push(10) acrescenta um item, original também passa a mostrar esse item. const impede reatribuir o nome, mas não congela o conteúdo do objeto associado.",
           "push adiciona no fim e pop remove o último item. splice pode remover ou inserir posições e modifica o próprio array; slice cria um novo array com uma faixa, sem modificar o original. original.slice() copia todas as posições. Essa cópia é rasa: se os itens forem objetos, ambos os arrays ainda apontam para os mesmos objetos internos. Na próxima aula veremos spread e cópias de objetos.",
-          "Escolha conscientemente se uma operação altera a entrada. Quando uma função calcula um relatório, normalmente é mais previsível preservar o catálogo recebido. Você pode construir objetos novos em map para transformar propriedades. Copiar apenas o array e depois escrever copia[0].preco = 0 ainda altera o objeto compartilhado no original."
+          "Escolha conscientemente se uma operação altera a entrada. Quando uma função calcula um relatório, normalmente é mais previsível preservar o catálogo recebido. Você pode construir objetos novos em map para transformar propriedades. Copiar apenas o array e depois escrever copia[0].preco = 0 ainda altera o objeto compartilhado no original.",
+          "Mapa de referências: original → array A → objeto X; alias → array A → objeto X; original.slice() → array B → objeto X. Desenhe essas três setas antes de prever qual alteração fica visível por mais de um nome. Depois confira no Console com um catálogo pequeno."
         ]
       },
       {
@@ -559,23 +561,20 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "for...of percorre os valores de uma coleção: for (const item of produtos) { ... }. Ele é mais direto que administrar índices quando você só precisa dos itens. for...in enumera nomes de propriedades e não é a opção indicada para percorrer valores de arrays. Um for com índice continua útil quando a posição faz parte do problema.",
           "map chama uma função para cada item e forma um novo array com os retornos. produtos.map(function (item) { return item.nome; }) transforma registros em nomes. O callback precisa retornar o valor novo; esquecer return produz undefined naquela posição. map não altera o array por si só, mas seu callback ainda poderia modificar objetos: evite esse efeito quando a intenção é apenas transformar.",
-          "filter devolve um novo array somente com os itens cujo callback passa no teste. find devolve o primeiro item correspondente, ou undefined se não houver. Se precisa de todos os baratos, use filter; se procura o id de um produto, find. some responde se existe ao menos um item que passa; every responde se todos passam. Em coleção vazia, some é false e every é true, portanto não use every sozinho para afirmar que uma lista tem conteúdo."
+          "filter devolve um novo array somente com os itens cujo callback passa no teste. find devolve o primeiro item correspondente, ou undefined se não houver. Se precisa de todos os baratos, use filter; se procura o id de um produto, find. some responde se existe ao menos um item que passa; every responde se todos passam. Em coleção vazia, some é false e every é true, portanto não use every sozinho para afirmar que uma lista tem conteúdo.",
+          "Pausa de prática: para preços [1200, 300, 800], preveja quantos itens filter devolve ao pedir preço até 800 e o que find devolve ao procurar id 99. Execute só depois de registrar as duas previsões."
         ]
       },
       {
-        "title": "Acumular e ordenar",
+        "title": "Acumular, ordenar e conferir coleções",
         "paragraphs": [
           "reduce reúne os itens em um único resultado. produtos.reduce(function (total, item) { return total + item.preco; }, 0) começa em zero e soma cada preço. O segundo argumento é o valor inicial do acumulador. Fornecê-lo é especialmente importante no array vazio: somar uma lista vazia deve devolver zero, enquanto reduce sem valor inicial lança erro nesse caso.",
           "sort ordena o próprio array. Sem comparador, converte itens para uma comparação textual, portanto [2, 10].sort() pode surpreender. Para números crescentes use function (a,b) { return a-b; }. Retorno negativo coloca a antes de b; positivo coloca depois; zero mantém a ordem relativa entre elementos equivalentes nas implementações modernas. Para preservar a entrada, primeiro faça slice() e depois sort(comparador).",
-          "Para objetos, compare a propriedade desejada, como a.preco - b.preco. Se dois itens têm mesmo preço e você precisa de uma regra adicional, compare também o id. Métodos como toSorted também devolvem uma nova coleção, mas aqui usamos slice().sort() para tornar a cópia visível. Ordenar não deve ser uma desculpa para perder a correspondência entre nome, id e preço."
-        ]
-      },
-      {
-        "title": "Apresentar e testar coleções",
-        "paragraphs": [
+          "Para objetos, compare a propriedade desejada, como a.preco - b.preco. Se dois itens têm mesmo preço e você precisa de uma regra adicional, compare também o id. Métodos como toSorted também devolvem uma nova coleção, mas aqui usamos slice().sort() para tornar a cópia visível. Ordenar não deve ser uma desculpa para perder a correspondência entre nome, id e preço.",
           "join(\"\\n\") une strings de um array usando quebras de linha, sendo útil para mostrar uma lista em pre. JSON.stringify(objeto, null, 2) transforma um objeto em texto JSON com indentação de dois espaços, útil para inspecionar seus dados. Não é uma regra universal de clonagem: valores e tipos especiais podem não ser preservados. Nesta aula usamos registros simples e cópias explícitas.",
           "Teste uma coleção normal, outra vazia, uma com um único item e uma com empate. Verifique também uma busca sem correspondência. Antes de acessar encontrado.nome, confira se encontrado !== undefined. A ausência de resultado faz parte do contrato de find; não deve causar um erro inesperado ao tentar ler uma propriedade de undefined.",
-          "Pergunte sempre o formato da resposta: map e filter devolvem arrays; find devolve um item ou undefined; reduce devolve o tipo do acumulador construído; some e every devolvem booleanos. Saber o formato evita escrever operações incompatíveis na etapa seguinte. Uma boa transformação informa não apenas o valor esperado, mas o que acontece quando não há dados."
+          "Pergunte sempre o formato da resposta: map e filter devolvem arrays; find devolve um item ou undefined; reduce devolve o tipo do acumulador construído; some e every devolvem booleanos. Saber o formato evita escrever operações incompatíveis na etapa seguinte. Uma boa transformação informa não apenas o valor esperado, mas o que acontece quando não há dados.",
+          "Pausa de prática: preveja o resultado de [].reduce(function (soma, valor) { return soma + valor; }, 0) e a ordem de [10, 2, 30].slice().sort(function (a, b) { return a - b; }). Compare com o Console e verifique se o array original mudou."
         ]
       }
     ],
@@ -607,17 +606,17 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: transforme [10,20,30] em [20,40,60] com map. Mostre os números separados por vírgula.",
+        "prompt": "Prever: antes de executar, diga quantos itens map devolverá ao dobrar [10,20,30] e se o array original mudará. Depois transforme em [20,40,60] e mostre os números separados por vírgula.",
         "hints": [
           "O callback recebe um número por vez.",
           "Retorne o dobro e use join para exibir."
         ],
-        "solution": "const numeros = [10,20,30];\nconst dobros = numeros.map(function(n) { return n * 2; });\ndocument.getElementById(\"saida\").textContent = dobros.join(\", \");",
+        "solution": "const numeros = [10,20,30];\nconst dobros = numeros.map(function(n) { return n * 2; });\ndocument.getElementById(\"saida\").textContent = dobros.join(\", \");\nconsole.log(numeros);",
         "explanation": "map preserva a quantidade de itens, substituindo cada posição pelo retorno. O array numeros continua com seus valores originais.",
-        "expected": "20, 40, 60."
+        "expected": "Previsão registrada antes da execução; a página mostra 20, 40, 60 e o array original permanece [10,20,30]."
       },
       {
-        "prompt": "Completar: usando o catálogo do exemplo, encontre o produto id 99 e produza Não encontrado sem lançar erro.",
+        "prompt": "Alterar: no catálogo do exemplo, mude a busca para o produto id 99 e apresente Não encontrado sem lançar erro. Preserve os três produtos do catálogo.",
         "hints": [
           "find pode devolver undefined.",
           "Só leia nome quando existir um item."
@@ -637,7 +636,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "HTML, CSS; Total: 75. O Console mostra 3."
       },
       {
-        "prompt": "Depurar: const original = [10,2,30]; const copia = original; copia.sort(); não preserva o original nem ordena numericamente. Corrija ambos os problemas.",
+        "prompt": "Investigar erro: const original = [10,2,30]; const copia = original; copia.sort(); não preserva o original nem ordena numericamente. Antes de corrigir, desenhe se os dois nomes apontam para o mesmo array e preveja a ordem após sort(). Corrija ambos os problemas.",
         "hints": [
           "A atribuição compartilha a referência.",
           "Copie com slice e forneça comparador numérico."

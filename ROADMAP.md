@@ -159,6 +159,7 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `html-semantic`: inserir pausas de previsão e prática entre os fundamentos, reunir conteúdo e regiões e explicitar quatro tipos de exercício.
     - [x] `js-values`: intercalar previsão e execução nos fundamentos, reunir ausência e comparação e explicitar quatro tipos de exercício.
     - [x] `js-flow`: intercalar rastreamento de condições e laços, marcar sintaxes alternativas como aprofundamento e explicitar quatro tipos de exercício.
+    - [x] `js-arrays`: introduzir mapa de referências e pausas de previsão, reunir operações e verificação e explicitar quatro tipos de exercício.
   - [ ] Prioridade 4: revisar 15 aulas de IA/Entrega, preservando o nível avançado quando os pré-requisitos forem suficientes.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
 - [ ] Adicionar demonstrações visuais de laços.

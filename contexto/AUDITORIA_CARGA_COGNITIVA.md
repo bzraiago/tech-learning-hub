@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `js-flow`, a auditoria automática aponta 19: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 e as cinco aulas HTML da prioridade 3 foram concluídas; a revisão de JavaScript está em andamento.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `js-arrays`, a auditoria automática aponta 18: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 e as cinco aulas HTML da prioridade 3 foram concluídas; a revisão de JavaScript está em andamento.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 4 aulas JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
+| 1 | Média | G | 3 aulas JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 2 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 3 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
@@ -73,6 +73,14 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `js-arrays`
+
+- **Público e saída:** após funções e callbacks, o aluno deve modelar uma lista de registros, escolher a operação pelo formato do resultado, explicar referências compartilhadas e preservar a entrada ao ordenar. Editor, navegador e Console já foram preparados.
+- **FATO, alta, M:** cinco seções reuniam vários métodos de arrays e uma distinção difícil entre cópia e referência. A revisão criou pausas com previsão de índice, filtro, busca, redução e ordenação, além de um mapa textual de referências; a aula agora tem quatro blocos. Os exercícios explicitam prever, alterar, construir e investigar erro. ID e exemplo principal foram preservados.
+- **Pré-requisitos:** `js-functions` → `js-scope-pure` → `js-callbacks-closures` → `js-arrays` → `js-es6`. Nenhuma dependência circular identificada neste recorte.
+- **Fontes:** [MDN sobre `map`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map), [MDN sobre `sort`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) e [MDN sobre `reduce`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce) foram abertas em 24/10/2026 (fontes oficiais, EN, OK). Confirmam formato de retorno, mutação da ordenação e importância do valor inicial no array vazio.
+- **Limite:** um mapa textual ajuda a prever referências, mas não prova que o aluno transfira isso a objetos aninhados. Teste manual no navegador e observação com aluno não foram executados nesta revisão.
 
 ### Revisão localizada: `js-flow`
 
