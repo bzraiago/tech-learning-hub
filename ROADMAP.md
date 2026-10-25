@@ -201,6 +201,7 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Oferecer uma segunda tentativa diferente, sem repetir o mesmo exercício.
   - [x] Preparação digital: cinco casos novos com critério de aceite, pista e rascunho persistente após erro no quiz.
   - [x] Ambientes essenciais: dez casos novos de instalação, diagnóstico ou retomada, incluindo as alternativas leves.
+  - [x] HTML e CSS: treze casos novos com resultado esperado e pista após erro no quiz.
   - [ ] Expandir as segundas tentativas para as demais aulas.
 - [ ] Exigir explicação das decisões nas provas de nível.
 - [ ] Evitar que quiz de múltipla escolha seja tratado como comprovação prática.

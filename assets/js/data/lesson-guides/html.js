@@ -1942,3 +1942,76 @@ Object.assign(LESSON_GUIDES, {
     ]
   }
 });
+
+// Casos de recuperação após o quiz: cenário novo, resultado observável e pista.
+(() => {
+  const retries = {
+    "html-semantic": {
+      prompt: "Uma biblioteca comunitária precisa de uma página de horários. Crie um documento HTML completo com título de aba, cabeçalho, main, uma seção para os horários e rodapé. Antes de abrir, preveja onde aparecerá o título da aba.",
+      expected: "A aba mostra o título escolhido; a página mostra um h1 e um h2 na ordem correta, os horários em conteúdo legível e o rodapé separado do main.",
+      hint: "Comece por doctype, html, head e body; depois escolha elementos pelo papel do conteúdo."
+    },
+    "html-links-media": {
+      prompt: "Monte uma página de receitas com um link para #ingredientes e uma foto local em imagens/prato.jpg. Inclua texto alternativo que descreva a informação da foto e teste o link.",
+      expected: "O link leva à seção Ingredientes, a foto carrega a partir da subpasta e seu texto alternativo explica o prato caso a imagem falhe.",
+      hint: "Confira se fragmento e id coincidem e se o caminho é relativo ao arquivo HTML."
+    },
+    "html-forms": {
+      prompt: "Crie um formulário local de inscrição em oficina com nome, e-mail e quantidade de vagas entre 1 e 4. Preveja o que ocorre ao tentar enviar com quantidade 5 e confirme no navegador.",
+      expected: "Cada campo tem rótulo associado e name; o navegador impede envio vazio ou quantidade fora do intervalo, sem afirmar que os dados foram cadastrados.",
+      hint: "Use os tipos e atributos nativos; teste também a associação entre for e id."
+    },
+    "html-tables": {
+      prompt: "Organize em tabela o empréstimo de três livros, com colunas Livro, Pessoa e Dias. Acrescente título da tabela e cabeçalhos de coluna; explique por que uma lista não comunicaria as relações tão bem.",
+      expected: "Há caption, três cabeçalhos com scope=col e três linhas de dados alinhadas às colunas, sem células faltando.",
+      hint: "Conte as células de cada linha e confira a leitura por linha e coluna."
+    },
+    "html-accessibility": {
+      prompt: "Uma página de atendimento tem três respostas escondidas em elementos clicáveis feitos com div. Refaça uma resposta como controle nativo expansível e verifique só com teclado.",
+      expected: "Tab alcança o controle; Enter ou Espaço abre e fecha a resposta; o texto do controle descreve o que será mostrado.",
+      hint: "Considere details com summary antes de adicionar JavaScript ou tabindex."
+    },
+    "css-cascade": {
+      prompt: "Um aviso de biblioteca recebe cor cinza por .mensagem e verde por .aviso, nesta ordem. Preveja a cor, confirme no inspetor e altere apenas a regra vencedora para torná-lo azul.",
+      expected: "A previsão cita a ordem entre seletores de mesma especificidade; o inspetor mostra a declaração ativa e só o aviso passa a azul.",
+      hint: "Compare especificidade, origem e ordem; procure a regra riscada no painel de estilos."
+    },
+    "css-box": {
+      prompt: "Um painel de avisos com width: 280px, padding: 20px e border: 2px estoura uma coluna de 300px. Calcule a largura externa antes de executar e ajuste a caixa sem esconder conteúdo.",
+      expected: "O cálculo inicial chega a 324px com content-box; após o ajuste, o painel cabe na coluna e o texto permanece inteiro.",
+      hint: "Pense no que box-sizing: border-box inclui dentro de width."
+    },
+    "css-typography": {
+      prompt: "Prepare um aviso de consulta com título, texto e link. Use tamanhos relativos e teste zoom de 200% e uma frase longa no link; registre o que precisou ajustar.",
+      expected: "Título e corpo mantêm hierarquia sem trocar tags por aparência; texto e link seguem legíveis, sem sobreposição nem corte no zoom.",
+      hint: "Prefira rem para tamanho de fonte e evite alturas fixas em blocos de texto."
+    },
+    "css-states": {
+      prompt: "Em um cartão de agendamento, há um botão disponível e outro indisponível. Diferencie foco, hover e disabled, e teste Tab com movimento reduzido ativado.",
+      expected: "O botão disponível tem foco visível; o indisponível não recebe ativação; a interface não depende de hover e evita animação quando o sistema pede redução.",
+      hint: "Use :focus-visible, :hover, :disabled e uma media query de preferência de movimento."
+    },
+    "css-flex": {
+      prompt: "Faça uma faixa de ações com logotipo textual e três links de comprimentos diferentes. Ela deve quebrar em tela de 320px, preservar a ordem de teclado e não cortar palavras longas.",
+      expected: "Os itens se distribuem em largura ampla e quebram sem rolagem lateral em 320px; Tab segue a ordem do HTML.",
+      hint: "Examine flex-wrap, gap e min-width dos filhos antes de mudar a ordem visual."
+    },
+    "css-grid": {
+      prompt: "Organize quatro painéis de um painel de controle em duas colunas em tela larga e uma em tela estreita. Um painel tem texto bem maior; teste se nenhum conteúdo vaza.",
+      expected: "Os quatro painéis seguem a ordem do HTML, ocupam uma coluna no celular e duas em tela larga, sem corte ou rolagem lateral.",
+      hint: "Comece com uma coluna e altere grid-template-columns numa media query; permita que os itens encolham."
+    },
+    "css-responsive": {
+      prompt: "Adapte um convite de evento com imagem, data e botão de inscrição para 320px, 750px e 1200px. Preveja a disposição em cada largura antes de testar.",
+      expected: "Imagem preserva proporção; texto e botão permanecem visíveis e utilizáveis nas três larguras, inclusive perto do breakpoint.",
+      hint: "Combine viewport correto, largura fluida e uma mudança de layout motivada pelo conteúdo."
+    },
+    "css-variables": {
+      prompt: "Uma página de avisos usa a mesma cor em borda, título e botão. Crie um token para essa decisão e uma variação de tema somente na seção de alertas; teste foco e contraste.",
+      expected: "Mudar o token atualiza os três usos; a variação afeta apenas a seção prevista e mantém texto e foco distinguíveis.",
+      hint: "Defina o token no escopo comum e redefina-o no contêiner da variação."
+    }
+  };
+
+  for (const [id, retry] of Object.entries(retries)) LESSON_GUIDES[id].retry = retry;
+})();
