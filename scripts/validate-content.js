@@ -266,7 +266,7 @@ for (const lessonId of progressiveBrowserLessonIds) {
   }
 }
 
-const reviewedDeliveryLessonIds = ['delivery-http', 'delivery-forms', 'delivery-security'];
+const reviewedDeliveryLessonIds = ['delivery-http', 'delivery-forms', 'delivery-security', 'delivery-environments'];
 for (const lessonId of reviewedDeliveryLessonIds) {
   const guide = LESSON_GUIDES[lessonId];
   if (!guide) {

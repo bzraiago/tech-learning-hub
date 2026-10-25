@@ -481,36 +481,40 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "delivery-environments": {
-    "prerequisites": "Conseguir executar um site estático e o servidor local da aula de integração.",
-    "setup": "Execute o código em Node ou no Console; ele apenas escolhe uma URL, sem fazer requisições. Use um projeto de exemplo local para criar um checklist de publicação. Publicação remota é opcional.",
+    "prerequisites": "Concluir delivery-http, delivery-forms e a preparação setup-node; saber localizar index.html e assets/css/global.css no projeto estático.",
+    "setup": "Na pasta da aula, salve o exemplo como config.js no editor. No terminal aberto nessa pasta, execute node config.js; a saída esperada é http://127.0.0.1:4178/api. O processo termina sozinho; para retomar, execute o mesmo comando. Se node não for reconhecido, revise setup-node. O exemplo não faz requisições nem publica o projeto; para o exercício de caminhos, abra index.html e a aba Rede do navegador. Publicação remota é opcional.",
     "why": "A aplicação que roda no seu computador pode falhar ao ser publicada por caminhos, configurações ou serviços ausentes. Entender o destino evita prometer que um backend funcionará em hospedagem de arquivos estáticos.",
     "sections": [
       {
         "title": "O que é entregue",
         "paragraphs": [
           "Um site estático entrega arquivos como HTML, CSS, JavaScript e imagens. O navegador executa o JavaScript, mas a hospedagem estática não executa seu processo Node, não salva dados no servidor nem mantém uma API própria. Já uma aplicação com endpoint /api/estudos exige algum processo ou serviço de backend. Se o frontend for para GitHub Pages, o endpoint local 127.0.0.1 não acompanha a publicação; cada visitante apontaria para seu próprio computador.",
-          "Faça um inventário dos componentes do projeto: arquivos finais, comando de geração se existir, variáveis públicas, API, armazenamento, domínio e permissões. Um site com dados de demonstração pode funcionar estaticamente. Um formulário que grava registros compartilhados precisa de um serviço remoto apropriado. A escolha da plataforma vem depois de identificar o que deve executar, não antes."
+          "Faça um inventário dos componentes do projeto: arquivos finais, comando de geração se existir, variáveis públicas, API, armazenamento, domínio e permissões. Um site com dados de demonstração pode funcionar estaticamente. Um formulário que grava registros compartilhados precisa de um serviço remoto apropriado. A escolha da plataforma vem depois de identificar o que deve executar, não antes.",
+          "Pausa: para este repositório, encontre index.html e assets/css/global.css; depois indique onde o server.js do laboratório anterior poderia executar."
         ]
       },
       {
         "title": "Desenvolvimento, prévia e produção",
         "paragraphs": [
           "Desenvolvimento é o ambiente em que você altera e depura; prévia permite revisar uma versão candidata; produção serve pessoas reais. As URLs, permissões e dados devem ser configurados para cada ambiente. O código demonstrativo mostra um mapeamento explícito de origem de API. Ele não envia requisições; o domínio .invalid marca uma URL fictícia que precisa ser substituída em uma entrega real.",
-          "Uma configuração pública como a URL da API pode estar no frontend. Chave privada e senha não podem. No servidor, variáveis de ambiente ajudam a fornecer configuração sem gravar segredo no código. Ainda assim é preciso cuidar de logs, permissões e acesso ao ambiente. Documente quais valores são obrigatórios, seus nomes e o que fazer se faltarem; não publique valores verdadeiros no README."
+          "Uma configuração pública como a URL da API pode estar no frontend. Chave privada e senha não podem. No servidor, variáveis de ambiente ajudam a fornecer configuração sem gravar segredo no código. Ainda assim é preciso cuidar de logs, permissões e acesso ao ambiente. Documente quais valores são obrigatórios, seus nomes e o que fazer se faltarem; não publique valores verdadeiros no README.",
+          "Pausa: preveja o resultado de obterApi('producao') e de obterApi('teste') antes de executar. A URL .invalid é apenas um marcador."
         ]
       },
       {
         "title": "Construção e caminhos",
         "paragraphs": [
           "Em uma aplicação de HTML puro, publicar pode significar copiar o index.html e arquivos de apoio. Em projetos com ferramenta de build, o código fonte é transformado em uma pasta de saída; é essa saída que deve ser implantada. Verifique links relativos, nome e caixa das letras dos arquivos e caminhos quando a aplicação está em uma subpasta. Um caminho que funciona na raiz local pode quebrar em /nome-do-repositorio/.",
-          "Repita o mesmo comando de build ou preparação antes de entregar. Confirme que arquivos esperados existem e que nenhum arquivo temporário ou secreto entrou na saída. Faça uma checagem móvel, teclado e carregamento em uma URL de prévia. A entrega termina quando o comportamento foi observado no endereço final, não quando o botão “Deploy” foi clicado."
+          "Repita o mesmo comando de build ou preparação antes de entregar. Confirme que arquivos esperados existem e que nenhum arquivo temporário ou secreto entrou na saída. Faça uma checagem móvel, teclado e carregamento em uma URL de prévia. A entrega termina quando o comportamento foi observado no endereço final, não quando o botão “Deploy” foi clicado.",
+          "Pausa: compare assets/css/global.css com /assets/css/global.css quando index.html está em /tech-learning-hub/. Qual URL cada caminho pede?"
         ]
       },
       {
         "title": "Dependências entre frontend e API",
         "paragraphs": [
           "Se a interface usa serviço remoto, confira URL, HTTPS quando a página usa HTTPS, autenticação exigida, CORS, formato JSON e políticas de erro. Um endereço local de desenvolvimento não serve como URL de produção. Mudanças de ambiente também podem alterar dados e latência; teste carregamento, lista vazia, sucesso, validação e falha. Uma demonstração estática com mock deve ser apresentada honestamente como demo.",
-          "Não configure permissões amplas só para “fazer funcionar”. Se a API for de outra equipe, peça a origem permitida e o contrato. Se houver dados de pessoas, analise o que pode ser exibido publicamente. Publique apenas depois de revisar o conteúdo e os limites do projeto; para este laboratório, a publicação real é opcional e todo aprendizado essencial pode ser feito localmente."
+          "Não configure permissões amplas só para “fazer funcionar”. Se a API for de outra equipe, peça a origem permitida e o contrato. Se houver dados de pessoas, analise o que pode ser exibido publicamente. Publique apenas depois de revisar o conteúdo e os limites do projeto; para este laboratório, a publicação real é opcional e todo aprendizado essencial pode ser feito localmente.",
+          "Pausa: desenhe navegador → frontend publicado → API e marque onde um endereço 127.0.0.1 apontaria para cada visitante."
         ]
       },
       {
@@ -547,17 +551,17 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: escreva três itens de checklist para validar uma publicação estática.",
+        "prompt": "Prever: se index.html abrir em /tech-learning-hub/, onde o navegador procurará assets/css/global.css? Depois escreva três itens de checklist para validar a publicação. Aceite: indicar o caminho esperado e registrar endereço final, carregamento dos arquivos e interação por teclado.",
         "hints": [
           "Inclua endereço final e caminhos.",
           "Inclua teste de interação e acessibilidade."
         ],
-        "solution": "1. Abrir URL final em janela limpa e verificar assets/Console. 2. Testar navegação, formulário local e largura móvel. 3. Conferir foco e nomes acessíveis nos controles.",
+        "solution": "O caminho relativo aponta para /tech-learning-hub/assets/css/global.css. 1. Abrir URL final em janela limpa e verificar assets/Console. 2. Testar navegação, formulário local e largura móvel. 3. Conferir foco e nomes acessíveis nos controles.",
         "explanation": "O checklist observa o produto no destino real.",
         "expected": "Três verificações concretas, com resultado registrado."
       },
       {
-        "prompt": "Complete o mapa: frontend no GitHub Pages, API apenas em 127.0.0.1 do desenvolvedor. O formulário grava registros para visitantes?",
+        "prompt": "Alterar: no plano de entrega, o frontend está no GitHub Pages e a API apenas em 127.0.0.1 do desenvolvedor. Ajuste o plano para não prometer gravação compartilhada. Aceite: explicar o destino de 127.0.0.1 e escolher API hospedada ou demonstração rotulada; entrada: visitante envia formulário → saída: comportamento descrito sem promessa falsa.",
         "hints": [
           "127.0.0.1 significa o computador de quem visita.",
           "Hospedagem estática não executa Node."
@@ -567,7 +571,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Resposta explica por que URL local não funciona para visitantes."
       },
       {
-        "prompt": "Construa uma configuração que recuse ambiente não conhecido e retorne uma URL para desenvolvimento.",
+        "prompt": "Construir: faça uma configuração pública que retorne a URL local para desenvolvimento e recuse ambiente desconhecido. Aceite: entrada desenvolvimento → http://127.0.0.1:4178/api; entrada teste → erro Ambiente inválido.",
         "hints": [
           "Use um objeto de opções.",
           "Valide antes de retornar."
@@ -577,12 +581,12 @@ Object.assign(LESSON_GUIDES, {
         "expected": "desenvolvimento retorna URL local; outro valor gera erro."
       },
       {
-        "prompt": "Diagnostique um 404 de style.css apenas após publicar em subpasta. Escreva hipótese e verificação.",
+        "prompt": "Investigar erro: o CSS deste projeto retorna 404 quando index.html é publicado em /tech-learning-hub/. O link foi alterado para /assets/css/global.css. Escreva hipótese, correção e verificação na aba Rede. Aceite: entrada caminho absoluto → 404; saída com caminho relativo → CSS 200.",
         "hints": [
           "Compare a URL pedida em Rede com a pasta real.",
           "Caminho absoluto /style.css aponta para raiz do domínio."
         ],
-        "solution": "Hipótese: href=\"/style.css\" procura na raiz do domínio. Se o arquivo está junto ao index.html em subpasta, usar href=\"./style.css\" e confirmar 200 em Rede.",
+        "solution": "Hipótese: href=\"/assets/css/global.css\" procura na raiz do domínio. Se index.html está em /tech-learning-hub/, usar href=\"assets/css/global.css\" e confirmar 200 em Rede no endereço publicado.",
         "explanation": "Teste antes e depois no endereço publicado; avalie também outros assets.",
         "expected": "CSS carrega 200 e a aparência volta."
       }

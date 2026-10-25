@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de `delivery-http`, `delivery-forms` e `delivery-security`, a auditoria automática continua apontando 15: as cinco etapas de cada aula foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 12 aulas de IA e Entrega a revisar na prioridade 4.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de `delivery-http`, `delivery-forms`, `delivery-security` e `delivery-environments`, a auditoria automática continua apontando 15: as cinco etapas de cada aula foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 11 aulas de IA e Entrega a revisar na prioridade 4.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 12 aulas IA/Entrega ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 1 | Média | G | 11 aulas IA/Entrega ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
@@ -72,6 +72,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `delivery-environments`
+
+- **Público e saída:** após os laboratórios HTTP e formulário, o aluno deve escolher onde publicar arquivos estáticos e API, prever os caminhos dos assets em subpasta e formular uma verificação da entrega.
+- **FATO, média, P:** o exercício de 404 usava `style.css`, enquanto o projeto usa `assets/css/global.css`. A tarefa e a solução agora usam o caminho real e distinguem endereço relativo de caminho iniciado por `/`. Os exercícios cobrem prever, alterar, construir e investigar erro.
+- **Julgamento didático:** mantidas cinco fases distintas (artefatos, ambientes, caminhos, dependências e retorno), com pausas de previsão ou desenho entre elas. A aula continua sinalizada pela contagem estrutural para observar com aluno.
+- **Pré-requisitos e ambiente:** `setup-node`, `delivery-http`, `delivery-forms` → `delivery-environments`. A preparação nomeia pasta, terminal, comando, saída esperada, parada, retomada e alternativa de publicação local.
+- **Fontes:** [GitHub Pages: serviço estático](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages), [criar site no Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site), [Node.js: variáveis de ambiente](https://nodejs.org/learn/command-line/how-to-read-environment-variables-from-nodejs) e [MDN Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) foram abertas em 24/10/2026 (fontes oficiais, EN, OK).
+- **Limite:** o exemplo apenas escolhe uma URL fictícia; não publica nem faz requisições. Teste de publicação real, navegação manual, teclado e largura de celular não foram executados nesta revisão.
 
 ### Revisão localizada: `delivery-security`
 
