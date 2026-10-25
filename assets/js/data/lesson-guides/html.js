@@ -476,36 +476,26 @@ Object.assign(LESSON_GUIDES, {
     "why": "Uma tabela permite cruzar duas informações: uma linha identifica um item e uma coluna identifica uma característica. Se o leitor pergunta quantas horas práticas estão previstas para CSS, a resposta fica no encontro dessas coordenadas. Marcar essa relação corretamente é tão importante quanto mostrar números alinhados. A aula trabalha com dados pequenos para que você consiga conferir cada célula e explicar seu significado.",
     "sections": [
       {
-        "title": "1. Quando uma tabela é a estrutura certa",
+        "title": "1. Escolher e planejar os dados",
         "paragraphs": [
           "Use table quando existe uma relação estável entre linhas e colunas: produtos e preços, dias e horários, tecnologias e horas. Cada célula deve poder ser interpretada por seu cabeçalho de linha, de coluna ou ambos. Se os conteúdos são apenas cartões independentes, uma lista ou seções provavelmente expressam melhor a relação. Aparência alinhada, sozinha, não justifica uma tabela.",
-          "Antigamente tabelas eram usadas para organizar cabeçalho, menu e conteúdo de páginas inteiras. Isso mistura a estrutura dos dados com posicionamento visual e dificulta adaptação a telas pequenas. Neste curso o layout será feito com CSS. Mesmo que uma tabela deixe tudo alinhado rapidamente, reserve-a para dados cujo cruzamento realmente importa."
-        ]
-      },
-      {
-        "title": "2. Da informação ao desenho das colunas",
-        "paragraphs": [
+          "Antigamente tabelas eram usadas para organizar cabeçalho, menu e conteúdo de páginas inteiras. Isso mistura a estrutura dos dados com posicionamento visual e dificulta adaptação a telas pequenas. Neste curso o layout será feito com CSS. Mesmo que uma tabela deixe tudo alinhado rapidamente, reserve-a para dados cujo cruzamento realmente importa.",
           "Antes de escrever tags, desenhe a tabela no papel. Dê um nome a cada coluna e registre o tipo de informação esperado. Na tabela desta aula, Tema contém nomes e Teoria (h) e Prática (h) contêm quantidades de horas. A unidade no cabeçalho evita que o leitor precise adivinhar se 3 significa minutos, encontros ou horas. Uma coluna deve manter o mesmo significado em todas as linhas.",
           "Escolha dados suficientemente pequenos para conferir manualmente. HTML não identifica que um total está errado nem distingue número de texto dentro de td. Se você escrever sete em uma linha e 7 em outra, o navegador mostrará os dois. A consistência dos valores é sua responsabilidade. Não confunda ausência de informação com zero: zero significa uma quantidade conhecida, enquanto Não informado expressa uma lacuna."
         ]
       },
       {
-        "title": "3. A estrutura mínima",
+        "title": "2. Marcar células, cabeçalhos e grupos",
         "paragraphs": [
           "table envolve a tabela. tr representa uma linha. th representa uma célula de cabeçalho e td representa uma célula de dados. caption dá um título à tabela e deve aparecer no início de sua estrutura. No exemplo, o h1 é o assunto da página e caption identifica especificamente o conjunto de dados; são níveis diferentes de descrição.",
-          "Não coloque texto solto diretamente dentro de table ou tr. A linha contém células; as células contêm o texto. Uma linha simples deste exemplo possui três células. Se uma linha tiver apenas duas por engano, os valores seguintes podem parecer associados à coluna errada. A contagem de células faz parte da revisão, e a indentação ajuda a enxergar a forma retangular."
-        ]
-      },
-      {
-        "title": "4. Cabeçalhos e grupos de linhas",
-        "paragraphs": [
+          "Não coloque texto solto diretamente dentro de table ou tr. A linha contém células; as células contêm o texto. Uma linha simples deste exemplo possui três células. Se uma linha tiver apenas duas por engano, os valores seguintes podem parecer associados à coluna errada. A contagem de células faz parte da revisão, e a indentação ajuda a enxergar a forma retangular.",
           "scope=\"col\" informa que o th identifica sua coluna. scope=\"row\" informa que ele identifica sua linha. No exemplo, HTML e CSS são cabeçalhos de linha, não apenas dados estilizados em negrito: eles nomeiam os conjuntos de horas. O navegador aplica uma aparência padrão a th, mas usar td com negrito não cria a mesma associação semântica.",
           "thead reúne linhas de cabeçalho, tbody reúne dados principais e tfoot reúne resumos ou rodapé dos dados. Esses elementos organizam, mas não calculam nem ordenam nada. O navegador pode inserir tbody na árvore interpretada mesmo quando ele foi omitido no arquivo; escrevê-lo explicitamente torna a intenção mais clara. Um tfoot não substitui o footer da página, que tem outro escopo.",
           "Associações bem marcadas ajudam tecnologias assistivas a contextualizar células. Entretanto, uma tabela pode se tornar difícil de entender mesmo sendo tecnicamente válida. Prefira cabeçalhos claros e estruturas simples. Para tabelas complexas com vários níveis, podem ser necessárias associações mais detalhadas por id e headers; não as invente sem necessidade quando uma divisão em tabelas menores resolveria melhor."
         ]
       },
       {
-        "title": "5. Mesclagens e apresentação sem esconder os dados",
+        "title": "3. Mesclagens e apresentação sem esconder os dados",
         "paragraphs": [
           "colspan faz uma célula ocupar mais de uma coluna e rowspan faz ocupar mais de uma linha. Ao usar essas mesclagens, conte os espaços ocupados, não apenas o número de tags. Para uma tabela de três colunas, uma célula com colspan=\"3\" ocupa toda a largura estrutural daquela linha. Mesclar não soma valores nem cria cabeçalhos automaticamente.",
           "Evite começar com mesclagens extensas: elas tornam a leitura e a revisão mais difíceis. Se precisar escrever uma observação geral, um parágrafo antes ou depois da tabela pode ser mais claro que uma célula gigante. Não use atributos antigos como border, bgcolor ou align para estilizar; na parte de CSS aprenderemos bordas, espaçamento e alinhamento de apresentação.",
@@ -513,7 +503,7 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "6. Como conferir uma tabela sem adivinhar",
+        "title": "4. Como conferir uma tabela sem adivinhar",
         "paragraphs": [
           "Faça perguntas concretas: quantas horas práticas de HTML, quantas horas teóricas de CSS e qual o total de prática? No exemplo as respostas são 3, 2 e 7. Leia cada linha da esquerda para a direita, depois cada coluna de cima para baixo. Se uma resposta parece depender de uma célula vizinha inesperada, verifique se faltou td ou se uma mesclagem está ocupando a posição.",
           "Altere um dado e recalcule os totais. Isso mostra a diferença entre documento estático e planilha: a tabela HTML registra o resultado que você escreveu. Inspecione a árvore do navegador e confira caption, thead, tbody, tfoot e scopes. A avaliação do exercício considera estrutura, significado e coerência, não a quantidade de decoração."
@@ -548,17 +538,17 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: restaure os dados originais e acrescente uma linha JavaScript, com 1 h de teoria e 2 h de prática. Atualize os totais.",
+        "prompt": "Prever: antes de editar, diga quais serão os totais ao acrescentar JavaScript com 1 h de teoria e 2 h de prática e se tfoot os atualizará sozinho. Depois restaure os dados originais, acrescente a linha e atualize os totais.",
         "hints": [
           "A linha vai dentro de tbody.",
           "O primeiro conteúdo é um th de linha; os outros dois são td."
         ],
         "solution": "\u003ctr>\u003cth scope=\"row\">JavaScript\u003c/th>\u003ctd>1\u003c/td>\u003ctd>2\u003c/td>\u003c/tr>\n\u003c!-- No tfoot: -->\n\u003ctr>\u003cth scope=\"row\">Total\u003c/th>\u003ctd>5\u003c/td>\u003ctd>9\u003c/td>\u003c/tr>",
         "explanation": "Somamos 1 a 4 e 2 a 7, partindo da tabela original. A nova linha não deve ficar fora de tbody.",
-        "expected": "Existem três temas e os totais são 5 h e 9 h."
+        "expected": "Previsão registrada antes da edição; existem três temas e os totais escritos manualmente são 5 h e 9 h."
       },
       {
-        "prompt": "Completar: uma tabela de Item e Quantidade tem \u003ctr>\u003ctd>Caderno\u003c/td>\u003ctd>2\u003c/td>\u003c/tr>. Transforme Caderno em cabeçalho da linha e escreva o cabeçalho das colunas.",
+        "prompt": "Alterar: uma tabela de Item e Quantidade tem \u003ctr>\u003ctd>Caderno\u003c/td>\u003ctd>2\u003c/td>\u003c/tr>. Transforme Caderno em cabeçalho da linha e acrescente o cabeçalho das colunas, preservando a quantidade 2.",
         "hints": [
           "Use th para nomear relações.",
           "Scope de coluna e de linha são diferentes."
@@ -578,7 +568,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Cada duração pode ser associada a exatamente um dia e a um tema."
       },
       {
-        "prompt": "Depurar: uma tabela com colunas Tema, Teoria e Prática contém \u003ctr>\u003cth scope=\"col\">HTML\u003c/th>\u003ctd>2\u003c/td>\u003c/tr>. O valor de prática deveria ser 3. Corrija.",
+        "prompt": "Investigar erro: uma tabela com colunas Tema, Teoria e Prática contém \u003ctr>\u003cth scope=\"col\">HTML\u003c/th>\u003ctd>2\u003c/td>\u003c/tr>. O valor de prática deveria ser 3. Identifique a associação e a célula ausente antes de corrigir.",
         "hints": [
           "HTML nomeia uma linha, não a coluna.",
           "Falta uma célula para a terceira coluna."

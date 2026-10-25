@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `html-accessibility`, a auditoria automática aponta 25: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 foi concluída e a prioridade 3 começou.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `html-tables`, a auditoria automática aponta 24: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 foi concluída e a prioridade 3 começou.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 4 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
+| 1 | Média | G | 3 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 2 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 3 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
@@ -73,6 +73,14 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `html-tables`
+
+- **Público e saída:** após as aulas de documento, links e formulários, o aluno deve planejar uma tabela pequena, marcar cabeçalhos e grupos e conferir a coerência dos valores. Editor e navegador bastam.
+- **FATO, média, M:** o guia reunia seis seções e apenas `Construir` aparecia como tipo padronizado de exercício. Ele agora tem quatro blocos e atividades explícitas de prever, alterar, construir e investigar erro. Conteúdo, ID e exemplo principal foram preservados.
+- **Pré-requisitos:** `html-semantic` → `html-links-media` → `html-forms` → `html-tables` → `html-accessibility`. Não foi identificada dependência circular neste recorte.
+- **Fontes:** [MDN sobre `table`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table) e [MDN sobre `th`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/th) foram abertas em 24/10/2026 (fontes oficiais, EN, OK); confirmam dados tabulares e associação de cabeçalhos por `scope`.
+- **Limite:** a revisão do guia e o validador não demonstram que um aluno lê corretamente uma tabela nova. O teste manual no navegador ainda não foi executado.
 
 ### Revisão localizada: `html-accessibility`
 

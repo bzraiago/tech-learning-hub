@@ -172,7 +172,7 @@ const setupMarkers = [
 ];
 const exerciseKinds = ['Prever:', 'Alterar:', 'Construir:', 'Investigar erro:'];
 
-const progressiveHtmlLessonIds = ['html-accessibility'];
+const progressiveHtmlLessonIds = ['html-accessibility', 'html-tables'];
 for (const lessonId of progressiveHtmlLessonIds) {
   const guide = LESSON_GUIDES[lessonId];
   if (!guide) {
