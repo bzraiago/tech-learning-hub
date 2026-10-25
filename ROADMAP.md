@@ -172,6 +172,7 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `delivery-requirements`: transformar pedidos em critérios observáveis e corrigir o README para separar regra isolada de integração ainda pendente na API.
     - [x] `ai-llms`: intercalar previsão e prática nos fundamentos, distinguir simulação de modelo real e explicitar os quatro tipos de exercício.
     - [x] `ai-prompts`: separar erros da função de abstenção por modelo, praticar desenho de prompt e avaliação com casos reservados.
+    - [x] `ai-system`: exercitar filtro de evidências antes da montagem de contexto e distinguir memória externa de treinamento.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
 - [ ] Adicionar demonstrações visuais de laços.
 - [ ] Adicionar diagramas de referências e cópias entre objetos.

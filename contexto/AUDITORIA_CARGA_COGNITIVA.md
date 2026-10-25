@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega, `ai-llms` e `ai-prompts`, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 7 aulas de IA a revisar na prioridade 4.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega, `ai-llms`, `ai-prompts` e `ai-system`, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 6 aulas de IA a revisar na prioridade 4.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 7 aulas de IA ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 1 | Média | G | 6 aulas de IA ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
@@ -72,6 +72,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `ai-system`
+
+- **Público e saída:** após fundamentos de LLM e prompts, o aluno deve montar contexto com orçamento fictício, separar memória externa de treinamento e demonstrar que documento de outro dono foi filtrado antes da montagem.
+- **FATO, alta, M:** o texto exigia verificar que evidência privada não entrasse no contexto, mas os exercícios cobriam apenas orçamento e cópia de lista. A construção agora filtra documentos fictícios por dono antes da função e confirma ausência do texto privado. Os quatro exercícios cobrem prever, alterar, construir e investigar erro.
+- **Julgamento didático:** cinco blocos distintos (papéis, orçamento, memória, montagem e operação) foram mantidos com pausas entre conceitos. A contagem estrutural continua alerta para observação com aluno.
+- **Pré-requisitos e ambiente:** `setup-python`, `ai-llms`, `ai-prompts` → `ai-system`. A preparação nomeia pasta, arquivo, terminal, comando por sistema, saída e retomada; não usa API.
+- **Fontes:** [Anthropic sobre contexto](https://www.anthropic.com/research/effective-context-engineering-for-ai-agents) e [biblioteca padrão Python](https://docs.python.org/3/library/) foram abertas em 25/10/2026 (fontes primárias, EN, OK).
+- **Limite:** o filtro usa um nome fictício, sem sessão autenticada; não comprova autorização de produção. Os valores de orçamento não são tokens reais. Observação com aluno não foi executada.
 
 ### Revisão localizada: `ai-prompts`
 

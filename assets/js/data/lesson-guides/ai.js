@@ -313,43 +313,48 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "ai-system": {
-    "prerequisites": "Python: funções, listas, dicionários, JSON, exceções e testes. Releia as aulas anteriores deste módulo antes de prosseguir.",
-    "setup": "Use Python 3.11 ou posterior. Salve o exemplo em aula.py e execute python aula.py (ou py aula.py no Windows). Os exemplos principais usam somente a biblioteca padrão, dados fictícios e nenhuma API. Exercícios de código reutilizam as funções do exemplo; acrescente-os ao final do mesmo arquivo. Atividades de projeto e especificação são resolvidas em texto e comparadas com os critérios fornecidos.",
+    "prerequisites": "Concluir setup-python, ai-llms e ai-prompts; saber usar funções, listas, dicionários, exceções e testes em Python.",
+    "setup": "Na pasta ia-estudos, salve o exemplo como ai-system.py no editor. Abra o terminal nessa pasta e execute python ai-system.py (ou py ai-system.py no Windows, python3 ai-system.py no macOS/Linux, conforme setup-python). A saída esperada é Qual o prazo? e Prazo: 7 dias., em duas linhas. O processo termina sozinho; para retomar, execute o mesmo comando. Se Python não for reconhecido, revise setup-python. Acrescente os exercícios de código ao fim do arquivo; escreva o registro de memória em texto separado. Usa dados fictícios e biblioteca padrão, sem API ou modelo real.",
     "why": "Organize instruções, histórico e evidências mantendo regras de autorização no código.",
     "sections": [
       {
         "title": "Papéis e responsabilidades",
         "paragraphs": [
           "Uma aplicação define comportamento esperado: tom, escopo, limites e formato. APIs costumam oferecer papéis de mensagem para separar instruções da aplicação e pedidos do usuário; os nomes e a hierarquia exata dependem do provedor. Um system prompt descreve comportamento, mas não é uma credencial nem um controle de acesso. “Só responda sobre documentos públicos” não impede que um documento privado seja enviado por um bug do servidor.",
-          "O servidor deve identificar o usuário, filtrar documentos autorizados e somente depois montar o contexto. O texto recuperado é dado não confiável, mesmo quando vem de um repositório da organização. Se uma página contém “ignore as regras”, essa frase não ganha autoridade para alterar permissões. A aplicação deve preservar essa separação em código e em sua interface."
+          "O servidor deve identificar o usuário, filtrar documentos autorizados e somente depois montar o contexto. O texto recuperado é dado não confiável, mesmo quando vem de um repositório da organização. Se uma página contém “ignore as regras”, essa frase não ganha autoridade para alterar permissões. A aplicação deve preservar essa separação em código e em sua interface.",
+          "Pausa: desenhe usuário → filtro de documentos autorizados → montar_contexto. Indique onde um documento privado deve ser descartado."
         ]
       },
       {
         "title": "Contexto tem um orçamento",
         "paragraphs": [
           "A janela de contexto comporta uma quantidade limitada de tokens. Instruções, histórico, documentos, ferramentas e saída competem por espaço, com detalhes que variam por modelo. Reserve orçamento para a resposta antes de preencher a entrada. O laboratório usa estimativas já fornecidas para demonstrar uma soma; não calcula tokens reais. Para produção, use contagem e limites compatíveis com o modelo escolhido.",
-          "Se a soma exceder o limite, priorize: instruções essenciais, pergunta atual e evidências relevantes. Cortar o início de um documento pode remover justamente a condição que muda a resposta. Preserve unidades de sentido e referências de origem. Se não houver espaço para evidência suficiente, reduza a tarefa ou solicite esclarecimento em vez de esconder a limitação."
+          "Se a soma exceder o limite, priorize: instruções essenciais, pergunta atual e evidências relevantes. Cortar o início de um documento pode remover justamente a condição que muda a resposta. Preserve unidades de sentido e referências de origem. Se não houver espaço para evidência suficiente, reduza a tarefa ou solicite esclarecimento em vez de esconder a limitação.",
+          "Pausa: preveja os resultados para 800 + 200 e 801 + 200 com limite 1000 antes de executar."
         ]
       },
       {
         "title": "Memória não é aprendizado de pesos",
         "paragraphs": [
           "Histórico de conversa mantém mensagens enquanto elas estiverem disponíveis ao sistema. Memória persistente pode ser um registro em banco de dados, como preferência de idioma ou resumo de uma tarefa. Isso não equivale a treinar o modelo. Cada registro precisa de origem, data, escopo, permissão e uma política de atualização ou exclusão.",
-          "Um resumo pode perder ressalvas. Ao resumir “prefiro e-mail, exceto em incidentes”, guardar apenas “prefere e-mail” altera o requisito. Guarde fatos críticos em campos estruturados e mantenha acesso à origem. Não registre senhas, tokens nem informações pessoais desnecessárias. Quando alguém pede a remoção de uma informação, considere também resumos, índices e caches derivados."
+          "Um resumo pode perder ressalvas. Ao resumir “prefiro e-mail, exceto em incidentes”, guardar apenas “prefere e-mail” altera o requisito. Guarde fatos críticos em campos estruturados e mantenha acesso à origem. Não registre senhas, tokens nem informações pessoais desnecessárias. Quando alguém pede a remoção de uma informação, considere também resumos, índices e caches derivados.",
+          "Pausa: registre a preferência e a exceção em campos distintos; diga o que deve ser apagado se a pessoa revogar a preferência."
         ]
       },
       {
         "title": "Montagem explícita e testes",
         "paragraphs": [
           "O exemplo organiza instrução, pergunta e evidências numa estrutura local. Uma função valida o orçamento antes de devolver os dados. O modelo não é chamado: você consegue observar exatamente quais informações seriam enviadas. Isso ajuda a detectar vazamentos antes de testar uma integração real.",
-          "Teste limite exato, excesso, pergunta vazia e evidência ausente. Em uma aplicação com múltiplos usuários, acrescente um teste no qual um documento de outro usuário nunca aparece na estrutura montada. Um teste de permissão deve verificar ausência do conteúdo, não apenas se a resposta final resolveu escondê-lo."
+          "Teste limite exato, excesso, pergunta vazia e evidência ausente. Em uma aplicação com múltiplos usuários, acrescente um teste no qual um documento de outro usuário nunca aparece na estrutura montada. Um teste de permissão deve verificar ausência do conteúdo, não apenas se a resposta final resolveu escondê-lo.",
+          "Pausa: explique por que filtrar uma resposta depois da geração não desfaz o envio anterior de um documento privado."
         ]
       },
       {
         "title": "Operação e rastreabilidade",
         "paragraphs": [
           "Versione a instrução junto com o código. Registre qual versão, coleção de dados e configuração produziram uma resposta. Evite copiar o contexto inteiro para logs indiscriminadamente; prefira IDs, métricas e trechos redigidos quando necessário. Assim, um incidente pode ser investigado sem criar uma segunda base de dados sensíveis.",
-          "Ao terminar, desenhe o caminho usuário → autorização → seleção de evidências → montagem de contexto → geração → validação. A ordem importa: uma checagem depois da geração não desfaz um envio indevido ao provedor. Use esse desenho como checklist antes de qualquer integração real."
+          "Ao terminar, desenhe o caminho usuário → autorização → seleção de evidências → montagem de contexto → geração → validação. A ordem importa: uma checagem depois da geração não desfaz um envio indevido ao provedor. Use esse desenho como checklist antes de qualquer integração real.",
+          "Pausa: escolha três dados de diagnóstico que ajudem a reproduzir uma falha sem copiar pergunta e documentos completos para logs."
         ]
       }
     ],
@@ -370,7 +375,7 @@ Object.assign(LESSON_GUIDES, {
       },
       {
         "instruction": "Execute o exemplo e depois substitua uma entrada válida por uma entrada ausente ou inválida.",
-        "result": "Compare o comportamento com o contrato. Uma falha explícita ou uma abstenção pode ser o resultado correto; não a substitua por uma resposta inventada."
+        "result": "Pergunta vazia ou só de espaços lança ValueError com pergunta obrigatoria. O exemplo não produz resposta de modelo nem abstenção."
       },
       {
         "instruction": "Resolva os quatro exercícios. Guarde código, previsão, saída e explicação do que mudou.",
@@ -379,7 +384,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Teste o limite exato: entrada 800, reserva 200, limite 1000.",
+        "prompt": "Prever: entrada estimada 800 e reserva 200 cabem no limite 1000? Confirme com montar_contexto. Aceite: entrada (800,200,1000) → pergunta Oi; os números são estimativas didáticas, não tokens contados.",
         "hints": [
           "A comparação usa >, não >=.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -389,7 +394,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "Cabe no orçamento didático; ainda faltam dados para uma resposta factual."
       },
       {
-        "prompt": "Teste entrada 801 com a mesma reserva.",
+        "prompt": "Alterar: aumente a entrada estimada para 801 mantendo reserva 200 e limite 1000. Capture a falha. Aceite: entrada (801,200,1000) → ValueError contexto excedido; nenhuma estrutura é devolvida.",
         "hints": [
           "Capture ValueError.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -399,22 +404,22 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "A reserva faz parte do orçamento total."
       },
       {
-        "prompt": "Mostre que mudar a lista original não altera o contexto.",
+        "prompt": "Construir: antes de montar o contexto, filtre uma lista de documentos fictícios pelo dono autorizado e teste que o texto de outro dono não foi incluído. Aceite: usuário ana, documentos de ana e bia → apenas texto de ana em evidencias; nenhum modelo é chamado.",
         "hints": [
-          "Use lista de strings e append.",
-          "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
+          "Monte documentos com dono e texto.",
+          "Filtre pelo dono antes de chamar montar_contexto; a comparação com uma sessão real é uma etapa futura."
         ],
-        "solution": "origem = ['publico']\nc = montar_contexto('Oi', origem, 1, 1, 10)\norigem.append('novo')\nprint(c['evidencias'])",
-        "expected": "['publico']",
-        "explanation": "A cópia rasa é suficiente para essa lista de strings, não para objetos aninhados mutáveis."
+        "solution": "documentos = [{'dono': 'ana', 'texto': 'Publico'}, {'dono': 'bia', 'texto': 'Privado'}]\nautorizadas = [d['texto'] for d in documentos if d['dono'] == 'ana']\ncontexto = montar_contexto('Oi', autorizadas, 1, 1, 10)\nassert 'Privado' not in contexto['evidencias']\nprint(contexto['evidencias'])",
+        "expected": "['Publico']",
+        "explanation": "O filtro ocorre antes da montagem; o nome ana é fictício e não representa autenticação de sessão."
       },
       {
-        "prompt": "Defina um registro de memória para preferência de idioma.",
+        "prompt": "Investigar erro: um resumo guardou apenas 'prefere e-mail' e perdeu 'exceto em incidentes'. Defina um registro de memória que preserve escopo, origem, exceção, atualização e exclusão. Aceite: entrada preferência com exceção → registro mantém ambas; revogação → registro e cache derivados removidos.",
         "hints": [
           "Inclua escopo, origem e exclusão.",
-          "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
+          "Esta atividade é um desenho em texto; compare-o com os critérios antes de abrir a solução."
         ],
-        "solution": "Referência: usuario_id obtido da sessão; idioma pt-BR; origem escolha explícita; data; versão; finalidade apresentação; atualização por nova escolha; exclusão remove registro e cache; nunca compartilhar entre usuários.",
+        "solution": "Referência: usuario_id obtido da sessão; canal preferido e-mail; exceção incidentes; origem escolha explícita; data; finalidade comunicação; atualização por nova escolha; exclusão remove registro, resumos e cache derivados; nunca compartilhar entre usuários.",
         "expected": "Registro com finalidade, origem, permissão, atualização e exclusão.",
         "explanation": "Memória precisa de governança, mesmo quando parece um simples detalhe de interface."
       }
