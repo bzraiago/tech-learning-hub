@@ -2632,52 +2632,38 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "db-security": {
-    "prerequisites": "Revise sqlite3, placeholders e funções Python. Diferencie o navegador que apresenta a interface do servidor que controla os dados compartilhados.",
-    "setup": "Execute em Python 3. O exemplo usa SQLite em memória e dados fictícios, sem credenciais. Em uma API real, usuario_id precisa vir da sessão autenticada e verificada pelo servidor.",
+    "prerequisites": "Conclua setup-python, db-ddl-crud e a aula de funções Python. Revise placeholders no sqlite3 e diferencie o navegador que apresenta a interface da API que controla dados compartilhados. Não é necessário instalar PostgreSQL para este laboratório.",
+    "setup": "No editor, crie uma pasta nova de laboratório e salve o exemplo como security_lab.py. No terminal aberto nessa pasta, confirme python --version e execute python security_lab.py. O banco existe apenas em memória e usa dados fictícios, sem credenciais. Em uma API real, usuario_id deve vir da sessão ou token verificado no servidor; nunca substitua esse passo por um valor livre recebido do navegador.",
     "why": "Uma busca por título não deve transformar o texto digitado em comando SQL. Além disso, Ana não pode acessar os registros de Beto apenas trocando um identificador. Segurança inclui a construção da consulta e a autorização sobre as linhas.",
     "sections": [
       {
-        "title": "Dados não são instruções",
+        "title": "Valide a entrada e vincule valores",
         "paragraphs": [
           "SQL parametrizado mantém o texto do comando fixo e envia valores separadamente ao driver. O placeholder ? representa um valor no sqlite3. Um apóstrofo dentro do título continua sendo parte do título, sem encerrar uma string SQL construída manualmente. Não é necessário remover caracteres legítimos para proteger uma busca.",
-          "A função recebe usuario_id e titulo e passa ambos como tupla. A ordem deve corresponder aos placeholders. Outros drivers usam sintaxes diferentes, como %s ou parâmetros nomeados. Consulte o driver utilizado, sem transportar cegamente os pontos de interrogação para toda biblioteca. A proteção está na vinculação de parâmetros, não no símbolo isolado."
+          "Validação pergunta se o título é texto e tem tamanho permitido; parametrização separa valores da estrutura SQL. Uma não substitui a outra. A função passa usuario_id e titulo como tupla na ordem dos placeholders. Outros drivers usam sintaxes diferentes; consulte a biblioteca. A proteção está na vinculação feita pelo driver, não no símbolo ? isolado."
         ]
       },
       {
-        "title": "Autorização é outra condição",
+        "title": "Autentique a identidade e autorize o recurso",
         "paragraphs": [
           "WHERE usuario_id=? AND titulo=? restringe a consulta ao dono dos registros. Essa regra só funciona se usuario_id for confiável. Em uma API, derive-o da identidade autenticada, não de um campo livre enviado pelo navegador. Autenticação responde quem é a pessoa; autorização responde quais dados ela pode acessar.",
-          "Duas pessoas podem ter materiais com o mesmo título. Buscar somente pelo título devolveria ambas as linhas e violaria a separação de contas. O exemplo cria esse caso intencionalmente. Um teste com apenas um usuário não revelaria o problema, portanto os dados de teste devem representar a situação que queremos impedir."
+          "Duas pessoas podem ter materiais com o mesmo título. Buscar somente por título mistura as contas; o exemplo cria esse caso de propósito. Teste leitura, contagem, atualização e remoção com duas identidades, inclusive chamando a rota diretamente. Um teste apenas pela tela pode esconder uma autorização ausente na API. Um identificador bem formatado ainda pode pertencer a outra pessoa."
         ]
       },
       {
-        "title": "Privilégios e fronteiras",
-        "paragraphs": [
-          "Em uma aplicação web compartilhada, o navegador chama a API e a API consulta o banco. A conta usada pela aplicação deve receber apenas os privilégios necessários para suas tabelas e operações. Credenciais ficam no ambiente do servidor, não em JavaScript entregue ao cliente. SQLite local usa permissões de arquivo em vez de contas internas de servidor.",
-          "Placeholders representam valores; não escolhem nomes de colunas nem palavras como ASC. Quando a ordenação é dinâmica, use um mapa de opções permitidas definido no código. Evite concatenar nomes vindos diretamente da requisição. Parametrização e lista permitida resolvem problemas distintos e podem coexistir na mesma consulta."
-        ]
-      },
-      {
-        "title": "Validar, parametrizar e autorizar são etapas distintas",
-        "paragraphs": [
-          "Validação pergunta se a entrada faz sentido: um título deve ser texto e ter tamanho permitido; um identificador deve ter formato válido. Parametrização separa os valores da estrutura SQL. Autorização decide se a pessoa pode realizar a operação sobre aquele recurso. Uma etapa não substitui as outras. Um número de usuário perfeitamente válido ainda pode pertencer a outra pessoa; uma string bem parametrizada ainda pode ser longa demais para a regra do produto.",
-          "Uma API deve obter a identidade de uma sessão ou token verificado e entregar esse identificador confiável à função de dados. Aceitar usuario_id livre no corpo da requisição e usá-lo na consulta não prova identidade. Em testes, crie duas contas com títulos iguais e tente ler, atualizar e remover o material da outra conta. O isolamento deve valer em todas as operações, inclusive contagens e relatórios. Um teste apenas da tela pode esconder uma falha na rota usada diretamente."
-        ]
-      },
-      {
-        "title": "Alterações também precisam de escopo",
+        "title": "Limite alterações e identificadores dinâmicos",
         "paragraphs": [
           "Para renomear um material, use WHERE id=? AND usuario_id=? e valores separados. O identificador do material escolhe o objeto; o identificador confiável da pessoa limita a permissão. Verifique a quantidade de linhas afetadas. Zero pode significar objeto inexistente ou fora do escopo, e a resposta pública pode evitar distinguir esses casos para não revelar a existência do material de outra conta. Esse comportamento deve ser uma decisão explícita da API.",
-          "Permissões do banco limitam o dano de um defeito da aplicação. Uma conta de consulta não precisa criar tabelas; uma conta de execução normal não precisa administrar usuários. Em motores cliente-servidor, roles e privilégios organizam esse acesso. SQLite não fornece o mesmo modelo de usuários internos: o processo que abre o arquivo depende das permissões do sistema e da fronteira da aplicação. Não apresente um GRANT de PostgreSQL como solução para um arquivo SQLite.",
-          "Segredos pertencem à configuração protegida do servidor. Uma variável em JavaScript entregue ao navegador continua visível, mesmo minificada. Arquivos de ambiente podem facilitar a configuração, mas não devem entrar no repositório com senhas reais. Use credenciais de laboratório, restrinja acesso e planeje rotação quando houver exposição. Logs também merecem atenção: registrar uma consulta com todos os parâmetros pode revelar dados pessoais ou tokens. Guarde informações suficientes para investigar sem copiar segredos desnecessários."
+          "O placeholder ? representa um valor. SELECT ? FROM materiais devolve o valor fornecido para cada linha; não seleciona uma coluna pelo nome recebido. Para ordenar por título ou id, um mapa controlado pode converter \"titulo\" em \"titulo\" e \"codigo\" em \"id\", rejeitando qualquer outra opção. Só o identificador escolhido pelo programa entra na estrutura SQL. Isso é diferente de concatenar uma entrada externa diretamente. Drivers de outros motores podem oferecer APIs específicas de composição segura; use o mecanismo documentado.",
+          "Nos testes negativos, use apóstrofo, texto que parece SQL, identidade sem registros e tentativa de alterar outro proprietário. Compare dados antes e depois. O objetivo não é proibir caracteres: vinculação protege a estrutura, e autorização protege o recurso. Trate erros sem devolver stack trace, URI ou senha; também não transforme toda falha em lista vazia, pois sucesso sem resultados e indisponibilidade são estados diferentes."
         ]
       },
       {
-        "title": "Identificadores dinâmicos, erros e testes negativos",
+        "title": "Proteja a fronteira operacional",
         "paragraphs": [
-          "O placeholder ? representa um valor. SELECT ? FROM materiais devolve o valor fornecido para cada linha; não seleciona uma coluna pelo nome recebido. Para ordenar por título ou id, um mapa controlado pode converter \"titulo\" em \"titulo\" e \"codigo\" em \"id\", rejeitando qualquer outra opção. Só o identificador escolhido pelo programa entra na estrutura SQL. Isso é diferente de concatenar uma entrada externa diretamente. Drivers de outros motores podem oferecer APIs específicas de composição segura; use o mecanismo documentado.",
-          "Exceções do banco devem ser tratadas na fronteira apropriada. Uma violação de unicidade pode virar mensagem de conflito; uma falha de conexão pode exigir resposta temporária; um erro de programação precisa de investigação. Não devolva stack trace, URI de conexão ou senha ao usuário. Também não esconda tudo com um retorno vazio, pois isso transforma falha em aparente ausência de dados. A interface deve distinguir sucesso vazio de operação que não pôde ser concluída.",
-          "O teste negativo é parte central desta aula. Além de buscar um título comum, busque uma string com apóstrofo, uma entrada que parece SQL, uma identidade sem registros e uma tentativa de alterar outro proprietário. Compare os dados antes e depois. O objetivo não é decorar uma lista de caracteres proibidos: a separação entre comando e valor precisa funcionar para todo texto aceito pelo domínio, enquanto a autorização protege cada operação independentemente do conteúdo do título."
+          "Em uma aplicação compartilhada, navegador chama API e API consulta banco. A conta da aplicação recebe somente privilégios necessários; uma conta de leitura não cria tabelas e uma conta comum não administra usuários. PostgreSQL organiza isso com roles. SQLite usa permissões do arquivo e a fronteira do processo, não o mesmo modelo interno: um GRANT de PostgreSQL não se aplica ao arquivo SQLite.",
+          "Credenciais pertencem à configuração protegida do servidor, nunca ao JavaScript enviado ao navegador. Arquivos de ambiente não devem entrar no repositório com segredos reais. Use credenciais de laboratório, restrinja acesso e rotacione após exposição. Logs também podem revelar dados e tokens: registre contexto suficiente para investigar sem copiar segredos ou parâmetros pessoais desnecessários.",
+          "Este laboratório comprova parametrização e escopo de linha em uma função pequena; não implementa login, sessão, gestão de roles, criptografia ou conformidade com a LGPD. Essas camadas precisam de testes próprios na futura API. Marcar a aula como concluída não comprova que uma aplicação publicada esteja segura."
         ]
       }
     ],
@@ -2708,7 +2694,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Busque SQL apenas para o usuário 1 usando a função existente.",
+        "prompt": "Prever: antes de executar, diga qual registro buscar(conexao, 1, \"SQL\") deve devolver; depois faça a chamada e compare.",
         "hints": [
           "A função já recebe os dois critérios.",
           "Mantenha a chamada dentro do bloco da conexão."
@@ -2718,7 +2704,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "[(3, \"SQL\")]."
       },
       {
-        "prompt": "Implemente uma função para contar materiais de um usuário.",
+        "prompt": "Alterar: implemente uma função para contar materiais de um usuário, mantendo usuario_id como parâmetro vinculado.",
         "hints": [
           "Use COUNT(*) com WHERE usuario_id=?.",
           "fetchone()[0] extrai o número da primeira coluna."
@@ -2728,7 +2714,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Usuário 1: 2. Usuário 2: 1."
       },
       {
-        "prompt": "Dentro da conexão do exemplo, busque um título que parece condição SQL. A consulta deve retornar vazio e a tabela deve manter três linhas.",
+        "prompt": "Construir: dentro da conexão do exemplo, teste um título que parece condição SQL e prove que a tabela permanece com três linhas.",
         "hints": [
           "Passe o texto como argumento da função.",
           "Não monte SQL novo por f-string."
@@ -2738,7 +2724,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "[] e depois 3."
       },
       {
-        "prompt": "Escreva renomear que altera um material somente se pertencer à identidade confiável. Teste usuário 1 tentando alterar id 2.",
+        "prompt": "Investigar erro: uma função atualiza somente por id e permite alterar material de outra conta. Corrija renomear para exigir a identidade confiável e teste usuário 1 tentando alterar id 2.",
         "hints": [
           "Inclua id e usuario_id no WHERE.",
           "Use rowcount para observar a abrangência."

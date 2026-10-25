@@ -3097,12 +3097,11 @@
             "minutes": 75,
             "concept": "Dados digitados pelo usuário devem ser enviados como parâmetros, separados da instrução SQL. Placeholders representam valores, não nomes de tabelas ou colunas: identificadores dinâmicos exigem uma lista permitida ou composição segura do driver. Restrinja as permissões da conta da aplicação e mantenha credenciais no servidor. O navegador acessa uma API; não deve receber uma senha de banco.",
             "objectives": [
-              "Escrever consultas parametrizadas sem interpolação de valores.",
-              "Separar interface, API, autenticação e autorização de acesso aos dados.",
-              "Separe valores da instrução SQL.",
-              "Verificar resultados e explicar os limites do laboratório com casos válidos e inválidos."
+              "Vincular valores sem interpolá-los na instrução SQL.",
+              "Aplicar identidade confiável ao escopo de leitura, contagem e alteração.",
+              "Explicar onde ficam credenciais, privilégios e tratamento seguro de erros."
             ],
-            "exercise": "Escreva renomear que altera um material somente se pertencer à identidade confiável. Teste usuário 1 tentando alterar id 2.",
+            "exercise": "Corrija uma atualização sem escopo de proprietário e prove que o usuário 1 não altera o material do usuário 2.",
             "code": "import sqlite3\nfrom contextlib import closing\n\ndef buscar(conexao, usuario_id, titulo):\n    return conexao.execute(\n        \"SELECT id,titulo FROM materiais WHERE usuario_id=? AND titulo=? ORDER BY id\",\n        (usuario_id, titulo)\n    ).fetchall()\n\nwith closing(sqlite3.connect(\":memory:\")) as conexao:\n    with conexao:\n        conexao.execute(\"CREATE TABLE materiais(id INTEGER PRIMARY KEY,usuario_id INTEGER,titulo TEXT)\")\n        conexao.executemany(\"INSERT INTO materiais VALUES(?,?,?)\", [\n            (1,1,\"Guia d'água\"), (2,2,\"Guia d'água\"), (3,1,\"SQL\")\n        ])\n    print(buscar(conexao, 1, \"Guia d'água\"))\n    print(buscar(conexao, 1, \"Inexistente\"))\n",
             "docs": [
               {
@@ -3114,7 +3113,7 @@
               {
                 "kind": "doc",
                 "title": "PostgreSQL · Roles e privilégios",
-                "url": "https://www.postgresql.org/docs/current/user-manag.html",
+                "url": "https://www.postgresql.org/docs/17/user-manag.html",
                 "language": "EN"
               }
             ]

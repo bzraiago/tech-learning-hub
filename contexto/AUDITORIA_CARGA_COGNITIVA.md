@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-recovery`, a auditoria automática aponta 27: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; nove das dez aulas avançadas foram condensadas sem mudar seus IDs. Resta uma aula avançada de banco prioritária.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `db-security`, a auditoria automática aponta 26: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 foi concluída.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,10 +18,9 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Alta | M | Última aula avançada restante da trilha `database` | FATO | Possui seis seções e nenhum dos quatro prefixos padronizados nos exercícios. | Auditar e padronizar a progressão. |
-| 2 | Média | G | 5 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
-| 3 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
-| 4 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
+| 1 | Média | G | 5 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
+| 2 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 3 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
 
@@ -154,6 +153,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 - **Ambiente:** script `recovery_lab.py` em pasta nova, duas bases `:memory:` e dados fictícios. O exemplo não persiste após o processo; a extensão em disco exige dois caminhos novos e abertura do destino em outra execução. A preparação alerta que a API escreve no destino e proíbe reutilizar um banco importante. Nenhum arquivo de banco do usuário foi criado ou sobrescrito nesta revisão.
 - **Fontes:** documentação oficial [SQLite — Backup API](https://www.sqlite.org/backup.html), [PostgreSQL 17 — SQL dump](https://www.postgresql.org/docs/17/backup-dump.html) e [Firebird — gbak](https://firebirdsql.org/file/documentation/html/en/firebirddocs/gbak/firebird-gbak.html) foi aberta em 24/10/2026 (EN, OK). O link PostgreSQL foi fixado em 17, versão usada no laboratório do curso.
 - **Limite:** o exemplo em memória demonstra cópia independente, não durabilidade, retenção externa ou recuperação de produção. Sem ensaio em arquivo, medição de tempo e observação do aluno, RTO/RPO e autonomia operacional continuam não comprovados.
+
+### Revisão localizada: `db-security`
+
+- **Público e saída:** após Python, CRUD seguro e funções, o aluno deve vincular valores, usar identidade confiável no escopo das linhas e impedir que uma conta altere dados de outra em um laboratório SQLite.
+- **FATO, alta, M:** seis seções repetiam validação, parametrização e autorização. A aula ficou com quatro blocos: entrada/vinculação, identidade/autorização, alteração/identificadores e fronteira operacional. Os exercícios explicitam prever, alterar, construir e investigar erro.
+- **Sequência:** `setup-python` → funções Python e `db-ddl-crud` → `db-security` → futura API autenticada. O laboratório não exige PostgreSQL; roles aparecem como aprofundamento para banco cliente-servidor. Não se identificou ciclo.
+- **Ambiente e segurança:** arquivo `security_lab.py`, terminal na pasta de laboratório, SQLite somente em memória e dados fictícios. Nenhum segredo é necessário. O conteúdo diferencia navegador, API e banco, proíbe confiar em `usuario_id` livre e declara que o laboratório não implementa login, sessão, criptografia ou conformidade LGPD.
+- **Fontes:** documentação oficial [Python sqlite3](https://docs.python.org/pt-br/3/library/sqlite3.html) (PT-BR) e [PostgreSQL 17 — roles](https://www.postgresql.org/docs/17/user-manag.html) (EN) foi aberta em 24/10/2026 (OK). A primeira confirma placeholders em vez de formatação; a segunda confirma controle de acesso por roles. O link PostgreSQL foi alinhado à versão 17 do curso.
+- **Limite:** o teste unitário de uma função não comprova segurança de uma API publicada. Autenticação, autorização em todas as rotas, privilégios reais, logs, rotação de segredos e LGPD precisam de implementação e testes próprios.
 
 ## 9. Limites desta auditoria
 
