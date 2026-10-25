@@ -12,7 +12,8 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "HTML é uma linguagem de marcação, não uma linguagem de programação. Ela descreve conteúdo; não calcula resultados nem executa decisões por conta própria. O arquivo que você salva contém caracteres. O navegador interpreta as marcações e mostra uma apresentação. Por isso o texto do editor e a página aberta têm aparências diferentes, mas representam o mesmo documento.",
           "O ciclo de trabalho é editar, salvar, atualizar e conferir. Se nada mudou na tela, primeiro veja se salvou o arquivo correto e se a aba aponta para esse mesmo caminho. Crie nomes curtos em minúsculas, sem espaços, como index.html. A extensão identifica o formato. Um editor de documentos que salva .docx não produz o arquivo de texto simples que precisamos.",
-          "Clique com o botão direito na página e escolha Inspecionar. O painel de elementos mostra a árvore interpretada pelo navegador. Ele pode reorganizar um HTML malformado para conseguir exibi-lo. Portanto, aparecer na tela não prova que o documento está correto. Compare o código salvo com a árvore quando uma região aparecer fora do lugar."
+          "Clique com o botão direito na página e escolha Inspecionar. O painel de elementos mostra a árvore interpretada pelo navegador. Ele pode reorganizar um HTML malformado para conseguir exibi-lo. Portanto, aparecer na tela não prova que o documento está correto. Compare o código salvo com a árvore quando uma região aparecer fora do lugar.",
+          "Pausa de prática: mude uma palavra no arquivo, salve e atualize. Antes de atualizar, diga qual texto espera ver. Se não aparecer, confira o caminho do arquivo e a aba aberta."
         ]
       },
       {
@@ -21,28 +22,26 @@ Object.assign(LESSON_GUIDES, {
           "Em \u003cp>Olá\u003c/p>, \u003cp> é a tag de abertura, \u003c/p> é a tag de fechamento e o conjunto forma um elemento de parágrafo. O conteúdo fica entre as tags. Em \u003cp class=\"aviso\">Olá\u003c/p>, class é um atributo e aviso é seu valor. Os atributos ficam na abertura e fornecem informações adicionais. Use aspas para delimitar os valores e espaços para separar atributos.",
           "Aninhar significa colocar um elemento dentro de outro. Abra primeiro o elemento externo e feche primeiro o interno: \u003cp>Estude \u003cstrong>hoje\u003c/strong>.\u003c/p>. Não cruze fechamentos. Nem todo elemento pode conter qualquer outro: um parágrafo não deve envolver uma seção ou outro parágrafo. A indentação não muda a semântica, mas permite conferir visualmente a relação entre pais e filhos.",
           "Alguns elementos são vazios: meta, img, input e br não têm conteúdo interno nem tag de fechamento em HTML. Não escreva \u003c/img>. br representa uma quebra de linha apropriada, por exemplo em um endereço ou poema; não use várias quebras para criar espaçamento. Atributos booleanos representam ligado pela presença e desligado pela ausência: required=\"false\" ainda torna um campo obrigatório. Você verá required na aula de formulários.",
-          "id identifica um elemento de forma única no documento; class permite agrupar vários elementos, principalmente para estilos. title pode acrescentar uma dica, mas não deve guardar informação indispensável porque não aparece de maneira confiável em todos os modos de interação. Atributos não são palavras livres: escolha os que existem para o elemento ou use data-* para dados personalizados quando aprender JavaScript."
+          "id identifica um elemento de forma única no documento; class permite agrupar vários elementos, principalmente para estilos. title pode acrescentar uma dica, mas não deve guardar informação indispensável porque não aparece de maneira confiável em todos os modos de interação. Atributos não são palavras livres: escolha os que existem para o elemento ou use data-* para dados personalizados quando aprender JavaScript.",
+          "Pausa de prática: escreva um parágrafo com uma palavra em strong. Antes de abrir, desenhe a ordem de abertura e fechamento das tags; depois confira a árvore no navegador."
         ]
       },
       {
         "title": "3. O esqueleto e os metadados",
         "paragraphs": [
           "\u003c!DOCTYPE html> instrui o navegador a trabalhar no modo moderno de interpretação. html é a raiz. lang=\"pt-BR\" informa o idioma principal. head guarda metadados sobre o documento; body guarda seu conteúdo apresentado. Não confunda head com header: o primeiro é a área de configuração; o segundo é uma introdução visível de uma página ou região.",
-          "meta charset=\"UTF-8\" define a codificação, que também deve ser usada ao salvar o arquivo. Isso evita problemas com acentos. meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" permite que o layout considere a largura do dispositivo; não torna uma página responsiva sozinho. title identifica a aba e ajuda a distinguir páginas abertas. Uma descrição pode ser acrescentada com meta name=\"description\" content=\"Resumo da página\"; ela não aparece como parágrafo no body."
+          "meta charset=\"UTF-8\" define a codificação, que também deve ser usada ao salvar o arquivo. Isso evita problemas com acentos. meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" permite que o layout considere a largura do dispositivo; não torna uma página responsiva sozinho. title identifica a aba e ajuda a distinguir páginas abertas. Uma descrição pode ser acrescentada com meta name=\"description\" content=\"Resumo da página\"; ela não aparece como parágrafo no body.",
+          "Pausa de prática: altere title e h1 para textos diferentes. Preveja o que mudará na aba e no corpo da página, salve, atualize e compare."
         ]
       },
       {
-        "title": "4. Conteúdo com significado",
+        "title": "4. Conteúdo e regiões com significado",
         "paragraphs": [
           "Use h1 para o assunto principal desta página, h2 para suas seções e h3 para subdivisões dessas seções. Os níveis vão até h6. Pense como o sumário de um texto, não como uma escala de tamanhos. Neste curso adotamos um h1 principal por página. Um p marca um parágrafo. strong indica importância e em indica ênfase; escolha-os pelo sentido, não apenas por negrito ou itálico.",
-          "ul apresenta itens sem sequência obrigatória; ol apresenta uma ordem relevante; os itens usam li. Uma lista de materiais normalmente usa ul; os passos de inscrição usam ol. Para pares como termo e definição existe dl, com dt para o termo e dd para sua descrição. Espaços e quebras repetidos no código geralmente são condensados na apresentação, portanto não alinhe conteúdo apertando a barra de espaço."
-        ]
-      },
-      {
-        "title": "5. Regiões, comentários e caracteres especiais",
-        "paragraphs": [
+          "ul apresenta itens sem sequência obrigatória; ol apresenta uma ordem relevante; os itens usam li. Uma lista de materiais normalmente usa ul; os passos de inscrição usam ol. Para pares como termo e definição existe dl, com dt para o termo e dd para sua descrição. Espaços e quebras repetidos no código geralmente são condensados na apresentação, portanto não alinhe conteúdo apertando a barra de espaço.",
           "header reúne a introdução, nav reúne navegação relevante, main marca o conteúdo principal e footer fecha uma página ou região. section agrupa um assunto normalmente identificado por título. article serve para conteúdo que faz sentido de forma independente, como uma notícia. aside contém informação complementar. div é um agrupador sem significado próprio: use quando precisa agrupar sem declarar uma dessas funções.",
-          "Um comentário usa \u003c!-- comentário -->. Ele não aparece como texto na página, mas continua visível para quem abre o código; não coloque segredos nele. Para mostrar caracteres usados na marcação, use referências como &lt; para \u003c, &gt; para > e &amp; para &. A referência é interpretada uma vez: escrever &lt;p&gt; mostra literalmente \u003cp> em vez de criar um parágrafo. A correção estrutural vem antes do acabamento visual, que será estudado em CSS."
+          "Um comentário usa \u003c!-- comentário -->. Ele não aparece como texto na página, mas continua visível para quem abre o código; não coloque segredos nele. Para mostrar caracteres usados na marcação, use referências como &lt; para \u003c, &gt; para > e &amp; para &. A referência é interpretada uma vez: escrever &lt;p&gt; mostra literalmente \u003cp> em vez de criar um parágrafo. A correção estrutural vem antes do acabamento visual, que será estudado em CSS.",
+          "Pausa de prática: desenhe um sumário com h1 e duas seções h2. Escolha uma lista de materiais com ul e uma sequência de passos com ol. Só então marque header, main, section e footer no arquivo."
         ]
       }
     ],
@@ -74,17 +73,17 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: acrescente uma meta description ao head descrevendo o clube em uma frase.",
+        "prompt": "Prever: antes de editar, diga se uma meta description criará texto visível no corpo da página. Depois acrescente ao head uma descrição do clube em uma frase e confira sua previsão.",
         "hints": [
           "Insira uma tag meta depois de title.",
           "Use name e content; meta é vazio."
         ],
         "solution": "\u003cmeta name=\"description\" content=\"Encontros gratuitos para aprender desenvolvimento web com prática.\">",
         "explanation": "A descrição é metadado: não deve criar um texto no conteúdo principal.",
-        "expected": "A tag aparece no código dentro de head e a página mantém a mesma apresentação."
+        "expected": "Previsão registrada antes do teste; a tag aparece dentro de head e a página mantém a mesma apresentação."
       },
       {
-        "prompt": "Completar: adicione a main uma segunda seção chamada Regras, com uma lista não ordenada de duas regras.",
+        "prompt": "Alterar: no exemplo, adicione a main uma segunda seção chamada Regras, com uma lista não ordenada de duas regras. Preserve a primeira seção e seus títulos.",
         "hints": [
           "A nova section deve ser irmã da primeira, antes de \u003c/main>.",
           "O título tem o mesmo nível de Nosso primeiro encontro."
@@ -104,7 +103,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "O arquivo abre sozinho, tem acentos corretos e cada passo aparece como item numerado."
       },
       {
-        "prompt": "Depurar: corrija \u003cp>Bem-vindo \u003cstrong>ao clube\u003c/p>\u003c/strong>\u003ch3>Objetivo\u003c/h3> quando Objetivo é a primeira seção abaixo de um h1.",
+        "prompt": "Investigar erro: observe \u003cp>Bem-vindo \u003cstrong>ao clube\u003c/p>\u003c/strong>\u003ch3>Objetivo\u003c/h3> quando Objetivo é a primeira seção abaixo de um h1. Compare a ordem das tags no arquivo com a árvore interpretada e identifique os dois problemas antes de corrigir.",
         "hints": [
           "Feche os elementos na ordem inversa da abertura.",
           "O primeiro subtítulo do h1 deve ser h2 neste documento."

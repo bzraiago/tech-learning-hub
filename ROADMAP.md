@@ -156,6 +156,7 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `html-tables`: organizar escolha dos dados, marcação, mesclagens e conferência em quatro blocos com quatro tipos de prática.
     - [x] `html-forms`: reunir controles e agrupamentos, explicitar quatro tipos de prática e preservar o aviso de envio demonstrativo.
     - [x] `html-links-media`: reunir caminhos e destinos em um bloco, mantendo imagens e mídia em blocos próprios e explicitando quatro tipos de prática.
+    - [x] `html-semantic`: inserir pausas de previsão e prática entre os fundamentos, reunir conteúdo e regiões e explicitar quatro tipos de exercício.
   - [ ] Prioridade 4: revisar 15 aulas de IA/Entrega, preservando o nível avançado quando os pré-requisitos forem suficientes.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
 - [ ] Adicionar demonstrações visuais de laços.

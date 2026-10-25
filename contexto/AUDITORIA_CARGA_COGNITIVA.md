@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `html-links-media`, a auditoria automática aponta 22: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 foi concluída e a prioridade 3 começou.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `html-semantic`, a auditoria automática aponta 21: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 foi concluída; as cinco aulas HTML da prioridade 3 foram revisadas.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 1 aula HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
+| 1 | Média | G | 6 aulas JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 2 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 3 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
@@ -73,6 +73,14 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `html-semantic`
+
+- **Público e saída:** sem conhecimento prévio de programação, após a preparação de arquivos e editor, o aluno deve criar um documento HTML completo, conferir seu aninhamento e escolher títulos, listas e regiões pelo significado. Editor e navegador bastam.
+- **FATO, alta, M:** a primeira aula tinha cinco seções longas e só `Construir` como tipo explícito de exercício. A revisão manteve o conteúdo e o ID, reuniu conteúdo e regiões em um bloco e inseriu pausas de previsão e execução entre os fundamentos. Os quatro exercícios agora explicitam prever, alterar, construir e investigar erro.
+- **Pré-requisitos:** preparação digital da Etapa 0 → `html-semantic` → `html-links-media`. Sem dependência circular identificada neste recorte.
+- **Fontes:** [MDN sobre sintaxe HTML básica](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Basic_HTML_syntax) e [MDN sobre estrutura de documentos](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Structuring_documents) foram abertas em 24/10/2026 (fontes oficiais, EN, OK). A segunda pressupõe sintaxe e semântica de texto básicas, ordem que as pausas internas procuram respeitar.
+- **Limite:** quatro seções continuam cobrindo muitos conceitos para uma primeira aula. O número de seções é apenas triagem; uma observação com aluno iniciante ainda é necessária para decidir se o conteúdo deve virar duas aulas. Teste manual no navegador não executado nesta revisão.
 
 ### Revisão localizada: `html-links-media`
 
