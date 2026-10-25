@@ -468,43 +468,48 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "ai-rag": {
-    "prerequisites": "Concluir setup-python e ai-system; saber usar funções, listas, dicionários, exceções e testes em Python.",
-    "setup": "Na pasta ia-estudos, salve o exemplo como ai-data.py no editor. Abra o terminal nessa pasta e execute python ai-data.py (ou py ai-data.py no Windows, python3 ai-data.py no macOS/Linux, conforme setup-python). A saída esperada mostra manual-v1:0 e manual-v1:1 com os trechos indicados abaixo. O processo termina sozinho; para retomar, execute o mesmo comando. Se Python não for reconhecido, revise setup-python. Acrescente exercícios de código ao final do arquivo; escreva o plano de atualização em texto separado. Usa dados fictícios e biblioteca padrão, sem índice remoto ou modelo real.",
+    "prerequisites": "Concluir setup-python, ai-data e ai-embeddings; saber usar funções, listas, dicionários e testes em Python.",
+    "setup": "Na pasta ia-estudos, salve o exemplo como ai-rag.py no editor. Abra o terminal nessa pasta e execute python ai-rag.py (ou py ai-rag.py no Windows, python3 ai-rag.py no macOS/Linux, conforme setup-python). A saída esperada é ['A'] e sem evidencia, em duas linhas. O processo termina sozinho; para retomar, execute o mesmo comando. Se Python não for reconhecido, revise setup-python. Acrescente os exercícios de código ao final do arquivo; o último é respondido em texto. Usa dados fictícios e biblioteca padrão, sem LLM, embeddings ou API.",
     "why": "Monte um fluxo de resposta apoiado em documentos, entendendo as falhas de cada etapa.",
     "sections": [
       {
         "title": "O significado e a arquitetura",
         "paragraphs": [
           "RAG significa Retrieval-Augmented Generation: geração aumentada por recuperação. O sistema busca informação externa e a fornece como contexto para produzir uma resposta. Isso permite usar conteúdo atualizado sem treinar novamente os pesos a cada documento. Não transforma o modelo em uma fonte infalível: dados, busca e geração podem falhar.",
-          "Há um caminho de ingestão, que prepara e indexa documentos, e um caminho de consulta, que identifica o usuário, busca evidências, monta contexto, gera e valida. Desenhe os dois separadamente. Atualização da base e resposta ao usuário têm tempos, testes e responsabilidades diferentes."
+          "Há um caminho de ingestão, que prepara e indexa documentos, e um caminho de consulta, que identifica o usuário, busca evidências, monta contexto, gera e valida. Desenhe os dois separadamente. Atualização da base e resposta ao usuário têm tempos, testes e responsabilidades diferentes.",
+          "Pausa: desenhe ingestão e consulta em duas linhas; marque em qual delas uma versão revogada deve ser retirada."
         ]
       },
       {
         "title": "Da pergunta à evidência",
         "paragraphs": [
           "Uma pergunta pode ser ambígua: “qual prazo?” precisa indicar o processo. Primeiro verifique se há dados suficientes para buscar. Recupere apenas documentos autorizados, vigentes e relevantes. Preserve ID, trecho e origem; o gerador precisa saber qual evidência corresponde a qual referência.",
-          "O exemplo faz busca lexical mínima com conjuntos de palavras. Não usa embeddings nem um LLM; devolve o trecho encontrado como evidência. A escolha é proposital para que você teste permissões e ausência de resultado sem depender de um serviço. Busca real pode exigir normalização, ranking híbrido e avaliação com paráfrases."
+          "O exemplo faz busca lexical mínima com conjuntos de palavras. Não usa embeddings nem um LLM; devolve o trecho encontrado como evidência. A escolha é proposital para que você teste permissões e ausência de resultado sem depender de um serviço. Busca real pode exigir normalização, ranking híbrido e avaliação com paráfrases. Resultado vazio nesta busca não prova que o corpus não contém resposta: a pergunta pode usar uma palavra diferente.",
+          "Pausa: preveja a busca de devolucao para ana e carlos e identifique em qual etapa o documento B é descartado."
         ]
       },
       {
         "title": "Gerar com um contrato",
         "paragraphs": [
           "Ao conectar um modelo, envie a pergunta e os trechos, solicite resposta apoiada neles e referências aos IDs apresentados. Defina o que fazer quando não houver evidência ou quando duas fontes se contradisserem. Em uma política com datas conflitantes, não escolha silenciosamente a frase mais conveniente: use a versão vigente ou encaminhe a dúvida.",
-          "Valide a forma de saída e se as referências pertencem ao conjunto recuperado. Isso detecta IDs inventados, mas não prova que a afirmação é sustentada pelo trecho. “Fonte A” pode existir e ainda assim não dizer o que a resposta afirma. A avaliação de suporte exige comparar cada afirmação com a evidência."
+          "Valide a forma de saída e se as referências pertencem ao conjunto recuperado. Isso detecta IDs inventados, mas não prova que a afirmação é sustentada pelo trecho. “Fonte A” pode existir e ainda assim não dizer o que a resposta afirma. A avaliação de suporte exige comparar cada afirmação com a evidência.",
+          "Pausa: para a fonte A que diz sete dias, avalie a frase 'o prazo é trinta dias [A]'. O ID existe; qual verificação a reprova?"
         ]
       },
       {
         "title": "Abstenção é um resultado útil",
         "paragraphs": [
           "Quando não há conteúdo suficiente, responda que a base não permite concluir e indique um próximo passo: especificar o produto, consultar o responsável ou fornecer uma fonte. Uma aplicação confiável precisa distinguir pergunta sem resposta de falha técnica e de acesso negado. Não exponha a existência de documentos privados ao explicar a ausência.",
-          "Defina estados para a interface: respondido, sem evidência, revisar e indisponível. Esses estados ajudam a evitar mensagens genéricas que escondem a causa. Não use um limiar arbitrário de similaridade como garantia universal de resposta; calibre a decisão com casos representativos e revise falsos positivos."
+          "Defina estados para a interface: respondido, sem evidência, revisar e indisponível. Esses estados ajudam a evitar mensagens genéricas que escondem a causa. Não use um limiar arbitrário de similaridade como garantia universal de resposta; calibre a decisão com casos representativos e revise falsos positivos.",
+          "Pausa: diferencie consulta sem termo encontrado, documento privado e gerador indisponível. Que informação pode aparecer para a pessoa usuária em cada caso?"
         ]
       },
       {
         "title": "Avaliar por camada",
         "paragraphs": [
           "Avalie recuperação com documentos esperados; geração com correção, suporte e utilidade; sistema com latência, custo, privacidade e falhas. Uma resposta correta por conhecimento prévio do modelo pode mascarar uma busca quebrada. Por isso os testes devem verificar também quais documentos entraram no contexto.",
-          "Inclua perguntas respondíveis, sem resposta, adversariais, ambíguas e dependentes de atualização. Teste exclusão de documento, revogação de acesso e indisponibilidade do gerador. No projeto final, um gerador injetado permite reproduzir erros de contrato; uma API real exige uma etapa adicional de avaliação de qualidade."
+          "Inclua perguntas respondíveis, sem resposta, adversariais, ambíguas e dependentes de atualização. Teste exclusão de documento, revogação de acesso e indisponibilidade do gerador. No projeto final, um gerador injetado permite reproduzir erros de contrato; uma API real exige uma etapa adicional de avaliação de qualidade.",
+          "Pausa: escolha um caso em que a busca falha e outro em que a citação existe mas não sustenta a resposta; registre qual etapa cada teste avalia."
         ]
       }
     ],
@@ -525,7 +530,7 @@ Object.assign(LESSON_GUIDES, {
       },
       {
         "instruction": "Execute o exemplo e depois substitua uma entrada válida por uma entrada ausente ou inválida.",
-        "result": "Texto só com espaços gera []; sobreposição igual ao tamanho lança ValueError parametros invalidos. Esta função não gera resposta nem decide abstenção."
+        "result": "Consulta por carlos retorna []; pergunta sem termo em comum retorna []. A função não gera texto nem consulta um LLM."
       },
       {
         "instruction": "Resolva os quatro exercícios. Guarde código, previsão, saída e explicação do que mudou.",
@@ -534,7 +539,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Consulte como um usuário sem acesso.",
+        "prompt": "Prever: antes de executar, qual resultado carlos recebe ao buscar devolucao? Confirme com o código. Aceite: entrada usuário carlos → []; a saída não revela o texto privado nem prova que não existam documentos.",
         "hints": [
           "Use usuario carlos.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -544,7 +549,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "A ausência de resultados não revela conteúdo privado."
       },
       {
-        "prompt": "Teste que a busca não modifica os documentos.",
+        "prompt": "Alterar: acrescente ao roteiro uma verificação de que buscar devolucao para ana não modifica docs. Aceite: entrada corpus com A e B → corpus igual antes e depois; saída corpus preservado.",
         "hints": [
           "Copie profundamente antes.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -554,7 +559,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "Uma consulta não deve alterar acidentalmente a base."
       },
       {
-        "prompt": "Mostre uma paráfrase que esta busca não encontra.",
+        "prompt": "Investigar erro: a pergunta reembolso recebe lista vazia mesmo havendo um texto sobre devolucao. Reproduza a falha lexical e explique por que ela não prova ausência de informação. Aceite: entrada reembolso → []; causa: nenhum termo em comum.",
         "hints": [
           "A base fala devolucao; pergunte reembolso.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -564,10 +569,10 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "A limitação lexical motiva comparar alternativas, não assumir que um embedding resolverá todos os casos."
       },
       {
-        "prompt": "Crie um caso em que a citação existe mas não sustenta a resposta.",
+        "prompt": "Construir: crie um caso em que o ID de citação existe, mas a frase contradiz o trecho; proponha correção ou abstenção. Aceite: fonte A diz sete dias, resposta diz trinta dias [A] → ID válido e suporte reprovado. Esta atividade é respondida em texto.",
         "hints": [
           "Use prazo diferente do trecho.",
-          "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
+          "Compare o caso textual com os critérios de suporte antes de abrir a solução."
         ],
         "solution": "Fonte A: devolucao em sete dias. Resposta incorreta: o prazo é trinta dias [A]. O validador de IDs aceita A, mas a revisão de suporte reprova o prazo. Corrija para sete dias ou abstenha-se se o documento não se aplica ao produto.",
         "expected": "Exemplo com ID válido e afirmação incompatível, mais critério de reprovação.",
@@ -1067,8 +1072,8 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "ai-skills": {
-    "prerequisites": "Concluir setup-python e ai-data; saber usar funções, listas, dicionários e exceções em Python. Esta aula usa vetores numéricos desenhados à mão.",
-    "setup": "Na pasta ia-estudos, salve o exemplo como ai-embeddings.py no editor. Abra o terminal nessa pasta e execute python ai-embeddings.py (ou py ai-embeddings.py no Windows, python3 ai-embeddings.py no macOS/Linux, conforme setup-python). A saída esperada é A 0.80 e B 0.00 em duas linhas. O processo termina sozinho; para retomar, execute o mesmo comando. Se Python não for reconhecido, revise setup-python. Acrescente os exercícios ao fim do arquivo. Usa só biblioteca padrão e vetores fictícios, sem modelo de embeddings, API ou banco vetorial.",
+    "prerequisites": "Funções, dicionários, exceções e testes em Python; conhecer instruções reutilizáveis e a diferença entre ferramenta e autorização.",
+    "setup": "Salve o exemplo como skills_locais.py e execute python skills_locais.py no terminal. O exemplo usa só dados fictícios e biblioteca padrão; demonstra um manifesto e um validador, sem carregar SKILL.md ou acionar agente.",
     "why": "Empacote um procedimento com escopo, exemplos e verificações, mantendo permissões fora do texto.",
     "sections": [
       {
@@ -1124,7 +1129,7 @@ Object.assign(LESSON_GUIDES, {
       },
       {
         "instruction": "Execute o exemplo e depois substitua uma entrada válida por uma entrada ausente ou inválida.",
-        "result": "Vetor nulo lança ValueError vetor nulo; dimensão diferente lança ValueError dimensoes invalidas. A função calcula números e não gera uma resposta de modelo."
+        "result": "Preço zero acrescenta preco invalido à lista de erros; o validador não executa uma skill nem um agente."
       },
       {
         "instruction": "Resolva os quatro exercícios. Guarde código, previsão, saída e explicação do que mudou.",
@@ -1367,8 +1372,8 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "ai-data": {
-    "prerequisites": "Python: funções, listas, dicionários, JSON, exceções e testes. Releia as aulas anteriores deste módulo antes de prosseguir.",
-    "setup": "Use Python 3.11 ou posterior. Salve o exemplo em aula.py e execute python aula.py (ou py aula.py no Windows). Os exemplos principais usam somente a biblioteca padrão, dados fictícios e nenhuma API. Exercícios de código reutilizam as funções do exemplo; acrescente-os ao final do mesmo arquivo. Atividades de projeto e especificação são resolvidas em texto e comparadas com os critérios fornecidos.",
+    "prerequisites": "Concluir setup-python e ai-system; saber usar funções, listas, dicionários, exceções e testes em Python.",
+    "setup": "Na pasta ia-estudos, salve o exemplo como ai-data.py no editor. Abra o terminal nessa pasta e execute python ai-data.py (ou py ai-data.py no Windows, python3 ai-data.py no macOS/Linux, conforme setup-python). A saída esperada mostra manual-v1:0 e manual-v1:1 com os trechos indicados abaixo. O processo termina sozinho; para retomar, execute o mesmo comando. Se Python não for reconhecido, revise setup-python. Acrescente exercícios de código ao final do arquivo; escreva o plano de atualização em texto separado. Usa dados fictícios e biblioteca padrão, sem índice remoto ou modelo real.",
     "why": "Construa uma base recuperável com conteúdo rastreável, atualizado e acessível apenas a quem tem permissão.",
     "sections": [
       {
@@ -1429,7 +1434,7 @@ Object.assign(LESSON_GUIDES, {
       },
       {
         "instruction": "Execute o exemplo e depois substitua uma entrada válida por uma entrada ausente ou inválida.",
-        "result": "Compare o comportamento com o contrato. Uma falha explícita ou uma abstenção pode ser o resultado correto; não a substitua por uma resposta inventada."
+        "result": "Texto só com espaços gera []; sobreposição igual ao tamanho lança ValueError parametros invalidos. Esta função não gera resposta nem decide abstenção."
       },
       {
         "instruction": "Resolva os quatro exercícios. Guarde código, previsão, saída e explicação do que mudou.",
@@ -1522,8 +1527,8 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "ai-embeddings": {
-    "prerequisites": "Python: funções, listas, dicionários, JSON, exceções e testes. Releia as aulas anteriores deste módulo antes de prosseguir.",
-    "setup": "Use Python 3.11 ou posterior. Salve o exemplo em aula.py e execute python aula.py (ou py aula.py no Windows). Os exemplos principais usam somente a biblioteca padrão, dados fictícios e nenhuma API. Exercícios de código reutilizam as funções do exemplo; acrescente-os ao final do mesmo arquivo. Atividades de projeto e especificação são resolvidas em texto e comparadas com os critérios fornecidos.",
+    "prerequisites": "Concluir setup-python e ai-data; saber usar funções, listas, dicionários e exceções em Python. Esta aula usa vetores numéricos desenhados à mão.",
+    "setup": "Na pasta ia-estudos, salve o exemplo como ai-embeddings.py no editor. Abra o terminal nessa pasta e execute python ai-embeddings.py (ou py ai-embeddings.py no Windows, python3 ai-embeddings.py no macOS/Linux, conforme setup-python). A saída esperada é A 0.80 e B 0.00 em duas linhas. O processo termina sozinho; para retomar, execute o mesmo comando. Se Python não for reconhecido, revise setup-python. Acrescente os exercícios ao fim do arquivo. Usa só biblioteca padrão e vetores fictícios, sem modelo de embeddings, API ou banco vetorial.",
     "why": "Entenda como representar e comparar itens sem confundir proximidade numérica com verdade ou autorização.",
     "sections": [
       {
@@ -1584,7 +1589,7 @@ Object.assign(LESSON_GUIDES, {
       },
       {
         "instruction": "Execute o exemplo e depois substitua uma entrada válida por uma entrada ausente ou inválida.",
-        "result": "Compare o comportamento com o contrato. Uma falha explícita ou uma abstenção pode ser o resultado correto; não a substitua por uma resposta inventada."
+        "result": "Vetor nulo lança ValueError vetor nulo; dimensão diferente lança ValueError dimensoes invalidas. A função calcula números e não gera resposta de modelo."
       },
       {
         "instruction": "Resolva os quatro exercícios. Guarde código, previsão, saída e explicação do que mudou.",

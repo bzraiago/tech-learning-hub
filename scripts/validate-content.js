@@ -281,7 +281,7 @@ for (const lessonId of reviewedDeliveryLessonIds) {
   }
 }
 
-const reviewedAiLessonIds = ['ai-llms', 'ai-prompts', 'ai-system', 'ai-data', 'ai-embeddings'];
+const reviewedAiLessonIds = ['ai-llms', 'ai-prompts', 'ai-system', 'ai-data', 'ai-embeddings', 'ai-rag'];
 for (const lessonId of reviewedAiLessonIds) {
   const guide = LESSON_GUIDES[lessonId];
   if (!guide) {
@@ -293,6 +293,24 @@ for (const lessonId of reviewedAiLessonIds) {
     if (!prompts.some((prompt) => prompt.startsWith(kind))) {
       fail(`Aula ${lessonId} sem exercício do tipo ${kind}`);
     }
+  }
+}
+
+const aiLessonSpecificGuidance = {
+  'ai-data': ['ai-data.py', 'sobreposição'],
+  'ai-embeddings': ['ai-embeddings.py', 'Vetor nulo'],
+  'ai-rag': ['ai-rag.py', 'carlos'],
+  'ai-skills': ['skills_locais.py', 'Preço zero'],
+};
+for (const [lessonId, [filename, guidedTerm]] of Object.entries(aiLessonSpecificGuidance)) {
+  const guide = LESSON_GUIDES[lessonId];
+  if (!guide) {
+    fail(`Aula obrigatória ausente: ${lessonId}`);
+    continue;
+  }
+  if (!guide.setup.includes(filename)) fail(`Preparação de ${lessonId} deve citar ${filename}.`);
+  if (!guide.guided?.[1]?.result?.includes(guidedTerm)) {
+    fail(`Resultado guiado de ${lessonId} não corresponde ao exemplo da aula.`);
   }
 }
 

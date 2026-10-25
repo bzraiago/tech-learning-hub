@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega, `ai-llms`, `ai-prompts`, `ai-system`, `ai-data` e `ai-embeddings`, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 4 aulas de IA a revisar na prioridade 4.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega, `ai-llms`, `ai-prompts`, `ai-system`, `ai-data`, `ai-embeddings` e `ai-rag`, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 3 aulas de IA a revisar na prioridade 4.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 4 aulas de IA ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 1 | Média | G | 3 aulas de IA ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
@@ -72,6 +72,16 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `ai-rag` e correção de referências entre aulas
+
+- **Público e saída:** após `ai-data` e `ai-embeddings`, o aluno deve executar busca lexical com filtro de acesso, reconhecer limites de recuperação e julgar se uma citação sustenta uma afirmação.
+- **FATO, alta, M:** `ai-rag` continha preparação para `ai-data.py` e resultado guiado da função `dividir`; `ai-skills` continha preparação e resultado de vetores; `ai-data` e `ai-embeddings` ainda exibiam preparação genérica e resultado guiado impreciso. Essas referências foram corrigidas nas quatro aulas e uma verificação de arquivo/resultado por ID foi adicionada ao validador.
+- **FATO, média, P:** `ai-rag` devolve lista vazia para uma paráfrase como `reembolso`, embora haja texto sobre devolução. A aula agora distingue falha da busca lexical de ausência comprovada de informação. Os quatro exercícios cobrem prever, alterar, construir e investigar erro.
+- **Julgamento didático:** cinco blocos distintos (arquitetura, busca, contrato, abstenção e avaliação) foram mantidos com pausas curtas. A contagem estrutural continua alerta para observação com aluno.
+- **Pré-requisitos e ambiente:** `setup-python`, `ai-data`, `ai-embeddings` → `ai-rag`. O laboratório roda Python local sem modelo, embeddings ou API; a preparação informa pasta, arquivo, comando, saída e retomada.
+- **Fontes:** [Anthropic sobre contexto](https://www.anthropic.com/research/effective-context-engineering-for-ai-agents) e [Sentence Transformers sobre busca semântica](https://www.sbert.net/examples/sentence_transformer/applications/semantic-search/README.html) foram abertas em 25/10/2026 (fontes primárias, EN, OK).
+- **Limite:** o código apenas recupera trechos por termos em comum e não gera resposta. O julgamento de suporte é atividade textual; acesso por nome fictício não comprova autenticação real. Observação com aluno não foi executada.
 
 ### Revisão localizada: `ai-embeddings`
 
