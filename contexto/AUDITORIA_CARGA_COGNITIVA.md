@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `html-forms`, a auditoria automática aponta 23: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 foi concluída e a prioridade 3 começou.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `html-links-media`, a auditoria automática aponta 22: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 foi concluída e a prioridade 3 começou.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 2 aulas HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
+| 1 | Média | G | 1 aula HTML e 6 JavaScript | RISCO | Possuem cinco ou seis seções; já têm três passos guiados, mas somente um ou dois tipos de exercício explicitamente identificados. | Manter IDs e priorizar intercalação/prática antes de criar novas aulas. |
 | 2 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 3 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
@@ -73,6 +73,14 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `html-links-media`
+
+- **Público e saída:** depois de `html-semantic`, o aluno deve ligar duas páginas e um fragmento, entregar imagem local com alternativa contextual e explicar o que falta para publicar áudio ou vídeo acessível. Editor e navegador bastam; o SVG fornecido permite a prática sem baixar mídia.
+- **FATO, média, M:** o guia tinha cinco seções e somente `Construir` como tipo explícito. A revisão reúne caminhos e destinos especiais em um bloco de navegação, mantém imagens e mídia em blocos próprios e torna explícitos prever, alterar, construir e investigar erro. O ID e o exemplo principal foram preservados.
+- **Pré-requisitos:** `html-semantic` → `html-links-media` → `html-forms`. Nenhuma dependência circular identificada neste recorte.
+- **Fontes:** [MDN sobre `a`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a), [MDN sobre `img`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/img) e [MDN sobre `video`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/video) foram abertas em 24/10/2026 (fontes oficiais, EN, OK). Confirmam destinos, alternativas de imagem e recursos nativos de mídia.
+- **Limite:** a validação estrutural não comprova que um aluno consiga corrigir links e imagens quebrados sem ajuda. Testes manuais com navegador e tecnologias assistivas não foram executados nesta revisão.
 
 ### Revisão localizada: `html-forms`
 

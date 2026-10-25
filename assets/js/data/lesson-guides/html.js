@@ -171,22 +171,17 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "2. Caminhos absolutos, relativos e fragmentos",
+        "title": "2. Caminhos, fragmentos e destinos especiais",
         "paragraphs": [
           "Uma URL absoluta inclui o esquema e o endereço, como https://developer.mozilla.org/pt-BR/. Um caminho relativo é resolvido a partir da localização do documento. Se index.html e sobre.html estão na mesma pasta, href=\"sobre.html\" encontra o segundo arquivo. Se a imagem está em uma subpasta imagens, use imagens/sala.svg. Para subir um nível de pasta, use ../. Desenhe a árvore de pastas antes de escrever caminhos.",
           "Um caminho iniciado por / parte da raiz da origem em um site hospedado. Ele não significa simplesmente a pasta onde está seu HTML e pode se comportar de maneira inconveniente ao abrir arquivos locais. Nos primeiros exercícios use caminhos relativos sem a barra inicial. Evite C:\\Users\\... no HTML: esse endereço existe apenas no seu computador. Prefira barras / e nomes com capitalização consistente, porque muitos servidores distinguem Sala.svg de sala.svg.",
-          "Um fragmento como #agenda aponta para um id do documento atual. O alvo precisa existir e seu id deve ser único. Em sobre.html#equipe, primeiro o navegador abre a outra página e depois procura equipe. Uma âncora válida nem sempre provoca um salto visível se todo o conteúdo já cabe na tela; conferir a URL e a existência do alvo é melhor que concluir que houve falha só por não perceber rolagem."
-        ]
-      },
-      {
-        "title": "3. Novas abas e destinos especiais",
-        "paragraphs": [
+          "Um fragmento como #agenda aponta para um id do documento atual. O alvo precisa existir e seu id deve ser único. Em sobre.html#equipe, primeiro o navegador abre a outra página e depois procura equipe. Uma âncora válida nem sempre provoca um salto visível se todo o conteúdo já cabe na tela; conferir a URL e a existência do alvo é melhor que concluir que houve falha só por não perceber rolagem.",
           "Links normalmente abrem no mesmo contexto. target=\"_blank\" pede outro contexto, geralmente uma aba; use apenas quando houver motivo e avise no texto. rel=\"noopener\" explicita que a nova página não deve controlar a página de origem por window.opener. Não force outra aba em todos os links: o usuário pode preferir escolher isso pelo próprio navegador.",
           "mailto: abre o aplicativo de e-mail configurado; não envia uma mensagem automaticamente. tel: pode acionar um aplicativo de chamada em dispositivos compatíveis. Esses destinos dependem de configuração externa. O endereço example.com do exemplo é demonstrativo: não prometa atendimento. Quando um link falhar, confira primeiro o href, depois o arquivo ou serviço de destino, em vez de tentar corrigir com CSS."
         ]
       },
       {
-        "title": "4. Imagens que comunicam",
+        "title": "3. Imagens que comunicam",
         "paragraphs": [
           "img é um elemento vazio. src aponta para o recurso e alt oferece uma alternativa textual. A descrição deve transmitir a função da imagem naquele contexto. Uma foto informativa pede informação relevante; uma imagem puramente decorativa usa alt=\"\" para que tecnologias assistivas possam ignorá-la. O atributo ausente não comunica tão bem essa intenção e pode levar à leitura do nome do arquivo.",
           "Se uma imagem for o único conteúdo de um link, sua alternativa deve comunicar o destino ou propósito desse link. Uma imagem de gráfico precisa de uma explicação dos dados relevantes no texto, além de uma alternativa breve. Não repita em alt uma legenda completa se a repetição nada acrescenta. figure agrupa uma figura independente e figcaption fornece sua legenda; a legenda é visível para todos.",
@@ -194,7 +189,7 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "5. Áudio, vídeo e checagens de publicação",
+        "title": "4. Áudio, vídeo e checagens de publicação",
         "paragraphs": [
           "audio e video oferecem reprodução nativa quando recebem controls. src pode apontar para o arquivo, ou elementos source podem fornecer formatos alternativos com seus tipos. Uma mensagem entre as tags oferece alternativa caso o elemento não seja suportado. Para vídeo falado, ofereça legendas sincronizadas com track e uma transcrição acessível; vídeo também pode precisar de descrição das informações visuais essenciais.",
           "Evite reprodução automática, especialmente com áudio. Legendas e transcrição são conteúdo que precisa ser produzido e revisado, não algo que a presença de uma tag resolve. Nesta aula não precisamos baixar vídeo algum: o objetivo é entender que mídia tem arquivos, formatos, controles e alternativas. Antes de publicar, abra cada link, confira cada imagem e teste a página sem depender da conexão a uma imagem remota."
@@ -229,17 +224,17 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: adicione um link para o rodapé, dando a ele id=\"contato\".",
+        "prompt": "Prever: antes de editar, diga se um link href=\"#contato\" chega ao rodapé sem um id correspondente e como isso aparece na URL. Depois adicione o link e dê ao rodapé id=\"contato\" para conferir sua previsão.",
         "hints": [
           "id deve ser único.",
           "O href do link começa com #."
         ],
         "solution": "\u003ca href=\"#contato\">Ir ao contato\u003c/a>\n\u003c!-- Modifique o rodapé existente: -->\n\u003cfooter id=\"contato\">\u003cp>Contato do clube.\u003c/p>\u003c/footer>",
         "explanation": "O alvo e o fragmento devem ter exatamente o mesmo nome; acrescente o link à nav e modifique o rodapé, sem duplicá-lo.",
-        "expected": "O endereço recebe #contato e existe exatamente um alvo correspondente."
+        "expected": "Previsão registrada antes do teste; o endereço recebe #contato e existe exatamente um alvo correspondente."
       },
       {
-        "prompt": "Completar: mova sala.svg para uma pasta imagens e atualize apenas o atributo necessário.",
+        "prompt": "Alterar: mova sala.svg para uma pasta imagens e atualize apenas o atributo necessário no exemplo, preservando a alternativa textual e as dimensões.",
         "hints": [
           "O HTML continua na pasta anterior.",
           "src deve expressar o caminho da página até a imagem."
@@ -259,7 +254,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Ambas as páginas abrem, os links retornam ao destino correto e a imagem tem descrição e legenda."
       },
       {
-        "prompt": "Depurar: uma página usa href=\"#horarios\", mas o alvo tem id=\"horario\"; sua imagem usa src=\"Sala.svg\", enquanto o arquivo se chama sala.svg. Corrija e explique cada erro.",
+        "prompt": "Investigar erro: uma página usa href=\"#horarios\", mas o alvo tem id=\"horario\"; sua imagem usa src=\"Sala.svg\", enquanto o arquivo se chama sala.svg. Compare cada destino com o arquivo ou id real, depois corrija e explique os dois erros.",
         "hints": [
           "Compare os caracteres do fragmento e do id.",
           "Use a mesma capitalização do nome salvo."
