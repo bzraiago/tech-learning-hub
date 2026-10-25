@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega, `ai-llms`, `ai-prompts` e `ai-system`, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 6 aulas de IA a revisar na prioridade 4.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de seis aulas de Entrega, `ai-llms`, `ai-prompts`, `ai-system` e `ai-data`, a auditoria automática continua apontando 15: as cinco etapas dessas aulas foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 5 aulas de IA a revisar na prioridade 4.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 6 aulas de IA ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 1 | Média | G | 5 aulas de IA ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
@@ -72,6 +72,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `ai-data`
+
+- **Público e saída:** após contexto em IA e Python básico, o aluno deve dividir texto em chunks, preservar origem e acesso, reconhecer entrada vazia e planejar uma atualização de versão sem resultados revogados.
+- **FATO, média, P:** a prática guiada sugeria abstenção para entrada inválida, embora `dividir` apenas retorne lista ou lance `ValueError`. Ela agora descreve esses resultados. O novo exercício de construção verifica metadados e cópia da lista de acesso. Os quatro exercícios cobrem prever, alterar, construir e investigar erro.
+- **Julgamento didático:** mantidos cinco blocos distintos (escopo, limpeza, divisão, versões e validação) com pausas entre eles. A contagem estrutural continua alerta para observação com aluno.
+- **Pré-requisitos e ambiente:** `setup-python`, `ai-system` → `ai-data`. A preparação nomeia pasta, arquivo, terminal, comando por sistema, saída e retomada; não instala índice nem modelo.
+- **Fontes:** [Anthropic sobre contexto](https://www.anthropic.com/research/effective-context-engineering-for-ai-agents), [Python padrão](https://docs.python.org/3/library/), [Sentence Transformers sobre busca semântica](https://www.sbert.net/examples/sentence_transformer/applications/semantic-search/README.html) e [Microsoft AI Agents for Beginners](https://github.com/microsoft/ai-agents-for-beginners) foram abertas em 25/10/2026 (fontes primárias, EN, OK).
+- **Limite:** metadados copiados não garantem filtragem autorizada na busca. O plano de troca v1/v2 é textual; não há índice real nem teste de falha parcial. Observação com aluno não foi executada.
 
 ### Revisão localizada: `ai-system`
 

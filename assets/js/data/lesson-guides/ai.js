@@ -468,8 +468,8 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "ai-rag": {
-    "prerequisites": "Python: funções, listas, dicionários, JSON, exceções e testes. Releia as aulas anteriores deste módulo antes de prosseguir.",
-    "setup": "Use Python 3.11 ou posterior. Salve o exemplo em aula.py e execute python aula.py (ou py aula.py no Windows). Os exemplos principais usam somente a biblioteca padrão, dados fictícios e nenhuma API. Exercícios de código reutilizam as funções do exemplo; acrescente-os ao final do mesmo arquivo. Atividades de projeto e especificação são resolvidas em texto e comparadas com os critérios fornecidos.",
+    "prerequisites": "Concluir setup-python e ai-system; saber usar funções, listas, dicionários, exceções e testes em Python.",
+    "setup": "Na pasta ia-estudos, salve o exemplo como ai-data.py no editor. Abra o terminal nessa pasta e execute python ai-data.py (ou py ai-data.py no Windows, python3 ai-data.py no macOS/Linux, conforme setup-python). A saída esperada mostra manual-v1:0 e manual-v1:1 com os trechos indicados abaixo. O processo termina sozinho; para retomar, execute o mesmo comando. Se Python não for reconhecido, revise setup-python. Acrescente exercícios de código ao final do arquivo; escreva o plano de atualização em texto separado. Usa dados fictícios e biblioteca padrão, sem índice remoto ou modelo real.",
     "why": "Monte um fluxo de resposta apoiado em documentos, entendendo as falhas de cada etapa.",
     "sections": [
       {
@@ -525,7 +525,7 @@ Object.assign(LESSON_GUIDES, {
       },
       {
         "instruction": "Execute o exemplo e depois substitua uma entrada válida por uma entrada ausente ou inválida.",
-        "result": "Compare o comportamento com o contrato. Uma falha explícita ou uma abstenção pode ser o resultado correto; não a substitua por uma resposta inventada."
+        "result": "Texto só com espaços gera []; sobreposição igual ao tamanho lança ValueError parametros invalidos. Esta função não gera resposta nem decide abstenção."
       },
       {
         "instruction": "Resolva os quatro exercícios. Guarde código, previsão, saída e explicação do que mudou.",
@@ -1375,35 +1375,40 @@ Object.assign(LESSON_GUIDES, {
         "title": "Comece pela pergunta que a base deve responder",
         "paragraphs": [
           "Corpus é o conjunto de documentos usados pelo sistema. Antes de indexar, identifique as perguntas atendidas e as fontes autorizadas. Um manual de produto não responde ao saldo de um cliente; isso exige uma consulta ao sistema responsável pelo saldo. A preparação começa com escopo, não com um banco vetorial.",
-          "Cada documento precisa de ID estável, origem, versão ou data de vigência, conteúdo e regra de acesso. Essas informações permitem corrigir uma resposta: qual versão foi usada, qual trecho sustentou a afirmação e quem podia lê-lo? Sem origem, uma citação pode apontar para um texto impossível de auditar."
+          "Cada documento precisa de ID estável, origem, versão ou data de vigência, conteúdo e regra de acesso. Essas informações permitem corrigir uma resposta: qual versão foi usada, qual trecho sustentou a afirmação e quem podia lê-lo? Sem origem, uma citação pode apontar para um texto impossível de auditar.",
+          "Pausa: para um manual-v1, anote ID, origem, versão e quem pode acessá-lo antes de pensar em dividir o texto."
         ]
       },
       {
         "title": "Limpeza preserva significado",
         "paragraphs": [
           "Remova ruídos de extração, como espaços repetidos e cabeçalhos duplicados, sem apagar estrutura relevante. Uma tabela pode depender do título da coluna; uma regra pode depender de uma nota de rodapé. Transformar tudo em texto sem contexto pode produzir um trecho gramaticalmente correto e semanticamente errado.",
-          "Faça uma amostra manual antes de processar todo o corpus. Compare original e extração de listas, tabelas e caracteres acentuados. Guarde o original ou uma referência acessível. Documentos digitalizados podem exigir OCR e revisão; baixa qualidade de extração não é resolvida automaticamente por um modelo maior."
+          "Faça uma amostra manual antes de processar todo o corpus. Compare original e extração de listas, tabelas e caracteres acentuados. Guarde o original ou uma referência acessível. Documentos digitalizados podem exigir OCR e revisão; baixa qualidade de extração não é resolvida automaticamente por um modelo maior.",
+          "Pausa: imagine uma tabela de prazos sem o cabeçalho da coluna. Explique qual significado se perdeu e como detectaria o problema antes de indexar."
         ]
       },
       {
         "title": "Dividir em chunks",
         "paragraphs": [
           "Chunk é uma unidade de recuperação. Trechos pequenos favorecem precisão, mas podem perder condições; trechos grandes preservam contexto, mas podem trazer ruído e consumir orçamento. Comece por seções ou parágrafos com significado completo. Sobreposição repete parte do conteúdo entre chunks para preservar continuidade, ao custo de duplicação.",
-          "O exemplo divide por quantidade de palavras, com sobreposição, apenas para tornar o mecanismo observável. Em produção, avalie cortes por estrutura e limites de tokens. Copie a origem e a permissão para cada chunk. Um documento privado não se torna público ao ser dividido. Se a versão muda, seus chunks e vetores antigos devem ser atualizados ou removidos."
+          "O exemplo divide por quantidade de palavras, com sobreposição, apenas para tornar o mecanismo observável. Em produção, avalie cortes por estrutura e limites de tokens. Copie a origem e a permissão para cada chunk. Um documento privado não se torna público ao ser dividido. Se a versão muda, seus chunks e vetores antigos devem ser atualizados ou removidos.",
+          "Pausa: preveja quais palavras se repetem entre os dois chunks do exemplo e confira se ambos mantêm origem manual-v1 e acesso de ana."
         ]
       },
       {
         "title": "Duplicatas e versões",
         "paragraphs": [
           "Duas páginas podem conter o mesmo texto. Deduplicar reduz resultados repetidos, mas compare também contexto e metadados: a mesma frase pode ter vigências ou permissões diferentes. Um hash de conteúdo ajuda a detectar igualdade exata; não identifica sozinho equivalência de significado.",
-          "Defina uma política: substituir a versão anterior, manter histórico explícito ou separar coleções por vigência. Na exclusão, remova chunks, vetores e caches associados. Teste que uma busca não retorna uma política revogada. Manter apenas um timestamp sem uma rotina de atualização não mantém a base atualizada."
+          "Defina uma política: substituir a versão anterior, manter histórico explícito ou separar coleções por vigência. Na exclusão, remova chunks, vetores e caches associados. Teste que uma busca não retorna uma política revogada. Manter apenas um timestamp sem uma rotina de atualização não mantém a base atualizada.",
+          "Pausa: desenhe a troca de manual-v1 por manual-v2 e marque em que momento v1 deixa de participar das buscas."
         ]
       },
       {
         "title": "Validar antes de indexar",
         "paragraphs": [
           "Confira campos obrigatórios, IDs únicos, texto não vazio e permissões válidas. Conte quantos documentos entraram, quantos foram rejeitados e por quê. Uma ingestão silenciosa que pula metade dos arquivos pode parecer bem-sucedida até o primeiro usuário perguntar justamente sobre o material ausente.",
-          "A atividade usa dados fictícios e não lê arquivos externos. Para um projeto real, crie um pequeno corpus controlado, documente erros de extração e escreva testes de atualização e exclusão. O critério de pronto é conseguir reconstruir o índice e provar que origem, versão e acesso sobreviveram ao processamento."
+          "A atividade usa dados fictícios e não lê arquivos externos. Para um projeto real, crie um pequeno corpus controlado, documente erros de extração e escreva testes de atualização e exclusão. O critério de pronto é conseguir reconstruir o índice e provar que origem, versão e acesso sobreviveram ao processamento.",
+          "Pausa: liste uma entrada que deve ser rejeitada antes da indexação e qual contagem revelaria que ela foi descartada."
         ]
       }
     ],
@@ -1433,7 +1438,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Qual o resultado para texto vazio?",
+        "prompt": "Prever: o que dividir devolve para texto só com espaços? Execute e explique a consequência para a ingestão. Aceite: entrada '   ' → []; registrar documento sem chunks como ocorrência a investigar, não como sucesso silencioso.",
         "hints": [
           "split retorna uma lista vazia.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -1443,7 +1448,7 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "A ingestão deve registrar que o documento não gerou chunks."
       },
       {
-        "prompt": "Divida seis palavras em blocos de três, sem sobreposição.",
+        "prompt": "Alterar: divida seis palavras em blocos de três sem sobreposição. Aceite: entrada 'a b c d e f', tamanho 3, sobreposição 0 → ['a b c','d e f']; nenhum termo se repete.",
         "hints": [
           "Use tamanho 3 e sobreposicao 0.",
           "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
@@ -1453,22 +1458,22 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "Sem sobreposição não há repetição entre blocos."
       },
       {
-        "prompt": "Rejeite sobreposição igual ao tamanho.",
+        "prompt": "Construir: usando o documento fictício do exemplo, verifique que cada chunk mantém origem manual-v1 e acesso de ana, e que mudar a lista original de acesso não altera a cópia nos chunks. Aceite: ambos os chunks preservam os metadados; nenhuma permissão é concedida pela divisão.",
         "hints": [
-          "Sem rejeição, o avanço poderia ser zero.",
-          "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
+          "Percorra chunks e compare os metadados.",
+          "A lista de acesso foi copiada com list(...); isso não autentica nem autoriza uma busca."
         ],
-        "solution": "try:\n    dividir('a b', 2, 2)\nexcept ValueError as e:\n    print(e)",
-        "expected": "parametros invalidos",
-        "explanation": "Validar o avanço impede laço infinito."
+        "solution": "assert all(c['origem'] == 'manual-v1' and c['acesso'] == ['ana'] for c in chunks)\ndocumento['acesso'].append('bia')\nassert all(c['acesso'] == ['ana'] for c in chunks)\nprint('origem e acesso preservados')",
+        "expected": "origem e acesso preservados",
+        "explanation": "Os metadados acompanham o trecho; a autorização da consulta ainda precisa ser aplicada antes da busca."
       },
       {
-        "prompt": "Planeje substituir manual-v1 por manual-v2 sem deixar resultados antigos ativos.",
+        "prompt": "Investigar erro: após publicar manual-v2, a busca ainda devolve manual-v1. Planeje atualização, troca da versão ativa, invalidação de cache, verificação e retorno seguro se a atualização falhar. Aceite: consultas após a troca retornam só v2; falha no meio não mistura versões; descreva também por que sobreposição igual ao tamanho é rejeitada no exemplo.",
         "hints": [
           "Considere índice, cache e falha no meio da atualização.",
-          "Registre sua previsão, execute e compare com o resultado esperado antes de abrir a solução."
+          "Esta atividade é um plano em texto; compare-o com os critérios antes de abrir a solução."
         ],
-        "solution": "Referência: ingerir v2 em área temporária; validar IDs, origem e ACL; testar buscas; trocar a coleção ativa de modo controlado; invalidar cache; retirar v1 da busca; manter rollback autorizado e documentado; verificar que consultas só retornam v2.",
+        "solution": "Referência: ingerir v2 em área temporária; validar IDs, origem e ACL; testar buscas; trocar a coleção ativa de modo controlado; invalidar cache; retirar v1 da busca; manter rollback autorizado e documentado; verificar que consultas só retornam v2. Sobreposição igual ao tamanho produziria avanço zero, por isso dividir lança ValueError.",
         "expected": "Plano que cobre atualização, falha, exclusão de resultados antigos e rollback.",
         "explanation": "Troca controlada evita misturar versões durante a atualização."
       }

@@ -281,7 +281,7 @@ for (const lessonId of reviewedDeliveryLessonIds) {
   }
 }
 
-const reviewedAiLessonIds = ['ai-llms', 'ai-prompts', 'ai-system'];
+const reviewedAiLessonIds = ['ai-llms', 'ai-prompts', 'ai-system', 'ai-data'];
 for (const lessonId of reviewedAiLessonIds) {
   const guide = LESSON_GUIDES[lessonId];
   if (!guide) {
