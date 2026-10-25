@@ -1760,8 +1760,8 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "js-modules": {
-    "prerequisites": "Funções com retorno, arrays, objetos, validação, DOM e async/await. Você precisa conseguir explicar a diferença entre calcular um resultado e mostrar esse resultado na página.",
-    "setup": "O exemplo completo funciona em um único HTML: cria um módulo JavaScript em um Blob local e usa import() para carregá-lo. Esse recurso mantém a demonstração copiável, mas a organização habitual usa arquivos separados, ensinados abaixo. Para os exercícios com arquivos, abra o terminal na pasta do projeto e execute python -m http.server 8000 --bind 127.0.0.1 com Python instalado (ou python3). Abra http://127.0.0.1:8000, não file://. Ctrl+C encerra o servidor. Nenhum gerenciador de pacotes é necessário.",
+    "prerequisites": "Funções com retorno, arrays, objetos, validação, DOM e async/await. Você precisa conseguir explicar a diferença entre calcular um resultado e mostrar esse resultado na página. Para separar arquivos, retome o servidor local de js-storage; se Python ainda não estiver preparado, conclua antes setup-python.",
+    "setup": "O exemplo completo funciona em um único HTML: cria um módulo JavaScript em um Blob local e usa import() para carregá-lo. Esse recurso mantém a demonstração copiável, mas a organização habitual usa arquivos separados, ensinados abaixo. Para os exercícios com arquivos, abra o terminal na pasta javascript-estudos e execute python -m http.server 8000 --bind 127.0.0.1 com Python instalado (ou python3, conforme setup-python). Abra http://127.0.0.1:8000 no navegador, não file://. Confira que a página aparece e que o Console não mostra 404 para tarefas.js e app.js; se mostrar, revise nomes e pasta atual. Ctrl+C encerra o servidor; para retomar, execute o mesmo comando na mesma pasta. Nenhum gerenciador de pacotes é necessário. Se não puder preparar Python agora, pratique o exemplo de um arquivo e deixe a divisão em arquivos pendente.",
     "why": "Quando uma página cresce, misturar cálculos, leitura de campos e mensagens em uma única função dificulta mudanças e diagnóstico. Módulos permitem declarar quais funções são oferecidas e quais dependências são utilizadas. A separação fica realmente útil quando as responsabilidades são claras e as regras podem ser verificadas sem clicar na interface.",
     "sections": [
       {
@@ -1769,7 +1769,8 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "resumir recebe dados e devolve um objeto. Ela não seleciona elementos, não grava localStorage e não busca rede. Essa função é pura para as entradas válidas usadas aqui: não modifica o array recebido e seu resultado depende desses dados. Isso facilita perguntar o que deve acontecer com três tarefas, nenhuma tarefa ou uma entrada inválida.",
           "formatar transforma um resumo em uma frase. O código da página decide onde exibir a frase usando textContent. Separar essas etapas permite trocar a apresentação sem refazer a contagem. Também evita que uma regra de negócio dependa de um id específico do HTML, o que tornaria seu teste desnecessariamente complicado.",
-          "Não crie dezenas de arquivos apenas para seguir uma aparência profissional. Comece com responsabilidades que você consegue nomear: regras de tarefas, interface e armazenamento. Se uma função precisa conhecer todos os detalhes da página para fazer uma soma, examine se há acoplamento excessivo. Uma fronteira útil reduz o conhecimento necessário para alterar cada parte."
+          "Não crie dezenas de arquivos apenas para seguir uma aparência profissional. Comece com responsabilidades que você consegue nomear: regras de tarefas, interface e armazenamento. Se uma função precisa conhecer todos os detalhes da página para fazer uma soma, examine se há acoplamento excessivo. Uma fronteira útil reduz o conhecimento necessário para alterar cada parte.",
+          "Pausa de prática: para três tarefas, duas concluídas, preveja o objeto devolvido por resumir antes de escrever a frase na página. Confira se a função de regra precisa conhecer o id saida."
         ]
       },
       {
@@ -1777,7 +1778,8 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "export torna uma declaração disponível para outros módulos. Uma exportação nomeada, como export function resumir, é importada pelo mesmo nome entre chaves: import { resumir } from \"./tarefas.js\". Podemos usar as para dar um nome local diferente. O caminho relativo começa em ./ ou ../ e inclui a extensão no navegador.",
           "Uma exportação default representa um valor principal e é importada sem chaves. Ela não é obrigatória nem automaticamente melhor. Nesta aula preferimos nomes explícitos para acompanhar a ligação entre arquivos. Variáveis internas do módulo não viram propriedades globais de window; isso reduz colisões acidentais entre partes independentes da aplicação.",
-          "A declaração import estática fica no nível superior de um módulo, não dentro de um if ou de uma função. Já import(caminho) é uma expressão que devolve uma Promise e pode acontecer sob demanda. No exemplo, usamos essa forma dinâmica porque o endereço Blob só existe durante a execução. O objeto retornado oferece as exportações nomeadas, que desestruturamos."
+          "A declaração import estática fica no nível superior de um módulo, não dentro de um if ou de uma função. Já import(caminho) é uma expressão que devolve uma Promise e pode acontecer sob demanda. No exemplo, usamos essa forma dinâmica porque o endereço Blob só existe durante a execução. O objeto retornado oferece as exportações nomeadas, que desestruturamos.",
+          "Pausa de prática: antes de executar, preveja se app.js pode ler uma variável de tarefas.js que não foi exportada. Depois compare com uma função exportada por nome."
         ]
       },
       {
@@ -1785,22 +1787,19 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "O texto fonte do exemplo contém JavaScript de módulo, não conteúdo vindo do usuário. Ele é colocado em um Blob com tipo text/javascript. Essa escolha demonstra o carregamento sem entregar vários arquivos, mas não é um padrão para executar código digitado por pessoas. Na organização habitual, copie as funções exportadas para tarefas.js, sem a string externa.",
           "Crie app.js com import { resumir, formatar } from \"./tarefas.js\"; depois coloque a criação do array e a atualização do DOM nesse arquivo. No HTML, use \u003cscript type=\"module\" src=\"./app.js\">\u003c/script>. Retire o script antigo para não executar duas versões. O navegador reconhece o modo módulo pelo atributo type e carrega as dependências declaradas.",
-          "Sirva essa pasta por HTTP local conforme o setup. Módulos têm regras de origem e carregamento que tornam abrir arquivos diretamente por file:// uma fonte comum de problemas. Confira o painel Network para encontrar 404 e caminhos incorretos. O servidor Python apenas entrega arquivos; ele não compila JavaScript nem instala dependências. Bibliotecas e ferramentas de construção podem ser aprendidas depois."
+          "Sirva essa pasta por HTTP local conforme o setup. Módulos têm regras de origem e carregamento que tornam abrir arquivos diretamente por file:// uma fonte comum de problemas. Confira o painel Network para encontrar 404 e caminhos incorretos. O servidor Python apenas entrega arquivos; ele não compila JavaScript nem instala dependências. Bibliotecas e ferramentas de construção podem ser aprendidas depois.",
+          "Pausa de prática: desenhe app.js → tarefas.js e anote o nome importado e o caminho exato. Antes de abrir no navegador, preveja qual erro surgirá se trocar resumir por resumo ou retirar ./ do caminho."
         ]
       },
       {
-        "title": "Testes pequenos e critérios verificáveis",
+        "title": "Testes, erros e dependências verificáveis",
         "paragraphs": [
           "Um teste compara o comportamento observado com uma expectativa. console.assert registra uma falha quando a condição é falsa; ausência de mensagem não prova que todos os cenários foram cobertos. Comece por exemplos cujo resultado você consegue calcular manualmente. Três tarefas, duas concluídas, devem produzir total 3, concluidas 2 e pendentes 1.",
           "Casos de borda incluem array vazio, todas concluídas e nenhuma concluída. Entradas inválidas, como null ou concluida com texto \"sim\", devem seguir um contrato explícito. Nossa função lança TypeError porque não consegue fazer uma contagem confiável com esse formato. Um teste desse caso precisa confirmar que o erro realmente aconteceu, não apenas ignorá-lo com catch vazio.",
-          "Testes de funções não substituem testes de interação. A contagem pode estar correta enquanto o botão não responde ou a mensagem não é acessível. Separe as evidências: regras verificadas por entradas e saídas; integração verificada na página. Ao corrigir um defeito, acrescente um caso que reproduz a causa, para detectar sua reaparição durante mudanças futuras."
-        ]
-      },
-      {
-        "title": "Ler erros e manter dependências simples",
-        "paragraphs": [
+          "Testes de funções não substituem testes de interação. A contagem pode estar correta enquanto o botão não responde ou a mensagem não é acessível. Separe as evidências: regras verificadas por entradas e saídas; integração verificada na página. Ao corrigir um defeito, acrescente um caso que reproduz a causa, para detectar sua reaparição durante mudanças futuras.",
           "Se aparecer que uma exportação não foi encontrada, compare o nome importado com o nome exportado, incluindo maiúsculas. Se o arquivo não carregou, confira primeiro a URL e o servidor. Um erro de sintaxe dentro de uma dependência pode impedir o módulo principal de iniciar. Corrigir por tentativa aleatória costuma ser mais lento que localizar a primeira mensagem relevante.",
-          "Evite dependências circulares nesta etapa: tarefas.js não precisa importar app.js se apenas calcula resumos. Um fluxo simples é app.js depender de regras e armazenamento, enquanto regras permanece independente do DOM. Essa direção ajuda a reutilizar e testar. A arquitetura deve servir ao problema; não há necessidade de adicionar classes, frameworks ou pacotes para um contador de tarefas."
+          "Evite dependências circulares nesta etapa: tarefas.js não precisa importar app.js se apenas calcula resumos. Um fluxo simples é app.js depender de regras e armazenamento, enquanto regras permanece independente do DOM. Essa direção ajuda a reutilizar e testar. A arquitetura deve servir ao problema; não há necessidade de adicionar classes, frameworks ou pacotes para um contador de tarefas.",
+          "Pausa de prática: execute os casos comum e vazio, depois remova temporariamente ./ do import local. Registre a primeira mensagem do Console e a URL solicitada antes de restaurar o caminho."
         ]
       }
     ],
@@ -1842,7 +1841,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "app.js utiliza as funções exportadas sem acessar seus detalhes internos."
       },
       {
-        "prompt": "Modificar: acrescente percentual inteiro ao objeto retornado, definindo zero para lista vazia.",
+        "prompt": "Alterar: na função resumir do exemplo, acrescente percentual inteiro ao objeto retornado, definindo zero para lista vazia. Preserve total, concluidas e pendentes.",
         "hints": [
           "Evite divisão por zero.",
           "Math.round arredonda para o inteiro mais próximo."
@@ -1862,7 +1861,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Nenhuma asserção falha; o caso inválido é rejeitado deliberadamente."
       },
       {
-        "prompt": "Depurar: app.js usa import { resumo } from \"tarefas.js\", mas o arquivo exporta resumir. Corrija os dois problemas.",
+        "prompt": "Investigar erro: app.js usa import { resumo } from \"tarefas.js\", mas o arquivo exporta resumir. No navegador servido por HTTP local, registre o primeiro erro do Console e confira a URL antes de corrigir o nome e o caminho.",
         "hints": [
           "Confira o nome exato exportado.",
           "Um caminho local no navegador precisa ser relativo explícito."

@@ -151,7 +151,7 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `db-project`: alinhar o projeto SQLite à decisão de banco, explicitar regra ainda não garantida e tornar a entrega verificável.
     - [x] `db-recovery`: organizar metas, restauração, retenção e migração segura em um ensaio verificável.
     - [x] `db-security`: separar parametrização, autorização, escopo de alteração e fronteira operacional.
-  - [ ] Prioridade 3: revisar 11 aulas de HTML/JavaScript e distinguir aprofundamento legítimo de sobrecarga.
+  - [x] Prioridade 3: revisar 11 aulas de HTML/JavaScript e distinguir aprofundamento legítimo de sobrecarga.
     - [x] `html-accessibility`: reunir conteúdo, navegação e revisão em quatro blocos; explicitar previsão, alteração, construção e investigação de erro.
     - [x] `html-tables`: organizar escolha dos dados, marcação, mesclagens e conferência em quatro blocos com quatro tipos de prática.
     - [x] `html-forms`: reunir controles e agrupamentos, explicitar quatro tipos de prática e preservar o aviso de envio demonstrativo.
@@ -162,6 +162,7 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `js-arrays`: introduzir mapa de referências e pausas de previsão, reunir operações e verificação e explicitar quatro tipos de exercício.
     - [x] `js-es6`: reunir extração e cópias, intercalar previsões sobre retorno, referências e valores ausentes e explicitar quatro tipos de exercício.
     - [x] `js-debug`: reunir diagnóstico e testes em quatro blocos, praticar hipótese antes da correção e explicitar quatro tipos de exercício.
+    - [x] `js-modules`: ligar o laboratório à preparação do servidor local, reunir teste e diagnóstico e explicitar quatro tipos de exercício.
   - [ ] Prioridade 4: revisar 15 aulas de IA/Entrega, preservando o nível avançado quando os pré-requisitos forem suficientes.
 - [ ] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes.
 - [ ] Adicionar demonstrações visuais de laços.

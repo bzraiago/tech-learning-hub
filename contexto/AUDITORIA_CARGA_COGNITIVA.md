@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `js-debug`, a auditoria automática aponta 16: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. A prioridade 2 e as cinco aulas HTML da prioridade 3 foram concluídas; a revisão de JavaScript está em andamento.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após a revisão de `js-modules`, a auditoria automática aponta 15: as cinco aulas fundamentais de banco preservaram seus IDs e receberam aulas complementares menores; as dez aulas avançadas prioritárias foram condensadas sem mudar seus IDs. As prioridades 2 e 3 foram concluídas; a prioridade 4 reúne IA e Entrega.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,9 +18,8 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 1 aula JavaScript | RISCO | Possui cinco seções; já tem passos guiados, mas nem todos os tipos de exercício estão explicitamente identificados. | Manter ID e priorizar intercalação/prática antes de criar nova aula. |
-| 2 | Média | G | 9 aulas IA e 6 Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
-| 3 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | Contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
+| 1 | Média | G | 15 aulas IA/Entrega | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
 
@@ -73,6 +72,14 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `js-modules`
+
+- **Público e saída:** após funções, DOM e async/await, o aluno deve separar uma regra pura da interface, exportá-la e importá-la, servir os arquivos por HTTP local e verificar comportamento e erros observáveis.
+- **FATO, média, M:** cinco seções tratavam teste e diagnóstico em blocos separados. O guia agora tem quatro blocos, com pausas de previsão sobre exportação, nomes, caminhos e resultados. Os exercícios explicitam prever, alterar, construir e investigar erro. O ID e o exemplo de um arquivo foram preservados.
+- **Pré-requisitos:** `js-storage` e `setup-python` (para servidor local) → `js-modules`. O exemplo de um arquivo permite estudar o conceito sem instalar Python; a separação real em arquivos fica pendente até preparar o servidor. Nenhuma dependência circular identificada neste recorte.
+- **Fontes:** [MDN sobre módulos JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules), [MDN sobre `import()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import) e [documentação Python sobre `http.server`](https://docs.python.org/3/library/http.server.html) foram abertas em 24/10/2026 (fontes oficiais, EN, OK). Confirmam importação nomeada, carregamento dinâmico e servidor local de arquivos.
+- **Limite:** o exemplo com Blob é uma demonstração; ele não substitui a verificação de arquivos separados servidos por HTTP. Teste manual no navegador e observação com aluno não foram executados nesta revisão.
 
 ### Revisão localizada: `js-debug`
 

@@ -250,6 +250,22 @@ for (const lessonId of progressiveJavaScriptLessonIds) {
   }
 }
 
+const progressiveBrowserLessonIds = ['js-modules'];
+for (const lessonId of progressiveBrowserLessonIds) {
+  const guide = LESSON_GUIDES[lessonId];
+  if (!guide) {
+    fail(`Aula progressiva obrigatória ausente: ${lessonId}`);
+    continue;
+  }
+  if (guide.sections.length > 4) fail(`Aula ${lessonId} ainda tem mais de quatro seções centrais.`);
+  const prompts = (guide.exercises || []).map((exercise) => exercise.prompt || '');
+  for (const kind of exerciseKinds) {
+    if (!prompts.some((prompt) => prompt.startsWith(kind))) {
+      fail(`Aula ${lessonId} sem exercício do tipo ${kind}`);
+    }
+  }
+}
+
 const progressiveDatabaseLessonIds = ['db-modeling', 'db-normalization', 'db-ddl-constraints', 'db-ddl-crud', 'db-select', 'db-aggregation', 'db-joins', 'db-subqueries-ctes', 'db-transactions', 'db-concurrency-boundaries', 'db-docker-basics', 'db-docker-compose', 'db-docker-operations', 'db-mongo-crud', 'db-mongo-pipelines', 'db-performance', 'db-nosql-models', 'db-project', 'db-recovery', 'db-security'];
 for (const lessonId of progressiveDatabaseLessonIds) {
   const guide = LESSON_GUIDES[lessonId];
