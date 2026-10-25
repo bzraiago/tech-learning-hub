@@ -199,6 +199,8 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Criar recuperação ativa do módulo anterior na primeira aula de cada módulo posterior, com rascunho salvo e retorno à aula de origem.
 - [x] Associar cada erro de quiz à aula que o contém e oferecer acesso direto aos conceitos dessa aula.
 - [ ] Oferecer uma segunda tentativa diferente, sem repetir o mesmo exercício.
+  - [x] Preparação digital: cinco casos novos com critério de aceite, pista e rascunho persistente após erro no quiz.
+  - [ ] Expandir as segundas tentativas para as demais aulas.
 - [ ] Exigir explicação das decisões nas provas de nível.
 - [ ] Evitar que quiz de múltipla escolha seja tratado como comprovação prática.
 - [ ] Criar evidências observáveis para passagem entre os níveis 0, 1, 2, 3 e 4.

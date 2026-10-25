@@ -131,6 +131,12 @@ for (const lesson of lessons) {
       if (!exercise.solution?.trim()) fail(`Exercício sem solução: ${lesson.id}:${index}`);
     });
   }
+  if (guide.retry) {
+    for (const field of ['prompt', 'expected', 'hint']) {
+      if (typeof guide.retry[field] !== 'string' || !guide.retry[field].trim()) fail(`Segunda tentativa sem ${field}: ${lesson.id}`);
+    }
+    if (guide.exercises?.some((exercise) => exercise.prompt === guide.retry.prompt)) fail(`Segunda tentativa repete exercício: ${lesson.id}`);
+  }
   if (!Array.isArray(guide.quiz) || guide.quiz.length === 0) {
     fail(`Aula sem quiz: ${lesson.id}`);
   } else {

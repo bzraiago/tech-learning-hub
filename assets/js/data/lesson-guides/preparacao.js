@@ -29,7 +29,8 @@ Object.assign(LESSON_GUIDES, {
       {"question": "Instalar um editor instala automaticamente Python, Node.js e bancos?", "options": ["Sempre", "Não; são ferramentas separadas", "Somente no navegador"], "correctIndex": 1, "explanation": "O editor pode integrar ferramentas instaladas, mas não substitui seus runtimes."},
       {"question": "Qual ferramenta apresenta uma página HTML?", "options": ["Navegador", "Gerenciador de arquivos", "Editor exclusivamente"], "correctIndex": 0, "explanation": "O navegador interpreta e apresenta o documento."}
     ],
-    "summary": ["Editor salva arquivos; navegador apresenta páginas.", "Terminal recebe comandos; o shell os interpreta.", "Runtimes executam linguagens e são separados do editor."]
+    "summary": ["Editor salva arquivos; navegador apresenta páginas.", "Terminal recebe comandos; o shell os interpreta.", "Runtimes executam linguagens e são separados do editor."],
+    "retry": {"prompt": "Uma colega alterou o título de uma página no editor, salvou e diz que nada mudou na tela. Sem repetir o exemplo da aula, descreva como confirmar o arquivo salvo, qual ferramenta mostra a página e que ação atualiza a visualização.", "expected": "A resposta distingue arquivo no editor, página no navegador e atualização da página; não presume que salvar executa código.", "hint": "Separe o lugar onde o texto é modificado do lugar onde o resultado é visto."}
   },
 
   "prep-files": {
@@ -59,7 +60,8 @@ Object.assign(LESSON_GUIDES, {
       {"question": "O que um caminho informa?", "options": ["Como localizar um item", "A senha do arquivo", "A linguagem obrigatória"], "correctIndex": 0, "explanation": "O caminho descreve a localização na árvore de pastas."},
       {"question": "Renomear foto.jpg para foto.py converte a imagem?", "options": ["Sim", "Não", "Somente no Windows"], "correctIndex": 1, "explanation": "Mudar o nome não converte o conteúdo."}
     ],
-    "summary": ["Caminhos localizam arquivos dentro de uma árvore.", "A extensão final precisa estar visível e correta.", "Nome, formato e conteúdo não são a mesma coisa."]
+    "summary": ["Caminhos localizam arquivos dentro de uma árvore.", "A extensão final precisa estar visível e correta.", "Nome, formato e conteúdo não são a mesma coisa."],
+    "retry": {"prompt": "Em Documentos/projeto-web, você recebeu `pagina.html.txt`. Crie uma pasta `rascunhos`, coloque ali uma cópia e informe o caminho e a extensão reais da cópia antes de renomeá-la para HTML. Explique como verificaria que o conteúdo continua igual.", "expected": "A resposta identifica .txt como extensão inicial, mostra o caminho dentro de rascunhos e distingue renomear de converter o conteúdo.", "hint": "Leia a última extensão e confira as propriedades do arquivo, não apenas o ícone."}
   },
 
   "prep-workspace": {
@@ -89,7 +91,8 @@ Object.assign(LESSON_GUIDES, {
       {"question": "Qual comando lista itens no PowerShell de forma explícita?", "options": ["Get-ChildItem", "Get-Location", "Write-Output"], "correctIndex": 0, "explanation": "Get-ChildItem lista arquivos e pastas."},
       {"question": "Por que abrir uma pasta como workspace?", "options": ["Para alinhar arquivos e ferramentas no mesmo contexto", "Para instalar linguagens automaticamente", "Para publicar na internet"], "correctIndex": 0, "explanation": "O workspace fornece contexto comum ao editor e terminal."}
     ],
-    "summary": ["Abra a pasta inteira no editor.", "Confirme localização antes de executar comandos.", "Compare a listagem do terminal com o Explorador do editor."]
+    "summary": ["Abra a pasta inteira no editor.", "Confirme localização antes de executar comandos.", "Compare a listagem do terminal com o Explorador do editor."],
+    "retry": {"prompt": "O editor mostra `projeto-a/notas.txt`, mas o terminal integrado lista arquivos de `projeto-b`. Descreva uma sequência segura para descobrir a pasta atual e alinhar as duas ferramentas sem mover nem apagar arquivos.", "expected": "A resposta confere os dois caminhos, abre a pasta correta e verifica que a listagem contém notas.txt.", "hint": "Comece observando a localização atual antes de executar outros comandos."}
   },
 
   "prep-cycle": {
@@ -119,7 +122,8 @@ Object.assign(LESSON_GUIDES, {
       {"question": "O que indica o retorno do prompt após Ctrl+C?", "options": ["O terminal pode receber outro comando", "O computador foi desligado", "O arquivo foi publicado"], "correctIndex": 0, "explanation": "O processo em primeiro plano terminou ou foi interrompido."},
       {"question": "Salvar um arquivo é o mesmo que executá-lo?", "options": ["Sim", "Não", "Somente no macOS"], "correctIndex": 1, "explanation": "Salvar grava conteúdo; executar inicia um programa ou interpretação."}
     ],
-    "summary": ["Mude uma coisa por ciclo.", "Defina e compare o resultado esperado.", "Use Ctrl+C para interromper processos contínuos no terminal."]
+    "summary": ["Mude uma coisa por ciclo.", "Defina e compare o resultado esperado.", "Use Ctrl+C para interromper processos contínuos no terminal."],
+    "retry": {"prompt": "Você alterou duas mensagens de uma página e não sabe qual mudança causou um resultado inesperado. Proponha um novo ciclo de teste com uma alteração por vez, incluindo o que salvar, executar ou atualizar e observar em cada rodada.", "expected": "O plano isola uma mudança por rodada e compara o resultado observado com o esperado antes da próxima alteração.", "hint": "Reduza a experiência a uma mudança pequena e observável por vez."}
   },
 
   "prep-errors": {
@@ -149,6 +153,7 @@ Object.assign(LESSON_GUIDES, {
       {"question": "Uma hipótese deve ser tratada como fato?", "options": ["Sim", "Não; deve ser testada", "Somente no terminal"], "correctIndex": 1, "explanation": "A hipótese orienta a próxima verificação."},
       {"question": "O que comprova a Etapa 0?", "options": ["Marcar cinco aulas", "Resolver a prova prática com nomes diferentes e explicar as ações", "Acertar apenas o quiz"], "correctIndex": 1, "explanation": "Conclusão e quiz não substituem desempenho em tarefa nova."}
     ],
-    "summary": ["Registre evidências antes de tentar correções aleatórias.", "Separe resultado esperado, observado e hipótese.", "A prova prática, repetida e explicada, é a evidência do Nível 0."]
+    "summary": ["Registre evidências antes de tentar correções aleatórias.", "Separe resultado esperado, observado e hipótese.", "A prova prática, repetida e explicada, é a evidência do Nível 0."],
+    "retry": {"prompt": "Uma pessoa tentou abrir `relatorios/resultado.txt` e recebeu 'arquivo não encontrado'. Escreva um relato curto com pasta atual, comando ou ação, resultado esperado, mensagem observada e duas hipóteses verificáveis, sem inventar a saída do computador.", "expected": "O relato separa fatos e hipóteses e propõe verificar caminho, nome e existência do arquivo antes de corrigir.", "hint": "A mensagem diz o que falhou; ainda é preciso confirmar a pasta e o nome reais."}
   }
 });

@@ -70,6 +70,10 @@ function sanitizeState(candidate) {
   if (lessonIndex.has(candidate.lastLesson)) clean.lastLesson = candidate.lastLesson;
   for (const { track, module, lesson } of lessonIndex.values()) {
     if (!lesson.guide) continue;
+    if (lesson.guide.retry) {
+      const key = `${lesson.id}:retry`;
+      if (typeof candidate.notes?.[key] === 'string') clean.notes[key] = candidate.notes[key].slice(0, 2000);
+    }
     if (track.modules.indexOf(module) > 0 && module.lessons[0].id === lesson.id) {
       const key = `${lesson.id}:cumulative`;
       if (typeof candidate.notes?.[key] === 'string') clean.notes[key] = candidate.notes[key].slice(0, 2000);
