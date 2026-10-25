@@ -24,6 +24,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.
+- [ ] Após uma resposta incorreta, o feedback indica a aula de revisão; o botão abre os conceitos e a orientação persiste após recarregar.
 - [ ] Anotação é salva após aguardar e continua presente após recarregar.
 - [ ] Fechar o diálogo devolve o foco ao controle que o abriu.
 

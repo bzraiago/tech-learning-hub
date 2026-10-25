@@ -106,6 +106,11 @@ $('#lesson-sections').addEventListener('keydown', (event) => {
 document.addEventListener('click', (event) => {
   const button = event.target.closest('button');
   if (!button) return;
+  if (button.dataset.reviewConcept && lessonIndex.has(button.dataset.reviewConcept)) {
+    if (dialogContext?.id !== button.dataset.reviewConcept) openLesson(button.dataset.reviewConcept);
+    renderLessonSection('learn', true);
+    return;
+  }
   if (button.dataset.reviewLesson) {
     openLesson(button.dataset.reviewLesson);
     renderLessonSection('review', true);
