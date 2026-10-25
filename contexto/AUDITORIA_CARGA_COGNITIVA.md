@@ -6,7 +6,7 @@
 
 ## 1. Veredito
 
-O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de `delivery-http` e `delivery-forms`, a auditoria automática continua apontando 15: as cinco etapas de cada aula foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 13 aulas de IA e Entrega a revisar na prioridade 4.
+O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seções. Após as revisões de `delivery-http`, `delivery-forms` e `delivery-security`, a auditoria automática continua apontando 15: as cinco etapas de cada aula foram mantidas após revisão didática. As prioridades 2 e 3 foram concluídas; restam 12 aulas de IA e Entrega a revisar na prioridade 4.
 
 ## 2. Contrato de aprendizagem
 
@@ -18,7 +18,7 @@ O mapeamento estrutural encontrou originalmente 41 aulas com mais de quatro seç
 
 | # | Severidade | Esforço | Onde | Tipo | Achado | Ação |
 |---|---|---|---|---|---|---|
-| 1 | Média | G | 13 aulas IA/Entrega ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
+| 1 | Média | G | 12 aulas IA/Entrega ainda não revisadas | RISCO | Possuem cinco seções e nenhum prefixo padronizado; parte da densidade pode ser compatível com o nível avançado. | Conferir pré-requisitos e tarefas de transferência antes de dividir. |
 | 2 | Baixa | P | `scripts/audit-lesson-load.js` | SUGESTÃO | A contagem de seções é um indicador reproduzível, mas não mede dificuldade real. | Usar o relatório como triagem e exigir revisão humana antes de alterar conteúdo. |
 
 ## 4. Pré-requisitos
@@ -72,6 +72,15 @@ O mapeamento permite planejar aulas menores, mas não melhora sozinho a aprendiz
 4. [Concluído] Separar junções básicas e granularidade de CTEs e subconsultas em `db-joins` e `db-subqueries-ctes`.
 5. [Concluído] Separar transação básica de concorrência, repetição e efeitos externos em `db-transactions` e `db-concurrency-boundaries`.
 6. Reexecutar a auditoria e revisar manualmente as prioridades 2 a 4.
+
+### Revisão localizada: `delivery-security`
+
+- **Público e saída:** após HTTP, formulários e a preparação Node, o aluno deve explicar autenticação, autorização, segredo privado e CORS e prever decisões de acesso em uma regra simulada.
+- **FATO, alta, P:** o exemplo emitia 403 para usuário ausente, embora o exercício associasse a ausência de credencial a 401. A saída simulada agora distingue 401 e 403; o guia explicita que não existe sessão validada nem servidor HTTP nesse código.
+- **Julgamento didático:** os cinco blocos seguem fronteiras distintas (identidade, segredos, CORS, validação e revisão). Foram preservados com pausas de previsão ou inspeção. Os quatro exercícios agora cobrem prever, alterar, construir e investigar erro, com critério observável.
+- **Pré-requisitos e ambiente:** `setup-node`, `delivery-http`, `delivery-forms` → `delivery-security`. A preparação nomeia pasta, terminal, comando, saída, parada, retomada e alternativa sem serviço externo.
+- **Fontes:** [MDN 401](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401), [MDN 403](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403), [MDN CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS) e [OWASP Top 10](https://owasp.org/projects/top-ten) foram abertas em 24/10/2026 (fontes primárias, EN, OK).
+- **Limite:** a regra demonstra decisões sobre objetos fictícios. Ela não valida identidade, não inicia servidor e não comprova proteção de uma API real. Teste manual de interface e observação com aluno não foram executados nesta revisão.
 
 ### Revisão localizada: `delivery-forms`
 

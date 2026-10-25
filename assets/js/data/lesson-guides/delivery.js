@@ -326,36 +326,40 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "delivery-security": {
-    "prerequisites": "Conhecer requisições HTTP e o exemplo de formulário. Não é preciso construir um sistema de login.",
-    "setup": "Salve o código em security.js e execute node security.js. Desenhe uma tabela com identidade, ação, dono do registro e decisão do servidor.",
+    "prerequisites": "Concluir delivery-http e delivery-forms; para executar o exemplo, concluir a preparação setup-node. Não é preciso construir um sistema de login.",
+    "setup": "Na pasta da aula, salve o exemplo como security.js no editor. No terminal aberto nessa pasta, execute node security.js; a saída esperada é 200, 403, 401, em linhas separadas. Para parar, o processo termina sozinho; para retomar, execute o mesmo comando. Se node não for reconhecido, revise setup-node. A atividade só usa Node.js local e não requer serviço externo.",
     "why": "Integração com serviços reais envolve dados e permissões. Um desenvolvedor iniciante deve reconhecer limites seguros antes de colocar chaves ou decisões de acesso no navegador.",
     "sections": [
       {
         "title": "Três perguntas diferentes",
         "paragraphs": [
           "Identificação é informar quem alguém diz ser. Autenticação é verificar essa identidade por um mecanismo confiável. Autorização é decidir se essa pessoa autenticada pode realizar uma ação específica sobre um recurso. Uma interface pode esconder o botão “Editar” para melhorar a experiência, mas o servidor precisa tomar novamente a decisão ao receber a requisição. Caso contrário, basta chamar a rota diretamente.",
-          "No exemplo, podeEditar compara id do usuário autenticado com donoId do registro. O código é apenas uma regra isolada, não um login: um objeto {id:2} escrito no cliente não prova identidade. Em um sistema real, o servidor extrai a identidade de uma sessão ou credencial validada, busca a propriedade do recurso e decide. Se a pessoa não tem permissão, a API responde 403 sem vazar dados protegidos."
+          "No exemplo, podeEditar compara id do usuário autenticado com donoId do registro. O código é apenas uma regra isolada, não um login: um objeto {id:2} escrito no cliente não prova identidade. Em um sistema real, o servidor extrai a identidade de uma sessão ou credencial validada, busca a propriedade do recurso e decide. Se a pessoa não está autenticada, o exemplo usa 401; se está autenticada mas não tem permissão, usa 403. O exemplo não recebe requisições HTTP de verdade.",
+          "Pausa: preveja as três saídas antes de executar e explique qual informação ainda falta para o objeto {id:2} provar identidade."
         ]
       },
       {
         "title": "Segredos não pertencem ao código entregue",
         "paragraphs": [
           "Todo JavaScript enviado ao navegador pode ser lido por quem acessa a página. Uma variável de ambiente injetada durante um build de frontend também se torna pública se seu valor vai parar no pacote final. Não coloque chaves privadas, senha de banco nem token mestre no HTML, no repositório ou no localStorage. Esses dados pertencem ao ambiente do servidor; o servidor usa a chave para chamar o serviço e retorna apenas o resultado autorizado.",
-          "Algumas APIs oferecem chaves públicas destinadas ao navegador, mas isso depende de documentação, escopo e limites explícitos. Não assuma que uma chave é pública porque funciona no browser. Para treinar sem conta externa, use o mock local e uma credencial fictícia de exemplo. Em trabalho real, peça o contrato de autenticação e use os mecanismos aprovados pela equipe."
+          "Algumas APIs oferecem chaves públicas destinadas ao navegador, mas isso depende de documentação, escopo e limites explícitos. Não assuma que uma chave é pública porque funciona no browser. Para treinar sem conta externa, use o mock local e uma credencial fictícia de exemplo. Em trabalho real, peça o contrato de autenticação e use os mecanismos aprovados pela equipe.",
+          "Pausa: liste dois arquivos públicos do projeto e diga se uma chave privada colocada neles poderia ser lida por quem acessa a página."
         ]
       },
       {
         "title": "CORS não é autenticação",
         "paragraphs": [
           "CORS é uma política aplicada pelo navegador para controlar leitura de respostas entre origens. Se a página está em uma porta e a API em outra, há origens diferentes; o servidor pode responder com os cabeçalhos apropriados para uma origem permitida. O bloqueio do navegador não impede chamadas feitas por clientes que não seguem a mesma política e não substitui autorização.",
-          "O laboratório anterior serviu página e API na mesma origem, então não precisou de CORS. Se uma requisição aparecer na Rede mas o navegador disser que a resposta foi bloqueada, confira origem e cabeçalhos da API, inclusive pedido preliminar quando aplicável. Não resolva adicionando permissão irrestrita sem entender quem deve acessar os dados. O local correto da configuração é a API sob controle de quem a mantém."
+          "O laboratório anterior serviu página e API na mesma origem, então não precisou de CORS. Se uma requisição aparecer na Rede mas o navegador disser que a resposta foi bloqueada, confira origem e cabeçalhos da API, inclusive pedido preliminar quando aplicável. Não resolva adicionando permissão irrestrita sem entender quem deve acessar os dados. O local correto da configuração é a API sob controle de quem a mantém.",
+          "Pausa: desenhe página → navegador → API e marque em qual ponto CORS limita a leitura da resposta e em qual ponto o servidor decide a permissão."
         ]
       },
       {
         "title": "Validação, saída e mensagens",
         "paragraphs": [
           "O servidor deve validar tipos, comprimentos e permissões de cada operação. A interface também precisa inserir texto de pessoas usuárias como texto, por exemplo com textContent, e evitar transformá-lo em HTML. São proteções em fronteiras distintas: uma cuida da integridade do serviço; outra evita executar marcação não confiável no navegador. A revisão de segurança deve olhar entrada, armazenamento, decisão de acesso e saída.",
-          "Quando uma operação falha, o cliente precisa de uma mensagem útil, mas não de stack trace, token, consulta interna ou detalhes de infraestrutura. Registre detalhes no lado apropriado do servidor e apresente um erro compreensível na interface. Segurança não é uma única biblioteca instalada ao final: é uma coleção de decisões verificáveis durante o projeto."
+          "Quando uma operação falha, o cliente precisa de uma mensagem útil, mas não de stack trace, token, consulta interna ou detalhes de infraestrutura. Registre detalhes no lado apropriado do servidor e apresente um erro compreensível na interface. Segurança não é uma única biblioteca instalada ao final: é uma coleção de decisões verificáveis durante o projeto.",
+          "Pausa: para um recurso de outra pessoa, escreva uma mensagem pública curta e indique quais detalhes ficariam apenas no diagnóstico do servidor."
         ]
       },
       {
@@ -368,13 +372,13 @@ Object.assign(LESSON_GUIDES, {
     ],
     "example": {
       "language": "js",
-      "code": "// Arquivo demonstrativo: node security.js\nfunction podeEditar(usuario, registro) {\n  return Boolean(usuario && registro && usuario.id === registro.donoId);\n}\nconst registro = { id: 7, donoId: 2, titulo: 'Plano' };\nfor (const usuario of [{id:2}, {id:9}, null]) {\n  console.log(podeEditar(usuario, registro) ? 200 : 403);\n}\n// Saída: 200, 403, 403. Em sistema real o servidor valida a sessão.\n",
+      "code": "// Arquivo demonstrativo: node security.js\nfunction podeEditar(usuario, registro) {\n  return Boolean(usuario && registro && usuario.id === registro.donoId);\n}\nconst registro = { id: 7, donoId: 2, titulo: 'Plano' };\nfor (const usuario of [{id:2}, {id:9}, null]) {\n  console.log(!usuario ? 401 : podeEditar(usuario, registro) ? 200 : 403);\n}\n// Resultado simulado: 200, 403, 401. Não há servidor nem sessão validada.\n",
       "explanation": [
         "A função ilustra uma regra de autorização sobre um recurso.",
-        "Usuário ausente ou não proprietário recebe decisão negativa.",
+        "A saída 401 para usuário ausente e 403 para não proprietário apenas simula códigos HTTP; este arquivo não cria uma API.",
         "Identidade real precisa ser validada no servidor antes de chamar a regra."
       ],
-      "expected": "Três linhas: 200, 403, 403."
+      "expected": "Três linhas: 200, 403, 401. São códigos simulados, não respostas de um servidor."
     },
     "guided": [
       {
@@ -392,7 +396,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Guiado: acrescente uma regra que só aceita registro existente e usuario.id numérico.",
+        "prompt": "Prever: qual saída o exemplo imprime para null? Depois altere podeEditar para exigir registro existente e ids inteiros. Aceite: entrada {id:2} e {donoId:2} → true; entrada {id:'2'} ou registro ausente → false.",
         "hints": [
           "Valide antes da comparação.",
           "Number.isInteger pode exigir inteiro."
@@ -402,7 +406,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Dados ausentes ou ids inválidos resultam false."
       },
       {
-        "prompt": "Classifique cada situação: token ausente, usuário autenticado sem permissão, rota inexistente.",
+        "prompt": "Alterar: crie uma tabela com token ausente, usuário autenticado sem permissão e rota inexistente; associe 401, 403 e 404 e explique qual verificação do servidor levou a cada decisão. Aceite: três situações classificadas; entrada: rota inexistente → 404.",
         "hints": [
           "Pense em autenticação, autorização e roteamento.",
           "Use 401, 403, 404."
@@ -412,7 +416,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Três códigos associados às condições."
       },
       {
-        "prompt": "Construa uma revisão de exposição: indique onde colocar uma chave privada de API e que resultado público enviar ao cliente.",
+        "prompt": "Construir: desenhe o fluxo de uma chamada a serviço externo com chave privada, marcando onde a chave fica e qual resposta chega ao navegador. Aceite: chave só no servidor e retorno limitado aos dados autorizados; entrada: pedido de relatório → saída: relatório sem segredo.",
         "hints": [
           "Tudo no bundle do browser é legível.",
           "O servidor pode mediar a chamada."
@@ -422,7 +426,7 @@ Object.assign(LESSON_GUIDES, {
         "expected": "Plano separa segredo privado e resposta pública."
       },
       {
-        "prompt": "Diagnostique: CORS bloqueia no browser, mas curl obtém dados privados sem credencial. Qual falha realmente importa?",
+        "prompt": "Investigar erro: CORS bloqueia no navegador, mas um cliente de terminal obtém dados privados sem credencial. Identifique a falha e proponha uma segunda verificação pelo servidor. Aceite: resposta distingue CORS de autorização; entrada: pedido sem credencial → saída esperada: acesso negado.",
         "hints": [
           "CORS é política do navegador.",
           "Teste autorização no servidor."
