@@ -3072,3 +3072,131 @@ Object.assign(LESSON_GUIDES, {
     ]
   }
 });
+
+// Segundas tentativas após erro no quiz, com dados diferentes dos exercícios.
+(() => {
+  const retries = {
+    "db-modeling": {
+      prompt: "Uma biblioteca empresta livros a pessoas. A mesma pessoa pode pegar vários livros, e cada empréstimo registra data de retirada e devolução. Desenhe entidades, chaves e relações antes de criar SQL.",
+      expected: "O modelo distingue pessoas, livros e empréstimos; cada empréstimo aponta para uma pessoa e um livro e guarda suas próprias datas, sem lista de IDs em uma célula.",
+      hint: "Pergunte a qual fato cada atributo pertence e onde a relação entre pessoa e livro acontece."
+    },
+    "db-normalization": {
+      prompt: "Uma planilha guarda pedido_id, cliente_id, nome_cliente e uma lista de produtos separados por vírgula. O nome de um cliente mudou. Proponha tabelas que permitam atualizar o nome uma única vez e guardar a quantidade de cada produto no pedido.",
+      expected: "Cliente fica identificado em tabela própria; pedido referencia cliente; itens relacionam pedido e produto com quantidade. Nenhuma atualização do nome exige percorrer pedidos antigos.",
+      hint: "Separe atributos do cliente dos atributos de cada item comprado."
+    },
+    "db-ddl-constraints": {
+      prompt: "Crie categorias e eventos. Cada evento deve ter título não vazio, duração inteira de 1 a 240 minutos e categoria existente. Teste um registro válido e três inválidos, incluindo categoria ausente.",
+      expected: "O válido é aceito; título vazio, duração fora da faixa e referência inexistente são recusados; a tabela continua apenas com o registro válido após os testes.",
+      hint: "Combine NOT NULL, CHECK e FOREIGN KEY; no SQLite, confira se a checagem de chaves estrangeiras está ativa."
+    },
+    "db-ddl-crud": {
+      prompt: "Uma lista de livros contém IDs 1, 2 e 3. Corrija o título apenas do livro 2 e remova apenas o 3. Antes de cada alteração, use SELECT para confirmar o alvo e depois confira a lista completa.",
+      expected: "O livro 1 permanece igual, o 2 tem o novo título e o 3 não aparece; cada UPDATE ou DELETE usa condição por ID.",
+      hint: "Execute primeiro o mesmo WHERE em SELECT; valores vindos da aplicação devem ser enviados por parâmetros."
+    },
+    "db-select": {
+      prompt: "Consulte uma tabela de chamados para obter os pendentes com prioridade pelo menos 2. Mostre id, título e observação, substituindo apenas observações NULL por 'Sem nota'; ordene por prioridade e id para desempatar.",
+      expected: "Só entram chamados pendentes na faixa; NULL vira 'Sem nota', mas texto vazio continua vazio; a ordem é estável quando há prioridades iguais.",
+      hint: "Use WHERE para linhas, COALESCE para ausência e dois critérios no ORDER BY."
+    },
+    "db-aggregation": {
+      prompt: "Com vendas (loja, valor, status), faça um relatório por loja somente das vendas confirmadas. Mostre quantidade e soma e mantenha apenas lojas cuja soma é pelo menos 100. Confira um grupo manualmente.",
+      expected: "Vendas canceladas não participam; quantidade e total batem com a conta manual; o limite de 100 filtra grupos depois da soma.",
+      hint: "WHERE limita linhas antes de GROUP BY; HAVING limita os grupos agregados."
+    },
+    "db-joins": {
+      prompt: "Liste todos os autores e a quantidade de livros publicados, inclusive autores sem livros. Acrescente um autor sem livro aos dados de teste e preveja sua contagem antes de executar.",
+      expected: "O autor sem livro aparece com 0; os demais têm contagens correspondentes aos livros, sem contagem artificial da linha criada pelo LEFT JOIN.",
+      hint: "Parta de autores com LEFT JOIN e conte a chave do livro, não todas as linhas."
+    },
+    "db-subqueries-ctes": {
+      prompt: "Uma escola quer comparar o total de pontos de cada turma com a média dos totais das turmas, incluindo turma sem alunos. Escreva uma CTE com um total por turma e outra etapa para selecionar as abaixo da média.",
+      expected: "Cada turma aparece uma vez na CTE inicial; a turma vazia tem total 0; a média usa totais de turmas, sem multiplicar pontos por junções adicionais.",
+      hint: "Agregue por turma antes de calcular AVG sobre os totais resultantes."
+    },
+    "db-transactions": {
+      prompt: "Duas contas começam com 80 e 20. Transfira 12 da primeira para a segunda em uma única transação. Simule uma falha antes do crédito e confira o estado depois de desfazer.",
+      expected: "Após uma operação confirmada, os saldos são 68 e 32 e a soma permanece 100; após a falha e ROLLBACK, ambos voltam a 80 e 20.",
+      hint: "Teste confirmação e desfazimento em bases iniciais equivalentes; confira as duas contas, não só o total."
+    },
+    "db-concurrency-boundaries": {
+      prompt: "Um pedido grava no banco a compra e uma intenção de enviar comprovante. O envio externo falha após COMMIT. Descreva como reenviar sem duplicar a compra e o que deve ser repetido se houver conflito antes do COMMIT.",
+      expected: "A compra confirmada permanece; a intenção pendente permite tentar o envio novamente com identidade estável; um conflito antes do COMMIT repete toda a unidade de banco, com limite, não apenas uma alteração.",
+      hint: "Separe a transação do efeito externo e registre um identificador da intenção pendente."
+    },
+    "db-docker-basics": {
+      prompt: "Um colega tem o cliente psql instalado, mas o comando que lista containers falha por indisponibilidade do Engine. Registre qual componente funciona, qual não funciona e como verificaria persistência sem apagar dados.",
+      expected: "O diagnóstico distingue cliente, Engine, container e volume; nenhum volume é apagado para corrigir conexão; persistência exige criar um dado, reiniciar o serviço e consultá-lo novamente.",
+      hint: "Trate cada camada separadamente e confira o estado antes de modificar a instalação."
+    },
+    "db-docker-compose": {
+      prompt: "Um PostgreSQL no Compose publica 55432 no computador e usa 5432 dentro da rede do Compose. Descreva host e porta para um cliente no computador e para uma API em outro serviço; valide com uma consulta simples.",
+      expected: "O cliente no computador usa 127.0.0.1:55432; a API usa o nome do serviço na porta 5432; ambas as conexões executam uma consulta real, além de validar o arquivo de configuração.",
+      hint: "Pergunte de qual ambiente parte cada conexão antes de escolher endereço e porta."
+    },
+    "db-docker-operations": {
+      prompt: "Depois de criar um registro de teste, faça uma cópia da base e restaure-a em um destino separado. Compare uma linha conhecida antes e depois; documente o que faria se a conexão fosse recusada.",
+      expected: "O destino restaurado contém a linha esperada; a origem permanece utilizável; o diagnóstico distingue serviço parado, porta errada e credenciais antes de alterar dados.",
+      hint: "Uma cópia só está comprovada após restauração e consulta no destino."
+    },
+    "db-postgres": {
+      prompt: "Num banco PostgreSQL de cursos e matrículas, adicione um curso sem alunos e escreva um relatório com todos os cursos e a quantidade de matrículas, incluindo zero. Tente uma matrícula com curso inexistente.",
+      expected: "O curso vazio aparece com contagem 0; a referência inválida é recusada pela restrição; os dados confirmados continuam íntegros.",
+      hint: "Use LEFT JOIN a partir de cursos e conte a chave da matrícula."
+    },
+    "db-mariadb": {
+      prompt: "Em uma base MariaDB de cursos e inscrições, verifique o mecanismo e a chave estrangeira. Cadastre um curso sem inscrições e consulte todos os cursos com a quantidade de inscritos.",
+      expected: "O mecanismo e a relação são observados no esquema real; o curso novo aparece com 0 inscritos; a consulta não perde cursos sem correspondência.",
+      hint: "Inspecione a definição da tabela antes de confiar na restrição; comece a consulta pela tabela de cursos."
+    },
+    "db-sqlite": {
+      prompt: "Em SQLite, cadastre de forma parametrizada um curso cujo título contém apóstrofo. Consulte-o pelo ID e teste, em conexão separada, uma inscrição que aponta para curso inexistente.",
+      expected: "O apóstrofo é armazenado como texto comum; a consulta retorna o curso certo; a referência inválida é recusada quando a checagem de chaves estrangeiras está ativa nessa conexão.",
+      hint: "Separe instrução e valores; confira PRAGMA foreign_keys em cada conexão usada no teste."
+    },
+    "db-firebird": {
+      prompt: "Numa base Firebird de cursos e inscrições, liste todos os cursos com total de inscritos e tente registrar uma inscrição para um ID de curso ausente. Desfaça a tentativa se necessário.",
+      expected: "O relatório inclui cursos sem inscritos com zero; a inscrição inválida não fica confirmada; o teste mostra a restrição efetivamente em ação.",
+      hint: "Parta de cursos com LEFT JOIN e confira a transação antes de encerrar a sessão."
+    },
+    "db-nosql-models": {
+      prompt: "Um aplicativo offline guarda notas pessoais e busca por ID, mas agora precisa mostrar todas as notas de uma categoria. Compare duas formas de armazenamento e justifique a escolha com custo de leitura, atualização e recuperação.",
+      expected: "A justificativa descreve como cada consulta localiza dados, o efeito de mudar uma categoria e como recuperar o acervo; não afirma que um tipo de banco é sempre superior.",
+      hint: "Comece pelas perguntas reais que a aplicação faz e pela frequência de cada operação."
+    },
+    "db-mongo-crud": {
+      prompt: "Em uma coleção de tarefas com IDs t1, t2 e t3, marque apenas t2 como concluída usando $set, confira matchedCount e modifiedCount e tente repetir a mesma atualização.",
+      expected: "Só t2 muda na primeira chamada; na repetição, o documento ainda corresponde ao filtro, mas nenhuma alteração adicional é necessária; t1 e t3 permanecem intactos.",
+      hint: "Filtre por _id estável e diferencie encontrar um documento de modificá-lo."
+    },
+    "db-mongo-pipelines": {
+      prompt: "Uma coleção de sessões contém trilha, minutos e concluida. Produza por trilha o total de minutos das sessões concluídas e a quantidade delas; depois acrescente uma sessão pendente e preveja o relatório.",
+      expected: "A sessão pendente não altera os totais de concluídas; cada saída tem uma trilha, total e quantidade; os estágios deixam visível onde ocorreu o filtro.",
+      hint: "Coloque o filtro de conclusão antes do agrupamento e confira o formato após cada estágio."
+    },
+    "db-performance": {
+      prompt: "Uma consulta procura eventos por usuario_id e ordena por data. Registre o resultado e o plano antes e depois de um índice compatível; compare também uma consulta que lê quase toda a tabela.",
+      expected: "Os resultados continuam iguais; a análise distingue o custo observado das duas consultas e não promete que o índice acelere a leitura de quase todos os registros.",
+      hint: "Relacione as primeiras colunas do índice ao filtro e à ordenação; use dados representativos."
+    },
+    "db-security": {
+      prompt: "Uma função lista documentos de um usuário e outra altera o título por ID. Adapte ambas para exigir a identidade do usuário, use valores parametrizados e teste uma tentativa de alterar documento alheio.",
+      expected: "A leitura retorna somente documentos autorizados; a alteração alheia afeta zero linhas; um título com aparência de SQL permanece dado, sem modificar a instrução.",
+      hint: "Inclua usuario_id no WHERE tanto da leitura quanto da escrita."
+    },
+    "db-recovery": {
+      prompt: "Uma cópia foi feita às 9h e o serviço falhou às 9h20, sem registro de mudanças posterior. Restaure em ambiente separado, confira uma linha e uma restrição e estime a perda máxima possível.",
+      expected: "A cópia restaurada passa nas duas verificações; a perda potencial é de até 20 minutos de alterações; o tempo de recuperação só é informado após medição do ensaio.",
+      hint: "Separe RPO de RTO e não trate arquivo de backup como prova de restauração."
+    },
+    "db-project": {
+      prompt: "Na plataforma de estudos, cadastre uma pessoa em duas trilhas e conclua uma lição de apenas uma delas. Gere um relatório por pessoa e trilha; depois tente registrar conclusão de lição fora da matrícula.",
+      expected: "O relatório mantém as trilhas separadas e mostra zero na ainda sem conclusão; a conclusão fora da matrícula é recusada por regra verificável, sem alterar progresso existente.",
+      hint: "Relacione identidade de pessoa, matrícula e lição; teste a regra também no banco, não só na interface."
+    }
+  };
+
+  for (const [id, retry] of Object.entries(retries)) LESSON_GUIDES[id].retry = retry;
+})();
