@@ -1794,3 +1794,71 @@ Object.assign(LESSON_GUIDES, {
     ]
   }
 });
+
+// Recuperação após erro no quiz: um problema novo para aplicar a mesma habilidade.
+(() => {
+  const retries = {
+    "py-syntax": {
+      prompt: "Uma oficina registra '18' participantes pela manhã e '7' à tarde. Antes de executar, preveja o resultado de somar os textos. Depois converta-os e imprima '25 participantes' em um arquivo .py.",
+      expected: "A concatenação dos textos produz '187'; a soma convertida produz 25 e o programa imprime '25 participantes' sem traceback.",
+      hint: "Confira o tipo de cada valor no REPL antes de calcular no arquivo."
+    },
+    "py-control": {
+      prompt: "Para as temperaturas [19, 21, 20, 18], conte quantas estão em 20 ou mais e imprima o total. Preveja a resposta e teste também uma lista vazia.",
+      expected: "O total é 2 para a lista dada e 0 para a lista vazia; o limite 20 está incluído e o laço termina após percorrer os itens.",
+      hint: "Separe o contador da condição; verifique o operador usado na fronteira."
+    },
+    "py-data": {
+      prompt: "Você recebeu nomes ['Lia', 'Rui', 'Lia', 'Bia']. Mostre quantos nomes distintos existem e crie uma nova lista em ordem de primeira aparição, preservando a lista original.",
+      expected: "A contagem é 3; a nova lista é ['Lia', 'Rui', 'Bia']; a lista de entrada continua com quatro itens.",
+      hint: "Um set ajuda a testar unicidade, mas a lista guarda a ordem desejada."
+    },
+    "py-functions": {
+      prompt: "Escreva calcular_saldo(creditos, debitos), que retorna a diferença para dois números não negativos. Defina o que ocorre com entrada inválida e teste (10, 3), (0, 0) e um valor negativo.",
+      expected: "A função retorna 7 e 0 nos casos válidos; recusa o caso inválido conforme o contrato escolhido; não imprime como substituto de return.",
+      hint: "Documente parâmetros, retorno e erro antes de escrever o cálculo."
+    },
+    "py-files": {
+      prompt: "Grave em UTF-8 um arquivo JSON com uma lista de dois livros, cada um com título e páginas. Leia de volta, valide que veio uma lista e calcule o total de páginas; teste o arquivo contendo apenas 42.",
+      expected: "O total corresponde aos dois livros; o conteúdo 42 é recusado como formato inesperado, sem tentar iterá-lo como lista de livros.",
+      hint: "Use with e json; valide a estrutura depois de carregar, antes de acessar os campos."
+    },
+    "py-debug": {
+      prompt: "Uma função que calcula a média de [6, 8, 10] devolve 6. Registre entrada, resultado esperado e observado. Use um ponto de parada para examinar soma e divisor; acrescente um teste para lista vazia.",
+      expected: "O caso principal espera 8; a primeira divergência é identificada com valores observados; o teste de lista vazia define um comportamento explícito e passa após a correção.",
+      hint: "Inspecione soma e quantidade separadamente antes de editar a fórmula."
+    },
+    "py-oop": {
+      prompt: "Modele uma classe Carrinho que guarda itens por instância. Crie dois carrinhos, adicione um item apenas ao primeiro e implemente remover_ultimo com erro claro quando não houver itens.",
+      expected: "O segundo carrinho continua vazio; remover_ultimo devolve o item do primeiro; chamar no segundo gera a exceção documentada.",
+      hint: "Crie a lista em __init__, não como atributo mutável da classe."
+    },
+    "py-errors": {
+      prompt: "Crie ler_idade(texto), que aceita inteiros de 0 a 120. Teste '0', '121' e 'abc'; capture apenas as falhas que a interface consegue explicar ao usuário.",
+      expected: "'0' é aceito; '121' e 'abc' produzem erros distinguíveis de faixa e formato; nenhuma exceção inesperada é escondida por except genérico.",
+      hint: "Separe a conversão da validação de domínio e escolha o tipo de exceção para cada falha."
+    },
+    "py-modules": {
+      prompt: "Separe calcular_total(valores) em regras.py e uma apresentação em app.py. Importe a regra sem imprimir nada apenas por causa do import; execute app.py e teste uma lista vazia.",
+      expected: "A importação não dispara a apresentação; executar o app mostra o resultado previsto; a regra retorna 0 para lista vazia conforme o contrato.",
+      hint: "Deixe a chamada de apresentação sob if __name__ == '__main__' e mantenha print fora da regra."
+    },
+    "py-venv": {
+      prompt: "Um projeto funciona no computador A, mas o computador B relata ModuleNotFoundError. Descreva como conferir qual Python executa o app, instalar a dependência nesse ambiente e recriar tudo em pasta limpa.",
+      expected: "O diagnóstico compara o interpretador em uso com o usado na instalação; o ambiente local pode ser recriado pelo README e pela lista de dependências, sem versionar .venv ou tokens.",
+      hint: "Use sys.executable e invoque pip pelo mesmo interpretador escolhido para o app."
+    },
+    "py-requests": {
+      prompt: "Uma consulta de catálogo por transporte falso retorna [{'titulo':'  Redes  '}] numa execução e lança timeout em outra. Valide os dados e mostre resultados diferentes para sucesso, lista vazia e falha de rede.",
+      expected: "O caso válido produz 'Redes'; lista vazia permanece vazia; timeout é apresentado como falha, sem ser convertido em resultado vazio. Os testes funcionam offline.",
+      hint: "Passe um transporte falso à regra e trate a exceção na camada que apresenta o resultado."
+    },
+    "py-tests": {
+      prompt: "Uma função arredonda a porcentagem de acertos. Escreva testes para (0, 5), (5, 5), (1, 3) e total zero. Introduza temporariamente um defeito de truncamento e observe qual teste falha.",
+      expected: "Cada teste declara o valor esperado; o teste de 1 em 3 detecta o truncamento; após restaurar a regra, todos passam e total zero segue o contrato escolhido.",
+      hint: "Calcule as expectativas sem chamar a própria função testada para criá-las."
+    }
+  };
+
+  for (const [id, retry] of Object.entries(retries)) LESSON_GUIDES[id].retry = retry;
+})();
