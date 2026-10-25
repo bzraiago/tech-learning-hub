@@ -230,7 +230,7 @@ function projectCard(module) {
   const project = PROJECTS.find(item => item.module === module.id);
   if (!project) return '';
   const delivered = !!state.projects[project.id]?.delivered;
-  return `<div class="m-4 rounded-xl border border-amber-300/20 bg-amber-300/5 p-4"><p class="text-[10px] font-bold uppercase tracking-wide text-amber-200">${escapeHTML(project.level)}</p><h3 class="mt-2 text-sm font-semibold">${escapeHTML(project.title)}</h3><p class="mt-2 text-xs leading-relaxed text-slate-400">${delivered ? 'Entrega registrada · critérios do projeto conferidos e testes autoavaliados.' : ['python','database','ai'].includes(project.kind) ? 'Aplique o conteúdo: contrato, testes locais, resultados esperados e solução comentada.' : 'Aplique o conteúdo: enunciado, referência visual, testes e solução comentada.'}</p><button data-project="${project.id}" data-focus="project-${project.id}" class="mt-3 rounded-lg bg-amber-300/10 px-3 py-2 text-xs font-semibold text-amber-100 hover:bg-amber-300/20">${delivered ? 'Revisar projeto' : 'Abrir projeto'}</button></div>`;
+  return `<div class="m-4 rounded-xl border border-amber-300/20 bg-amber-300/5 p-4"><p class="text-[10px] font-bold uppercase tracking-wide text-amber-200">${escapeHTML(project.level)}</p><h3 class="mt-2 text-sm font-semibold">${escapeHTML(project.title)}</h3><p class="mt-2 text-xs leading-relaxed text-slate-400">${delivered ? 'Entrega registrada · critérios do projeto conferidos e testes autoavaliados.' : ['python','database','ai','workflow'].includes(project.kind) ? 'Aplique o conteúdo: contrato, testes locais, resultados esperados e solução comentada.' : 'Aplique o conteúdo: enunciado, referência visual, testes e solução comentada.'}</p><button data-project="${project.id}" data-focus="project-${project.id}" class="mt-3 rounded-lg bg-amber-300/10 px-3 py-2 text-xs font-semibold text-amber-100 hover:bg-amber-300/20">${delivered ? 'Revisar projeto' : 'Abrir projeto'}</button></div>`;
 }
 
 function projectEntry(id) {
@@ -308,6 +308,7 @@ function openProject(id) {
 }
 
 function renderProjectSection(section, focus = false) {
+  if(dialogContext?.type==='project'&&projectById(dialogContext.id)?.kind==='workflow')return renderWorkflowProjectSection(section,focus);
   if(dialogContext?.type==='project'&&projectById(dialogContext.id)?.kind==='ai')return renderAiProjectSection(section,focus);
   if(dialogContext?.type==='project'&&projectById(dialogContext.id)?.kind==='database')return renderDatabaseProjectSection(section,focus);
   if(dialogContext?.type==='project'&&projectById(dialogContext.id)?.kind==='python')return renderPythonProjectSection(section,focus);
@@ -336,6 +337,7 @@ function renderProjectSection(section, focus = false) {
 }
 
 function submitProject() {
+  if(dialogContext?.type==='project'&&projectById(dialogContext.id)?.kind==='workflow')return submitWorkflowProject();
   if(dialogContext?.type==='project'&&projectById(dialogContext.id)?.kind==='ai')return submitAiProject();
   if(dialogContext?.type==='project'&&projectById(dialogContext.id)?.kind==='database')return submitDatabaseProject();
   if(dialogContext?.type==='project'&&projectById(dialogContext.id)?.kind==='python')return submitPythonProject();
@@ -535,6 +537,44 @@ function submitAiProject() {
   renderModules();
   projectFooter();
   $('#project-status').textContent = 'Entrega registrada como autoavaliação. O dashboard não executou Python nem modelos de IA; os testes locais foram autoavaliados.';
+}
+
+function renderWorkflowProjectSection(section, focus = false) {
+  if (!PROJECT_SECTIONS.some(([key]) => key === section)) return;
+  activeProjectSection = section;
+  const project = projectById(dialogContext.id), entry = projectEntry(project.id);
+  $('#lesson-sections').innerHTML = PROJECT_SECTIONS.map(([key, title]) => `<button id="project-tab-${key}" role="tab" aria-controls="project-panel" aria-selected="${key === section}" tabindex="${key === section ? 0 : -1}" data-project-section="${key}" class="reader-section shrink-0 rounded-lg border border-transparent px-3 py-2.5 text-xs font-semibold text-slate-400">${title}</button>`).join('');
+  let body = '';
+  if (section === 'brief') {
+    body = `<h3 class="text-2xl font-semibold">${escapeHTML(project.title)}</h3>${readerParagraph(project.goal)}<h4 class="mt-6 font-semibold text-violet-200">Antes de começar</h4>${readerParagraph(project.prerequisites)}<h4 class="mt-6 font-semibold text-violet-200">Missão e entrega</h4>${project.brief.map(readerParagraph).join('')}${readerParagraph(project.deliverable)}<h4 class="mt-6 font-semibold text-violet-200">Critérios obrigatórios</h4><ul class="mt-3 list-disc space-y-2 pl-5 text-sm leading-7 text-slate-300">${project.checks.map(check => `<li>${escapeHTML(check.label)}</li>`).join('')}</ul><details class="mt-6 rounded-xl border border-white/10 p-4"><summary class="font-semibold">Orientações para começar</summary>${project.hints.map(readerParagraph).join('')}</details>`;
+  } else if (section === 'reference') {
+    body = `<h3 class="text-2xl font-semibold">Resultado esperado</h3>${readerParagraph('Compare estes artefatos e observações antes de implementar. Não copie hashes, caminhos ou resultados fictícios: inspecione os seus no terminal.')}${readerCode(project.exampleOutput, 'Exemplo de evidências esperadas')}${readerCode(project.testCommand, 'Comandos para executar no terminal da pasta do projeto')}`;
+  } else if (section === 'build') {
+    body = `<h3 class="text-2xl font-semibold">Sua entrega</h3>${readerParagraph(project.deliverable)}<label for="project-source" class="mb-2 mt-5 block text-sm font-semibold">Resumo dos artefatos e resultados · até 80.000 caracteres</label><textarea id="project-source" maxlength="80000" rows="17" class="w-full rounded-xl border border-white/20 bg-[#0b101b] p-4 font-mono text-sm leading-6" placeholder="Descreva a issue, o README, o PR e o histórico observado…">${escapeHTML(entry.source)}</textarea><p class="mt-2 text-xs leading-6 text-slate-400">O rascunho fica neste navegador. O repositório Git completo deve permanecer na sua pasta de laboratório. Alterar o resumo reinicia os critérios marcados.</p>`;
+  } else if (section === 'checks') {
+    body = `<h3 class="text-2xl font-semibold">Verificação local e autoavaliação</h3>${readerParagraph(project.rubric)}${readerCode(project.testCommand, 'Execute no terminal da pasta do projeto')}<p class="mt-4 rounded-xl border border-amber-300/20 p-4 text-sm leading-7 text-amber-100">Confira arquivos, histórico e comportamento antes de marcar os itens. O dashboard não executa Git nem verifica o repositório.</p><div class="mt-5 space-y-3">${project.checks.map(check => `<label class="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 p-4"><input type="checkbox" data-project-manual="${escapeHTML(check.id)}" ${entry.manual[check.id] ? 'checked' : ''} class="mt-1 h-4 w-4 shrink-0 accent-amber-300"><span class="text-sm leading-7"><span class="block text-xs font-bold text-violet-200">VERIFICAÇÃO LOCAL · AUTOAVALIAÇÃO</span>${escapeHTML(check.label)}</span></label>`).join('')}</div><h4 class="mt-6 font-semibold">Novo requisito</h4>${readerParagraph(project.transfer)}`;
+  } else {
+    body = `<h3 class="text-2xl font-semibold">Compare suas decisões</h3>${readerParagraph('Consulte este roteiro somente depois de tentar a entrega. Ele não substitui o histórico real nem a revisão independente.')}${readerParagraph(project.solution)}<h4 class="mt-6 font-semibold">Verifique sua autonomia</h4>${readerParagraph(project.transfer)}`;
+  }
+  $('#dialog-body').innerHTML = `<article id="project-panel" role="tabpanel" aria-labelledby="project-tab-${section}" tabindex="0" class="reader-prose">${body}</article>`;
+  $('#dialog-body').scrollTop = 0;
+  projectFooter();
+  if (focus) $(`#project-tab-${section}`).focus({ preventScroll: true });
+}
+
+function submitWorkflowProject() {
+  const project = projectById(dialogContext.id), entry = projectEntry(project.id);
+  if (!entry.source.trim() || project.checks.some(check => !entry.manual[check.id])) {
+    renderProjectSection('checks');
+    $('#project-status').textContent = 'Registre o resumo da entrega e confira todos os critérios locais antes de continuar.';
+    return;
+  }
+  if (!requireProjectExplanation(entry)) return;
+  entry.delivered = true;
+  saveState();
+  renderModules();
+  projectFooter();
+  $('#project-status').textContent = 'Entrega registrada como autoavaliação. O repositório e a revisão não foram verificados pelo dashboard.';
 }
 
 function htmlReferenceGuide() {
