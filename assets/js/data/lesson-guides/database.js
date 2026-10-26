@@ -1287,7 +1287,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Host: 127.0.0.1\nPorta: 55432\nBanco: estudos\nUsuário: aluno",
         "explanation": "A porta publicada liga o host ao serviço interno.",
-        "expected": "Conexão TCP para 127.0.0.1:55432."
+        "expected": "A previsão identifica de onde parte a conexão e quais dados o cliente precisa informar para chegar ao banco certo.",
+        "criteria": ["Separa endereço e porta do computador da porta interna do container.", "Identifica banco e usuário definidos no Compose, sem incluir a senha no registro da atividade.", "Registra a previsão antes de testar a conexão de um cliente no computador."]
       },
       {
         "prompt": "Alterar: a porta 55432 está ocupada. Adapte apenas o necessário e registre a nova porta no README.",
@@ -1297,7 +1298,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "ports:\n  - \"127.0.0.1:55433:5432\"",
         "explanation": "Somente a porta do computador mudou; clientes externos agora usam 55433.",
-        "expected": "O serviço continua em db:5432 dentro da rede."
+        "expected": "A nova configuração valida e publica outra porta no computador, preservando a conexão interna do serviço.",
+        "criteria": ["Altera somente a porta do host no mapeamento, mantendo loopback e porta interna.", "Valida a configuração sem imprimir a senha resolvida e confere a porta em docker compose ps.", "Atualiza o README com a porta observada para clientes do computador."]
       },
       {
         "prompt": "Construir: crie evidência de persistência com uma tabela própria.",
@@ -1307,7 +1309,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "-- No psql:\nCREATE TABLE prova(id integer PRIMARY KEY, texto text NOT NULL);\nINSERT INTO prova VALUES(1,'persistiu');\nSELECT * FROM prova;\n-- Depois de down/up e reconectar:\nSELECT * FROM prova;",
         "explanation": "O ciclo de recriação deve preservar o registro no mesmo volume.",
-        "expected": "Antes e depois: 1 | persistiu."
+        "expected": "O mesmo registro é encontrado antes e depois de recriar o serviço com o volume preservado.",
+        "criteria": ["Cria e consulta um marcador no banco indicado, anotando o resultado inicial.", "Sai do psql, executa down sem remover o volume e reinicia o mesmo projeto Compose.", "Aguarda o serviço ficar saudável, reconecta ao banco e compara o marcador com o resultado inicial."]
       },
       {
         "prompt": "Investigar erro: uma API em outro container tenta localhost:55432 e falha. Corrija o endereço e explique a origem da conexão.",
@@ -1317,7 +1320,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Host da API na mesma rede: db\nPorta: 5432",
         "explanation": "A API precisa alcançar o container db, não a si mesma.",
-        "expected": "A conexão usa o nome de serviço e a porta interna."
+        "expected": "A configuração corrigida aponta para o banco a partir da rede compartilhada, e a origem da conexão fica explícita.",
+        "criteria": ["Explica que localhost dentro da API aponta para o próprio container da API.", "Usa o nome do serviço e a porta interna para a conexão na mesma rede Compose.", "Confere banco, usuário e estado do serviço antes de atribuir a falha apenas ao endereço."]
       }
     ],
     "quiz": [
