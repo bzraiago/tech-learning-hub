@@ -23,6 +23,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Abas Conceitos, Exemplo, Prática, Revisão e Fontes funcionam.
 - [ ] Em `prep-tools`, cada exercício mostra resultado esperado e critérios antes do rascunho; dicas e solução continuam recolhidas.
 - [ ] Em `prep-files`, os quatro critérios aparecem antes da dica e a tarefa de investigar erro não antecipa as duas hipóteses.
+- [ ] Em `prep-workspace`, os quatro critérios verificam contexto de pasta, navegação, registro da sessão real e diagnóstico sem antecipar a solução.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.

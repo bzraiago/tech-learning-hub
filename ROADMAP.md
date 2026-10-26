@@ -130,6 +130,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Exibir antes do rascunho o resultado esperado já existente nos 458 exercícios; detalhar critérios específicos continua pendente.
   - [x] Detalhar critérios observáveis nos quatro exercícios de `prep-tools`, sem expor as respostas nos resultados visíveis.
   - [x] Detalhar critérios observáveis nos quatro exercícios de `prep-files` e preservar a investigação antes da dica.
+  - [x] Detalhar critérios observáveis nos quatro exercícios de `prep-workspace`, cobrindo contexto do terminal e editor.
   - [ ] Revisar os demais resultados esperados para evitar respostas antecipadas e completar critérios específicos por aula.
 - [ ] Garantir exemplos executáveis com saída ou comportamento visível.
 - [ ] Aplicar a progressão guiado → pistas → problema novo → mudança de requisito.
