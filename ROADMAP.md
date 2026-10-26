@@ -555,6 +555,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 26/10/2026 | Fase 3 — concorrência e limites | `58a2e49` | `db-concurrency-boundaries` ganhou critérios nos quatro exercícios; savepoint, efeito externo e repetição da unidade são verificados sem antecipar estados finais. Validação de conteúdo passou; conferência manual pendente. |
 | 26/10/2026 | Fase 3 — fundamentos Docker | `c083251` | `db-docker-basics` ganhou critérios nos quatro exercícios; imagem, Engine e volume são diferenciados, com diagnóstico que preserva os dados. Validação de conteúdo passou; laboratório Docker pendente. |
 | 26/10/2026 | Fase 3 — Docker Compose | `e9cd627` | `db-docker-compose` ganhou critérios nos quatro exercícios; portas, configuração e persistência são verificadas sem antecipar saídas literais. Validação de conteúdo passou; laboratório Docker pendente. |
+| 26/10/2026 | Fase 3 — operações Docker | `9c35d07` | `db-docker-operations` ganhou critérios nos quatro exercícios; diagnóstico, restauração separada e credenciais persistidas são verificados. Validação de conteúdo passou; laboratório Docker pendente. |
 
 ## Decisões e bloqueios
 
