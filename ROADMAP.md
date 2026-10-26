@@ -495,6 +495,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Fase 3.17 — segurança de dados | Conclusão da prioridade 2 | `db-security` ficou com quatro blocos, testes negativos progressivos, identidade confiável e limites explícitos do laboratório. |
 | 26/10/2026 | Fase 3 — resultado esperado visível | `19daa97` | Os 458 resultados existentes aparecem antes das soluções; validador de conteúdo passou. Conferência manual no site publicado pendente. |
 | 26/10/2026 | Fase 3 — critérios da Etapa 0 | `aa9d0a9` | `prep-tools` ganhou critérios específicos visíveis em quatro exercícios; validação automática passou. Conferência manual publicada pendente. |
+| 26/10/2026 | Fase 3 — arquivos e extensões | `d663c99` | `prep-files` ganhou critérios em quatro exercícios; resultado da investigação não revela as hipóteses. Validação automática passou; conferência publicada pendente. |
 
 ## Decisões e bloqueios
 
