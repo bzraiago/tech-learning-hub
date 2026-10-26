@@ -2156,7 +2156,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Chave: preferencia:7\nValor: {idioma: \"pt-BR\"}",
         "explanation": "Chave-valor é uma representação natural para esse acesso direto. Uma tabela relacional com id e idioma também funcionaria; a atividade não prova necessidade de adicionar outro banco.",
-        "expected": "A busca por preferencia:7 devolve pt-BR."
+        "expected": "A chave proposta permite localizar diretamente a preferência, e o valor contém o idioma solicitado.",
+        "criteria": [
+          "Registra uma previsão de chave formada a partir do identificador informado.",
+          "Descreve o valor recuperado sem precisar percorrer outros usuários.",
+          "Compara essa forma de acesso com o exemplo de sessão da aula."
+        ]
       },
       {
         "prompt": "Alterar: o catálogo passa a ter um autor cujo nome aparece em 500 cursos e pode mudar. Compare incorporar o nome e guardar autor_id.",
@@ -2166,7 +2171,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Incorporado: atualizar os 500 cursos.\nReferenciado: atualizar um registro AUTOR e consultar autor_id ao montar o curso.",
         "explanation": "A escolha envolve custo de leitura e de atualização. Como o enunciado enfatiza mudança compartilhada, uma referência evita 500 cópias que podem divergir.",
-        "expected": "Uma atualização no autor contra até 500 atualizações nos cursos; leitura pode exigir composição adicional."
+        "expected": "A comparação explicita o custo de atualizar o nome e de ler os cursos em cada representação.",
+        "criteria": [
+          "Mostra quantos registros precisariam ser alterados em cada alternativa quando o nome mudar.",
+          "Explica como o nome seria recuperado ao apresentar um curso em cada modelo.",
+          "Justifica a escolha com base na mudança compartilhada descrita no enunciado."
+        ]
       },
       {
         "prompt": "Construir: um curso recebe um milhão de eventos de visualização. Proponha onde guardar os eventos e quais campos permitem buscar os últimos de uma pessoa.",
@@ -2176,7 +2186,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "CURSOS: id, titulo, recursos pequenos\nEVENTOS: id, pessoa_id, curso_id, instante, tipo\nConsulta: pessoa_id + intervalo de instante; ordenar por instante e id.",
         "explanation": "Um conjunto que cresce sem limite não deve ser incorporado apenas por compartilhar curso_id. A forma física depende do motor e do volume medido.",
-        "expected": "Eventos separados do documento do curso; crescimento e acesso explicitamente descritos."
+        "expected": "A proposta acomoda o crescimento do histórico e permite consultar os eventos recentes de uma pessoa.",
+        "criteria": [
+          "Distingue os dados do catálogo do conjunto de eventos que cresce com o uso.",
+          "Indica campos necessários para identificar a pessoa, localizar o curso e ordenar os eventos no tempo.",
+          "Descreve uma consulta para os eventos recentes sem presumir que um motor específico seja obrigatório."
+        ]
       },
       {
         "prompt": "Investigar erro: alguém escolheu um servidor documental para um app individual offline de anotações e afirmou que isso fornece sincronização automática. Identifique a suposição incorreta e escreva uma decisão com requisito, escolha, alternativa, custo e gatilho de revisão.",
@@ -2186,7 +2201,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Escolha inicial: SQLite local.\nMotivo: funcionamento offline e consultas por caderno.\nAlternativa: servidor documental, sem necessidade atual.\nCusto aceito: sincronização não implementada.\nRevisão: edição simultânea por usuários em dispositivos diferentes.",
         "explanation": "Uma decisão é defensável quando liga uma característica do produto a uma necessidade e explicita o que ainda não resolve.",
-        "expected": "Cinco itens com requisito, escolha, alternativa, custo e gatilho de revisão."
+        "expected": "A decisão registra os cinco itens pedidos e distingue armazenamento local de uma capacidade de sincronização demonstrada.",
+        "criteria": [
+          "Avalia a suposição à luz do funcionamento offline exigido pelo aplicativo.",
+          "Registra requisito, escolha, alternativa, custo aceito e condição concreta para rever a escolha.",
+          "Explica quais capacidades estão disponíveis e quais ainda precisariam ser implementadas."
+        ]
       }
     ],
     "mistakes": [
