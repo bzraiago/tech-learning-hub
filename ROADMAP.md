@@ -539,6 +539,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 26/10/2026 | Fase 3 — normalização de dados | `92d9575` | `db-normalization` ganhou critérios nos quatro exercícios; o exemplo ativa chaves estrangeiras e verifica a representação de data ausente. Validação de conteúdo passou; conferência manual pendente. |
 | 26/10/2026 | Fase 3 — restrições SQL | `f00d3f5` | `db-ddl-constraints` ganhou critérios nos quatro exercícios; testes positivos, recusas e diagnóstico de FK foram separados. Validação de conteúdo passou; conferência manual pendente. |
 | 26/10/2026 | Fase 3 — CRUD SQL | `a60775d` | `db-ddl-crud` ganhou critérios nos quatro exercícios; a remoção agora pode ser feita a partir do exemplo inicial e os resultados não antecipam linhas literais. Validação de conteúdo passou; conferência manual pendente. |
+| 26/10/2026 | Fase 3 — consultas SQL | `2dd4f3b` | `db-select` ganhou critérios nos quatro exercícios; filtros, limites, ordem e valores ausentes são verificados sem antecipar as linhas finais. Validação de conteúdo passou; conferência manual pendente. |
 
 ## Decisões e bloqueios
 
