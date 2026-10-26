@@ -1,160 +1,44 @@
 'use strict';
 
-// A transferência é manual: entrar na conta não substitui nem envia dados.
+// O Supabase é a única fonte persistente do progresso da conta Clerk ativa.
 const cloudPanel = document.querySelector('#cloud-panel');
 const cloudStatus = document.querySelector('#cloud-status');
-const cloudUpload = document.querySelector('#cloud-upload');
-const cloudDownload = document.querySelector('#cloud-download');
-const cloudRecover = document.querySelector('#cloud-recover');
-const cloudClaim = document.querySelector('#cloud-claim');
-const cloudExport = document.querySelector('#cloud-export');
-const cloudRestore = document.querySelector('#cloud-restore');
-const cloudBackupFile = document.querySelector('#cloud-backup-file');
-const CLOUD_OWNER_KEY = 'tech-learning-hub:local-owner:v1';
-const CLOUD_ACCOUNT_PREFIX = 'tech-learning-hub:account:v1:';
-const CLOUD_BACKUP_PREFIX = 'tech-learning-hub:backup:v1:';
-const CLOUD_GUEST_KEY = 'tech-learning-hub:guest:v1';
+const cloudSidebarStatus = document.querySelector('#storage-status');
+const loginGate = document.querySelector('#login-gate');
+const loginGateStatus = document.querySelector('#login-gate-status');
 let cloudConfig = null;
+let cloudConfigError = null;
 let cloudUserId = null;
-let cloudBusy = false;
-let localOwnerId = null;
-let cloudSwitchVersion = 0;
-const memorySnapshots = new Map();
-const memoryBackups = new Map();
-try { localOwnerId = localStorage.getItem(CLOUD_OWNER_KEY) || null; }
-catch { /* O app continua na sessão mesmo sem localStorage. */ }
-let activeStateOwner = localOwnerId ? null : 'guest';
+let cloudReady = false;
+let cloudGeneration = 0;
+let cloudRevision = 0;
+let cloudSavedRevision = 0;
+let cloudWriting = false;
+let cloudRetryTimer = null;
 
-function cloudCacheKey(owner) { return owner === 'guest' ? CLOUD_GUEST_KEY : `${CLOUD_ACCOUNT_PREFIX}${owner}`; }
-function cloudSaveSnapshot(owner) {
-  if (!owner) return;
-  const snapshot = JSON.stringify(state);
-  memorySnapshots.set(owner, snapshot);
-  try { localStorage.setItem(cloudCacheKey(owner), snapshot); }
-  catch { /* O cache em memória ainda permite trocar de conta nesta sessão. */ }
-}
-function cloudReadSnapshot(owner) {
-  let raw = memorySnapshots.get(owner);
-  if (!raw) {
-    try { raw = localStorage.getItem(cloudCacheKey(owner)); }
-    catch { return null; }
-  }
-  if (!raw) return null;
-  try { return sanitizeState(JSON.parse(raw)); }
-  catch { return null; }
-}
-function cloudReadBackup(userId) {
-  if (!userId) return null;
-  let raw = memoryBackups.get(userId);
-  if (!raw) {
-    try { raw = localStorage.getItem(`${CLOUD_BACKUP_PREFIX}${userId}`); }
-    catch { return null; }
-  }
-  if (!raw) return null;
-  try { return sanitizeState(JSON.parse(raw)); }
-  catch { return null; }
-}
-function cloudPreserveLocal(userId) {
-  if (!userId) return;
-  const raw = JSON.stringify(state);
-  memoryBackups.set(userId, raw);
-  try { localStorage.setItem(`${CLOUD_BACKUP_PREFIX}${userId}`, raw); }
-  catch { /* A versão anterior ainda pode ser recuperada nesta sessão. */ }
-  cloudControls();
-}
-// Cópias locais anteriores à separação por conta são preservadas para o dono já vinculado.
-if (localOwnerId) {
-  try {
-    const key = cloudCacheKey(localOwnerId);
-    if (!localStorage.getItem(key)) {
-      const legacy = localStorage.getItem(STORAGE_KEY);
-      if (legacy) localStorage.setItem(key, legacy);
-    }
-  } catch { /* A cópia remota continua disponível mesmo sem cache local. */ }
+function cloudMessage(message) {
+  cloudStatus.textContent = message;
+  cloudSidebarStatus.textContent = message;
+  loginGateStatus.textContent = message;
 }
 
-function cloudMessage(message) { cloudStatus.textContent = message; }
-function cloudControls() {
-  const ready = Boolean(cloudConfig && cloudUserId);
-  cloudUpload.disabled = cloudBusy || !ready || activeStateOwner !== cloudUserId;
-  cloudDownload.disabled = cloudBusy || !ready;
-  cloudRecover.hidden = !ready || !cloudReadBackup(cloudUserId);
-  cloudRecover.disabled = cloudBusy;
-  cloudExport.disabled = cloudBusy || !ready;
-  cloudRestore.disabled = cloudBusy || !ready;
-  cloudClaim.hidden = !ready || !cloudReadSnapshot('guest');
-  cloudClaim.disabled = cloudBusy;
-}
-function cloudSetOwner(userId) {
-  localOwnerId = userId;
-  try {
-    if (userId) localStorage.setItem(CLOUD_OWNER_KEY, userId);
-    else localStorage.removeItem(CLOUD_OWNER_KEY);
-  } catch { /* A associação vale só até fechar a página se o armazenamento falhar. */ }
-  cloudControls();
-}
-function cloudSetBusy(busy) {
-  cloudBusy = busy;
-  cloudControls();
+function cloudLock(locked) {
+  document.body.toggleAttribute('data-auth-locked', locked);
+  loginGate.hidden = !locked;
+  document.querySelector('main').inert = locked;
+  document.querySelector('aside').inert = locked;
+  document.querySelector('main').setAttribute('aria-busy', String(locked));
 }
 
-async function cloudSwitchTo(userId, refreshRemote = false) {
-  const owner = userId || 'guest';
-  if (activeStateOwner === owner && !refreshRemote) return;
-  const version = ++cloudSwitchVersion;
-  if (activeStateOwner && activeStateOwner !== owner) cloudSaveSnapshot(activeStateOwner);
-  cloudUserId = userId;
-  const cached = cloudReadSnapshot(owner);
-  if (activeStateOwner !== owner) {
-    state = cached || sanitizeState(null);
-    activeStateOwner = owner;
-    cloudSetOwner(userId);
-    if (dialog.open) closeDialog();
-    saveState();
-    render();
-  }
-  cloudPanel.hidden = !(cloudConfig && userId);
-  cloudControls();
-  if (!userId || !cloudConfig) return;
-  cloudSetBusy(true);
-  cloudMessage('Carregando o progresso desta conta…');
-  try {
-    const remote = await cloudReadCurrent();
-    if (version !== cloudSwitchVersion || cloudUserId !== userId) return;
-    if (remote) {
-      if (!remote.state || remote.state.version !== 1 || !remote.state.completed || typeof remote.state.completed !== 'object') {
-        throw new Error('O progresso remoto tem formato desconhecido.');
-      }
-      const remoteState = sanitizeState(remote.state);
-      if (cached && JSON.stringify(cached) !== JSON.stringify(remoteState)) {
-        cloudPreserveLocal(userId);
-        cloudMessage('Progresso da nuvem carregado. A versão local anterior pode ser recuperada neste navegador.');
-      } else {
-        cloudMessage('Progresso desta conta carregado da nuvem.');
-      }
-      state = remoteState;
-      saveState();
-      render();
-    } else {
-      cloudMessage(cached
-        ? 'Sem cópia na nuvem. O progresso local desta conta foi mantido.'
-        : 'Esta conta ainda não tem progresso. Jornada vazia iniciada.');
-    }
-  } catch (error) {
-    if (version === cloudSwitchVersion) cloudMessage(`Nuvem indisponível: ${error.message} Progresso local desta conta mantido.`);
-  } finally {
-    if (version === cloudSwitchVersion) cloudSetBusy(false);
-  }
-}
-
-async function cloudRequest(method, query = '', body = null) {
-  const userId = cloudUserId;
+async function cloudRequest(userId, method, query = '', body = null) {
   const session = window.Clerk?.session;
-  if (!cloudConfig || !userId || !session || window.Clerk.user?.id !== userId) {
-    throw new Error('Entre novamente para sincronizar.');
+  if (!cloudConfig || !session || window.Clerk.user?.id !== userId || cloudUserId !== userId) {
+    throw new Error('Sessão indisponível. Entre novamente.');
   }
   const token = await session.getToken();
-  if (!token || window.Clerk.user?.id !== userId) throw new Error('Sessão encerrada. Entre novamente.');
+  if (!token || window.Clerk.user?.id !== userId || cloudUserId !== userId) {
+    throw new Error('A conta mudou. Entre novamente.');
+  }
   const headers = {
     apikey: cloudConfig.key,
     Authorization: `Bearer ${token}`,
@@ -162,175 +46,130 @@ async function cloudRequest(method, query = '', body = null) {
   };
   if (body !== null) {
     headers['Content-Type'] = 'application/json';
-    headers.Prefer = 'return=minimal';
+    headers.Prefer = 'resolution=merge-duplicates,return=minimal';
   }
   const response = await fetch(`${cloudConfig.url}/rest/v1/learning_state${query}`, {
-    method,
-    headers,
-    body: body === null ? undefined : JSON.stringify(body),
-    cache: 'no-store'
+    method, headers, body: body === null ? undefined : JSON.stringify(body), cache: 'no-store'
   });
-  if (!response.ok) {
-    const hint = [401, 403].includes(response.status)
-      ? ' Confira a integração Clerk e as políticas RLS no Supabase.' : '';
-    throw new Error(`Supabase respondeu HTTP ${response.status}.${hint}`);
-  }
+  if (!response.ok) throw new Error(`Supabase respondeu HTTP ${response.status}.`);
   return method === 'GET' ? response.json() : null;
 }
 
-async function cloudReadCurrent() {
-  const query = `?select=user_id,state&user_id=eq.${encodeURIComponent(cloudUserId)}`;
-  const rows = await cloudRequest('GET', query);
-  if (!Array.isArray(rows)) throw new Error('Resposta inesperada do Supabase.');
-  return rows[0] || null;
+async function cloudLoad(userId, generation) {
+  if (!cloudConfig || !userId) return;
+  cloudLock(true);
+  cloudMessage('Carregando o progresso desta conta…');
+  try {
+    const rows = await cloudRequest(userId, 'GET', `?select=user_id,state&user_id=eq.${encodeURIComponent(userId)}`);
+    if (generation !== cloudGeneration) return;
+    if (!Array.isArray(rows)) throw new Error('Resposta inesperada do Supabase.');
+    const candidate = rows[0]?.state;
+    if (candidate && (candidate.version !== 1 || !candidate.completed || typeof candidate.completed !== 'object' || Array.isArray(candidate.completed))) {
+      throw new Error('O progresso remoto tem formato desconhecido.');
+    }
+    state = sanitizeState(candidate || null);
+    if (dialog.open) closeDialog();
+    render();
+    cloudReady = true;
+    cloudLock(false);
+    cloudMessage(candidate ? 'Progresso desta conta carregado da nuvem.' : 'Conta pronta. Seu progresso será salvo automaticamente.');
+    if (startupNotice) notify(startupNotice);
+  } catch (error) {
+    if (generation !== cloudGeneration) return;
+    cloudMessage(`Não foi possível carregar o progresso: ${error.message} Nova tentativa em instantes.`);
+    clearTimeout(cloudRetryTimer);
+    cloudRetryTimer = setTimeout(() => { cloudRetryTimer = null; void cloudLoad(userId, generation); }, 5000);
+  }
 }
 
-function cloudBackupLocal() {
-  const backup = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(backup);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'tech-learning-hub-progresso-local.json';
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 0);
+function cloudSwitch(userId) {
+  if (userId === cloudUserId && cloudReady) return;
+  const pending = cloudReady && cloudRevision !== cloudSavedRevision;
+  const generation = ++cloudGeneration;
+  clearTimeout(cloudRetryTimer);
+  cloudRetryTimer = null;
+  cloudUserId = userId;
+  cloudReady = false;
+  cloudRevision = 0;
+  cloudSavedRevision = 0;
+  startupNotice = '';
+  state = sanitizeState(null);
+  if (dialog.open) closeDialog();
+  render();
+  cloudPanel.hidden = false;
+  if (pending) notify('A conta mudou antes de confirmar o salvamento. As alterações pendentes podem não ter sido enviadas.');
+  if (!userId) {
+    cloudLock(true);
+    cloudMessage('Entre para carregar e salvar seu progresso na nuvem.');
+  } else if (!cloudConfig) {
+    cloudLock(true);
+    cloudMessage(cloudConfigError ? `Nuvem indisponível: ${cloudConfigError} Nenhum progresso será salvo.` : 'Aguardando a configuração da nuvem…');
+  } else {
+    void cloudLoad(userId, generation);
+  }
 }
 
-cloudUpload.addEventListener('click', async () => {
-  if (cloudBusy) return;
-  if (!cloudUserId || activeStateOwner !== cloudUserId) {
-    cloudMessage('Entre na conta e aguarde o carregamento antes de enviar.');
-    return;
-  }
+async function cloudFlush() {
+  if (!cloudReady || cloudWriting || !cloudUserId || cloudRevision === cloudSavedRevision) return;
   const userId = cloudUserId;
-  cloudSetBusy(true);
-  cloudMessage('Conferindo o progresso na nuvem…');
+  const generation = cloudGeneration;
+  const revision = cloudRevision;
+  const snapshot = sanitizeState(state);
+  cloudWriting = true;
+  cloudMessage('Salvando progresso na nuvem…');
   try {
-    const remote = await cloudReadCurrent();
-    if (userId !== cloudUserId) throw new Error('A conta mudou. Tente novamente.');
-    if (remote && !window.confirm('Já existe progresso nesta conta na nuvem. Substituí-lo pelo progresso deste navegador?')) {
-      cloudMessage('Envio cancelado; o progresso na nuvem foi preservado.');
-      return;
-    }
-    const snapshot = sanitizeState(state);
-    if (remote) {
-      await cloudRequest('PATCH', `?user_id=eq.${encodeURIComponent(userId)}`, { state: snapshot });
-    } else {
-      await cloudRequest('POST', '', { user_id: userId, state: snapshot });
-    }
-    cloudMessage('Progresso enviado para a nuvem nesta conta.');
+    await cloudRequest(userId, 'POST', '?on_conflict=user_id', { user_id: userId, state: snapshot });
+    if (generation !== cloudGeneration) return;
+    cloudSavedRevision = revision;
+    cloudMessage('Progresso salvo na nuvem.');
   } catch (error) {
-    cloudMessage(`Não foi possível enviar: ${error.message}`);
+    if (generation !== cloudGeneration) return;
+    cloudMessage(`Não foi possível salvar: ${error.message} Tentaremos novamente.`);
+    clearTimeout(cloudRetryTimer);
+    cloudRetryTimer = setTimeout(() => { cloudRetryTimer = null; void cloudFlush(); }, 5000);
   } finally {
-    cloudSetBusy(false);
+    cloudWriting = false;
+    if (generation === cloudGeneration && cloudRevision !== cloudSavedRevision && !cloudRetryTimer) void cloudFlush();
+  }
+}
+
+window.addEventListener('tech-hub:state-change', () => {
+  if (!cloudReady) return;
+  cloudRevision += 1;
+  clearTimeout(cloudRetryTimer);
+  cloudRetryTimer = setTimeout(() => {
+    cloudRetryTimer = null;
+    void cloudFlush();
+  }, 350);
+  cloudMessage('Alterações aguardando envio à nuvem…');
+});
+
+window.addEventListener('tech-hub:auth-change', (event) => cloudSwitch(event.detail.userId));
+window.addEventListener('online', () => {
+  if (cloudUserId && !cloudReady && cloudConfig) void cloudLoad(cloudUserId, cloudGeneration);
+  else void cloudFlush();
+});
+window.addEventListener('beforeunload', (event) => {
+  if (cloudReady && cloudRevision !== cloudSavedRevision) {
+    event.preventDefault();
+    event.returnValue = '';
   }
 });
-
-cloudDownload.addEventListener('click', async () => {
-  if (cloudBusy) return;
-  const userId = cloudUserId;
-  cloudSetBusy(true);
-  cloudMessage('Buscando o progresso na nuvem…');
-  try {
-    const remote = await cloudReadCurrent();
-    if (userId !== cloudUserId) throw new Error('A conta mudou. Tente novamente.');
-    if (!remote) {
-      cloudMessage('Esta conta ainda não tem progresso na nuvem.');
-      return;
-    }
-    if (!remote.state || remote.state.version !== 1 || !remote.state.completed || typeof remote.state.completed !== 'object') {
-      throw new Error('O progresso remoto tem um formato desconhecido. Nada foi substituído.');
-    }
-    if (!window.confirm('Carregar o progresso da nuvem substituirá o exibido nesta conta. A versão local anterior ficará disponível em Recuperar versão local anterior. Continuar?')) {
-      cloudMessage('Carregamento cancelado; o progresso local foi preservado.');
-      return;
-    }
-    if (userId !== cloudUserId || window.Clerk?.user?.id !== userId) {
-      throw new Error('A conta mudou. Tente novamente.');
-    }
-    const remoteState = sanitizeState(remote.state);
-    if (JSON.stringify(state) !== JSON.stringify(remoteState)) cloudPreserveLocal(userId);
-    if (dialog.open) closeDialog();
-    state = remoteState;
-    saveState();
-    render();
-    cloudSaveSnapshot(userId);
-    cloudMessage('Progresso da nuvem carregado. Nenhum arquivo foi baixado.');
-  } catch (error) {
-    cloudMessage(`Não foi possível carregar: ${error.message}`);
-  } finally {
-    cloudSetBusy(false);
-  }
-});
-
-cloudRecover.addEventListener('click', () => {
-  if (cloudBusy || !cloudUserId) return;
-  const backup = cloudReadBackup(cloudUserId);
-  if (!backup) return;
-  if (!window.confirm('Recuperar a versão local anterior substituirá o progresso exibido nesta conta. A versão na nuvem não será alterada. Continuar?')) return;
-  if (dialog.open) closeDialog();
-  state = backup;
-  saveState();
-  render();
-  cloudMessage('Versão local anterior recuperada. Use Enviar somente se quiser substituir a cópia na nuvem.');
-});
-
-cloudClaim.addEventListener('click', () => {
-  if (cloudBusy || !cloudUserId) return;
-  const guest = cloudReadSnapshot('guest');
-  if (!guest) return;
-  if (!window.confirm('Importar o progresso anterior deste navegador substituirá o progresso exibido nesta conta. Confirme que esses dados são seus. Continuar?')) return;
-  cloudPreserveLocal(cloudUserId);
-  if (dialog.open) closeDialog();
-  state = guest;
-  saveState();
-  render();
-  cloudMessage('Progresso anterior importado para esta conta. Envie à nuvem se desejar atualizar a cópia remota.');
-});
-
-cloudExport.addEventListener('click', () => { if (!cloudBusy && cloudUserId) cloudBackupLocal(); });
-
-cloudRestore.addEventListener('click', () => { if (!cloudBusy) cloudBackupFile.click(); });
-cloudBackupFile.addEventListener('change', async () => {
-  const file = cloudBackupFile.files?.[0];
-  cloudBackupFile.value = '';
-  if (!file) return;
-  if (file.size > 5_000_000) {
-    cloudMessage('Arquivo grande demais para um backup de progresso.');
-    return;
-  }
-  cloudSetBusy(true);
-  try {
-    const candidate = JSON.parse(await file.text());
-    if (!candidate || candidate.version !== 1 || !candidate.completed || typeof candidate.completed !== 'object' || Array.isArray(candidate.completed)) {
-      throw new Error('O arquivo não parece ser um backup do Tech Learning Hub.');
-    }
-    if (!window.confirm('Restaurar este arquivo substituirá o progresso exibido neste navegador. Continuar?')) {
-      cloudMessage('Restauração cancelada.');
-      return;
-    }
-    if (dialog.open) closeDialog();
-    state = sanitizeState(candidate);
-    saveState();
-    render();
-    cloudMessage('Backup restaurado nesta conta. Envie à nuvem se desejar atualizar a cópia remota.');
-  } catch (error) {
-    cloudMessage(`Não foi possível restaurar: ${error.message}`);
-  } finally {
-    cloudSetBusy(false);
-  }
-});
-
-window.addEventListener('tech-hub:auth-change', (event) => { void cloudSwitchTo(event.detail.userId); });
 
 (async () => {
   try {
     const response = await fetch('/api/public-config', { cache: 'no-store' });
-    if (!response.ok) return;
+    if (!response.ok) throw new Error('Configuração indisponível.');
     const config = await response.json();
     const url = new URL(config.supabaseUrl);
-    if (url.protocol !== 'https:' || !url.hostname.endsWith('.supabase.co') || url.port || url.username || url.password || url.search || url.hash || url.pathname !== '/') return;
-    if (!/^sb_publishable_[A-Za-z0-9_-]+$/.test(config.supabasePublishableKey || '')) return;
+    if (url.protocol !== 'https:' || !url.hostname.endsWith('.supabase.co') || url.port || url.username || url.password || url.search || url.hash || url.pathname !== '/') throw new Error('URL Supabase inválida.');
+    if (!/^sb_publishable_[A-Za-z0-9_-]+$/.test(config.supabasePublishableKey || '')) throw new Error('Chave publicável Supabase inválida.');
     cloudConfig = { url: url.origin, key: config.supabasePublishableKey };
-    void cloudSwitchTo(window.Clerk?.user?.id || null, true);
-  } catch { /* Sem Supabase configurado, o curso continua com progresso local. */ }
+    if (cloudUserId) void cloudLoad(cloudUserId, cloudGeneration);
+  } catch (error) {
+    cloudConfigError = error.message;
+    cloudPanel.hidden = false;
+    cloudMessage(`Nuvem indisponível: ${error.message} Nenhum progresso será salvo.`);
+    cloudLock(true);
+  }
 })();

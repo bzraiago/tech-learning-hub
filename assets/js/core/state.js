@@ -11,7 +11,6 @@ for (const track of tracks) {
   }
 }
 
-const STORAGE_KEY = 'tech-learning-hub:v1';
 const REVIEW_DELAY_MS = 3 * 24 * 60 * 60 * 1000;
 const reviewDueAt = (practicedAt) => Date.parse(practicedAt) + REVIEW_DELAY_MS;
 // completed permanece como marcação de acompanhamento; evidências posteriores ficam separadas.
@@ -23,7 +22,6 @@ const normalize = (value) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, 
 const icon = (name, classes = 'h-4 w-4') => `<svg class="${classes} shrink-0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-${name}"/></svg>`;
 const duration = (minutes) => minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)}h${minutes % 60 ? ` ${minutes % 60}min` : ''}`;
 const lessonsOf = (track) => track.modules.flatMap((module) => module.lessons);
-let storageAvailable = true;
 let startupNotice = '';
 
 const READINESS_EVIDENCE = [
@@ -116,22 +114,7 @@ function sanitizeState(candidate) {
   return clean;
 }
 
-function loadState(hideOwnedAtStartup = false) {
-  let raw;
-  try {
-    if (hideOwnedAtStartup && localStorage.getItem('tech-learning-hub:local-owner:v1')) return sanitizeState(null);
-    raw = localStorage.getItem(STORAGE_KEY);
-  }
-  catch { storageAvailable = false; return sanitizeState(null); }
-  if (!raw) return sanitizeState(null);
-  try { return sanitizeState(JSON.parse(raw)); }
-  catch {
-    startupNotice = 'O progresso salvo estava ilegível. Uma nova jornada foi iniciada.';
-    return sanitizeState(null);
-  }
-}
-
-let state = loadState(true);
+let state = sanitizeState(null);
 let filter = 'all';
 let query = '';
 let dialogContext = null;
@@ -148,14 +131,5 @@ function notify(message) {
 }
 
 function saveState() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    const ownerId = localStorage.getItem('tech-learning-hub:local-owner:v1');
-    if (ownerId) localStorage.setItem(`tech-learning-hub:account:v1:${ownerId}`, JSON.stringify(state));
-    storageAvailable = true;
-  } catch {
-    storageAvailable = false;
-    notify('O navegador bloqueou o salvamento. Seu progresso vale apenas nesta sessão.');
-  }
-  $('#storage-status').textContent = storageAvailable ? 'Progresso salvo neste navegador' : 'Progresso apenas nesta sessão';
+  window.dispatchEvent(new Event('tech-hub:state-change'));
 }

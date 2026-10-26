@@ -41,7 +41,6 @@ function renderProgress() {
   const activeStats = stats(lessonsOf(tracks.find((track) => track.id === state.activeTrack)));
   $('#resume-label').textContent = activeStats.percent === 100 ? 'Revisar minha trilha' : total.done || state.lastLesson ? 'Continuar aprendendo' : 'Começar minha jornada';
   $('#resume-meta').textContent = `${next.title} · ${duration(next.minutes)}`;
-  $('#storage-status').textContent = storageAvailable ? 'Progresso salvo neste navegador' : 'Progresso apenas nesta sessão';
 }
 
 function renderEvidenceSummary() {

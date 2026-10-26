@@ -38,14 +38,18 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 
 ## Progresso e persistência
 
+- [ ] Sem login, só a tela de entrada é exibida; o curso e a navegação não recebem foco.
+- [ ] Após o login, o conteúdo é liberado somente depois da leitura do progresso da conta.
+- [ ] Ao sair, o conteúdo volta a ficar bloqueado e o progresso da conta deixa a tela.
 - [ ] Marcar uma aula atualiza módulo, trilha e progresso total.
 - [ ] Desmarcar a aula reverte as contagens.
 - [ ] Recarregar mantém conclusão, quiz, notas, projetos e evidências.
 - [ ] Registrar prática agenda a aula para três dias depois; desfazer remove a aula da fila.
 - [ ] Ao chegar o dia, a revisão pede nova tentativa completa do quiz antes de permitir o registro.
 - [ ] Na primeira aula de um módulo posterior, a revisão acumulativa recupera um fundamento do módulo anterior, salva o rascunho e abre a aula de origem.
-- [ ] Alteração em outra aba é refletida sem corromper o estado atual.
-- [ ] Com `localStorage` bloqueado, a aplicação continua funcionando e informa a limitação.
+- [ ] Após salvar em uma aba, recarregar outra aba da mesma conta mostra o estado remoto atualizado.
+- [ ] Trocar de conta carrega somente o progresso da nova conta, sem envio manual nem download de arquivo.
+- [ ] Com `localStorage` bloqueado, login, leitura e salvamento automático no Supabase continuam funcionando.
 
 ## Projetos
 

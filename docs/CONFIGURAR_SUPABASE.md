@@ -1,43 +1,40 @@
-# Sincronizar progresso com Supabase e Clerk
+# Configurar progresso na nuvem com Clerk e Supabase
 
-**Objetivo:** guardar uma cópia do progresso no PostgreSQL do Supabase, vinculada à conta Clerk. Ao entrar ou trocar de conta, o app consulta a nuvem e mostra o progresso dessa conta quando ele existe. Uma conta sem dados remotos começa vazia ou recupera seu próprio cache local. Se a versão local for diferente, ela é preservada no navegador para recuperação, enquanto a versão da nuvem é exibida. O envio continua manual.
+**Objetivo:** exigir login Clerk para abrir o curso, carregar automaticamente o progresso da conta e salvar cada alteração em `public.learning_state`. O navegador mantém o estado apenas na memória da página aberta. O formato do estado continua `version: 1`; registros antigos no `localStorage` não são lidos nem apagados por esta versão.
 
-O estado mantém o formato `tech-learning-hub:v1`. Para evitar mistura entre contas no mesmo navegador, cópias locais separadas usam `tech-learning-hub:account:v1:<id Clerk>`; a cópia anterior à associação fica em `tech-learning-hub:guest:v1`. A versão local anterior à leitura da nuvem fica em `tech-learning-hub:backup:v1:<id Clerk>` e pode ser recuperada pelo botão **Recuperar versão local anterior**. A chave `tech-learning-hub:local-owner:v1` identifica qual cópia foi exibida por último. Nada disso substitui as políticas RLS do banco.
+**Pré-requisitos:** login Clerk funcional, projeto Supabase e acesso aos painéis Clerk, Supabase e Vercel. Todos os passos podem ser feitos no navegador em Windows, macOS ou Linux. Um computador limitado não precisa instalar o banco localmente.
 
-**Pré-requisitos:** login Clerk funcionando na prévia da Vercel, projeto Supabase criado, acesso aos painéis do Clerk, Supabase e Vercel. A configuração é feita no navegador em Windows, macOS ou Linux; não é necessário instalar ferramenta local. Se estiver usando um computador limitado, execute o SQL no editor web do Supabase.
+## 1. Aceitar tokens Clerk
 
-## 1. Permitir tokens Clerk no Supabase
+1. No Clerk Dashboard, abra a instância usada pela prévia e, em **Supabase integration setup**, ative a integração e copie o **Clerk domain**.
+2. No Supabase Dashboard, em **Authentication → Sign In / Providers**, adicione o provedor de terceiros **Clerk** com esse domínio. Siga a [integração nativa](https://supabase.com/docs/guides/auth/third-party/clerk). Não compartilhe segredos JWT.
 
-1. No **Clerk Dashboard**, abra a mesma instância que fornece a chave `CLERK_PUBLISHABLE_KEY` da prévia. Em **Supabase integration setup**, ative a integração e copie o **Clerk domain** apresentado.
-2. No **Supabase Dashboard**, abra **Authentication → Sign In / Providers**, adicione o provedor de terceiros **Clerk** e informe esse domínio. Isso faz o Supabase aceitar o token de sessão assinado pelo Clerk. Use a [integração nativa](https://supabase.com/docs/guides/auth/third-party/clerk); não crie template JWT legado nem compartilhe o segredo JWT do Supabase com o Clerk.
-
-Se a instância de produção do Clerk for diferente da de prévia, configure-a separadamente e confira qual projeto Supabase aceitará cada instância.
+Se a instância Clerk de produção for diferente, configure-a separadamente no projeto Supabase correspondente.
 
 ## 2. Criar a tabela privada
 
-No **SQL Editor** do projeto Supabase, abra o arquivo [`supabase/learning-state.sql`](../supabase/learning-state.sql), copie seu conteúdo e execute **uma vez**. Resultado esperado: a tabela `public.learning_state` existe, com `user_id` textual, `state` JSON, Row Level Security (RLS) ativada e três políticas para leitura, criação e alteração pelo próprio usuário. O ID Clerk vem do campo `sub` do token; não use `auth.uid()`, que espera UUID.
+No **SQL Editor** do Supabase, execute [`supabase/learning-state.sql`](../supabase/learning-state.sql). Resultado esperado: `public.learning_state` com `user_id` textual, `state` JSON e Row Level Security (RLS) para leitura, inserção e atualização pelo próprio usuário. O ID Clerk vem do campo `sub` do token. Se a tabela já existe, inspecione o esquema antes de executar uma migração; o script não substitui dados existentes.
 
-O script não altera dados já existentes. Se a tabela já existir, a execução falha sem substituir seu esquema. Inspecione a tabela antes de adaptar a migração. As políticas impedem que uma conta leia ou substitua a linha de outra; visitantes sem sessão não recebem acesso à tabela.
+## 3. Configurar Vercel
 
-## 3. Configurar variáveis públicas na Vercel
-
-No Supabase, copie **Project URL** e **Publishable key** em **Project Settings / Connect / API Keys**. Na Vercel, em **Project → Settings → Environment Variables**, configure estas variáveis para o ambiente **Preview** e publique novamente:
+Em **Project → Settings → Environment Variables**, configure para cada ambiente publicado:
 
 ```text
+CLERK_PUBLISHABLE_KEY=pk_test_...
 SUPABASE_URL=https://SEU-PROJETO.supabase.co
 SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ```
 
-O arquivo [`.env.example`](../.env.example) mostra os nomes; o `.env` local não é lido automaticamente pelo site estático. A função `/api/public-config` envia somente URL e chaves **publicáveis** ao navegador. Nunca use `sb_secret_...`, `service_role`, senha do banco ou `CLERK_SECRET_KEY` nessas variáveis. A chave publicável identifica a aplicação; o token Clerk identifica a pessoa e as políticas RLS autorizam cada linha. [Chaves do Supabase](https://supabase.com/docs/guides/getting-started/api-keys).
+Publique novamente. [`.env.example`](../.env.example) documenta os nomes; o `.env` local não é lido automaticamente pela página estática. `/api/public-config` expõe somente URL e chaves publicáveis. Nunca coloque `sb_secret_...`, `service_role`, senha do banco ou `CLERK_SECRET_KEY` nessa resposta. O token Clerk identifica a pessoa e a RLS autoriza o acesso à sua linha. Consulte [chaves do Supabase](https://supabase.com/docs/guides/getting-started/api-keys).
 
-## 4. Verificar a integração
+## 4. Verificar
 
-1. No navegador, abra `https://SUA-PREVIA.vercel.app/api/public-config`. Resultado esperado: `supabaseUrl` com a URL base e `supabasePublishableKey` começando com `sb_publishable_`. Nenhum segredo deve aparecer.
-2. Entre no curso com a primeira conta de teste. Resultado esperado: o painel **Sincronização do progresso** aparece e a cópia remota dessa conta é carregada automaticamente, se existir. Se você tinha progresso antes do login, use **Importar progresso anterior deste navegador** somente após conferir que ele é seu. Marque uma aula fictícia e clique em **Enviar progresso para a nuvem**. Resultado esperado: mensagem de envio concluído e uma linha com `user_id` dessa conta em `learning_state`.
-3. Em outro navegador ou perfil, entre com uma segunda conta. Se a prévia Vercel for protegida e não abrir na janela anônima, saia da primeira conta e entre com a segunda no mesmo navegador. Resultado esperado: a cópia da primeira conta some da tela. Se a segunda conta não tiver progresso remoto nem cache próprio, a jornada aparece vazia; se tiver, seu progresso é carregado automaticamente. Marque uma aula diferente, envie e volte à primeira conta. Ela deve recuperar apenas seu próprio progresso.
-4. Teste conflito: altere o progresso local, envie de novo e confirme que o app pede autorização antes de substituir a versão remota. Se a cópia local estiver diferente ao entrar, a versão da nuvem aparece automaticamente; **Recuperar versão local anterior** permite voltar à cópia guardada no navegador. O botão **Carregar progresso da nuvem** pede confirmação, mas não baixa arquivo. O arquivo `.json` só é baixado ao clicar em **Baixar progresso atual**.
-5. Saia da conta e tente acessar a tabela sem token ou com outro usuário. Resultado esperado: nenhum registro de outra pessoa fica acessível. O simples fato de a interface ocultar dados não comprova segurança; confira a política RLS com as duas contas.
+1. No navegador, abra `https://SUA-PREVIA.vercel.app/api/public-config`. Resultado esperado: URL Supabase e chave `sb_publishable_...`, sem segredo.
+2. Entre com a primeira conta. Aguarde **Progresso desta conta carregado da nuvem** ou **Conta pronta**. Marque uma aula e aguarde **Progresso salvo na nuvem**. No Table Editor, `learning_state` deve ter uma linha com o `user_id` dessa conta.
+3. Saia e entre com a segunda conta. O progresso da primeira deve desaparecer; a segunda deve carregar só seus próprios dados. Marque outra aula, aguarde o salvamento e volte à primeira conta para conferir.
+4. Recarregue a página. O estado deve voltar da nuvem sem clicar em botão e sem baixar arquivo.
+5. Na aba **Rede** do navegador, confira `GET` no carregamento e `POST` ao alterar o progresso. Em falha de rede, o painel informa que o envio falhou e tenta novamente; mantenha a aba aberta até aparecer a confirmação. Não copie tokens para mensagens públicas.
 
-**Problemas comuns:** `401` indica token ausente, expirado ou instância Clerk não aceita pelo Supabase; `403` costuma indicar papel ou permissão insuficiente; ausência do painel indica URL ou chave publicável não configuradas na Vercel; falha ao criar a linha pode indicar tabela ou política ausente. Na aba Rede do navegador, confira método, status e rota, mas **não copie tokens de sessão** para mensagens públicas.
+**Problemas comuns:** HTTP 401 indica token ausente, expirado ou instância Clerk não aceita; HTTP 403 pode indicar RLS ou permissões; ausência de dados pode indicar `SUPABASE_URL` ou chave publicável incorreta. Se a leitura falhar, o curso aguarda uma nova tentativa antes de liberar a edição, para evitar substituir dados existentes por uma jornada vazia.
 
-**Parar e retomar:** sair do Clerk encerra a sessão e mostra a jornada de visitante; o cache da conta é preservado separadamente. Ao entrar de novo, o app mostra a cópia da nuvem. Se a cópia local era diferente, use **Recuperar versão local anterior** para restaurá-la sem alterar o banco. **Restaurar backup local** importa um arquivo `.json` baixado anteriormente; confirme que ele pertence à conta atual antes de enviá-lo. Não exclua registros do Supabase para testar o fluxo. O envio automático permanece para uma etapa posterior.
+**Parar e retomar:** espere **Progresso salvo na nuvem** antes de sair, trocar de conta ou fechar a aba. Alterações ainda pendentes não têm cópia local persistente. Ao voltar, entre na mesma conta e aguarde o carregamento automático.

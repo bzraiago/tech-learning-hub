@@ -4,7 +4,7 @@ Aplicação estática e autoguiada para aprender programação, do primeiro cont
 
 ## Executar
 
-Não há instalação, build ou dependências locais. Abra `index.html` em um navegador moderno com acesso à internet para carregar o Tailwind Browser e as fontes do Google. O login Clerk requer a função `api/public-config.mjs` na Vercel; ao abrir o arquivo diretamente, o curso funciona sem login e continua salvando progresso neste navegador.
+Não há build ou dependências locais. Publique na Vercel com Clerk, Supabase e `api/public-config.mjs` configurados. O curso exige login para abrir o conteúdo e usa o Supabase para guardar progresso. A abertura direta de `index.html` mostra a tela de entrada, mas não autentica sem a configuração da Vercel.
 
 ## Estrutura do projeto
 
@@ -18,8 +18,9 @@ Não há instalação, build ou dependências locais. Abra `index.html` em um na
 │   └── js/
 │       ├── app.js                     # Eventos e inicialização
 │       ├── auth.js                    # Controles de login Clerk
+│       ├── cloud.js                   # Carregamento e salvamento automático no Supabase
 │       ├── core/
-│       │   └── state.js               # Estado, persistência e sanitização
+│       │   └── state.js               # Estado em memória e sanitização
 │       ├── data/
 │       │   ├── resources.js           # Catálogo de fontes externas
 │       │   ├── tracks.js              # Trilhas, módulos e aulas
@@ -35,7 +36,7 @@ Não há instalação, build ou dependências locais. Abra `index.html` em um na
 └── ROADMAP.md                          # Plano de evolução e acompanhamento
 ```
 
-Os scripts são carregados como JavaScript clássico e em ordem explícita no fim do `index.html`. Essa escolha mantém a aplicação compatível com abertura direta pelo sistema de arquivos, sem servidor local ou bundler.
+Os scripts são carregados como JavaScript clássico e em ordem explícita no fim do `index.html`. O projeto continua sem servidor local ou bundler; o acesso ao curso exige a versão publicada com login e banco configurados.
 
 ## Onde alterar
 
@@ -45,7 +46,8 @@ Os scripts são carregados como JavaScript clássico e em ordem explícita no fi
 - Resumo das trilhas, módulos e aulas: `assets/js/data/tracks.js`
 - Conteúdo completo de uma aula: arquivo da trilha em `assets/js/data/lesson-guides/`
 - Projetos: `assets/js/data/projects.js`
-- Estado e `localStorage`: `assets/js/core/state.js`
+- Estado e sanitização: `assets/js/core/state.js`
+- Carregamento e salvamento automático: `assets/js/cloud.js`
 - Renderização: `assets/js/ui/render.js`
 - Leitor de aulas e projetos: `assets/js/ui/dialogs.js`
 - Eventos e inicialização: `assets/js/app.js`
@@ -62,5 +64,4 @@ O comando checa sintaxe, assets, ids, relações entre aulas e guias, exercício
 
 As dependências e os atalhos entre trilhas estão documentados em [`docs/MAPA_PRE_REQUISITOS.md`](docs/MAPA_PRE_REQUISITOS.md).
 
-O login opcional com Clerk na Vercel está descrito em [`docs/CONFIGURAR_CLERK.md`](docs/CONFIGURAR_CLERK.md). Após configurar o Supabase, o progresso da conta é carregado ao entrar; a versão local anterior fica recuperável se houver divergência, e o envio de alterações exige escolha do usuário.
-A sincronização manual com Supabase está descrita em [`docs/CONFIGURAR_SUPABASE.md`](docs/CONFIGURAR_SUPABASE.md). Ela exige a integração nativa Clerk ↔ Supabase, a tabela com RLS e as variáveis públicas da Vercel.
+O login com Clerk na Vercel está descrito em [`docs/CONFIGURAR_CLERK.md`](docs/CONFIGURAR_CLERK.md). O [guia do Supabase](docs/CONFIGURAR_SUPABASE.md) cobre a integração nativa Clerk ↔ Supabase, a tabela com RLS e a verificação do salvamento automático por conta.

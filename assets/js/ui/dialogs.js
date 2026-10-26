@@ -604,10 +604,10 @@ function openHow() {
   const steps = [
     ['Escolha um caminho', 'Para desenvolvimento web júnior, avance de HTML e CSS e JavaScript para Git, dados, qualidade e entrega. Python e IA ampliam caminhos conforme a vaga.'],
     ['Entenda e experimente', 'Leia a aba Conceitos e prepare o ambiente indicado. Em Exemplo, acompanhe cada explicação, reproduza o código e siga as mudanças guiadas.'],
-    ['Construa sem copiar', 'Na aba Prática, tente os exercícios antes de abrir as dicas e soluções. Seu rascunho fica salvo neste navegador; execute o código no ambiente indicado na aula.'],
+    ['Construa sem copiar', 'Na aba Prática, tente os exercícios antes de abrir as dicas e soluções. Entre na sua conta para salvar o rascunho automaticamente na nuvem; execute o código no ambiente indicado na aula.'],
     ['Revise e registre a conquista', 'Responda às perguntas em Revisão e leia o feedback. Marcar a aula como concluída registra acompanhamento, não domínio. Praticar, passar em revisão dias depois e resolver sozinho um problema novo com explicação são etapas distintas. Na visão geral, registre evidências práticas para a etapa júnior; as marcações atuais são autoavaliação.']
   ];
-  showDialog('Aprender é construir, aos poucos.', 'SEU MÉTODO DE ESTUDO', `<ol class="space-y-5">${steps.map(([title, description], index) => `<li class="flex gap-4"><span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-400/10 font-display text-violet-300">${index + 1}</span><div><h3 class="text-sm font-semibold">${title}</h3><p class="mt-1.5 text-sm leading-relaxed text-slate-400">${description}</p></div></li>`).join('')}</ol><div class="mt-7 rounded-xl border border-white/8 bg-white/[.025] p-4"><h3 class="mb-2 text-sm font-medium">Sobre o seu progresso</h3><p class="text-xs leading-6 text-slate-400">A conclusão é autodeclarada e fica no localStorage deste navegador. Não há conta nem sincronização entre dispositivos. Limpar os dados do site pode apagar o progresso. Se o armazenamento estiver bloqueado, você receberá um aviso e poderá continuar nesta sessão. Os tempos são sugestões de estudo, não duração dos vídeos.</p></div>`, '<button data-action="close" class="rounded-xl bg-violet-500 px-4 py-2.5 text-xs font-semibold text-white hover:bg-violet-400">Entendi, vamos aprender</button>');
+  showDialog('Aprender é construir, aos poucos.', 'SEU MÉTODO DE ESTUDO', `<ol class="space-y-5">${steps.map(([title, description], index) => `<li class="flex gap-4"><span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-400/10 font-display text-violet-300">${index + 1}</span><div><h3 class="text-sm font-semibold">${title}</h3><p class="mt-1.5 text-sm leading-relaxed text-slate-400">${description}</p></div></li>`).join('')}</ol><div class="mt-7 rounded-xl border border-white/8 bg-white/[.025] p-4"><h3 class="mb-2 text-sm font-medium">Sobre o seu progresso</h3><p class="text-xs leading-6 text-slate-400">Ao entrar, o progresso da sua conta é carregado e salvo automaticamente no Supabase. Aguarde a confirmação de salvamento antes de fechar a página. Sem login, alterações desta sessão não são persistidas. Os tempos são sugestões de estudo, não duração dos vídeos.</p></div>`, '<button data-action="close" class="rounded-xl bg-violet-500 px-4 py-2.5 text-xs font-semibold text-white hover:bg-violet-400">Entendi, vamos aprender</button>');
 }
 
 function setCompleted(id, completed) {
@@ -632,7 +632,6 @@ function setCompleted(id, completed) {
     const button = $('#dialog-footer [data-lesson]');
     if (button) button.dataset.lesson = (module.lessons.find((lesson) => !state.completed[lesson.id]) || module.lessons[0]).id;
   }
-  if (!storageAvailable) return;
   const { track } = lessonIndex.get(id);
-  notify(completed ? stats(lessonsOf(track)).percent === 100 ? `${track.title}: trilha concluída! Continue explorando.` : 'Mais um passo dado. Progresso salvo!' : 'Lição marcada para revisar.');
+  notify(completed ? stats(lessonsOf(track)).percent === 100 ? `${track.title}: trilha concluída! Continue explorando.` : 'Mais um passo dado. Aguarde o salvamento na nuvem.' : 'Lição marcada para revisar. Aguarde o salvamento na nuvem.');
 }

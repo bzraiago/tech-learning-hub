@@ -30,7 +30,8 @@ document.addEventListener('input', event => {
     const entry = projectEntry(dialogContext.id);
     entry.explanation = event.target.value.slice(0, 4000);
     entry.delivered = false;
-    clearTimeout(notesSaveTimer); notesSaveTimer = setTimeout(() => { saveState(); renderModules(); }, 350);
+    saveState();
+    clearTimeout(notesSaveTimer); notesSaveTimer = setTimeout(renderModules, 350);
     $('#project-delivery-label').textContent = 'Projeto separado do progresso das aulas';
     $('#project-status').textContent = 'Explicação alterada. Registre novamente a entrega após conferir os critérios.';
     return;
@@ -38,7 +39,8 @@ document.addEventListener('input', event => {
   if (event.target.id !== 'project-source') return;
   const entry=projectEntry(dialogContext.id);
   entry.source=event.target.value.slice(0,80000); entry.delivered=false; entry.manual={};
-  clearTimeout(notesSaveTimer); notesSaveTimer=setTimeout(()=>{saveState();renderModules();},350);
+  saveState();
+  clearTimeout(notesSaveTimer); notesSaveTimer=setTimeout(renderModules,350);
   projectFooter();
   $('#project-status').textContent='Código alterado. Refaça a validação antes da entrega.';
 });
@@ -85,23 +87,13 @@ document.addEventListener('change', (event) => {
 document.addEventListener('input', (event) => {
   if (!event.target.matches('[data-note]')) return;
   state.notes[event.target.dataset.note] = event.target.value.slice(0, 10000);
-  clearTimeout(notesSaveTimer);
-  notesSaveTimer = setTimeout(saveState, 350);
+  saveState();
 });
 
 document.addEventListener('submit', (event) => {
   if (event.target.id !== 'lesson-quiz') return;
   event.preventDefault();
   gradeQuiz();
-});
-
-window.addEventListener('pagehide', () => {
-  clearTimeout(notesSaveTimer);
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    const ownerId = localStorage.getItem('tech-learning-hub:local-owner:v1');
-    if (ownerId) localStorage.setItem(`tech-learning-hub:account:v1:${ownerId}`, JSON.stringify(state));
-  } catch { /* A indisponibilidade é informada durante o uso. */ }
 });
 
 $('#lesson-sections').addEventListener('keydown', (event) => {
@@ -192,24 +184,4 @@ $('#track-tabs').addEventListener('keydown', (event) => {
 });
 desktop.addEventListener('change', () => $('#track-tabs').setAttribute('aria-orientation', desktop.matches ? 'vertical' : 'horizontal'));
 
-// Uma alteração feita em outra aba do mesmo navegador atualiza esta interface.
-window.addEventListener('storage', (event) => {
-  if (event.key !== STORAGE_KEY && event.key !== null) return;
-  const activeTrack = state.activeTrack;
-  state = loadState();
-  state.activeTrack = activeTrack;
-  render();
-  document.querySelectorAll('#study-dialog [data-complete]').forEach((input) => { input.checked = !!state.completed[input.dataset.complete]; });
-  if (dialogContext?.type === 'lesson') {
-    $('#modal-completion-label').textContent = state.completed[dialogContext.id] ? 'Lição concluída' : 'Marcar como concluída';
-    if (activeLessonSection === 'review') renderLessonSection('review');
-  }
-  if (dialogContext?.type === 'module') {
-    const { module } = moduleIndex.get(dialogContext.id);
-    $('#module-dialog-progress').textContent = `${stats(module.lessons).done} de ${module.lessons.length} lições concluídas`;
-  }
-});
-
 render();
-if (!storageAvailable) notify('Armazenamento indisponível. O progresso será mantido apenas nesta sessão.');
-else if (startupNotice) notify(startupNotice);

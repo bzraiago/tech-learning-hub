@@ -31,7 +31,7 @@ Ao concluir um item:
 Toda implementação só pode ser considerada pronta quando:
 
 - [ ] Mantém os ids existentes ou inclui migração compatível em `sanitizeState()`.
-- [ ] Preserva o funcionamento sem `localStorage` disponível.
+- [ ] Permite ler o curso sem `localStorage` e salva progresso da conta somente no Supabase.
 - [ ] Não introduz dados pessoais, segredos ou execução insegura de código do aluno.
 - [ ] Mantém navegação por teclado, foco visível, rótulos e atributos `aria-*` coerentes.
 - [ ] Respeita `prefers-reduced-motion` e funciona em aproximadamente 375 px de largura.
@@ -295,10 +295,12 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Preparar contas, projeto local e variáveis separadas para desenvolvimento, prévia e produção.
 - [ ] Implementar cadastro, login, logout, sessão expirada e estado de carregamento com Clerk.
   - [x] Preparar interface de entrada/saída, função de configuração pública e guia de implantação; fluxo real pendente das chaves e do domínio Clerk.
+  - [x] Exigir login e carregamento do progresso da conta antes de liberar o conteúdo; verificação no navegador publicado pendente.
 - [ ] Configurar login social do Google pelo Clerk e ensinar os conceitos transferíveis de OAuth 2.0/OpenID Connect, redirect URI, consentimento, escopos e `state`.
 - [ ] Conectar Clerk ao Supabase pela integração nativa atual, sem usar o template JWT legado.
   - [x] Preparar cliente REST com token da sessão Clerk e guia da integração nativa; ativação e teste com duas contas pendentes.
-  - [x] Carregar automaticamente o progresso remoto da conta ao trocar de sessão, isolando caches locais e oferecendo recuperação da versão anterior sem download automático.
+  - [x] Carregar automaticamente o progresso remoto da conta ao trocar de sessão, sem misturar estados de usuários.
+  - [x] Enviar alterações automaticamente ao Supabase e remover controles de sincronização manual e arquivos locais; fluxo automatizado verificado, teste na Vercel pendente.
 - [ ] Criar tabelas e migrações no PostgreSQL do Supabase.
   - [x] Preparar `supabase/learning-state.sql` com tabela e políticas; execução no projeto remoto pendente.
 - [ ] Aplicar Row Level Security (RLS) e provar com duas contas que cada pessoa acessa somente seus próprios registros.
@@ -433,7 +435,7 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Navegar somente por teclado.
 - [ ] Testar em largura aproximada de 375 px.
 - [ ] Marcar e desmarcar conclusão, recarregar e conferir persistência.
-- [ ] Testar com `localStorage` indisponível quando o estado for alterado.
+- [ ] Testar leitura e salvamento no Supabase com `localStorage` indisponível.
 - [ ] Conferir textos longos, código, tabelas e modais sem cortes.
 - [ ] Verificar a saída esperada de todos os comandos novos.
 

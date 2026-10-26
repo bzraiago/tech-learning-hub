@@ -1,10 +1,12 @@
 'use strict';
 
-// Clerk identifica o usuário; a sincronização do progresso será adicionada depois.
+// Clerk identifica a conta cujo progresso é carregado e salvo no Supabase.
 const authStatus = document.querySelector('#auth-status');
 const signInButton = document.querySelector('#sign-in');
 const signUpButton = document.querySelector('#sign-up');
 const signOutButton = document.querySelector('#sign-out');
+const gateSignInButton = document.querySelector('#gate-sign-in');
+const gateStatus = document.querySelector('#login-gate-status');
 const userButton = document.querySelector('#clerk-user-button');
 let userButtonMounted = false;
 
@@ -31,6 +33,7 @@ function renderAuth(user) {
   signUpButton.hidden = signedIn;
   signOutButton.hidden = !signedIn;
   userButton.hidden = !signedIn;
+  gateSignInButton.hidden = signedIn;
   if (signedIn && !userButtonMounted) {
     window.Clerk.mountUserButton(userButton);
     userButtonMounted = true;
@@ -38,7 +41,7 @@ function renderAuth(user) {
     window.Clerk.unmountUserButton(userButton);
     userButtonMounted = false;
   }
-  setAuthStatus(signedIn ? 'Conta conectada · progresso ainda salvo neste navegador' : 'Progresso salvo neste navegador');
+  setAuthStatus(signedIn ? 'Conta conectada' : 'Entre para salvar seu progresso');
   window.dispatchEvent(new CustomEvent('tech-hub:auth-change', { detail: { userId: user?.id || null } }));
 }
 
@@ -62,9 +65,12 @@ async function initAuth() {
     if (!window.Clerk || !window.__internal_ClerkUICtor) throw new Error('Clerk não iniciou.');
 
     await window.Clerk.load({ ui: { ClerkUI: window.__internal_ClerkUICtor } });
-    signInButton.addEventListener('click', () => {
+    const openSignIn = () => {
       Promise.resolve(window.Clerk.openSignIn()).catch(() => setAuthStatus('Não foi possível abrir o login.'));
-    });
+    };
+    gateSignInButton.disabled = false;
+    signInButton.addEventListener('click', openSignIn);
+    gateSignInButton.addEventListener('click', openSignIn);
     signUpButton.addEventListener('click', () => {
       Promise.resolve(window.Clerk.openSignUp()).catch(() => setAuthStatus('Não foi possível abrir o cadastro.'));
     });
@@ -79,6 +85,7 @@ async function initAuth() {
   } catch (error) {
     console.warn('Login Clerk indisponível:', error);
     setAuthStatus('Login indisponível no momento');
+    gateStatus.textContent = 'Login indisponível no momento. Atualize a página para tentar novamente.';
   }
 }
 

@@ -131,7 +131,7 @@ Arquivos principais:
 | `assets/js/ui/dialogs.js` | Leitores, diálogos, recursos e validação de projetos |
 | `assets/js/app.js` | Eventos e inicialização da aplicação |
 | `assets/js/auth.js` | Login opcional com Clerk e aviso de mudança de sessão para a sincronização |
-| `assets/js/cloud.js` | Envio e carregamento manual do progresso no Supabase, com confirmação antes de substituir dados |
+| `assets/js/cloud.js` | Carregamento por conta Clerk e salvamento automático no Supabase |
 | `api/public-config.mjs` | Função Vercel que expõe somente configuração pública ao navegador |
 
 Os scripts são clássicos e compartilham o mesmo escopo global, carregados na ordem declarada em `index.html`. Não troque a ordem sem conferir as dependências e não converta para módulos ES sem aprovação, pois o projeto deve continuar abrindo diretamente no navegador e sem build.
@@ -141,14 +141,14 @@ Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workf
 > Os números de referência (9 trilhas, 28 módulos, 114 aulas, 458 exercícios, 341 questões, 24 projetos) foram conferidos no código em 25/10/2026. **Confira no código antes de citá-los** e atualize `ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
 
 ### 5.2 Persistência e compatibilidade (cuidado máximo)
-- O progresso fica em `localStorage` na chave **`tech-learning-hub:v1`**.
-- A associação da cópia local à conta Clerk fica em `tech-learning-hub:local-owner:v1`; caches por conta usam `tech-learning-hub:account:v1:<id Clerk>`, o progresso antigo de visitante usa `tech-learning-hub:guest:v1` e a versão local anterior a um carregamento remoto fica em `tech-learning-hub:backup:v1:<id Clerk>`. Ao trocar de conta, o app mostra a cópia remota da nova conta quando existir; divergências locais ficam recuperáveis. Não confunda esses metadados com autenticação ou RLS.
+- O curso exige login Clerk antes de mostrar o conteúdo. O progresso persistente fica somente em `public.learning_state` no Supabase, protegido por RLS e vinculado ao ID Clerk. `state` permanece em memória durante a sessão. Ao trocar de conta, a interface aguarda a leitura da nova conta antes de aceitar edição.
+- As antigas chaves `localStorage` podem existir em navegadores que usaram versões anteriores; o aplicativo atual não as lê, grava nem apaga automaticamente. Não confunda cache legado com autenticação ou RLS.
 - `sanitizeState()` descarta qualquer progresso cujo id de aula/trilha/exercício **não exista mais**. Portanto:
   - **Nunca renomeie ou remova ids** de aulas, módulos, trilhas, projetos ou checks sem necessidade. Se for inevitável, escreva migração em `sanitizeState()` mapeando ids antigos para novos.
   - Ao adicionar campos ao estado, defina o valor padrão em `sanitizeState()`.
   - Se mudar o formato de modo incompatível, incremente `version` e documente a migração.
   - Mantenha os campos de revisão (`htmlCssRevision`, `javascriptRevision`, `pythonRevision`, `databaseRevision`, `aiRevision`) coerentes quando reescrever conteúdo de uma trilha.
-- Todo acesso a `localStorage` deve estar em `try/catch` (já há `storageAvailable`). O app precisa funcionar, sem erro, quando o armazenamento estiver bloqueado.
+- Falhas de leitura impedem editar o progresso da conta até nova tentativa. Falhas de escrita mantêm mudanças em memória, mostram o erro e tentam novamente; antes de fechar a página, o usuário deve ver a confirmação de salvamento.
 
 ### 5.3 Segurança e robustez
 - Todo texto vindo do aluno (anotações, projetos colados) deve ser **escapado** antes de entrar em `innerHTML`. Prefira `textContent`.
@@ -265,7 +265,7 @@ Vem da análise em `ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima para baixo e
 9. [ ] Dividir aulas com excesso de conceitos (a aula de funções em JavaScript já foi dividida; mapear as demais).
 10. [ ] Demonstrações visuais de execução (laços, referências, `JOIN`, requisições HTTP).
 11. [ ] Revisão acumulativa e recuperação de dificuldades (indicar aula a revisar e segunda tentativa diferente).
-12. [ ] Exportar e importar progresso e anotações (evitar perda por `localStorage`).
+12. [x] Persistir progresso e anotações automaticamente por conta no Supabase, sem depender de `localStorage`.
 13. [ ] Modo de leitura prolongada (sumário, posição salva, ajustes de leitura).
 14. [ ] Glossário contextual no ponto de uso.
 15. [ ] Laboratório de leitura de projeto alheio (achar ponto de entrada e corrigir um defeito).
@@ -330,5 +330,7 @@ Extensão de IA (opcional): responder perguntas sobre um pequeno conjunto de mat
 - 2026-10-25 — Preparado login Clerk no frontend estático, usando chave publicável via função Vercel; progresso permanece local até a integração segura com Supabase.
 - 2026-10-26 — Preparada sincronização manual com Supabase e RLS por ID Clerk, preservando o estado local e pedindo confirmação antes de substituir progresso.
 - 2026-10-26 — Bloqueado envio de progresso local após troca de conta; a cópia local precisa ser vinculada explicitamente ao usuário Clerk antes de subir ao Supabase.
+- 2026-10-26 — Por pedido do dono do projeto, Supabase passou a ser a única fonte persistente; carga e envio são automáticos e controles de arquivo/local foram removidos.
+- 2026-10-26 — A página passou a exigir autenticação Clerk e carregamento do progresso antes de liberar o conteúdo.
 - 2026-10-26 — Troca de conta passa a carregar automaticamente o progresso remoto da nova conta, preservando cache local por usuário e exigindo escolha em caso de divergência.
 - 2026-10-26 — A cópia remota passa a ser exibida mesmo com cache divergente; a versão local anterior permanece recuperável no navegador, sem baixar arquivo automaticamente.
