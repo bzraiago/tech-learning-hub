@@ -1135,7 +1135,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "postgres:17 = imagem\nProcesso em execução = container\ndados = volume",
         "explanation": "A imagem pode originar várias execuções; o volume conserva arquivos entre recriações.",
-        "expected": "Três papéis diferentes, sem chamar Docker de banco."
+        "expected": "A previsão distingue o papel de cada peça e explica em que condição os arquivos permanecem após recriar a execução.",
+        "criteria": ["Identifica imagem, container em execução e volume como peças com funções diferentes.", "Registra a previsão antes de experimentar a recriação do container.", "Explica que os dados dependem de remontar o volume correto e que volume não substitui backup."]
       },
       {
         "prompt": "Alterar: o terminal mostra a versão do cliente e erro de conexão ao Engine. Qual próximo passo e qual comando repetirá para verificar a mudança?",
@@ -1145,7 +1146,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "1. Confirmar que Docker Desktop/Engine está iniciado.\n2. Repetir docker version.\n3. Só avançar quando Server responder.",
         "explanation": "A falha acontece antes de iniciar o banco.",
-        "expected": "Cliente e servidor Docker acessíveis."
+        "expected": "A nova verificação permite distinguir cliente instalado de Engine disponível antes de iniciar o banco.",
+        "criteria": ["Identifica que o erro ocorre na comunicação com o Engine, antes do PostgreSQL.", "Confere o estado do Docker Desktop ou do serviço sem alterar dados do laboratório.", "Repete docker version e só avança após observar resposta do servidor."]
       },
       {
         "prompt": "Construir: escreva um README mínimo reproduzível do ambiente.",
@@ -1155,7 +1157,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "# Laboratório de dados\nSistema: preencha o seu\nDocker/Compose: preencha as versões observadas\nVerificação: docker version; docker compose version; docker ps\nPróxima etapa: compose.yaml e .env local",
         "explanation": "Um roteiro verificável é melhor que afirmar apenas que foi instalado.",
-        "expected": "README permite identificar requisitos e comandos."
+        "expected": "Outra pessoa consegue abrir a pasta do laboratório, executar os comandos de verificação e reconhecer o resultado observado.",
+        "criteria": ["Registra sistema, pasta do laboratório e versões realmente observadas.", "Indica onde executar docker version, docker compose version e docker ps.", "Descreve o resultado esperado e o próximo passo quando o Engine não responde, sem publicar segredos locais."]
       },
       {
         "prompt": "Investigar erro: um colega quer trocar postgres:17 por latest e apagar volumes para resolver um erro de conexão. Investigue.",
@@ -1165,7 +1168,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Consultar docker version e docker ps -a; depois logs do serviço.\nPreservar os volumes. Manter a major definida até haver plano de migração.",
         "explanation": "O diagnóstico começa por evidências; apagar dados pode ocultar a causa e destruir o laboratório.",
-        "expected": "Hipótese e próxima verificação registradas, sem exclusão de dados."
+        "expected": "O diagnóstico registra a evidência da falha e a próxima verificação, preservando configuração e dados existentes.",
+        "criteria": ["Separa erro de conexão do Engine, estado do container e problema de acesso ao banco.", "Consulta comandos de estado ou logs adequados à etapa da falha antes de propor mudança.", "Preserva volumes e versão principal da imagem até existir motivo e plano de migração."]
       }
     ],
     "quiz": [

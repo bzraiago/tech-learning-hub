@@ -50,6 +50,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `db-subqueries-ctes`, o resumo intermediário inclui trilhas vazias, a média usa todos os totais e medidas independentes não se multiplicam após a junção.
 - [ ] Em `db-transactions`, o saldo provisório some após ROLLBACK; a transferência só confirma após dois UPDATE válidos e o destino inexistente não deixa débito persistido.
 - [ ] Em `db-concurrency-boundaries`, SAVEPOINT preserva apenas a parte anterior; o envio externo tem resultado próprio e conflitos não repetem só metade da transferência.
+- [ ] Em `db-docker-basics`, imagem, container e volume são diferenciados; cliente, Engine e Compose são verificados sem apagar dados para tratar erro de conexão.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.
