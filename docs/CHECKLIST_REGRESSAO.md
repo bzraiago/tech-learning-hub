@@ -32,6 +32,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `setup-postgresql`, os quatro exercícios mostram critérios antes das dicas; a previsão não lista as respostas e o diagnóstico preserva volume e senha.
 - [ ] Em `setup-mariadb`, `setup-firebird` e `setup-mongodb`, os critérios correspondem aos diagnósticos de cada motor, não antecipam a solução e mantêm segredos fora dos relatórios.
 - [ ] Em `db-mariadb`, os critérios dos quatro exercícios aparecem antes das dicas; a inspeção usa a definição real e os resultados esperados não revelam linhas ou valores finais.
+- [ ] Em `db-firebird`, os critérios aparecem nos quatro exercícios; a ordenação precede o limite e os resultados esperados não antecipam nomes ou contagens.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.

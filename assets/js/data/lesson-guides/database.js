@@ -1992,7 +1992,11 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "SHOW TABLE cursos;\nSHOW TABLE matriculas;",
         "explanation": "A inspeção mostra os objetos reais da base conectada.",
-        "expected": "curso_id de matriculas referencia cursos.id."
+        "expected": "A inspeção das tabelas permite identificar a relação gravada no banco.",
+        "criteria": [
+          "Consulta a definição real de cursos e matriculas no cliente Firebird.",
+          "Identifica as colunas relacionadas e explica qual tabela contém a referência."
+        ]
       },
       {
         "prompt": "Liste apenas o primeiro curso em ordem alfabética usando sintaxe Firebird.",
@@ -2002,7 +2006,11 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "SELECT titulo FROM cursos ORDER BY titulo ROWS 1;\nCOMMIT;",
         "explanation": "Limitar sem ordenar não define qual curso deve ser o primeiro.",
-        "expected": "Python."
+        "expected": "Uma única linha corresponde ao primeiro título após a ordenação alfabética.",
+        "criteria": [
+          "Ordena os cursos antes de limitar o resultado com sintaxe aceita pelo Firebird.",
+          "Confere que a consulta retornou uma linha e compara o título com os dados originais."
+        ]
       },
       {
         "prompt": "Tente inserir uma matrícula para curso inexistente e descarte a tentativa.",
@@ -2012,7 +2020,11 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "INSERT INTO matriculas(curso_id,aluno) VALUES (999,'Eva');\n-- Após o erro execute separadamente:\nROLLBACK;\nSELECT COUNT(*) FROM matriculas WHERE aluno='Eva';\nCOMMIT;",
         "explanation": "A chave estrangeira protege a referência independentemente do cliente.",
-        "expected": "Erro de chave estrangeira; contagem 0."
+        "expected": "A referência inválida é recusada e uma consulta posterior confirma que a tentativa não deixou matrícula.",
+        "criteria": [
+          "Registra a mensagem observada ao tentar associar a matrícula a um curso ausente.",
+          "Descarta a tentativa e consulta novamente os registros para verificar o estado preservado."
+        ]
       },
       {
         "prompt": "Confirme a conclusão de Beto e escreva uma consulta que prove duas conclusões em SQL.",
@@ -2022,7 +2034,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "UPDATE matriculas SET concluida=TRUE WHERE id=2;\nCOMMIT;\nSELECT COUNT(*) FROM matriculas WHERE curso_id=1 AND concluida IS TRUE;\nCOMMIT;",
         "explanation": "Uma nova sessão também verá o estado confirmado, respeitando seu contexto transacional.",
-        "expected": "2."
+        "expected": "Uma consulta após a confirmação reflete as matrículas concluídas do curso escolhido.",
+        "criteria": [
+          "Altera apenas a matrícula solicitada e confirma a transação.",
+          "Consulta as conclusões do curso correspondente e registra a contagem observada.",
+          "Distingue a alteração confirmada do resultado que seria obtido após desfazer a transação."
+        ]
       }
     ],
     "mistakes": [
