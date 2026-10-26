@@ -74,7 +74,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "INSERT INTO estudantes VALUES(3,'Carla','carla@example.test');\nINSERT INTO matriculas VALUES(3,1);\nSELECT COUNT(*) FROM estudantes;\nSELECT COUNT(*) FROM matriculas;\nSELECT COUNT(*) FROM progresso;",
         "explanation": "O primeiro registro cria a entidade; o segundo cria a relação. Nenhuma linha de PROGRESSO é necessária segundo a convenção desta aula.",
-        "expected": "Três estudantes, três matrículas e ainda dois registros de progresso."
+        "expected": "A nova estudante e sua matrícula aparecem nas consultas, sem registrar conclusão que ainda não ocorreu.",
+        "criteria": [
+          "Prevê antes da execução quais entidades e relações precisam de novos registros.",
+          "Cria a pessoa antes de sua matrícula e não acrescenta progresso sem conclusão.",
+          "Confere separadamente as contagens de estudantes, matrículas e progresso."
+        ]
       },
       {
         "prompt": "Alterar: partindo apenas do exemplo inicial, registre que Ana concluiu JOIN. Não execute o exercício anterior. Explique por que duplicar (1,10) seria inválido.",
@@ -84,7 +89,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "INSERT INTO progresso VALUES(1,11,1);\nSELECT estudante_id,licao_id,concluida FROM progresso ORDER BY estudante_id,licao_id;",
         "explanation": "O novo par representa outra lição de Ana. Uma segunda linha com o mesmo par (1,10) violaria a chave composta e produziria duas respostas para a mesma pergunta.",
-        "expected": "Ana tem duas conclusões; Beto continua pendente em SELECT."
+        "expected": "O progresso da nova lição aparece para Ana, preservando o estado de Beto.",
+        "criteria": [
+          "Parte dos dados originais e registra progresso para o par estudante e lição solicitado.",
+          "Consulta o resultado ordenado e compara os estados de Ana e Beto.",
+          "Explica por que inserir novamente um par já existente violaria a chave composta."
+        ]
       },
       {
         "prompt": "Construir: modele avaliações de lições. Cada estudante pode avaliar cada lição uma vez, com nota inteira de 1 a 5. Crie a tabela e registre nota 4 de Ana para SELECT.",
@@ -93,7 +103,12 @@ Object.assign(LESSON_GUIDES, {
           "Combine referências, NOT NULL e CHECK para a nota."
         ],
         "solution": "CREATE TABLE avaliacoes(estudante_id INTEGER NOT NULL REFERENCES estudantes(id),licao_id INTEGER NOT NULL REFERENCES licoes(id),nota INTEGER NOT NULL CHECK(typeof(nota)='integer' AND nota BETWEEN 1 AND 5),PRIMARY KEY(estudante_id,licao_id));\nINSERT INTO avaliacoes VALUES(1,10,4);\nSELECT * FROM avaliacoes;",
-        "expected": "1 | 10 | 4",
+        "expected": "A consulta mostra uma avaliação válida para o par solicitado, com a nota dentro da faixa definida.",
+        "criteria": [
+          "Cria a tabela com referências para estudante e lição e impede repetir o mesmo par.",
+          "Restringe a nota a valores inteiros da faixa pedida e rejeita sua ausência.",
+          "Insere a avaliação solicitada e confere o registro por consulta."
+        ],
         "explanation": "A nota depende do par completo; a chave composta impede avaliações duplicadas e a restrição limita o domínio."
       },
       {
@@ -103,7 +118,12 @@ Object.assign(LESSON_GUIDES, {
           "A matrícula já tem uma tabela associativa."
         ],
         "solution": "INSERT INTO trilhas VALUES(2,'Web');\nINSERT INTO matriculas VALUES(1,2);\nSELECT trilha_id FROM matriculas WHERE estudante_id=1 ORDER BY trilha_id;",
-        "expected": "1 e 2 em linhas separadas.",
+        "expected": "A consulta lista cada matrícula de Ana como relação separada e verificável.",
+        "criteria": [
+          "Explica por que uma lista de identificadores em um campo de texto não representa referências verificáveis individualmente.",
+          "Cria a trilha e registra a associação na tabela de matrículas.",
+          "Consulta as matrículas de Ana e confirma linhas distintas para suas trilhas."
+        ],
         "explanation": "Uma relação N:N possui uma linha por associação. Isso permite FK, unicidade e consultas sem quebrar uma lista textual."
       }
     ],
