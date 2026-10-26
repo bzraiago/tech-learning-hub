@@ -27,6 +27,6 @@ Segundo a [documentação de deploy do Clerk](https://clerk.com/docs/guides/deve
 
 ## 5. Próxima integração: Supabase
 
-O próximo passo é configurar a integração nativa [Clerk ↔ Supabase](https://supabase.com/docs/guides/auth/third-party/clerk), criar a tabela de progresso com políticas de acesso por usuário e migrar o estado salvo na chave local `tech-learning-hub:v1` **após** login, com confirmação explícita antes de substituir qualquer dado remoto. Teste com duas contas diferentes: cada uma deve enxergar apenas seus dados. Até esse teste passar, não trate o progresso como salvo na nuvem.
+O código para envio e carregamento manual do progresso está preparado. Siga [`CONFIGURAR_SUPABASE.md`](CONFIGURAR_SUPABASE.md) para ativar a [integração nativa Clerk ↔ Supabase](https://supabase.com/docs/guides/auth/third-party/clerk), criar a tabela com políticas de acesso e configurar as variáveis na Vercel. Teste com duas contas diferentes: cada uma deve enxergar apenas seus dados. Até esse teste passar, não trate o progresso como salvo na nuvem.
 
 **Parar e retomar:** o logout encerra a sessão Clerk; entrar de novo a recupera. Para desfazer esta integração de teste, remova a variável da Vercel e publique novamente. Isso não apaga o progresso local. Em computador limitado, use a prévia publicada; não é necessário instalar Node, Docker ou um banco para conferir esta etapa.

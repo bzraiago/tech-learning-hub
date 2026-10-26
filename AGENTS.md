@@ -111,7 +111,7 @@ Ao revisar, nesta ordem: (1) o que está bom e por quê; (2) o defeito mais impo
 ## 5. Modo Mantenedor — regras do código
 
 ### 5.1 Arquitetura atual (não mude sem pedido explícito)
-- **Aplicação estática modularizada**: `index.html` contém a estrutura da página e carrega CSS e JavaScript de `assets/`. **Sem build, sem bundler, sem framework de frontend.** Na Vercel, `api/public-config.mjs` entrega somente a chave publicável do Clerk.
+- **Aplicação estática modularizada**: `index.html` contém a estrutura da página e carrega CSS e JavaScript de `assets/`. **Sem build, sem bundler, sem framework de frontend.** Na Vercel, `api/public-config.mjs` entrega somente URL e chaves publicáveis do Clerk e Supabase.
 - Dependências externas apenas por CDN: Tailwind (`@tailwindcss/browser@4`), fontes Google (DM Sans, Space Grotesk) e ClerkJS quando o login estiver configurado.
 - Tema escuro por padrão (`class="dark"`), `lang="pt-BR"`.
 - Ícones SVG internos via `<symbol id="i-...">`.
@@ -130,7 +130,8 @@ Arquivos principais:
 | `assets/js/ui/render.js` | Renderização da navegação, progresso, módulos e aulas |
 | `assets/js/ui/dialogs.js` | Leitores, diálogos, recursos e validação de projetos |
 | `assets/js/app.js` | Eventos e inicialização da aplicação |
-| `assets/js/auth.js` | Login opcional com Clerk; ainda não sincroniza progresso |
+| `assets/js/auth.js` | Login opcional com Clerk e aviso de mudança de sessão para a sincronização |
+| `assets/js/cloud.js` | Envio e carregamento manual do progresso no Supabase, com confirmação antes de substituir dados |
 | `api/public-config.mjs` | Função Vercel que expõe somente configuração pública ao navegador |
 
 Os scripts são clássicos e compartilham o mesmo escopo global, carregados na ordem declarada em `index.html`. Não troque a ordem sem conferir as dependências e não converta para módulos ES sem aprovação, pois o projeto deve continuar abrindo diretamente no navegador e sem build.
@@ -326,3 +327,4 @@ Extensão de IA (opcional): responder perguntas sobre um pequeno conjunto de mat
 
 - 2026-10-24 — Criado o `AGENTS.md` a partir da análise pedagógica do mesmo dia.
 - 2026-10-25 — Preparado login Clerk no frontend estático, usando chave publicável via função Vercel; progresso permanece local até a integração segura com Supabase.
+- 2026-10-26 — Preparada sincronização manual com Supabase e RLS por ID Clerk, preservando o estado local e pedindo confirmação antes de substituir progresso.

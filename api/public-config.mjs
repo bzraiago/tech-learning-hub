@@ -12,6 +12,8 @@ export default function handler(request, response) {
 
   response.statusCode = 200;
   response.end(JSON.stringify({
-    clerkPublishableKey: process.env.CLERK_PUBLISHABLE_KEY || null
+    clerkPublishableKey: process.env.CLERK_PUBLISHABLE_KEY || null,
+    supabaseUrl: process.env.SUPABASE_URL || null,
+    supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || null
   }));
 }

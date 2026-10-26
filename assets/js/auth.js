@@ -39,6 +39,7 @@ function renderAuth(user) {
     userButtonMounted = false;
   }
   setAuthStatus(signedIn ? 'Conta conectada · progresso ainda salvo neste navegador' : 'Progresso salvo neste navegador');
+  window.dispatchEvent(new CustomEvent('tech-hub:auth-change', { detail: { userId: user?.id || null } }));
 }
 
 async function initAuth() {

@@ -11,7 +11,7 @@ Não há instalação, build ou dependências locais. Abra `index.html` em um na
 ```text
 .
 ├── index.html                         # Estrutura da interface e carregamento dos assets
-├── api/public-config.mjs              # Configuração pública do login na Vercel
+├── api/public-config.mjs              # Configuração pública de Clerk e Supabase na Vercel
 ├── assets/
 │   ├── css/
 │   │   └── global.css                 # Estilos globais e acessibilidade
@@ -62,4 +62,5 @@ O comando checa sintaxe, assets, ids, relações entre aulas e guias, exercício
 
 As dependências e os atalhos entre trilhas estão documentados em [`docs/MAPA_PRE_REQUISITOS.md`](docs/MAPA_PRE_REQUISITOS.md).
 
-O login opcional com Clerk na Vercel está descrito em [`docs/CONFIGURAR_CLERK.md`](docs/CONFIGURAR_CLERK.md). O progresso continua local até a integração com Supabase ser concluída e testada.
+O login opcional com Clerk na Vercel está descrito em [`docs/CONFIGURAR_CLERK.md`](docs/CONFIGURAR_CLERK.md). O progresso continua disponível localmente; o envio e carregamento da cópia remota dependem de configuração e escolha do usuário.
+A sincronização manual com Supabase está descrita em [`docs/CONFIGURAR_SUPABASE.md`](docs/CONFIGURAR_SUPABASE.md). Ela exige a integração nativa Clerk ↔ Supabase, a tabela com RLS e as variáveis públicas da Vercel.
