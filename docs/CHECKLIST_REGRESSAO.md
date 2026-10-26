@@ -44,6 +44,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `db-normalization`, os quatro critérios distinguem dependências, observação por matrícula, integridade das associações e ausência de data.
 - [ ] Em `db-ddl-constraints`, cada recusa é testada isoladamente; a consulta confirma o estado posterior e a verificação de FK vale para a conexão atual.
 - [ ] Em `db-ddl-crud`, cada exercício parte dos dados do exemplo; remoção e atualização atingem apenas o id selecionado e preservam as demais lições.
+- [ ] Em `db-select`, os critérios exigem previsão, limites corretos, ordenação estável e distinção entre `NULL` e texto vazio, sem antecipar as linhas retornadas.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.

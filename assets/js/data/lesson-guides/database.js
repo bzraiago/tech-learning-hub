@@ -558,7 +558,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "SELECT titulo FROM licoes WHERE minutos>=30 ORDER BY id;",
         "explanation": "O filtro é aplicado a cada linha e inclui o limite inferior. ORDER BY id mantém a ordem 1,2,4.",
-        "expected": "SELECT, JOIN e Arquivos, nessa ordem."
+        "expected": "A consulta lista as aulas que atendem ao limite de duração, em ordem de identificador.",
+        "criteria": ["Registra a previsão antes de executar a consulta.", "Usa o limite inclusivo sem acrescentar filtro de conclusão.", "Seleciona os títulos e confere a ordem pelo identificador."]
       },
       {
         "prompt": "Alterar: liste apenas aulas de Dados que estejam pendentes e tenham entre 30 e 40 minutos, ordenando da maior duração para a menor.",
@@ -568,7 +569,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "SELECT titulo,minutos FROM licoes WHERE trilha='Dados' AND concluida=0 AND minutos BETWEEN 30 AND 40 ORDER BY minutos DESC,id;",
         "explanation": "Todos os filtros atuam sobre linhas e os limites 30 e 40 são incluídos.",
-        "expected": "JOIN | 40; SELECT | 30."
+        "expected": "A consulta mostra apenas as pendências da trilha solicitada dentro do intervalo, em ordem decrescente de duração.",
+        "criteria": ["Combina trilha, estado e intervalo de duração na mesma condição.", "Mantém os dois limites do intervalo inclusivos.", "Ordena da maior duração para a menor e confere os registros retornados."]
       },
       {
         "prompt": "Construir: liste id, título e observação das aulas pendentes. Mostre 'Sem observação' somente quando o valor for NULL e coloque textos vazios por último.",
@@ -577,7 +579,8 @@ Object.assign(LESSON_GUIDES, {
           "Ordene primeiro pelo teste observacao='' e depois pelo id."
         ],
         "solution": "SELECT id,titulo,COALESCE(observacao,'Sem observação') AS observacao_exibida FROM licoes WHERE concluida=0 ORDER BY observacao='',id;",
-        "expected": "SELECT, JOIN e Arquivos; Arquivos fica por último por conter texto vazio.",
+        "expected": "As pendências aparecem com um texto de apresentação para valores ausentes, preservando texto vazio e posicionando-o por último.",
+        "criteria": ["Filtra apenas aulas pendentes e apresenta id, título e observação.", "Substitui NULL apenas no resultado, sem alterar os dados armazenados.", "Mantém a string vazia distinta de NULL e ordena essas linhas por último, com desempate por id."],
         "explanation": "NULL recebe um texto apenas no resultado. A expressão booleana de ordenação posiciona o texto vazio depois dos demais."
       },
       {
@@ -587,7 +590,8 @@ Object.assign(LESSON_GUIDES, {
           "Texto vazio ainda é texto conhecido."
         ],
         "solution": "SELECT id FROM licoes WHERE observacao IS NULL ORDER BY id;",
-        "expected": "1 e 3.",
+        "expected": "A consulta encontra somente as linhas cuja observação está ausente e não inclui o texto vazio.",
+        "criteria": ["Explica por que a comparação com = NULL não seleciona ausências.", "Usa IS NULL e ordena os identificadores para conferir o resultado.", "Distingue a observação vazia da observação ausente ao justificar o registro excluído."],
         "explanation": "IS NULL identifica ausência; a string vazia de id 4 não é NULL."
       }
     ],
