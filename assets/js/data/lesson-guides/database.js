@@ -2655,7 +2655,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "SELECT COUNT(*) AS quantidade,MIN(id) AS primeiro FROM perf_licoes WHERE trilha_id=8;",
         "explanation": "Os números 8,108,...,9908 formam cem registros. O menor é 8 e o índice não altera essa aritmética.",
-        "expected": "quantidade 100; primeiro 8."
+        "expected": "A previsão da quantidade e do menor identificador é registrada antes da consulta e comparada com o banco.",
+        "criteria": [
+          "Justifica a previsão usando a regra de distribuição da carga sintética.",
+          "Registra quantidade e menor identificador previstos antes de executar a consulta.",
+          "Consulta os dois valores no laboratório e compara com a previsão."
+        ]
       },
       {
         "prompt": "Alterar: compare o plano da consulta de trilha 7 com uma consulta que seleciona todas as trilhas. O que verificar?",
@@ -2665,7 +2670,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "EXPLAIN (ANALYZE, BUFFERS) SELECT id,titulo FROM perf_licoes WHERE trilha_id>=0;",
         "explanation": "A consulta ampla devolve 10000 linhas e pode preferir varredura sequencial. Compare volume efetivo e páginas, sem assumir que o mesmo índice será útil para todos os filtros.",
-        "expected": "A consulta ampla retorna 10000 linhas; o plano deve ser observado."
+        "expected": "A comparação registra quantas linhas cada consulta devolve e o caminho de acesso realmente escolhido pelo planejador.",
+        "criteria": [
+          "Mede somente consultas SELECT com o laboratório preparado.",
+          "Compara linhas efetivas e leituras dos dois planos, registrando as saídas observadas.",
+          "Explica por que um filtro amplo pode justificar um caminho diferente sem exigir um tipo de plano."
+        ]
       },
       {
         "prompt": "Construir: crie uma consulta paginada para os cinco primeiros IDs da trilha 7 maiores que 207 e explique a ordem.",
@@ -2675,7 +2685,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "SELECT id,titulo FROM perf_licoes\nWHERE trilha_id=7 AND id>207\nORDER BY id LIMIT 5;",
         "explanation": "O marcador id>207 evita repetir os registros já vistos; ORDER BY id torna a página determinística nesse conjunto.",
-        "expected": "IDs 307, 407, 507, 607 e 707."
+        "expected": "A página contém até cinco registros da trilha solicitada, após o marcador e em ordem crescente estável.",
+        "criteria": [
+          "Aplica conjuntamente os filtros da trilha e do identificador maior que o marcador.",
+          "Define a ordenação antes do limite da página.",
+          "Confere que os registros retornados respeitam o marcador e não excedem o tamanho pedido."
+        ]
       },
       {
         "prompt": "Investigar erro: alguém afirma que o índice sempre acelerou a consulta porque o segundo plano tem outro custo. Escreva um relatório sem inventar tempos: que evidências faltam para aceitar ou rejeitar essa afirmação?",
@@ -2685,7 +2700,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Hipótese: (trilha_id,id) reduz trabalho no filtro trilha 7 com ordenação.\nCarga: 10000 linhas, 100 por trilha.\nSQL: registrar o SELECT completo.\nAntes/depois: anexar planos reais e ambiente.\nCorreção: mesmos 100 IDs, de 7 a 9907.\nConclusão: manter apenas se benefício e custo forem justificáveis.",
         "explanation": "Não existe um tempo esperado universal; a comparação precisa de contexto e da mesma consulta.",
-        "expected": "Relatório que distingue resultado funcional fixo de plano e tempo observados."
+        "expected": "O relatório separa correção da consulta, medições reais e conclusão proporcional à evidência coletada.",
+        "criteria": [
+          "Registra o mesmo SQL, carga e ambiente para as medições antes e depois do índice.",
+          "Anexa planos e medidas observadas ou marca claramente o que ainda não foi executado.",
+          "Confere que a consulta devolveu os mesmos registros e discute custo de leitura e manutenção do índice sem prometer ganho universal."
+        ]
       }
     ],
     "mistakes": [

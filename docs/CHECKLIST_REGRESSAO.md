@@ -36,6 +36,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `db-mongo-crud`, previsão e contagens não aparecem antecipadas; a remoção confirma a ausência de x9 e a preservação de a1.
 - [ ] Em `db-mongo-pipelines`, a previsão antecede a execução; agrupamento, projeção e rejeições mostram critérios sem antecipar valores finais.
 - [ ] Em `db-nosql-models`, os critérios dos quatro exercícios aparecem antes das dicas e distinguem acesso, custo de atualização, crescimento e sincronização.
+- [ ] Em `db-performance`, as previsões são registradas antes da consulta, os planos são observados sem impor um tipo de acesso e a paginação não revela IDs finais.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.
