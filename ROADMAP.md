@@ -501,6 +501,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 26/10/2026 | Fase 3 — arquivos e extensões | `d663c99` | `prep-files` ganhou critérios em quatro exercícios; resultado da investigação não revela as hipóteses. Validação automática passou; conferência publicada pendente. |
 | 26/10/2026 | Fase 3 — contexto de trabalho | `136b9d2` | `prep-workspace` ganhou critérios em quatro exercícios e passou a ser exigida pelo validador. Verificações automatizadas e conferência publicada pendentes. |
 | 26/10/2026 | Fase 3 — ciclo de execução | `c8400c0` | `prep-cycle` ganhou critérios nos quatro exercícios e o resultado da previsão deixou de antecipar a saída literal. Verificações automatizadas e conferência publicada pendentes. |
+| 26/10/2026 | Fase 3 — leitura de erros | `352d16b` | `prep-errors` ganhou critérios nos quatro exercícios; a prova prática pede evidências observadas e o relato separa fatos de hipóteses. Verificações automatizadas e conferência publicada pendentes. |
 
 ## Decisões e bloqueios
 
