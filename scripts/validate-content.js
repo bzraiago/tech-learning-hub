@@ -141,7 +141,7 @@ for (const lesson of lessons) {
       if (exercise.criteria !== undefined && (!Array.isArray(exercise.criteria) || !exercise.criteria.length || exercise.criteria.some((item) => typeof item !== 'string' || !item.trim()))) {
         fail(`Critérios de aceite inválidos: ${lesson.id}:${index}`);
       }
-      if (['prep-tools', 'prep-files', 'prep-workspace', 'prep-cycle', 'prep-errors'].includes(lesson.id) && !exercise.criteria?.length) fail(`Exercício sem critérios de aceite: ${lesson.id}:${index}`);
+      if (['prep-tools', 'prep-files', 'prep-workspace', 'prep-cycle', 'prep-errors', 'setup-editor', 'setup-python', 'setup-git', 'setup-node'].includes(lesson.id) && !exercise.criteria?.length) fail(`Exercício sem critérios de aceite: ${lesson.id}:${index}`);
     });
   }
   if (!guide.retry) {
