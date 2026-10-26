@@ -226,28 +226,48 @@ Object.assign(LESSON_GUIDES, {
         "hints": ["Pergunte de qual parte da chave o nome depende."],
         "solution": "Todas as matrículas de Ana poderiam precisar de alteração. nome_estudante depende somente de estudante_id, não do par inteiro, e deve permanecer em ESTUDANTES.",
         "explanation": "A dependência parcial cria cópias e risco de divergência.",
-        "expected": "Uma linha por matrícula seria afetada no modelo repetido; uma única linha no modelo normalizado."
+        "expected": "A comparação mostra como a quantidade de matrículas muda o esforço de atualizar o nome no modelo repetido.",
+        "criteria": [
+          "Prevê a alteração antes de consultar a explicação e considera todas as matrículas da estudante.",
+          "Identifica de qual parte da chave composta o nome depende.",
+          "Compara o risco de divergência com o modelo que mantém os dados da estudante em um só registro."
+        ]
       },
       {
         "prompt": "Alterar: acrescente observacao à matrícula do exemplo. Permita ausência e registre 'Turma noturna' somente para a matrícula em Dados.",
         "hints": ["A observação descreve o par estudante/trilha."],
         "solution": "ALTER TABLE matriculas ADD COLUMN observacao TEXT;\nUPDATE matriculas SET observacao='Turma noturna' WHERE estudante_id=1 AND trilha_id=10;\nSELECT trilha_id,observacao FROM matriculas ORDER BY trilha_id;",
         "explanation": "A observação pertence à associação; a outra matrícula permanece com NULL.",
-        "expected": "Dados recebe Turma noturna; Web apresenta NULL."
+        "expected": "A consulta diferencia a matrícula com observação daquela que continua sem observação.",
+        "criteria": [
+          "Acrescenta um atributo opcional à associação entre estudante e trilha.",
+          "Restringe a alteração à matrícula solicitada, sem modificar a outra.",
+          "Consulta as duas matrículas e confere tanto o texto registrado quanto a ausência do outro valor."
+        ]
       },
       {
         "prompt": "Construir: normalize uma planilha de matrículas que repete nome e email do estudante e guarda trilhas separadas por vírgula. Entregue tabelas, chaves e três linhas de exemplo.",
         "hints": ["Separe ESTUDANTES e TRILHAS.", "Use uma linha por associação em MATRICULAS."],
-        "solution": "CREATE TABLE estudantes(id INTEGER PRIMARY KEY,nome TEXT NOT NULL,email TEXT NOT NULL UNIQUE);\nCREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT NOT NULL UNIQUE);\nCREATE TABLE matriculas(estudante_id INTEGER REFERENCES estudantes(id),trilha_id INTEGER REFERENCES trilhas(id),PRIMARY KEY(estudante_id,trilha_id));\nINSERT INTO estudantes VALUES(1,'Ana','ana@example.test');\nINSERT INTO trilhas VALUES(10,'Dados');\nINSERT INTO matriculas VALUES(1,10);",
+        "solution": "PRAGMA foreign_keys=ON;\nCREATE TABLE estudantes(id INTEGER PRIMARY KEY,nome TEXT NOT NULL,email TEXT NOT NULL UNIQUE);\nCREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT NOT NULL UNIQUE);\nCREATE TABLE matriculas(estudante_id INTEGER NOT NULL REFERENCES estudantes(id),trilha_id INTEGER NOT NULL REFERENCES trilhas(id),PRIMARY KEY(estudante_id,trilha_id));\nINSERT INTO estudantes VALUES(1,'Ana','ana@example.test');\nINSERT INTO trilhas VALUES(10,'Dados');\nINSERT INTO matriculas VALUES(1,10);\nSELECT * FROM estudantes;\nSELECT * FROM trilhas;\nSELECT * FROM matriculas;",
         "explanation": "Cada entidade é registrada uma vez e cada associação ocupa uma linha verificável.",
-        "expected": "Uma estudante, uma trilha e uma matrícula, sem lista de IDs em texto."
+        "expected": "As consultas mostram entidades e matrículas em registros verificáveis, sem lista de identificadores em texto.",
+        "criteria": [
+          "Separa os dados próprios de estudantes e trilhas dos dados da associação.",
+          "Define chaves primárias e referências que impedem associações sem entidades existentes ou pares repetidos.",
+          "Apresenta registros de exemplo e consulta as tabelas para conferir a separação."
+        ]
       },
       {
-        "prompt": "Investigar erro: alguém substituiu data_matricula ausente por '0000-00-00'. Explique por que o valor inventado prejudica consultas e proponha uma representação coerente.",
+        "prompt": "Investigar erro: alguém substituiu data_matricula ausente por '0000-00-00'. Explique por que o valor inventado prejudica consultas, proponha uma representação coerente e mostre como verificá-la.",
         "hints": ["Ausência não é uma data antiga nem zero."],
-        "solution": "Mantenha data_matricula como NULL enquanto a data for desconhecida e consulte com IS NULL. Se a data for obrigatória, use NOT NULL e recuse a matrícula sem data em vez de inventar um valor.",
+        "solution": "Mantenha data_matricula como NULL enquanto a data for desconhecida e consulte com SELECT estudante_id,trilha_id FROM matriculas WHERE data_matricula IS NULL;. Se a data for obrigatória, use NOT NULL e tente inserir uma matrícula sem data para observar a recusa, em vez de inventar um valor.",
         "explanation": "O contrato precisa distinguir valor conhecido de ausência; sentinelas falsas parecem datas e contaminam ordenações e relatórios.",
-        "expected": "Ausência representada por NULL ou entrada recusada por uma regra explícita."
+        "expected": "Uma consulta distingue datas conhecidas de matrículas cuja data ainda não foi informada, conforme a regra escolhida.",
+        "criteria": [
+          "Explica como uma data inventada altera filtros, ordenações ou relatórios.",
+          "Define explicitamente se a matrícula aceita data desconhecida.",
+          "Demonstra uma consulta ou tentativa de inserção que comprove o comportamento escolhido."
+        ]
       }
     ],
     "mistakes": [

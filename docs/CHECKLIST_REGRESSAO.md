@@ -41,6 +41,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `db-recovery`, os critérios verificam a cópia restaurada, comparam a perda ao RPO e preservam a origem durante o ensaio da migração.
 - [ ] Em `db-project`, os critérios distinguem progresso de Ana e Beto, mantêm matrículas vazias no relatório e rejeitam a relação inválida no esquema reforçado.
 - [ ] Em `db-modeling`, os quatro critérios distinguem entidades, matrículas e progresso; os resultados esperados não antecipam contagens ou linhas literais.
+- [ ] Em `db-normalization`, os quatro critérios distinguem dependências, observação por matrícula, integridade das associações e ausência de data.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.
