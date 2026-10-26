@@ -156,6 +156,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Acrescentar critérios aos quatro exercícios de `db-joins`, verificando linhas preservadas, contagem de filhos e filtros em `ON` ou `WHERE`.
   - [x] Acrescentar critérios aos quatro exercícios de `db-subqueries-ctes`, verificando média, resumo intermediário e granularidade antes das junções.
   - [x] Acrescentar critérios aos quatro exercícios de `db-transactions`, distinguindo estado provisório, confirmação, reversão e transferência incompleta.
+  - [x] Acrescentar critérios aos quatro exercícios de `db-concurrency-boundaries`, cobrindo savepoint, confirmação, efeito externo e repetição da unidade.
   - [ ] Revisar os demais resultados esperados para evitar respostas antecipadas e completar critérios específicos por aula.
 - [ ] Garantir exemplos executáveis com saída ou comportamento visível.
 - [ ] Aplicar a progressão guiado → pistas → problema novo → mudança de requisito.
