@@ -5,11 +5,14 @@ const cloudPanel = document.querySelector('#cloud-panel');
 const cloudStatus = document.querySelector('#cloud-status');
 const cloudUpload = document.querySelector('#cloud-upload');
 const cloudDownload = document.querySelector('#cloud-download');
+const cloudRecover = document.querySelector('#cloud-recover');
 const cloudClaim = document.querySelector('#cloud-claim');
+const cloudExport = document.querySelector('#cloud-export');
 const cloudRestore = document.querySelector('#cloud-restore');
 const cloudBackupFile = document.querySelector('#cloud-backup-file');
 const CLOUD_OWNER_KEY = 'tech-learning-hub:local-owner:v1';
 const CLOUD_ACCOUNT_PREFIX = 'tech-learning-hub:account:v1:';
+const CLOUD_BACKUP_PREFIX = 'tech-learning-hub:backup:v1:';
 const CLOUD_GUEST_KEY = 'tech-learning-hub:guest:v1';
 let cloudConfig = null;
 let cloudUserId = null;
@@ -17,6 +20,7 @@ let cloudBusy = false;
 let localOwnerId = null;
 let cloudSwitchVersion = 0;
 const memorySnapshots = new Map();
+const memoryBackups = new Map();
 try { localOwnerId = localStorage.getItem(CLOUD_OWNER_KEY) || null; }
 catch { /* O app continua na sessão mesmo sem localStorage. */ }
 let activeStateOwner = localOwnerId ? null : 'guest';
@@ -39,6 +43,25 @@ function cloudReadSnapshot(owner) {
   try { return sanitizeState(JSON.parse(raw)); }
   catch { return null; }
 }
+function cloudReadBackup(userId) {
+  if (!userId) return null;
+  let raw = memoryBackups.get(userId);
+  if (!raw) {
+    try { raw = localStorage.getItem(`${CLOUD_BACKUP_PREFIX}${userId}`); }
+    catch { return null; }
+  }
+  if (!raw) return null;
+  try { return sanitizeState(JSON.parse(raw)); }
+  catch { return null; }
+}
+function cloudPreserveLocal(userId) {
+  if (!userId) return;
+  const raw = JSON.stringify(state);
+  memoryBackups.set(userId, raw);
+  try { localStorage.setItem(`${CLOUD_BACKUP_PREFIX}${userId}`, raw); }
+  catch { /* A versão anterior ainda pode ser recuperada nesta sessão. */ }
+  cloudControls();
+}
 // Cópias locais anteriores à separação por conta são preservadas para o dono já vinculado.
 if (localOwnerId) {
   try {
@@ -55,6 +78,9 @@ function cloudControls() {
   const ready = Boolean(cloudConfig && cloudUserId);
   cloudUpload.disabled = cloudBusy || !ready || activeStateOwner !== cloudUserId;
   cloudDownload.disabled = cloudBusy || !ready;
+  cloudRecover.hidden = !ready || !cloudReadBackup(cloudUserId);
+  cloudRecover.disabled = cloudBusy;
+  cloudExport.disabled = cloudBusy || !ready;
   cloudRestore.disabled = cloudBusy || !ready;
   cloudClaim.hidden = !ready || !cloudReadSnapshot('guest');
   cloudClaim.disabled = cloudBusy;
@@ -101,13 +127,14 @@ async function cloudSwitchTo(userId, refreshRemote = false) {
       }
       const remoteState = sanitizeState(remote.state);
       if (cached && JSON.stringify(cached) !== JSON.stringify(remoteState)) {
-        cloudMessage('O progresso local desta conta difere da nuvem. Escolha Enviar ou Carregar; nada foi substituído.');
+        cloudPreserveLocal(userId);
+        cloudMessage('Progresso da nuvem carregado. A versão local anterior pode ser recuperada neste navegador.');
       } else {
-        state = remoteState;
-        saveState();
-        render();
         cloudMessage('Progresso desta conta carregado da nuvem.');
       }
+      state = remoteState;
+      saveState();
+      render();
     } else {
       cloudMessage(cached
         ? 'Sem cópia na nuvem. O progresso local desta conta foi mantido.'
@@ -213,20 +240,21 @@ cloudDownload.addEventListener('click', async () => {
     if (!remote.state || remote.state.version !== 1 || !remote.state.completed || typeof remote.state.completed !== 'object') {
       throw new Error('O progresso remoto tem um formato desconhecido. Nada foi substituído.');
     }
-    if (!window.confirm('Carregar o progresso da nuvem substituirá o progresso exibido neste navegador. Um backup local será baixado antes. Continuar?')) {
+    if (!window.confirm('Carregar o progresso da nuvem substituirá o exibido nesta conta. A versão local anterior ficará disponível em Recuperar versão local anterior. Continuar?')) {
       cloudMessage('Carregamento cancelado; o progresso local foi preservado.');
       return;
     }
     if (userId !== cloudUserId || window.Clerk?.user?.id !== userId) {
       throw new Error('A conta mudou. Tente novamente.');
     }
-    cloudBackupLocal();
+    const remoteState = sanitizeState(remote.state);
+    if (JSON.stringify(state) !== JSON.stringify(remoteState)) cloudPreserveLocal(userId);
     if (dialog.open) closeDialog();
-    state = sanitizeState(remote.state);
+    state = remoteState;
     saveState();
     render();
     cloudSaveSnapshot(userId);
-    cloudMessage('Progresso da nuvem carregado. Backup local baixado.');
+    cloudMessage('Progresso da nuvem carregado. Nenhum arquivo foi baixado.');
   } catch (error) {
     cloudMessage(`Não foi possível carregar: ${error.message}`);
   } finally {
@@ -234,18 +262,32 @@ cloudDownload.addEventListener('click', async () => {
   }
 });
 
+cloudRecover.addEventListener('click', () => {
+  if (cloudBusy || !cloudUserId) return;
+  const backup = cloudReadBackup(cloudUserId);
+  if (!backup) return;
+  if (!window.confirm('Recuperar a versão local anterior substituirá o progresso exibido nesta conta. A versão na nuvem não será alterada. Continuar?')) return;
+  if (dialog.open) closeDialog();
+  state = backup;
+  saveState();
+  render();
+  cloudMessage('Versão local anterior recuperada. Use Enviar somente se quiser substituir a cópia na nuvem.');
+});
+
 cloudClaim.addEventListener('click', () => {
   if (cloudBusy || !cloudUserId) return;
   const guest = cloudReadSnapshot('guest');
   if (!guest) return;
   if (!window.confirm('Importar o progresso anterior deste navegador substituirá o progresso exibido nesta conta. Confirme que esses dados são seus. Continuar?')) return;
-  cloudBackupLocal();
+  cloudPreserveLocal(cloudUserId);
   if (dialog.open) closeDialog();
   state = guest;
   saveState();
   render();
   cloudMessage('Progresso anterior importado para esta conta. Envie à nuvem se desejar atualizar a cópia remota.');
 });
+
+cloudExport.addEventListener('click', () => { if (!cloudBusy && cloudUserId) cloudBackupLocal(); });
 
 cloudRestore.addEventListener('click', () => { if (!cloudBusy) cloudBackupFile.click(); });
 cloudBackupFile.addEventListener('change', async () => {

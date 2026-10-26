@@ -298,7 +298,7 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Configurar login social do Google pelo Clerk e ensinar os conceitos transferíveis de OAuth 2.0/OpenID Connect, redirect URI, consentimento, escopos e `state`.
 - [ ] Conectar Clerk ao Supabase pela integração nativa atual, sem usar o template JWT legado.
   - [x] Preparar cliente REST com token da sessão Clerk e guia da integração nativa; ativação e teste com duas contas pendentes.
-  - [x] Carregar automaticamente o progresso da conta ao trocar de sessão, isolando caches locais e preservando conflitos para escolha manual.
+  - [x] Carregar automaticamente o progresso remoto da conta ao trocar de sessão, isolando caches locais e oferecendo recuperação da versão anterior sem download automático.
 - [ ] Criar tabelas e migrações no PostgreSQL do Supabase.
   - [x] Preparar `supabase/learning-state.sql` com tabela e políticas; execução no projeto remoto pendente.
 - [ ] Aplicar Row Level Security (RLS) e provar com duas contas que cada pessoa acessa somente seus próprios registros.

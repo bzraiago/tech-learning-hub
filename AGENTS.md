@@ -142,7 +142,7 @@ Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workf
 
 ### 5.2 Persistência e compatibilidade (cuidado máximo)
 - O progresso fica em `localStorage` na chave **`tech-learning-hub:v1`**.
-- A associação da cópia local à conta Clerk fica em `tech-learning-hub:local-owner:v1`; caches por conta usam `tech-learning-hub:account:v1:<id Clerk>` e o progresso antigo de visitante usa `tech-learning-hub:guest:v1`. Ao trocar de conta, o app lê a cópia remota da nova conta quando existir. Preserve divergências locais até escolha explícita do usuário. Não confunda esses metadados com autenticação ou RLS.
+- A associação da cópia local à conta Clerk fica em `tech-learning-hub:local-owner:v1`; caches por conta usam `tech-learning-hub:account:v1:<id Clerk>`, o progresso antigo de visitante usa `tech-learning-hub:guest:v1` e a versão local anterior a um carregamento remoto fica em `tech-learning-hub:backup:v1:<id Clerk>`. Ao trocar de conta, o app mostra a cópia remota da nova conta quando existir; divergências locais ficam recuperáveis. Não confunda esses metadados com autenticação ou RLS.
 - `sanitizeState()` descarta qualquer progresso cujo id de aula/trilha/exercício **não exista mais**. Portanto:
   - **Nunca renomeie ou remova ids** de aulas, módulos, trilhas, projetos ou checks sem necessidade. Se for inevitável, escreva migração em `sanitizeState()` mapeando ids antigos para novos.
   - Ao adicionar campos ao estado, defina o valor padrão em `sanitizeState()`.
@@ -331,3 +331,4 @@ Extensão de IA (opcional): responder perguntas sobre um pequeno conjunto de mat
 - 2026-10-26 — Preparada sincronização manual com Supabase e RLS por ID Clerk, preservando o estado local e pedindo confirmação antes de substituir progresso.
 - 2026-10-26 — Bloqueado envio de progresso local após troca de conta; a cópia local precisa ser vinculada explicitamente ao usuário Clerk antes de subir ao Supabase.
 - 2026-10-26 — Troca de conta passa a carregar automaticamente o progresso remoto da nova conta, preservando cache local por usuário e exigindo escolha em caso de divergência.
+- 2026-10-26 — A cópia remota passa a ser exibida mesmo com cache divergente; a versão local anterior permanece recuperável no navegador, sem baixar arquivo automaticamente.

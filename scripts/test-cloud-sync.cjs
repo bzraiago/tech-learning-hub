@@ -13,6 +13,7 @@ async function harness({ owner = 'user_a', rowsByUser = {}, confirm = true } = {
   const elements = new Map();
   const events = {};
   const calls = [];
+  let downloads = 0;
   const storage = new Map();
   if (owner) {
     storage.set('tech-learning-hub:local-owner:v1', owner);
@@ -57,7 +58,7 @@ async function harness({ owner = 'user_a', rowsByUser = {}, confirm = true } = {
   const context = vm.createContext({
     document: {
       querySelector: (selector) => element(selector),
-      createElement: () => ({ click() {} })
+      createElement: () => ({ click() { downloads += 1; } })
     },
     window, fetch, URL, Blob, setTimeout, localStorage,
     STORAGE_KEY: 'tech-learning-hub:v1',
@@ -69,7 +70,7 @@ async function harness({ owner = 'user_a', rowsByUser = {}, confirm = true } = {
   });
   vm.runInContext(source, context);
   await new Promise((resolve) => setImmediate(resolve));
-  return { elements, calls, context, events, window, storage };
+  return { elements, calls, context, events, window, storage, getDownloads: () => downloads };
 }
 
 test('login lê a nuvem sem enviar dados automaticamente', async () => {
@@ -112,19 +113,35 @@ test('voltar à conta anterior recupera seu próprio cache após logout', async 
   assert.equal(vm.runInContext('state.completed["html-intro"]', context), true);
 });
 
-test('divergência entre cópia local e nuvem não substitui nenhuma das duas', async () => {
+test('divergência mostra a nuvem e preserva a versão local para recuperação', async () => {
   const remoteB = { version: 1, completed: { remoto: true } };
   const localB = { version: 1, completed: { local: true } };
-  const { context, events, window, storage, elements } = await harness({
+  const { context, events, window, storage, elements, getDownloads } = await harness({
     rowsByUser: { user_b: [{ user_id: 'user_b', state: remoteB }] }
   });
   storage.set('tech-learning-hub:account:v1:user_b', JSON.stringify(localB));
   window.Clerk.user.id = 'user_b';
   events['tech-hub:auth-change']({ detail: { userId: 'user_b' } });
   await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(vm.runInContext('state.completed.remoto', context), true);
+  assert.equal(vm.runInContext('state.completed.local', context), undefined);
+  assert.equal(JSON.parse(storage.get('tech-learning-hub:backup:v1:user_b')).completed.local, true);
+  assert.equal(elements.get('#cloud-recover').hidden, false);
+  assert.equal(getDownloads(), 0);
+  elements.get('#cloud-recover').handlers.click();
   assert.equal(vm.runInContext('state.completed.local', context), true);
-  assert.equal(vm.runInContext('state.completed.remoto', context), undefined);
-  assert.match(elements.get('#cloud-status').textContent, /difere da nuvem/);
+});
+
+test('carregamento manual guarda versão local sem baixar arquivo', async () => {
+  const remote = { version: 1, completed: { remoto: true } };
+  const { elements, context, getDownloads, storage } = await harness({
+    rowsByUser: { user_a: [{ user_id: 'user_a', state: remote }] }
+  });
+  vm.runInContext('state = { version: 1, completed: { local: true } }', context);
+  await elements.get('#cloud-download').handlers.click();
+  assert.equal(vm.runInContext('state.completed.remoto', context), true);
+  assert.equal(JSON.parse(storage.get('tech-learning-hub:backup:v1:user_a')).completed.local, true);
+  assert.equal(getDownloads(), 0);
 });
 
 test('progresso legado vira cópia de visitante e só é importado por escolha explícita', async () => {
