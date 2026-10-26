@@ -138,6 +138,10 @@ for (const lesson of lessons) {
       if (!exercise.prompt?.trim()) fail(`Exercício sem enunciado: ${lesson.id}:${index}`);
       if (!exercise.expected?.trim()) fail(`Exercício sem resultado esperado: ${lesson.id}:${index}`);
       if (!exercise.solution?.trim()) fail(`Exercício sem solução: ${lesson.id}:${index}`);
+      if (exercise.criteria !== undefined && (!Array.isArray(exercise.criteria) || !exercise.criteria.length || exercise.criteria.some((item) => typeof item !== 'string' || !item.trim()))) {
+        fail(`Critérios de aceite inválidos: ${lesson.id}:${index}`);
+      }
+      if (lesson.id === 'prep-tools' && !exercise.criteria?.length) fail(`Exercício sem critérios de aceite: ${lesson.id}:${index}`);
     });
   }
   if (!guide.retry) {

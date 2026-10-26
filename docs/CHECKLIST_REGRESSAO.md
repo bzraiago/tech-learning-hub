@@ -21,6 +21,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 ## Aula, quiz e anotações
 
 - [ ] Abas Conceitos, Exemplo, Prática, Revisão e Fontes funcionam.
+- [ ] Em `prep-tools`, cada exercício mostra resultado esperado e critérios antes do rascunho; dicas e solução continuam recolhidas.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.

@@ -50,7 +50,10 @@ function readerParagraph(text) {
 }
 
 function exerciseExpected(exercise) {
-  return `<div class="mt-4 rounded-xl border border-sky-300/20 bg-sky-300/5 p-4"><p class="text-xs font-bold uppercase tracking-wide text-sky-200">Resultado esperado</p><p class="mt-2 text-sm leading-7 text-slate-200">${prose(exercise.expected)}</p></div>`;
+  const criteria = Array.isArray(exercise.criteria) && exercise.criteria.length
+    ? `<p class="mt-4 text-xs font-bold uppercase tracking-wide text-sky-200">Critérios de aceite</p><ul class="mt-2 list-disc space-y-1 pl-5 text-sm leading-7 text-slate-200">${exercise.criteria.map(item => `<li>${prose(item)}</li>`).join('')}</ul>`
+    : '';
+  return `<div class="mt-4 rounded-xl border border-sky-300/20 bg-sky-300/5 p-4"><p class="text-xs font-bold uppercase tracking-wide text-sky-200">Resultado esperado</p><p class="mt-2 text-sm leading-7 text-slate-200">${prose(exercise.expected)}</p>${criteria}</div>`;
 }
 
 function readerCode(code, label) {
