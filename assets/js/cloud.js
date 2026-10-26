@@ -6,7 +6,7 @@ const cloudStatus = document.querySelector('#cloud-status');
 const cloudSidebarStatus = document.querySelector('#storage-status');
 const loginGate = document.querySelector('#login-gate');
 const loginGateStatus = document.querySelector('#login-gate-status');
-const gateLoadingStatus = document.querySelector('#gate-loading-status');
+const cloudGateLoadingStatus = document.querySelector('#gate-loading-status');
 let cloudConfig = null;
 let cloudConfigError = null;
 let cloudUserId = null;
@@ -21,7 +21,7 @@ function cloudMessage(message) {
   cloudStatus.textContent = message;
   cloudSidebarStatus.textContent = message;
   loginGateStatus.textContent = message;
-  gateLoadingStatus.textContent = message;
+  cloudGateLoadingStatus.textContent = message;
 }
 
 function cloudLock(locked) {
@@ -85,7 +85,8 @@ async function cloudLoad(userId, generation) {
 }
 
 function cloudSwitch(userId) {
-  if (userId === cloudUserId && cloudReady) return;
+  // Clerk pode emitir vários eventos para a mesma sessão enquanto a leitura está em andamento.
+  if (userId === cloudUserId && (cloudReady || (userId && cloudConfig && !cloudConfigError))) return;
   const pending = cloudReady && cloudRevision !== cloudSavedRevision;
   const generation = ++cloudGeneration;
   clearTimeout(cloudRetryTimer);

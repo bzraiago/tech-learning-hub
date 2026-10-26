@@ -9,6 +9,7 @@ const gateSignInButton = document.querySelector('#gate-sign-in');
 const gateSignUpButton = document.querySelector('#gate-sign-up');
 const gateStatus = document.querySelector('#login-gate-status');
 const gateLoadingStatus = document.querySelector('#gate-loading-status');
+const gateRetryButton = document.querySelector('#gate-retry');
 const userButton = document.querySelector('#clerk-user-button');
 let userButtonMounted = false;
 
@@ -16,15 +17,24 @@ function setAuthStatus(message) {
   authStatus.textContent = message;
 }
 
+function authTimeout(promise, milliseconds, message) {
+  let timer;
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => { timer = setTimeout(() => reject(new Error(message)), milliseconds); })
+  ]).finally(() => clearTimeout(timer));
+}
+
 function loadClerkScript(url, publishableKey) {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
+    const timer = setTimeout(() => reject(new Error('O carregamento do Clerk demorou demais.')), 12000);
     script.src = url;
     script.async = true;
     script.crossOrigin = 'anonymous';
     if (publishableKey) script.dataset.clerkPublishableKey = publishableKey;
-    script.onload = resolve;
-    script.onerror = () => reject(new Error('Não foi possível carregar o Clerk.'));
+    script.onload = () => { clearTimeout(timer); resolve(); };
+    script.onerror = () => { clearTimeout(timer); reject(new Error('Não foi possível carregar o Clerk.')); };
     document.head.append(script);
   });
 }
@@ -51,7 +61,8 @@ function renderAuth(user) {
 
 async function initAuth() {
   try {
-    const configResponse = await fetch('/api/public-config', { cache: 'no-store' });
+    gateLoadingStatus.textContent = 'Verificando sua sessão…';
+    const configResponse = await authTimeout(fetch('/api/public-config', { cache: 'no-store' }), 12000, 'A configuração demorou demais para responder.');
     if (!configResponse.ok) throw new Error('Configuração de login indisponível.');
     const { clerkPublishableKey } = await configResponse.json();
     if (!/^pk_(test|live)_[A-Za-z0-9+/=]+$/.test(clerkPublishableKey || '')) {
@@ -64,11 +75,13 @@ async function initAuth() {
       throw new Error('Chave publicável do Clerk inválida.');
     }
     const origin = `https://${domain}`;
+    gateLoadingStatus.textContent = 'Conectando ao login…';
     await loadClerkScript(`${origin}/npm/@clerk/ui@1/dist/ui.browser.js`);
     await loadClerkScript(`${origin}/npm/@clerk/clerk-js@6/dist/clerk.browser.js`, clerkPublishableKey);
     if (!window.Clerk || !window.__internal_ClerkUICtor) throw new Error('Clerk não iniciou.');
 
-    await window.Clerk.load({ ui: { ClerkUI: window.__internal_ClerkUICtor } });
+    gateLoadingStatus.textContent = 'Restaurando sua sessão…';
+    await authTimeout(window.Clerk.load({ ui: { ClerkUI: window.__internal_ClerkUICtor } }), 15000, 'A sessão do Clerk demorou demais para iniciar.');
     const openSignIn = () => {
       Promise.resolve(window.Clerk.openSignIn()).catch(() => setAuthStatus('Não foi possível abrir o login.'));
     };
@@ -91,11 +104,13 @@ async function initAuth() {
     renderAuth(window.Clerk.user);
   } catch (error) {
     console.warn('Login Clerk indisponível:', error);
-    document.body.dataset.authView = 'login';
+    document.body.dataset.authView = 'loading';
     setAuthStatus('Login indisponível no momento');
-    gateStatus.textContent = 'Login indisponível no momento. Atualize a página para tentar novamente.';
-    gateLoadingStatus.textContent = 'Login indisponível no momento.';
+    gateStatus.textContent = 'Login indisponível no momento.';
+    gateLoadingStatus.textContent = `Não foi possível iniciar o login: ${error.message}`;
+    gateRetryButton.hidden = false;
   }
 }
 
+gateRetryButton.addEventListener('click', () => window.location.reload());
 initAuth();

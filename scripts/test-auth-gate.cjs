@@ -7,8 +7,13 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const source = fs.readFileSync(path.join(__dirname, '..', 'assets/js/auth.js'), 'utf8');
+const cloudSource = fs.readFileSync(path.join(__dirname, '..', 'assets/js/cloud.js'), 'utf8');
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const tick = () => new Promise((resolve) => setImmediate(resolve));
+
+test('auth e nuvem compartilham o escopo clássico sem redeclarar identificadores', () => {
+  assert.doesNotThrow(() => new vm.Script(`${source}\n${cloudSource}`));
+});
 
 test('mostra carregamento inicialmente e login apenas após confirmar sessão de visitante', async () => {
   assert.match(html, /<body[^>]*data-auth-view="loading"/);
@@ -44,7 +49,7 @@ test('mostra carregamento inicialmente e login apenas após confirmar sessão de
     head: { append(script) { queueMicrotask(() => script.onload()); } }
   };
   vm.runInNewContext(source, {
-    window, document, console, atob,
+    window, document, console, atob, setTimeout, clearTimeout,
     fetch: async () => ({ ok: true, json: async () => ({ clerkPublishableKey: key }) }),
     CustomEvent: class CustomEvent { constructor(type, options) { this.type = type; this.detail = options.detail; } }
   });

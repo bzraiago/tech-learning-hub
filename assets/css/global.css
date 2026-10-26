@@ -94,6 +94,9 @@ body[data-auth-view="loading"] #gate-loading { display: flex; flex-direction: co
 .gate-loading p:last-of-type { max-width: 480px; margin: 0; color: #aab5c9; font-size: 13px; line-height: 1.7; }
 .gate-loading-line { width: min(180px, 60vw); height: 3px; overflow: hidden; margin-top: 26px; border-radius: 5px; background: #a78bfa25; }
 .gate-loading-line span { display: block; width: 40%; height: 100%; border-radius: inherit; background: #ad91f4; animation: gate-progress 1.5s ease-in-out infinite alternate; }
+.gate-retry { margin-top: 20px; padding: 10px 18px; color: #fff; border: 1px solid #bca7fa80; border-radius: 10px; background: #8259df; font: 700 13px "DM Sans", sans-serif; }
+.gate-retry:hover { background: #956ff0; }
+.gate-retry[hidden] { display: none; }
 @keyframes gate-spin { to { transform: rotate(360deg); } }
 @keyframes gate-progress { to { transform: translateX(150%); } }
 @media (max-width: 850px) {

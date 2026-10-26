@@ -17,7 +17,7 @@
       --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
     }
   </style>
-  <link rel="stylesheet" href="assets/css/global.css?v=login-screen-1">
+  <link rel="stylesheet" href="assets/css/global.css?v=login-fix-2">
 
 </head>
 <body data-auth-locked data-auth-view="loading" class="min-h-screen antialiased">
@@ -96,6 +96,7 @@
         <div class="gate-spinner" aria-hidden="true"></div>
         <h1>Preparando sua jornada</h1>
         <p id="gate-loading-status">Verificando sua sessão…</p>
+        <button id="gate-retry" type="button" hidden class="gate-retry">Tentar novamente</button>
         <div class="gate-loading-line" aria-hidden="true"><span></span></div>
       </div>
       <div id="gate-login" class="gate-login">
@@ -238,7 +239,7 @@
   <script src="assets/js/ui/render.js?v=cloud-only-1"></script>
   <script src="assets/js/ui/dialogs.js?v=cloud-only-1"></script>
   <script src="assets/js/app.js?v=cloud-only-1"></script>
-  <script src="assets/js/auth.js?v=login-screen-1"></script>
-  <script src="assets/js/cloud.js?v=login-screen-1"></script>
+  <script src="assets/js/auth.js?v=login-fix-2"></script>
+  <script src="assets/js/cloud.js?v=login-fix-2"></script>
 </body>
 </html>

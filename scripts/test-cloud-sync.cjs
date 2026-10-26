@@ -9,11 +9,12 @@ const vm = require('node:vm');
 const source = fs.readFileSync(path.join(__dirname, '..', 'assets/js/cloud.js'), 'utf8');
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
-async function harness(rowsByUser = {}, { failPost = false, failGet = false } = {}) {
+async function harness(rowsByUser = {}, { failPost = false, failGet = false, deferGet = false } = {}) {
   const elements = new Map();
   const events = {};
   const calls = [];
   const timers = new Map();
+  let releaseGet;
   let timerId = 0;
   const element = (selector) => {
     if (!elements.has(selector)) elements.set(selector, {
@@ -37,6 +38,7 @@ async function harness(rowsByUser = {}, { failPost = false, failGet = false } = 
     };
     if (options.method === 'GET') {
       const userId = decodeURIComponent(url.split('user_id=eq.')[1]);
+      if (deferGet) return new Promise((resolve) => { releaseGet = () => resolve({ ok: true, json: async () => rowsByUser[userId] || [] }); });
       return { ok: !failGet, status: failGet ? 503 : 200, json: async () => rowsByUser[userId] || [] };
     }
     return { ok: !failPost, status: failPost ? 503 : 200 };
@@ -58,7 +60,7 @@ async function harness(rowsByUser = {}, { failPost = false, failGet = false } = 
     const [id, handler] = timers.entries().next().value || [];
     if (id) { timers.delete(id); handler(); await tick(); await tick(); }
   };
-  return { elements, events, calls, context, window, fireTimer };
+  return { elements, events, calls, context, window, fireTimer, releaseGet: () => releaseGet?.() };
 }
 
 test('carrega automaticamente a conta e salva mudanças sem localStorage', async () => {
@@ -110,6 +112,18 @@ test('visitante e logout deixam o curso bloqueado', async () => {
   assert.equal(app.elements.get('main').inert, true);
   assert.equal(app.elements.get('#login-gate').hidden, false);
   assert.equal(app.context.state.completed['html-intro'], undefined);
+});
+
+test('eventos repetidos da mesma conta não reiniciam uma leitura pendente', async () => {
+  const app = await harness({ user_a: [{ state: { version: 1, completed: { 'html-intro': true } } }] }, { deferGet: true });
+  app.window.Clerk.user = { id: 'user_a' };
+  app.events['tech-hub:auth-change']({ detail: { userId: 'user_a' } });
+  await tick();
+  app.events['tech-hub:auth-change']({ detail: { userId: 'user_a' } });
+  assert.equal(app.calls.filter((call) => call.options.method === 'GET').length, 1);
+  app.releaseGet();
+  await tick(); await tick();
+  assert.equal(app.elements.get('main').inert, false);
 });
 
 test('mantém alterações pendentes e avisa quando o envio falha', async () => {

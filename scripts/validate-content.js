@@ -59,6 +59,13 @@ for (const filePath of javascriptFiles) {
   }
 }
 
+// Scripts clássicos compartilham o escopo global; --check isolado não detecta const duplicada.
+try {
+  new vm.Script(javascriptFiles.filter(fs.existsSync).map((filePath) => fs.readFileSync(filePath, 'utf8')).join('\n;\n'), { filename: 'scripts do index.html' });
+} catch (error) {
+  fail(`Conflito entre scripts clássicos do index.html: ${error.message}`);
+}
+
 const dataSources = scriptSources.filter((source) => source.startsWith('assets/js/data/'));
 const context = vm.createContext({ console, URL });
 for (const source of dataSources) {
