@@ -25,6 +25,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `prep-files`, os quatro critérios aparecem antes da dica e a tarefa de investigar erro não antecipa as duas hipóteses.
 - [ ] Em `prep-workspace`, os quatro critérios verificam contexto de pasta, navegação, registro da sessão real e diagnóstico sem antecipar a solução.
 - [ ] Em `prep-cycle`, a previsão ocorre antes da execução e o resultado esperado não antecipa a saída literal; a investigação exige uma ação e um sinal de encerramento.
+- [ ] Em `prep-errors`, a prova registra evidências realmente observadas e a tarefa de relato distingue fatos de hipóteses.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.
