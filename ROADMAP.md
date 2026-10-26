@@ -507,6 +507,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 26/10/2026 | Fase 3 — leitura de erros | `352d16b` | `prep-errors` ganhou critérios nos quatro exercícios; a prova prática pede evidências observadas e o relato separa fatos de hipóteses. Verificações automatizadas e conferência publicada pendentes. |
 | 26/10/2026 | Fase 3 — ambientes iniciais | `7dc8d45` | Os quatro exercícios de `setup-editor`, `setup-python`, `setup-git` e `setup-node` ganharam critérios reutilizáveis; previsão não revela a resposta literal. Validação automatizada e conferência manual pendentes. |
 | 26/10/2026 | Fase 3 — preparação Docker | `71b58cb` | `setup-docker` ganhou critérios nos quatro exercícios, com distinção entre cliente, Engine, Compose e permissões. Validação automatizada e conferência manual pendentes. |
+| 26/10/2026 | Fase 3 — alternativa SQLite | `b122805` | `setup-docker-alternative` ganhou critérios nos quatro exercícios; previsão preservada e relatório com evidências e pendências. Validação de conteúdo passou; conferência manual pendente. |
 
 ## Decisões e bloqueios
 
