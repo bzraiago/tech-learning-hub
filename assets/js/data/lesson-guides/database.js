@@ -2821,7 +2821,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "print(buscar(conexao, 1, \"SQL\"))",
         "explanation": "O registro 3 possui simultaneamente o proprietário e o título solicitados. Não é necessário montar uma nova instrução com concatenação.",
-        "expected": "[(3, \"SQL\")]."
+        "expected": "A consulta devolve somente o material que corresponde ao proprietário e ao título informados.",
+        "criteria": [
+          "Registra a previsão de retorno antes de chamar a função.",
+          "Confere os dois filtros da função e compara a previsão com a lista retornada.",
+          "Executa a chamada dentro do bloco em que a conexão está aberta."
+        ]
       },
       {
         "prompt": "Alterar: implemente uma função para contar materiais de um usuário, mantendo usuario_id como parâmetro vinculado.",
@@ -2831,7 +2836,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def contar(conexao, usuario_id):\n    return conexao.execute(\"SELECT COUNT(*) FROM materiais WHERE usuario_id=?\", (usuario_id,)).fetchone()[0]\n# Faça estas chamadas dentro do bloco da conexão:\nprint(contar(conexao, 1))\nprint(contar(conexao, 2))",
         "explanation": "A separação de usuários também vale para agregações. A função deve receber identidade já autorizada pela camada que a chama.",
-        "expected": "Usuário 1: 2. Usuário 2: 1."
+        "expected": "Cada chamada informa apenas a quantidade de materiais do usuário indicado.",
+        "criteria": [
+          "Recebe usuario_id como argumento e o vincula ao parâmetro da consulta.",
+          "Conta registros separadamente para as duas identidades do laboratório.",
+          "Compara as contagens observadas com os registros iniciais sem misturar proprietários."
+        ]
       },
       {
         "prompt": "Construir: dentro da conexão do exemplo, teste um título que parece condição SQL e prove que a tabela permanece com três linhas.",
@@ -2841,7 +2851,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "print(buscar(conexao, 1, \"' OR 1=1 --\"))\nprint(conexao.execute(\"SELECT COUNT(*) FROM materiais\").fetchone()[0])",
         "explanation": "O driver trata toda a string como um título literal. A estrutura da consulta e o filtro de proprietário não mudam.",
-        "expected": "[] e depois 3."
+        "expected": "O texto de aparência SQL é tratado como título literal e a tabela conserva seus registros.",
+        "criteria": [
+          "Passa o texto de teste como valor para a função parametrizada, sem montar outra instrução SQL.",
+          "Registra o resultado da busca e confere a quantidade de linhas após a tentativa.",
+          "Explica por que a entrada não alterou a estrutura da consulta nem ampliou o escopo do usuário."
+        ]
       },
       {
         "prompt": "Investigar erro: uma função atualiza somente por id e permite alterar material de outra conta. Corrija renomear para exigir a identidade confiável e teste usuário 1 tentando alterar id 2.",
@@ -2851,7 +2866,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def renomear(conexao, usuario_id, material_id, novo_titulo):\n    with conexao:\n        cursor = conexao.execute(\n            \"UPDATE materiais SET titulo=? WHERE id=? AND usuario_id=?\",\n            (novo_titulo, material_id, usuario_id))\n    return cursor.rowcount\n\n# Chame dentro do bloco da conexão, após a carga:\nprint(renomear(conexao, 1, 2, \"Alterado\"))\nprint(conexao.execute(\"SELECT titulo FROM materiais WHERE id=?\", (2,)).fetchone()[0])",
         "explanation": "O par de filtros impede alteração de outra conta. O valor usuario_id deve ter sido verificado pela camada de autenticação.",
-        "expected": "0 linhas alteradas; título do id 2 continua Guia d’água com o apóstrofo simples do exemplo."
+        "expected": "A tentativa fora do escopo não modifica o material de outra conta e pode ser confirmada por uma nova leitura.",
+        "criteria": [
+          "Restringe a alteração pelo material e pelo proprietário em uma consulta parametrizada.",
+          "Registra a quantidade de linhas afetadas e consulta novamente o material protegido.",
+          "Explica que a identidade usada no laboratório precisa vir de uma sessão verificada na futura API."
+        ]
       }
     ],
     "mistakes": [
