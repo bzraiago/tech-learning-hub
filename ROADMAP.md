@@ -541,6 +541,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 26/10/2026 | Fase 3 — restrições SQL | `f00d3f5` | `db-ddl-constraints` ganhou critérios nos quatro exercícios; testes positivos, recusas e diagnóstico de FK foram separados. Validação de conteúdo passou; conferência manual pendente. |
 | 26/10/2026 | Fase 3 — CRUD SQL | `a60775d` | `db-ddl-crud` ganhou critérios nos quatro exercícios; a remoção agora pode ser feita a partir do exemplo inicial e os resultados não antecipam linhas literais. Validação de conteúdo passou; conferência manual pendente. |
 | 26/10/2026 | Fase 3 — consultas SQL | `2dd4f3b` | `db-select` ganhou critérios nos quatro exercícios; filtros, limites, ordem e valores ausentes são verificados sem antecipar as linhas finais. Validação de conteúdo passou; conferência manual pendente. |
+| 26/10/2026 | Fase 3 — agregações SQL | `3e02d01` | `db-aggregation` ganhou critérios nos quatro exercícios; população, agrupamento e filtros de grupo são verificados sem antecipar totais ou médias. Validação de conteúdo passou; conferência manual pendente. |
 
 ## Decisões e bloqueios
 
