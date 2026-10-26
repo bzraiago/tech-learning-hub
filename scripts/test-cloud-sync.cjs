@@ -8,7 +8,7 @@ const vm = require('node:vm');
 
 const source = fs.readFileSync(path.join(__dirname, '..', 'assets/js/cloud.js'), 'utf8');
 
-async function harness({ rows = [], confirm = true } = {}) {
+async function harness({ rows = [], confirm = true, owner = 'user_a' } = {}) {
   const elements = new Map();
   const events = {};
   const calls = [];
@@ -27,6 +27,11 @@ async function harness({ rows = [], confirm = true } = {}) {
     confirm: () => confirm,
     addEventListener(name, handler) { events[name] = handler; }
   };
+  const localStorage = {
+    getItem: () => owner,
+    setItem(_key, value) { owner = value; },
+    removeItem() { owner = null; }
+  };
   const fetch = async (url, options = {}) => {
     calls.push({ url, options });
     if (url === '/api/public-config') return {
@@ -44,9 +49,9 @@ async function harness({ rows = [], confirm = true } = {}) {
       querySelector: (selector) => element(selector),
       createElement: () => ({ click() {} })
     },
-    window, fetch, URL, Blob, setTimeout,
+    window, fetch, URL, Blob, setTimeout, localStorage,
     state: { version: 1, completed: { 'html-intro': true } },
-    sanitizeState: (candidate) => candidate,
+    sanitizeState: (candidate) => candidate || { version: 1, completed: {} },
     dialog: { open: false },
     saveState() {}, render() {}, closeDialog() {},
     console
@@ -54,7 +59,7 @@ async function harness({ rows = [], confirm = true } = {}) {
   vm.runInContext(source, context);
   await new Promise((resolve) => setImmediate(resolve));
   events['tech-hub:auth-change']({ detail: { userId: 'user_a' } });
-  return { elements, calls, context };
+  return { elements, calls, context, events, window };
 }
 
 test('entrar na conta não envia nem substitui progresso automaticamente', async () => {
@@ -62,6 +67,36 @@ test('entrar na conta não envia nem substitui progresso automaticamente', async
   assert.equal(elements.get('#cloud-panel').hidden, false);
   assert.equal(calls.length, 1);
   assert.equal(calls[0].url, '/api/public-config');
+});
+
+test('trocar de conta bloqueia envio do progresso local de outra pessoa', async () => {
+  const { elements, calls, events, window } = await harness();
+  window.Clerk.user.id = 'user_b';
+  events['tech-hub:auth-change']({ detail: { userId: 'user_b' } });
+  assert.equal(elements.get('#cloud-upload').disabled, true);
+  await elements.get('#cloud-upload').handlers.click();
+  assert.equal(calls.length, 1);
+  assert.match(elements.get('#cloud-status').textContent, /Vincule/);
+});
+
+test('progresso antigo exige associação explícita antes do primeiro envio', async () => {
+  const { elements, calls } = await harness({ owner: null });
+  assert.equal(elements.get('#cloud-upload').disabled, true);
+  assert.equal(elements.get('#cloud-claim').hidden, false);
+  await elements.get('#cloud-claim').handlers.click();
+  assert.equal(elements.get('#cloud-upload').disabled, false);
+  assert.equal(calls.length, 1);
+});
+
+test('nova jornada em outra conta limpa a cópia exibida antes de habilitar envio', async () => {
+  const { elements, events, window, context, calls } = await harness();
+  window.Clerk.user.id = 'user_b';
+  events['tech-hub:auth-change']({ detail: { userId: 'user_b' } });
+  assert.equal(elements.get('#cloud-new').hidden, false);
+  elements.get('#cloud-new').handlers.click();
+  assert.equal(vm.runInContext('Object.keys(state.completed).length', context), 0);
+  assert.equal(elements.get('#cloud-upload').disabled, false);
+  assert.equal(calls.length, 1);
 });
 
 test('envio preserva progresso remoto se confirmação for recusada', async () => {

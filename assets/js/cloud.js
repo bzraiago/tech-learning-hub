@@ -5,24 +5,50 @@ const cloudPanel = document.querySelector('#cloud-panel');
 const cloudStatus = document.querySelector('#cloud-status');
 const cloudUpload = document.querySelector('#cloud-upload');
 const cloudDownload = document.querySelector('#cloud-download');
+const cloudClaim = document.querySelector('#cloud-claim');
+const cloudNew = document.querySelector('#cloud-new');
 const cloudRestore = document.querySelector('#cloud-restore');
 const cloudBackupFile = document.querySelector('#cloud-backup-file');
+const CLOUD_OWNER_KEY = 'tech-learning-hub:local-owner:v1';
 let cloudConfig = null;
 let cloudUserId = null;
 let cloudBusy = false;
+let localOwnerId = null;
+try { localOwnerId = localStorage.getItem(CLOUD_OWNER_KEY) || null; }
+catch { /* O app continua na sessão mesmo sem localStorage. */ }
 
 function cloudMessage(message) { cloudStatus.textContent = message; }
+function cloudControls() {
+  const ready = Boolean(cloudConfig && cloudUserId);
+  cloudUpload.disabled = cloudBusy || !ready || localOwnerId !== cloudUserId;
+  cloudDownload.disabled = cloudBusy || !ready;
+  cloudRestore.disabled = cloudBusy || !ready;
+  cloudClaim.hidden = !ready || Boolean(localOwnerId);
+  cloudClaim.disabled = cloudBusy;
+  cloudNew.hidden = !ready || !localOwnerId || localOwnerId === cloudUserId;
+  cloudNew.disabled = cloudBusy;
+}
+function cloudSetOwner(userId) {
+  localOwnerId = userId;
+  try {
+    if (userId) localStorage.setItem(CLOUD_OWNER_KEY, userId);
+    else localStorage.removeItem(CLOUD_OWNER_KEY);
+  } catch { /* A associação vale só até fechar a página se o armazenamento falhar. */ }
+  cloudControls();
+}
 function cloudSetBusy(busy) {
   cloudBusy = busy;
-  cloudUpload.disabled = busy;
-  cloudDownload.disabled = busy;
-  cloudRestore.disabled = busy;
+  cloudControls();
 }
 
 function cloudShowFor(userId) {
   cloudUserId = userId;
   cloudPanel.hidden = !(cloudConfig && userId);
-  if (cloudConfig && userId && !cloudBusy) cloudMessage('Progresso local. Escolha quando enviar ou carregar da nuvem.');
+  cloudControls();
+  if (!cloudConfig || !userId || cloudBusy) return;
+  if (!localOwnerId) cloudMessage('Antes de enviar, confirme que o progresso deste navegador pertence a esta conta.');
+  else if (localOwnerId !== userId) cloudMessage('O progresso local pertence a outra conta. Carregue a cópia desta conta ou inicie uma jornada vazia.');
+  else cloudMessage('Progresso local desta conta. Escolha quando enviar ou carregar da nuvem.');
 }
 
 async function cloudRequest(method, query = '', body = null) {
@@ -75,6 +101,10 @@ function cloudBackupLocal() {
 
 cloudUpload.addEventListener('click', async () => {
   if (cloudBusy) return;
+  if (!cloudUserId || localOwnerId !== cloudUserId) {
+    cloudMessage('Vincule este progresso à conta atual antes de enviar.');
+    return;
+  }
   const userId = cloudUserId;
   cloudSetBusy(true);
   cloudMessage('Conferindo o progresso na nuvem…');
@@ -126,12 +156,32 @@ cloudDownload.addEventListener('click', async () => {
     state = sanitizeState(remote.state);
     saveState();
     render();
+    cloudSetOwner(userId);
     cloudMessage('Progresso da nuvem carregado. Backup local baixado.');
   } catch (error) {
     cloudMessage(`Não foi possível carregar: ${error.message}`);
   } finally {
     cloudSetBusy(false);
   }
+});
+
+cloudClaim.addEventListener('click', () => {
+  if (cloudBusy || !cloudUserId || localOwnerId) return;
+  if (!window.confirm('O progresso exibido pode ter sido criado por outra pessoa neste navegador. Você confirma que ele pertence à conta atual?')) return;
+  cloudSetOwner(cloudUserId);
+  cloudMessage('Progresso local vinculado a esta conta. Agora você pode enviá-lo à nuvem.');
+});
+
+cloudNew.addEventListener('click', () => {
+  if (cloudBusy || !cloudUserId || !localOwnerId || localOwnerId === cloudUserId) return;
+  if (!window.confirm('Iniciar uma jornada vazia substituirá o progresso exibido. Um backup será baixado antes. Continuar?')) return;
+  cloudBackupLocal();
+  if (dialog.open) closeDialog();
+  state = sanitizeState(null);
+  saveState();
+  render();
+  cloudSetOwner(cloudUserId);
+  cloudMessage('Jornada vazia iniciada nesta conta. A cópia anterior foi baixada.');
 });
 
 cloudRestore.addEventListener('click', () => { if (!cloudBusy) cloudBackupFile.click(); });
@@ -157,7 +207,8 @@ cloudBackupFile.addEventListener('change', async () => {
     state = sanitizeState(candidate);
     saveState();
     render();
-    cloudMessage('Backup local restaurado. Envie à nuvem se quiser atualizar a cópia remota.');
+    cloudSetOwner(null);
+    cloudMessage('Backup restaurado. Confirme a conta proprietária antes de enviá-lo à nuvem.');
   } catch (error) {
     cloudMessage(`Não foi possível restaurar: ${error.message}`);
   } finally {
