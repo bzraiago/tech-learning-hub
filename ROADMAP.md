@@ -127,6 +127,7 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Padronizar aulas na ordem definida no `AGENTS.md`.
 - [ ] Tornar todos os objetivos observáveis.
 - [ ] Separar resultado esperado e critérios de aceite das soluções ocultas.
+  - [x] Exibir antes do rascunho o resultado esperado já existente nos 458 exercícios; detalhar critérios específicos continua pendente.
 - [ ] Garantir exemplos executáveis com saída ou comportamento visível.
 - [ ] Aplicar a progressão guiado → pistas → problema novo → mudança de requisito.
 - [ ] Garantir, em cada aula, atividades de prever, alterar, construir e investigar erro.

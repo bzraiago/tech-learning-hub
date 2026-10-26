@@ -136,6 +136,7 @@ for (const lesson of lessons) {
   } else {
     guide.exercises.forEach((exercise, index) => {
       if (!exercise.prompt?.trim()) fail(`Exercício sem enunciado: ${lesson.id}:${index}`);
+      if (!exercise.expected?.trim()) fail(`Exercício sem resultado esperado: ${lesson.id}:${index}`);
       if (!exercise.solution?.trim()) fail(`Exercício sem solução: ${lesson.id}:${index}`);
     });
   }
