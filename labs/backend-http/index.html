@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Estudos — laboratório HTTP</title>
+</head>
+<body>
+  <main>
+    <h1>Estudos</h1>
+    <button type="button" id="atualizar">Atualizar lista</button>
+    <p id="situacao" role="status" aria-live="polite">Carregando…</p>
+    <ul id="lista"></ul>
+  </main>
+  <script>
+    const situacao = document.querySelector('#situacao');
+    const lista = document.querySelector('#lista');
+
+    async function carregarEstudos() {
+      situacao.textContent = 'Carregando…';
+      lista.replaceChildren();
+      try {
+        const resposta = await fetch('/api/estudos');
+        if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
+        const dados = await resposta.json();
+        if (!Array.isArray(dados)) throw new Error('Formato inesperado');
+        for (const estudo of dados) {
+          const item = document.createElement('li');
+          item.textContent = estudo.titulo;
+          lista.append(item);
+        }
+        situacao.textContent = dados.length ? `${dados.length} estudos encontrados.` : 'Nenhum estudo encontrado.';
+      } catch (erro) {
+        situacao.textContent = `Não foi possível carregar os estudos: ${erro.message}`;
+      }
+    }
+
+    document.querySelector('#atualizar').addEventListener('click', carregarEstudos);
+    carregarEstudos();
+  </script>
+</body>
+</html>
