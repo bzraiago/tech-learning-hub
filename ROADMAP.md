@@ -523,6 +523,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 26/10/2026 | Fase 3 — CRUD MongoDB | `8f8fdff` | `db-mongo-crud` ganhou critérios nos quatro exercícios; previsões e contagens ficaram para a prática do aluno. Validação de conteúdo passou; conferência manual pendente. |
 | 26/10/2026 | Fase 3 — pipelines MongoDB | `3326024` | `db-mongo-pipelines` ganhou critérios nos quatro exercícios; grupos, totais e contagens ficaram para a prática do aluno. Validação de conteúdo passou; conferência manual pendente. |
 | 26/10/2026 | Fase 3 — modelagem NoSQL | `2f3717f` | `db-nosql-models` ganhou critérios nos quatro exercícios; acesso, custo de atualização, crescimento e sincronização ficaram observáveis. Validação de conteúdo passou; conferência manual pendente. |
+| 26/10/2026 | Fase 3 — desempenho SQL | `bbcfa47` | `db-performance` ganhou critérios nos quatro exercícios; previsão, plano observado e correção funcional foram separados. Validação de conteúdo passou; conferência manual pendente. |
 
 ## Decisões e bloqueios
 
