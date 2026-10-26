@@ -6,7 +6,9 @@ const signInButton = document.querySelector('#sign-in');
 const signUpButton = document.querySelector('#sign-up');
 const signOutButton = document.querySelector('#sign-out');
 const gateSignInButton = document.querySelector('#gate-sign-in');
+const gateSignUpButton = document.querySelector('#gate-sign-up');
 const gateStatus = document.querySelector('#login-gate-status');
+const gateLoadingStatus = document.querySelector('#gate-loading-status');
 const userButton = document.querySelector('#clerk-user-button');
 let userButtonMounted = false;
 
@@ -29,11 +31,13 @@ function loadClerkScript(url, publishableKey) {
 
 function renderAuth(user) {
   const signedIn = Boolean(user);
+  document.body.dataset.authView = signedIn ? 'loading' : 'login';
   signInButton.hidden = signedIn;
   signUpButton.hidden = signedIn;
   signOutButton.hidden = !signedIn;
   userButton.hidden = !signedIn;
   gateSignInButton.hidden = signedIn;
+  gateSignUpButton.hidden = signedIn;
   if (signedIn && !userButtonMounted) {
     window.Clerk.mountUserButton(userButton);
     userButtonMounted = true;
@@ -68,12 +72,15 @@ async function initAuth() {
     const openSignIn = () => {
       Promise.resolve(window.Clerk.openSignIn()).catch(() => setAuthStatus('Não foi possível abrir o login.'));
     };
+    const openSignUp = () => {
+      Promise.resolve(window.Clerk.openSignUp()).catch(() => setAuthStatus('Não foi possível abrir o cadastro.'));
+    };
     gateSignInButton.disabled = false;
+    gateSignUpButton.disabled = false;
     signInButton.addEventListener('click', openSignIn);
     gateSignInButton.addEventListener('click', openSignIn);
-    signUpButton.addEventListener('click', () => {
-      Promise.resolve(window.Clerk.openSignUp()).catch(() => setAuthStatus('Não foi possível abrir o cadastro.'));
-    });
+    signUpButton.addEventListener('click', openSignUp);
+    gateSignUpButton.addEventListener('click', openSignUp);
     signOutButton.addEventListener('click', async () => {
       signOutButton.disabled = true;
       try { await window.Clerk.signOut(); }
@@ -84,8 +91,10 @@ async function initAuth() {
     renderAuth(window.Clerk.user);
   } catch (error) {
     console.warn('Login Clerk indisponível:', error);
+    document.body.dataset.authView = 'login';
     setAuthStatus('Login indisponível no momento');
     gateStatus.textContent = 'Login indisponível no momento. Atualize a página para tentar novamente.';
+    gateLoadingStatus.textContent = 'Login indisponível no momento.';
   }
 }
 

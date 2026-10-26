@@ -39,6 +39,8 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 ## Progresso e persistência
 
 - [ ] Sem login, só a tela de entrada é exibida; o curso e a navegação não recebem foco.
+- [ ] Ao atualizar uma sessão autenticada, aparece apenas a tela de carregamento; o convite de login não pisca antes de abrir o curso.
+- [ ] Na tela de entrada, Entrar e Criar conta abrem os fluxos correspondentes do Clerk por mouse e teclado, inclusive em largura de celular.
 - [ ] Após o login, o conteúdo é liberado somente depois da leitura do progresso da conta.
 - [ ] Ao sair, o conteúdo volta a ficar bloqueado e o progresso da conta deixa a tela.
 - [ ] Marcar uma aula atualiza módulo, trilha e progresso total.

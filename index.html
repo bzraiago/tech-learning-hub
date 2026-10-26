@@ -17,10 +17,10 @@
       --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
     }
   </style>
-  <link rel="stylesheet" href="assets/css/global.css">
+  <link rel="stylesheet" href="assets/css/global.css?v=login-screen-1">
 
 </head>
-<body data-auth-locked class="min-h-screen antialiased">
+<body data-auth-locked data-auth-view="loading" class="min-h-screen antialiased">
   <a href="#journey" class="fixed left-4 top-3 z-50 -translate-y-24 rounded-lg bg-violet-500 px-4 py-3 font-bold text-white focus:translate-y-0">Pular para as lições</a>
 
   <!-- Ícones vetoriais internos: nenhuma biblioteca de ícones é necessária. -->
@@ -89,11 +89,44 @@
       </div>
     </header>
 
-    <section id="login-gate" aria-labelledby="login-gate-title" class="mx-auto flex min-h-[70vh] max-w-lg flex-col items-center justify-center px-5 py-12 text-center">
-      <div class="mb-5 rounded-2xl border border-violet-400/20 bg-violet-400/10 p-4 text-violet-300"><svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><use href="#i-spark"/></svg></div>
-      <h1 id="login-gate-title" class="font-display text-3xl font-bold">Entre para acessar sua jornada</h1>
-      <p id="login-gate-status" role="status" class="mt-4 text-sm leading-7 text-slate-400">Carregando login…</p>
-      <button id="gate-sign-in" type="button" disabled class="mt-7 rounded-xl bg-violet-500 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-400 disabled:cursor-wait disabled:opacity-50">Entrar</button>
+    <section id="login-gate" aria-label="Acesso ao Tech Learning Hub">
+      <div id="gate-loading" class="gate-loading" role="status" aria-live="polite">
+        <div class="gate-loading-logo"><svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><use href="#i-logo"/></svg></div>
+        <p class="gate-loading-brand">Tech Learning <span>Hub</span></p>
+        <div class="gate-spinner" aria-hidden="true"></div>
+        <h1>Preparando sua jornada</h1>
+        <p id="gate-loading-status">Verificando sua sessão…</p>
+        <div class="gate-loading-line" aria-hidden="true"><span></span></div>
+      </div>
+      <div id="gate-login" class="gate-login">
+        <div class="gate-top">
+          <div class="gate-brand"><span class="gate-brand-icon"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><use href="#i-logo"/></svg></span><span>Tech Learning <strong>Hub</strong></span></div>
+          <span class="gate-top-note">APRENDER · PRATICAR · EVOLUIR</span>
+        </div>
+        <div class="gate-layout">
+          <div class="gate-intro">
+            <p class="gate-eyebrow"><span></span> SEU ESPAÇO PARA EVOLUIR</p>
+            <h1>Aprenda tecnologia.<br><em>Construa seu próximo passo.</em></h1>
+            <p class="gate-lead">Uma jornada em português, do primeiro código aos projetos completos. Estude no seu ritmo, pratique e retome de onde parou.</p>
+            <div class="gate-highlights" aria-label="O que você encontra no curso">
+              <div><span class="gate-highlight-icon"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><use href="#i-book"/></svg></span><span><strong>Aulas guiadas</strong><small>Conceitos, exemplos e prática no mesmo lugar.</small></span></div>
+              <div><span class="gate-highlight-icon"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><use href="#i-code"/></svg></span><span><strong>Projetos para construir</strong><small>Transforme o que aprendeu em entregas reais.</small></span></div>
+              <div><span class="gate-highlight-icon"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><use href="#i-shield"/></svg></span><span><strong>Seu progresso na sua conta</strong><small>Continue seus estudos em outro dispositivo.</small></span></div>
+            </div>
+          </div>
+          <div class="gate-card">
+            <div class="gate-card-mark"><svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><use href="#i-spark"/></svg></div>
+            <p class="gate-card-eyebrow">BEM-VINDO À SUA JORNADA</p>
+            <h2>Entre para começar</h2>
+            <p class="gate-card-copy">Acesse suas aulas, projetos e progresso com a sua conta.</p>
+            <button id="gate-sign-in" type="button" disabled class="gate-primary">Entrar <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+            <button id="gate-sign-up" type="button" disabled class="gate-secondary">Criar conta</button>
+            <p id="login-gate-status" role="status" class="gate-card-status">Preparando o acesso…</p>
+            <p class="gate-card-foot">Seu progresso é carregado automaticamente após o login.</p>
+          </div>
+        </div>
+        <div class="gate-bottom"><span>Um passo de cada vez. O próximo é seu.</span><span>TECH LEARNING HUB</span></div>
+      </div>
     </section>
 
     <main class="mx-auto max-w-[1600px] px-5 pb-8 pt-7 sm:px-8 xl:px-10">
@@ -205,7 +238,7 @@
   <script src="assets/js/ui/render.js?v=cloud-only-1"></script>
   <script src="assets/js/ui/dialogs.js?v=cloud-only-1"></script>
   <script src="assets/js/app.js?v=cloud-only-1"></script>
-  <script src="assets/js/auth.js?v=cloud-only-1"></script>
-  <script src="assets/js/cloud.js?v=cloud-only-1"></script>
+  <script src="assets/js/auth.js?v=login-screen-1"></script>
+  <script src="assets/js/cloud.js?v=login-screen-1"></script>
 </body>
 </html>

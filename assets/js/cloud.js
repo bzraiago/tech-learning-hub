@@ -6,6 +6,7 @@ const cloudStatus = document.querySelector('#cloud-status');
 const cloudSidebarStatus = document.querySelector('#storage-status');
 const loginGate = document.querySelector('#login-gate');
 const loginGateStatus = document.querySelector('#login-gate-status');
+const gateLoadingStatus = document.querySelector('#gate-loading-status');
 let cloudConfig = null;
 let cloudConfigError = null;
 let cloudUserId = null;
@@ -20,6 +21,7 @@ function cloudMessage(message) {
   cloudStatus.textContent = message;
   cloudSidebarStatus.textContent = message;
   loginGateStatus.textContent = message;
+  gateLoadingStatus.textContent = message;
 }
 
 function cloudLock(locked) {

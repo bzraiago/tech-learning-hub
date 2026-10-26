@@ -296,6 +296,7 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Implementar cadastro, login, logout, sessão expirada e estado de carregamento com Clerk.
   - [x] Preparar interface de entrada/saída, função de configuração pública e guia de implantação; fluxo real pendente das chaves e do domínio Clerk.
   - [x] Exigir login e carregamento do progresso da conta antes de liberar o conteúdo; verificação no navegador publicado pendente.
+  - [x] Separar a apresentação do curso da espera pela sessão Clerk e melhorar a entrada responsiva; teste no domínio publicado pendente.
 - [ ] Configurar login social do Google pelo Clerk e ensinar os conceitos transferíveis de OAuth 2.0/OpenID Connect, redirect URI, consentimento, escopos e `state`.
 - [ ] Conectar Clerk ao Supabase pela integração nativa atual, sem usar o template JWT legado.
   - [x] Preparar cliente REST com token da sessão Clerk e guia da integração nativa; ativação e teste com duas contas pendentes.
