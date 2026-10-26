@@ -951,9 +951,10 @@ Object.assign(LESSON_GUIDES, {
           "Envolva o UPDATE entre BEGIN e ROLLBACK.",
           "Use saldo=saldo+5, sem substituir por valor calculado fora do banco."
         ],
-        "solution": "BEGIN;\nUPDATE contas SET saldo=saldo+5 WHERE id=1;\nROLLBACK;\nSELECT saldo FROM contas WHERE id=1;",
+        "solution": "BEGIN;\nUPDATE contas SET saldo=saldo+5 WHERE id=1;\nSELECT saldo FROM contas WHERE id=1;\nROLLBACK;\nSELECT saldo FROM contas WHERE id=1;",
         "explanation": "A alteração existe apenas durante a transação e é descartada ao final. Reinicie o laboratório se realizou o passo guiado com COMMIT.",
-        "expected": "100."
+        "expected": "A consulta após a reversão mostra o saldo inicial, sem conservar o crédito provisório.",
+        "criteria": ["Registra a previsão do saldo final antes de executar os comandos.", "Faz o crédito dentro de uma transação e observa o estado provisório.", "Executa ROLLBACK e consulta novamente a conta para confirmar a reversão."]
       },
       {
         "prompt": "Alterar: em uma base inicial nova, transfira 20 de Ana para Beto e confirme; confira o total.",
@@ -963,17 +964,19 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "BEGIN;\nUPDATE contas SET saldo=saldo-20 WHERE id=1;\nUPDATE contas SET saldo=saldo+20 WHERE id=2;\nCOMMIT;\nSELECT nome,saldo FROM contas ORDER BY id;\nSELECT SUM(saldo) FROM contas;",
         "explanation": "A confirmação preserva os dois movimentos. O teste de soma é uma verificação adicional, não uma constraint automaticamente criada.",
-        "expected": "Ana 80; Beto 70; soma 150."
+        "expected": "Os dois saldos refletem a transferência confirmada e o total das contas permanece igual ao inicial.",
+        "criteria": ["Parte de uma base inicial nova e mantém débito e crédito na mesma transação.", "Aplica o mesmo valor aos dois movimentos e confirma somente depois de ambos.", "Consulta as duas contas e compara a soma final com a inicial."]
       },
       {
-        "prompt": "Construir: partindo de 100 e 50, transfira 15 de Ana para Beto e reverta toda a unidade se o destino não existir.",
+        "prompt": "Construir: partindo de 100 e 50, transfira 15 de Ana para Beto. Confira quantas linhas cada UPDATE alterou e reverta toda a unidade se o destino não existir.",
         "hints": [
           "Os dois UPDATE pertencem à mesma unidade.",
           "Confira se cada operação afetou uma conta antes de confirmar."
         ],
-        "solution": "BEGIN;\nUPDATE contas SET saldo=saldo-15 WHERE id=1;\nUPDATE contas SET saldo=saldo+15 WHERE id=2;\nCOMMIT;\nSELECT nome,saldo FROM contas ORDER BY id;\nSELECT SUM(saldo) FROM contas;",
-        "expected": "Ana 85; Beto 65; soma 150. Se o segundo UPDATE afetar zero linhas, ROLLBACK preserva 100 e 50.",
-        "explanation": "O caminho de sucesso confirma os dois movimentos. Em uma aplicação, zero linhas no destino deve selecionar o caminho de ROLLBACK."
+        "solution": "BEGIN;\nUPDATE contas SET saldo=saldo-15 WHERE id=1 AND saldo>=15;\nSELECT changes() AS debitos;\nUPDATE contas SET saldo=saldo+15 WHERE id=2;\nSELECT changes() AS creditos;\n-- Se ambos os resultados forem 1: COMMIT; caso contrário: ROLLBACK;\nSELECT nome,saldo FROM contas ORDER BY id;\nSELECT SUM(saldo) FROM contas;",
+        "expected": "O caminho válido confirma as duas mudanças e conserva o total; o caminho com destino ausente reverte o débito.",
+        "criteria": ["Mantém os dois UPDATE na mesma transação e impede débito sem saldo suficiente.", "Verifica o número de linhas alteradas em cada movimento antes de escolher COMMIT ou ROLLBACK.", "Testa também um destino inexistente e confirma que nenhuma metade da transferência persiste."],
+        "explanation": "O comando SQL mostra os dois caminhos como decisão manual no laboratório. Em uma aplicação, o código deve escolher COMMIT apenas quando ambos os UPDATE afetarem uma linha; caso contrário, executar ROLLBACK."
       },
       {
         "prompt": "Investigar erro: uma transferência debita 10 e credita 11. Substitua por dois movimentos iguais e confirme que a soma permanece 150. Use base inicial nova.",
@@ -982,7 +985,8 @@ Object.assign(LESSON_GUIDES, {
           "Valide as duas contas e a soma."
         ],
         "solution": "BEGIN;\nUPDATE contas SET saldo=saldo-10 WHERE id=1;\nUPDATE contas SET saldo=saldo+10 WHERE id=2;\nCOMMIT;\nSELECT nome,saldo FROM contas ORDER BY id;\nSELECT SUM(saldo) FROM contas;",
-        "expected": "Ana | 90; Beto | 60; soma 150.",
+        "expected": "Os saldos após a correção mostram movimentos iguais e preservam a soma inicial.",
+        "criteria": ["Identifica que a transação pode confirmar uma operação aritmeticamente errada.", "Usa o mesmo valor no débito e no crédito dentro de uma unidade.", "Consulta as contas e compara a soma final com a inicial para verificar a correção."],
         "explanation": "Os dois movimentos são confirmados juntos e têm a mesma magnitude. O teste da soma detecta o erro aritmético original."
       }
     ],

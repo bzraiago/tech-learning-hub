@@ -141,7 +141,7 @@ for (const lesson of lessons) {
       if (exercise.criteria !== undefined && (!Array.isArray(exercise.criteria) || !exercise.criteria.length || exercise.criteria.some((item) => typeof item !== 'string' || !item.trim()))) {
         fail(`Critérios de aceite inválidos: ${lesson.id}:${index}`);
       }
-      if (['prep-tools', 'prep-files', 'prep-workspace', 'prep-cycle', 'prep-errors', 'setup-editor', 'setup-python', 'setup-git', 'setup-node', 'setup-docker', 'setup-docker-alternative', 'setup-postgresql', 'setup-mariadb', 'setup-firebird', 'setup-mongodb', 'db-mariadb', 'db-firebird', 'db-mongo-crud', 'db-mongo-pipelines', 'db-nosql-models', 'db-performance', 'db-security', 'db-recovery', 'db-project', 'db-modeling', 'db-normalization', 'db-ddl-constraints', 'db-ddl-crud', 'db-select', 'db-aggregation', 'db-joins', 'db-subqueries-ctes'].includes(lesson.id) && !exercise.criteria?.length) fail(`Exercício sem critérios de aceite: ${lesson.id}:${index}`);
+      if (['prep-tools', 'prep-files', 'prep-workspace', 'prep-cycle', 'prep-errors', 'setup-editor', 'setup-python', 'setup-git', 'setup-node', 'setup-docker', 'setup-docker-alternative', 'setup-postgresql', 'setup-mariadb', 'setup-firebird', 'setup-mongodb', 'db-mariadb', 'db-firebird', 'db-mongo-crud', 'db-mongo-pipelines', 'db-nosql-models', 'db-performance', 'db-security', 'db-recovery', 'db-project', 'db-modeling', 'db-normalization', 'db-ddl-constraints', 'db-ddl-crud', 'db-select', 'db-aggregation', 'db-joins', 'db-subqueries-ctes', 'db-transactions'].includes(lesson.id) && !exercise.criteria?.length) fail(`Exercício sem critérios de aceite: ${lesson.id}:${index}`);
     });
   }
   if (!guide.retry) {

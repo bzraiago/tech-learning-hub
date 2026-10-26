@@ -48,6 +48,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `db-aggregation`, os quatro critérios separam linhas filtradas de grupos filtrados e os resultados esperados não antecipam totais ou médias.
 - [ ] Em `db-joins`, a previsão das linhas antecede a consulta; `LEFT JOIN` preserva trilhas vazias e a mudança de `WHERE` para `ON` é observada.
 - [ ] Em `db-subqueries-ctes`, o resumo intermediário inclui trilhas vazias, a média usa todos os totais e medidas independentes não se multiplicam após a junção.
+- [ ] Em `db-transactions`, o saldo provisório some após ROLLBACK; a transferência só confirma após dois UPDATE válidos e o destino inexistente não deixa débito persistido.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.
