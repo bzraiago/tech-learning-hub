@@ -2303,7 +2303,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "lab.licoes.find({tags:\"sql\"},{_id:0,titulo:1}).sort({titulo:1});",
         "explanation": "A igualdade com o elemento encontra arrays contendo sql. Tanto a1 quanto a2 satisfazem a condição, independentemente do estado de progresso.",
-        "expected": "JOIN e SELECT."
+        "expected": "A previsão identifica os títulos encontrados pelo filtro de tag e é comparada com a consulta executada.",
+        "criteria": [
+          "Registra os títulos previstos antes de executar a consulta.",
+          "Filtra pela tag sem restringir o estado de conclusão e projeta os títulos.",
+          "Compara a previsão com os documentos retornados e explica qualquer diferença."
+        ]
       },
       {
         "prompt": "Alterar: conclua apenas JOIN e verifique quantas pendências restam depois do exemplo principal.",
@@ -2313,7 +2318,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "lab.licoes.updateOne({_id:\"a2\"},{$set:{concluida:true}});\nlab.licoes.countDocuments({concluida:false});",
         "explanation": "a1 já foi concluída no exemplo e a3 começou concluída. Alterar a2 termina a última pendência sem substituir os outros campos.",
-        "expected": "0 documentos pendentes."
+        "expected": "A nova contagem de pendências reflete a alteração feita apenas na lição solicitada.",
+        "criteria": [
+          "Seleciona a lição solicitada por identidade e altera somente seu estado de conclusão.",
+          "Consulta a quantidade de documentos ainda pendentes após a alteração.",
+          "Confere que os demais documentos não tiveram seus campos substituídos."
+        ]
       },
       {
         "prompt": "Construir: crie uma lição temporária x9, consulte-a, remova-a e prove que a1 permanece.",
@@ -2323,7 +2333,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "lab.licoes.insertOne({_id:\"x9\",titulo:\"Rascunho\",minutos:5,concluida:false,tags:[]});\nlab.licoes.findOne({_id:\"x9\"});\nlab.licoes.deleteOne({_id:\"x9\"});\nlab.licoes.countDocuments({_id:\"x9\"});\nlab.licoes.countDocuments({_id:\"a1\"});",
         "explanation": "A criação de uma identidade descartável torna o teste de exclusão delimitado e a consulta final verifica o que foi preservado.",
-        "expected": "deleteOne: deletedCount 1; contagem x9: 0; contagem a1: 1."
+        "expected": "A remoção da lição temporária é confirmada, enquanto a lição existente continua disponível.",
+        "criteria": [
+          "Cria e consulta x9 antes de removê-la com um filtro específico por identidade.",
+          "Confere o resultado da remoção e a ausência de x9 em uma nova consulta.",
+          "Consulta a1 depois da remoção para demonstrar que permaneceu intacta."
+        ]
       },
       {
         "prompt": "Investigar erro: depois do exemplo, repita a conclusão de a1 duas vezes. modifiedCount igual a zero é falha? Compare com matchedCount antes de decidir.",
@@ -2333,7 +2348,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "lab.licoes.updateOne({_id:\"a1\"},{$set:{concluida:true}});\nlab.licoes.updateOne({_id:\"a1\"},{$set:{concluida:true}});",
         "explanation": "Uma atualização que preserva o estado é uma operação válida. Contagem de modificação zero não basta para concluir que o alvo inexiste.",
-        "expected": "Em ambas: matchedCount 1, modifiedCount 0; a1 já estava concluída."
+        "expected": "As duas tentativas permitem distinguir documento encontrado de documento efetivamente modificado.",
+        "criteria": [
+          "Registra matchedCount e modifiedCount de cada tentativa separadamente.",
+          "Confere o estado atual de a1 antes de interpretar uma contagem de modificação nula.",
+          "Explica se o alvo foi encontrado e se seu conteúdo precisou mudar."
+        ]
       }
     ],
     "mistakes": [

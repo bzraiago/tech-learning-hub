@@ -33,6 +33,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `setup-mariadb`, `setup-firebird` e `setup-mongodb`, os critérios correspondem aos diagnósticos de cada motor, não antecipam a solução e mantêm segredos fora dos relatórios.
 - [ ] Em `db-mariadb`, os critérios dos quatro exercícios aparecem antes das dicas; a inspeção usa a definição real e os resultados esperados não revelam linhas ou valores finais.
 - [ ] Em `db-firebird`, os critérios aparecem nos quatro exercícios; a ordenação precede o limite e os resultados esperados não antecipam nomes ou contagens.
+- [ ] Em `db-mongo-crud`, previsão e contagens não aparecem antecipadas; a remoção confirma a ausência de x9 e a preservação de a1.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.
