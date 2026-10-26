@@ -549,6 +549,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 26/10/2026 | Fase 3 — junções SQL | `d77435c` | `db-joins` ganhou critérios nos quatro exercícios; linhas preservadas, contagem de filhos e posição do filtro são verificadas sem antecipar a saída. Validação de conteúdo passou; conferência manual pendente. |
 | 26/10/2026 | Fase 3 — subconsultas e CTEs | `80dbfcb` | `db-subqueries-ctes` ganhou critérios nos quatro exercícios; média, resumos e granularidade são verificados sem antecipar os valores finais. Validação de conteúdo passou; conferência manual pendente. |
 | 26/10/2026 | Fase 3 — transações SQL | `1bf7c92` | `db-transactions` ganhou critérios nos quatro exercícios; a transferência exige verificar os dois movimentos antes de confirmar. Validação de conteúdo passou; conferência manual pendente. |
+| 26/10/2026 | Fase 3 — concorrência e limites | `58a2e49` | `db-concurrency-boundaries` ganhou critérios nos quatro exercícios; savepoint, efeito externo e repetição da unidade são verificados sem antecipar estados finais. Validação de conteúdo passou; conferência manual pendente. |
 
 ## Decisões e bloqueios
 
