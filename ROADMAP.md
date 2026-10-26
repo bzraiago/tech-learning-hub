@@ -513,6 +513,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 26/10/2026 | Fase 3 — alternativa SQLite | `b122805` | `setup-docker-alternative` ganhou critérios nos quatro exercícios; previsão preservada e relatório com evidências e pendências. Validação de conteúdo passou; conferência manual pendente. |
 | 26/10/2026 | Fase 3 — conexão PostgreSQL | `560c18b` | `setup-postgresql` ganhou critérios nos quatro exercícios; destino, evidências e diagnóstico seguro explicitados. Validação de conteúdo passou; navegador e laboratório real não verificados. |
 | 26/10/2026 | Fase 3 — bancos opcionais | `d526b73` | As preparações de MariaDB, Firebird e MongoDB ganharam critérios reutilizáveis; resultados foram ajustados para pedir evidências sem antecipar a resposta. Verificações não executadas nesta etapa. |
+| 26/10/2026 | Fase 3 — laboratório MariaDB | `1d887dd` | `db-mariadb` ganhou critérios nos quatro exercícios; resultados esperados deixaram de exibir diretamente as linhas e valores finais. Verificações não executadas nesta etapa. |
 
 ## Decisões e bloqueios
 
