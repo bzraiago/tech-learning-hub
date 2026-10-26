@@ -39,6 +39,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `db-performance`, as previsões são registradas antes da consulta, os planos são observados sem impor um tipo de acesso e a paginação não revela IDs finais.
 - [ ] Em `db-security`, os quatro critérios aparecem antes das dicas; busca, contagem e alteração preservam o escopo do usuário, sem expor os valores finais nos resultados esperados.
 - [ ] Em `db-recovery`, os critérios verificam a cópia restaurada, comparam a perda ao RPO e preservam a origem durante o ensaio da migração.
+- [ ] Em `db-project`, os critérios distinguem progresso de Ana e Beto, mantêm matrículas vazias no relatório e rejeitam a relação inválida no esquema reforçado.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.

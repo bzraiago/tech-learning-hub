@@ -146,6 +146,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Acrescentar critérios aos quatro exercícios de `db-performance`, distinguindo previsão, plano observado e correção funcional.
   - [x] Acrescentar critérios aos quatro exercícios de `db-security`, cobrindo parametrização, escopo por proprietário e teste negativo de alteração.
   - [x] Acrescentar critérios aos quatro exercícios de `db-recovery` e corrigir a descrição do título presente na cópia e na origem.
+  - [x] Acrescentar critérios aos quatro exercícios de `db-project`, preservando a previsão do aluno e verificando isolamento de progresso e integridade das matrículas.
   - [ ] Revisar os demais resultados esperados para evitar respostas antecipadas e completar critérios específicos por aula.
 - [ ] Garantir exemplos executáveis com saída ou comportamento visível.
 - [ ] Aplicar a progressão guiado → pistas → problema novo → mudança de requisito.

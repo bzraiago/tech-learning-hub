@@ -3151,7 +3151,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "INSERT INTO progresso VALUES(1,11,1);\n-- Reexecute o SELECT completo do exemplo.",
         "explanation": "A nova linha acrescenta uma conclusão apenas a Ana. O filtro composto da junção impede que a alteração afete Beto.",
-        "expected": "Ana/Dados: 2 concluídas e 100%. Beto/Dados: 0%. Ana/Python: 0%."
+        "expected": "A previsão distingue a matrícula afetada das demais e é conferida após repetir o relatório.",
+        "criteria": [
+          "Registra antes do INSERT quais linhas e percentuais espera ver mudar ou permanecer iguais.",
+          "Acrescenta progresso somente para o par estudante e lição indicado.",
+          "Compara o relatório posterior com a previsão, incluindo as matrículas não alteradas."
+        ]
       },
       {
         "prompt": "Alterar: adicione Listas à trilha Python sem registrar conclusão. Repita o relatório.",
@@ -3161,7 +3166,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "INSERT INTO licoes VALUES(12,2,'Listas');\n-- Reexecute o SELECT completo do exemplo.",
         "explanation": "A matrícula de Ana em Python já existia, então a lição entra no denominador. Sem progresso, permanece pendente. Beto não ganha matrícula automaticamente.",
-        "expected": "Ana/Python: total 1, concluídas 0, percentual 0. Continuam existindo três linhas."
+        "expected": "O relatório inclui a nova lição na matrícula existente e mantém visíveis as demais matrículas.",
+        "criteria": [
+          "Adiciona a lição à trilha solicitada sem criar uma conclusão para ela.",
+          "Confere total, conclusões e percentual da matrícula afetada após repetir o relatório.",
+          "Verifica que as outras matrículas continuam no resultado e não herdaram progresso."
+        ]
       },
       {
         "prompt": "Construir: na base original do exemplo, desmarque apenas SELECT para Ana. Reexecute o relatório e explique por que o WHERE precisa das duas identidades.",
@@ -3171,7 +3181,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "UPDATE progresso SET concluida=0\nWHERE estudante_id=1 AND licao_id=10;\n-- Reexecute o SELECT completo do exemplo antes de outras alterações.",
         "explanation": "A conclusão descreve um par. Filtrar apenas licao_id poderia alterar o estado de outras pessoas.",
-        "expected": "Ana/Dados: 0 de 2 e 0%; Beto/Dados permanece 0%; Ana/Python permanece 0%."
+        "expected": "Somente o progresso da pessoa e da lição escolhidas muda; o relatório conserva as demais linhas.",
+        "criteria": [
+          "Executa a alteração em uma cópia dos dados originais e filtra estudante e lição juntos.",
+          "Compara a linha afetada antes e depois da mudança.",
+          "Confirma que o progresso de Beto e a matrícula da trilha vazia permaneceram iguais."
+        ]
       },
       {
         "prompt": "Investigar erro: o esquema inicial aceita progresso de uma lição fora da matrícula. Desenhe duas FKs compostas para impedir isso em uma base nova, declare o caso inválido que deve falhar e registre por que SQLite basta para o laboratório local e qual requisito levaria a reavaliá-lo.",
@@ -3181,7 +3196,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "LICOES: UNIQUE(id,trilha_id)\nMATRICULAS: PRIMARY KEY(estudante_id,trilha_id)\nPROGRESSO: estudante_id,trilha_id,licao_id,concluida\n  PRIMARY KEY(estudante_id,licao_id)\n  FOREIGN KEY(estudante_id,trilha_id) -> MATRICULAS(estudante_id,trilha_id)\n  FOREIGN KEY(licao_id,trilha_id) -> LICOES(id,trilha_id)\nTeste inválido: Beto (2), Python (2), SELECT (10, da trilha 1).\nDecisão: SQLite local atende ao estudo individual sem serviço adicional; PostgreSQL com API é alternativa para acesso remoto centralizado, com custo de operação maior; reavaliar quando várias pessoas precisarem escrever de dispositivos diferentes.",
         "explanation": "A presença isolada de cada entidade não garante a relação correta. O par inclui a trilha nos dois lados e impede uma combinação incoerente.",
-        "expected": "Duas referências compostas rejeitam Beto/Python/SELECT no esquema reforçado; a decisão explicita requisito local, alternativa, custo e gatilho para revisão."
+        "expected": "O desenho especifica como rejeitar uma combinação incoerente de matrícula e lição, e a decisão de banco registra limites e condição de revisão.",
+        "criteria": [
+          "Desenha duas referências compostas que ligam progresso à matrícula e à trilha da lição, com chaves de destino válidas.",
+          "Declara um caso inválido com identidades existentes e explica por que o esquema proposto o recusaria; distingue o desenho de um teste ainda não executado.",
+          "Justifica a escolha para o laboratório local e identifica alternativa, custo aceito e requisito que motivaria reavaliá-la."
+        ]
       }
     ],
     "mistakes": [
