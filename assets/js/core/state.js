@@ -116,9 +116,12 @@ function sanitizeState(candidate) {
   return clean;
 }
 
-function loadState() {
+function loadState(hideOwnedAtStartup = false) {
   let raw;
-  try { raw = localStorage.getItem(STORAGE_KEY); }
+  try {
+    if (hideOwnedAtStartup && localStorage.getItem('tech-learning-hub:local-owner:v1')) return sanitizeState(null);
+    raw = localStorage.getItem(STORAGE_KEY);
+  }
   catch { storageAvailable = false; return sanitizeState(null); }
   if (!raw) return sanitizeState(null);
   try { return sanitizeState(JSON.parse(raw)); }
@@ -128,7 +131,7 @@ function loadState() {
   }
 }
 
-let state = loadState();
+let state = loadState(true);
 let filter = 'all';
 let query = '';
 let dialogContext = null;
@@ -147,6 +150,8 @@ function notify(message) {
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const ownerId = localStorage.getItem('tech-learning-hub:local-owner:v1');
+    if (ownerId) localStorage.setItem(`tech-learning-hub:account:v1:${ownerId}`, JSON.stringify(state));
     storageAvailable = true;
   } catch {
     storageAvailable = false;

@@ -7,11 +7,23 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const source = fs.readFileSync(path.join(__dirname, '..', 'assets/js/cloud.js'), 'utf8');
+const localExample = { version: 1, completed: { 'html-intro': true } };
 
-async function harness({ rows = [], confirm = true, owner = 'user_a' } = {}) {
+async function harness({ owner = 'user_a', rowsByUser = {}, confirm = true } = {}) {
   const elements = new Map();
   const events = {};
   const calls = [];
+  const storage = new Map();
+  if (owner) {
+    storage.set('tech-learning-hub:local-owner:v1', owner);
+    storage.set(`tech-learning-hub:account:v1:${owner}`, JSON.stringify(localExample));
+    storage.set('tech-learning-hub:v1', JSON.stringify(localExample));
+  }
+  const localStorage = {
+    getItem(key) { return storage.get(key) || null; },
+    setItem(key, value) { storage.set(key, value); },
+    removeItem(key) { storage.delete(key); }
+  };
   const element = (id) => {
     if (!elements.has(id)) elements.set(id, {
       hidden: true,
@@ -27,11 +39,6 @@ async function harness({ rows = [], confirm = true, owner = 'user_a' } = {}) {
     confirm: () => confirm,
     addEventListener(name, handler) { events[name] = handler; }
   };
-  const localStorage = {
-    getItem: () => owner,
-    setItem(_key, value) { owner = value; },
-    removeItem() { owner = null; }
-  };
   const fetch = async (url, options = {}) => {
     calls.push({ url, options });
     if (url === '/api/public-config') return {
@@ -41,7 +48,10 @@ async function harness({ rows = [], confirm = true, owner = 'user_a' } = {}) {
         supabasePublishableKey: 'sb_publishable_example'
       })
     };
-    if (options.method === 'GET') return { ok: true, json: async () => rows };
+    if (options.method === 'GET') {
+      const userId = decodeURIComponent(url.split('user_id=eq.')[1]);
+      return { ok: true, json: async () => rowsByUser[userId] || [] };
+    }
     return { ok: true };
   };
   const context = vm.createContext({
@@ -50,7 +60,8 @@ async function harness({ rows = [], confirm = true, owner = 'user_a' } = {}) {
       createElement: () => ({ click() {} })
     },
     window, fetch, URL, Blob, setTimeout, localStorage,
-    state: { version: 1, completed: { 'html-intro': true } },
+    STORAGE_KEY: 'tech-learning-hub:v1',
+    state: owner ? { version: 1, completed: {} } : localExample,
     sanitizeState: (candidate) => candidate || { version: 1, completed: {} },
     dialog: { open: false },
     saveState() {}, render() {}, closeDialog() {},
@@ -58,55 +69,84 @@ async function harness({ rows = [], confirm = true, owner = 'user_a' } = {}) {
   });
   vm.runInContext(source, context);
   await new Promise((resolve) => setImmediate(resolve));
-  events['tech-hub:auth-change']({ detail: { userId: 'user_a' } });
-  return { elements, calls, context, events, window };
+  return { elements, calls, context, events, window, storage };
 }
 
-test('entrar na conta não envia nem substitui progresso automaticamente', async () => {
+test('login lê a nuvem sem enviar dados automaticamente', async () => {
   const { elements, calls } = await harness();
   assert.equal(elements.get('#cloud-panel').hidden, false);
-  assert.equal(calls.length, 1);
-  assert.equal(calls[0].url, '/api/public-config');
+  assert.deepEqual(calls.map((call) => call.options.method || 'CONFIG'), ['CONFIG', 'GET']);
 });
 
-test('trocar de conta bloqueia envio do progresso local de outra pessoa', async () => {
-  const { elements, calls, events, window } = await harness();
+test('trocar de conta carrega automaticamente o progresso remoto da nova conta', async () => {
+  const remoteB = { version: 1, completed: { 'js-intro': true } };
+  const { context, events, window, calls } = await harness({
+    rowsByUser: { user_b: [{ user_id: 'user_b', state: remoteB }] }
+  });
   window.Clerk.user.id = 'user_b';
   events['tech-hub:auth-change']({ detail: { userId: 'user_b' } });
-  assert.equal(elements.get('#cloud-upload').disabled, true);
-  await elements.get('#cloud-upload').handlers.click();
-  assert.equal(calls.length, 1);
-  assert.match(elements.get('#cloud-status').textContent, /Vincule/);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(vm.runInContext('state.completed["js-intro"]', context), true);
+  assert.equal(vm.runInContext('state.completed["html-intro"]', context), undefined);
+  assert.equal(calls.filter((call) => call.options.method === 'POST').length, 0);
 });
 
-test('progresso antigo exige associação explícita antes do primeiro envio', async () => {
-  const { elements, calls } = await harness({ owner: null });
-  assert.equal(elements.get('#cloud-upload').disabled, true);
+test('conta sem cópia remota começa vazia e preserva cache da conta anterior', async () => {
+  const { context, events, window, storage } = await harness();
+  window.Clerk.user.id = 'user_b';
+  events['tech-hub:auth-change']({ detail: { userId: 'user_b' } });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(vm.runInContext('Object.keys(state.completed).length', context), 0);
+  assert.equal(JSON.parse(storage.get('tech-learning-hub:account:v1:user_a')).completed['html-intro'], true);
+});
+
+test('voltar à conta anterior recupera seu próprio cache após logout', async () => {
+  const { context, events, window } = await harness();
+  window.Clerk.user = null;
+  events['tech-hub:auth-change']({ detail: { userId: null } });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(vm.runInContext('Object.keys(state.completed).length', context), 0);
+  window.Clerk.user = { id: 'user_a' };
+  events['tech-hub:auth-change']({ detail: { userId: 'user_a' } });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(vm.runInContext('state.completed["html-intro"]', context), true);
+});
+
+test('divergência entre cópia local e nuvem não substitui nenhuma das duas', async () => {
+  const remoteB = { version: 1, completed: { remoto: true } };
+  const localB = { version: 1, completed: { local: true } };
+  const { context, events, window, storage, elements } = await harness({
+    rowsByUser: { user_b: [{ user_id: 'user_b', state: remoteB }] }
+  });
+  storage.set('tech-learning-hub:account:v1:user_b', JSON.stringify(localB));
+  window.Clerk.user.id = 'user_b';
+  events['tech-hub:auth-change']({ detail: { userId: 'user_b' } });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(vm.runInContext('state.completed.local', context), true);
+  assert.equal(vm.runInContext('state.completed.remoto', context), undefined);
+  assert.match(elements.get('#cloud-status').textContent, /difere da nuvem/);
+});
+
+test('progresso legado vira cópia de visitante e só é importado por escolha explícita', async () => {
+  const { context, elements, calls } = await harness({ owner: null });
+  assert.equal(vm.runInContext('Object.keys(state.completed).length', context), 0);
   assert.equal(elements.get('#cloud-claim').hidden, false);
   await elements.get('#cloud-claim').handlers.click();
-  assert.equal(elements.get('#cloud-upload').disabled, false);
-  assert.equal(calls.length, 1);
-});
-
-test('nova jornada em outra conta limpa a cópia exibida antes de habilitar envio', async () => {
-  const { elements, events, window, context, calls } = await harness();
-  window.Clerk.user.id = 'user_b';
-  events['tech-hub:auth-change']({ detail: { userId: 'user_b' } });
-  assert.equal(elements.get('#cloud-new').hidden, false);
-  elements.get('#cloud-new').handlers.click();
-  assert.equal(vm.runInContext('Object.keys(state.completed).length', context), 0);
-  assert.equal(elements.get('#cloud-upload').disabled, false);
-  assert.equal(calls.length, 1);
+  assert.equal(vm.runInContext('state.completed["html-intro"]', context), true);
+  assert.equal(calls.filter((call) => call.options.method === 'POST').length, 0);
 });
 
 test('envio preserva progresso remoto se confirmação for recusada', async () => {
-  const { elements, calls } = await harness({ rows: [{ user_id: 'user_a', state: {} }], confirm: false });
+  const remote = { version: 1, completed: { 'js-intro': true } };
+  const { elements, calls } = await harness({
+    rowsByUser: { user_a: [{ user_id: 'user_a', state: remote }] }, confirm: false
+  });
   await elements.get('#cloud-upload').handlers.click();
-  assert.deepEqual(calls.map((call) => call.options.method || 'CONFIG'), ['CONFIG', 'GET']);
+  assert.equal(calls.filter((call) => call.options.method === 'PATCH').length, 0);
   assert.match(elements.get('#cloud-status').textContent, /preservado/);
 });
 
-test('primeiro envio usa token Clerk e chave publicável, vinculado ao usuário', async () => {
+test('envio usa token Clerk e chave publicável, vinculado ao usuário', async () => {
   const { elements, calls } = await harness();
   await elements.get('#cloud-upload').handlers.click();
   const write = calls.find((call) => call.options.method === 'POST');
@@ -115,17 +155,4 @@ test('primeiro envio usa token Clerk e chave publicável, vinculado ao usuário'
   assert.equal(write.options.headers.apikey, 'sb_publishable_example');
   assert.equal(JSON.parse(write.options.body).user_id, 'user_a');
   assert.equal(JSON.parse(write.options.body).state.completed['html-intro'], true);
-});
-
-test('carregamento só substitui o estado local após confirmação', async () => {
-  const remote = { version: 1, completed: { 'js-intro': true } };
-  const cancelled = await harness({ rows: [{ user_id: 'user_a', state: remote }], confirm: false });
-  await cancelled.elements.get('#cloud-download').handlers.click();
-  assert.equal(vm.runInContext('state.completed["html-intro"]', cancelled.context), true);
-  assert.equal(cancelled.calls.length, 2);
-
-  const accepted = await harness({ rows: [{ user_id: 'user_a', state: remote }], confirm: true });
-  await accepted.elements.get('#cloud-download').handlers.click();
-  assert.equal(vm.runInContext('state.completed["js-intro"]', accepted.context), true);
-  assert.equal(accepted.calls.length, 2);
 });

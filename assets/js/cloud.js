@@ -6,27 +6,58 @@ const cloudStatus = document.querySelector('#cloud-status');
 const cloudUpload = document.querySelector('#cloud-upload');
 const cloudDownload = document.querySelector('#cloud-download');
 const cloudClaim = document.querySelector('#cloud-claim');
-const cloudNew = document.querySelector('#cloud-new');
 const cloudRestore = document.querySelector('#cloud-restore');
 const cloudBackupFile = document.querySelector('#cloud-backup-file');
 const CLOUD_OWNER_KEY = 'tech-learning-hub:local-owner:v1';
+const CLOUD_ACCOUNT_PREFIX = 'tech-learning-hub:account:v1:';
+const CLOUD_GUEST_KEY = 'tech-learning-hub:guest:v1';
 let cloudConfig = null;
 let cloudUserId = null;
 let cloudBusy = false;
 let localOwnerId = null;
+let cloudSwitchVersion = 0;
+const memorySnapshots = new Map();
 try { localOwnerId = localStorage.getItem(CLOUD_OWNER_KEY) || null; }
 catch { /* O app continua na sessão mesmo sem localStorage. */ }
+let activeStateOwner = localOwnerId ? null : 'guest';
+
+function cloudCacheKey(owner) { return owner === 'guest' ? CLOUD_GUEST_KEY : `${CLOUD_ACCOUNT_PREFIX}${owner}`; }
+function cloudSaveSnapshot(owner) {
+  if (!owner) return;
+  const snapshot = JSON.stringify(state);
+  memorySnapshots.set(owner, snapshot);
+  try { localStorage.setItem(cloudCacheKey(owner), snapshot); }
+  catch { /* O cache em memória ainda permite trocar de conta nesta sessão. */ }
+}
+function cloudReadSnapshot(owner) {
+  let raw = memorySnapshots.get(owner);
+  if (!raw) {
+    try { raw = localStorage.getItem(cloudCacheKey(owner)); }
+    catch { return null; }
+  }
+  if (!raw) return null;
+  try { return sanitizeState(JSON.parse(raw)); }
+  catch { return null; }
+}
+// Cópias locais anteriores à separação por conta são preservadas para o dono já vinculado.
+if (localOwnerId) {
+  try {
+    const key = cloudCacheKey(localOwnerId);
+    if (!localStorage.getItem(key)) {
+      const legacy = localStorage.getItem(STORAGE_KEY);
+      if (legacy) localStorage.setItem(key, legacy);
+    }
+  } catch { /* A cópia remota continua disponível mesmo sem cache local. */ }
+}
 
 function cloudMessage(message) { cloudStatus.textContent = message; }
 function cloudControls() {
   const ready = Boolean(cloudConfig && cloudUserId);
-  cloudUpload.disabled = cloudBusy || !ready || localOwnerId !== cloudUserId;
+  cloudUpload.disabled = cloudBusy || !ready || activeStateOwner !== cloudUserId;
   cloudDownload.disabled = cloudBusy || !ready;
   cloudRestore.disabled = cloudBusy || !ready;
-  cloudClaim.hidden = !ready || Boolean(localOwnerId);
+  cloudClaim.hidden = !ready || !cloudReadSnapshot('guest');
   cloudClaim.disabled = cloudBusy;
-  cloudNew.hidden = !ready || !localOwnerId || localOwnerId === cloudUserId;
-  cloudNew.disabled = cloudBusy;
 }
 function cloudSetOwner(userId) {
   localOwnerId = userId;
@@ -41,14 +72,52 @@ function cloudSetBusy(busy) {
   cloudControls();
 }
 
-function cloudShowFor(userId) {
+async function cloudSwitchTo(userId, refreshRemote = false) {
+  const owner = userId || 'guest';
+  if (activeStateOwner === owner && !refreshRemote) return;
+  const version = ++cloudSwitchVersion;
+  if (activeStateOwner && activeStateOwner !== owner) cloudSaveSnapshot(activeStateOwner);
   cloudUserId = userId;
+  const cached = cloudReadSnapshot(owner);
+  if (activeStateOwner !== owner) {
+    state = cached || sanitizeState(null);
+    activeStateOwner = owner;
+    cloudSetOwner(userId);
+    if (dialog.open) closeDialog();
+    saveState();
+    render();
+  }
   cloudPanel.hidden = !(cloudConfig && userId);
   cloudControls();
-  if (!cloudConfig || !userId || cloudBusy) return;
-  if (!localOwnerId) cloudMessage('Antes de enviar, confirme que o progresso deste navegador pertence a esta conta.');
-  else if (localOwnerId !== userId) cloudMessage('O progresso local pertence a outra conta. Carregue a cópia desta conta ou inicie uma jornada vazia.');
-  else cloudMessage('Progresso local desta conta. Escolha quando enviar ou carregar da nuvem.');
+  if (!userId || !cloudConfig) return;
+  cloudSetBusy(true);
+  cloudMessage('Carregando o progresso desta conta…');
+  try {
+    const remote = await cloudReadCurrent();
+    if (version !== cloudSwitchVersion || cloudUserId !== userId) return;
+    if (remote) {
+      if (!remote.state || remote.state.version !== 1 || !remote.state.completed || typeof remote.state.completed !== 'object') {
+        throw new Error('O progresso remoto tem formato desconhecido.');
+      }
+      const remoteState = sanitizeState(remote.state);
+      if (cached && JSON.stringify(cached) !== JSON.stringify(remoteState)) {
+        cloudMessage('O progresso local desta conta difere da nuvem. Escolha Enviar ou Carregar; nada foi substituído.');
+      } else {
+        state = remoteState;
+        saveState();
+        render();
+        cloudMessage('Progresso desta conta carregado da nuvem.');
+      }
+    } else {
+      cloudMessage(cached
+        ? 'Sem cópia na nuvem. O progresso local desta conta foi mantido.'
+        : 'Esta conta ainda não tem progresso. Jornada vazia iniciada.');
+    }
+  } catch (error) {
+    if (version === cloudSwitchVersion) cloudMessage(`Nuvem indisponível: ${error.message} Progresso local desta conta mantido.`);
+  } finally {
+    if (version === cloudSwitchVersion) cloudSetBusy(false);
+  }
 }
 
 async function cloudRequest(method, query = '', body = null) {
@@ -101,8 +170,8 @@ function cloudBackupLocal() {
 
 cloudUpload.addEventListener('click', async () => {
   if (cloudBusy) return;
-  if (!cloudUserId || localOwnerId !== cloudUserId) {
-    cloudMessage('Vincule este progresso à conta atual antes de enviar.');
+  if (!cloudUserId || activeStateOwner !== cloudUserId) {
+    cloudMessage('Entre na conta e aguarde o carregamento antes de enviar.');
     return;
   }
   const userId = cloudUserId;
@@ -156,7 +225,7 @@ cloudDownload.addEventListener('click', async () => {
     state = sanitizeState(remote.state);
     saveState();
     render();
-    cloudSetOwner(userId);
+    cloudSaveSnapshot(userId);
     cloudMessage('Progresso da nuvem carregado. Backup local baixado.');
   } catch (error) {
     cloudMessage(`Não foi possível carregar: ${error.message}`);
@@ -166,22 +235,16 @@ cloudDownload.addEventListener('click', async () => {
 });
 
 cloudClaim.addEventListener('click', () => {
-  if (cloudBusy || !cloudUserId || localOwnerId) return;
-  if (!window.confirm('O progresso exibido pode ter sido criado por outra pessoa neste navegador. Você confirma que ele pertence à conta atual?')) return;
-  cloudSetOwner(cloudUserId);
-  cloudMessage('Progresso local vinculado a esta conta. Agora você pode enviá-lo à nuvem.');
-});
-
-cloudNew.addEventListener('click', () => {
-  if (cloudBusy || !cloudUserId || !localOwnerId || localOwnerId === cloudUserId) return;
-  if (!window.confirm('Iniciar uma jornada vazia substituirá o progresso exibido. Um backup será baixado antes. Continuar?')) return;
+  if (cloudBusy || !cloudUserId) return;
+  const guest = cloudReadSnapshot('guest');
+  if (!guest) return;
+  if (!window.confirm('Importar o progresso anterior deste navegador substituirá o progresso exibido nesta conta. Confirme que esses dados são seus. Continuar?')) return;
   cloudBackupLocal();
   if (dialog.open) closeDialog();
-  state = sanitizeState(null);
+  state = guest;
   saveState();
   render();
-  cloudSetOwner(cloudUserId);
-  cloudMessage('Jornada vazia iniciada nesta conta. A cópia anterior foi baixada.');
+  cloudMessage('Progresso anterior importado para esta conta. Envie à nuvem se desejar atualizar a cópia remota.');
 });
 
 cloudRestore.addEventListener('click', () => { if (!cloudBusy) cloudBackupFile.click(); });
@@ -207,8 +270,7 @@ cloudBackupFile.addEventListener('change', async () => {
     state = sanitizeState(candidate);
     saveState();
     render();
-    cloudSetOwner(null);
-    cloudMessage('Backup restaurado. Confirme a conta proprietária antes de enviá-lo à nuvem.');
+    cloudMessage('Backup restaurado nesta conta. Envie à nuvem se desejar atualizar a cópia remota.');
   } catch (error) {
     cloudMessage(`Não foi possível restaurar: ${error.message}`);
   } finally {
@@ -216,7 +278,7 @@ cloudBackupFile.addEventListener('change', async () => {
   }
 });
 
-window.addEventListener('tech-hub:auth-change', (event) => cloudShowFor(event.detail.userId));
+window.addEventListener('tech-hub:auth-change', (event) => { void cloudSwitchTo(event.detail.userId); });
 
 (async () => {
   try {
@@ -227,6 +289,6 @@ window.addEventListener('tech-hub:auth-change', (event) => cloudShowFor(event.de
     if (url.protocol !== 'https:' || !url.hostname.endsWith('.supabase.co') || url.port || url.username || url.password || url.search || url.hash || url.pathname !== '/') return;
     if (!/^sb_publishable_[A-Za-z0-9_-]+$/.test(config.supabasePublishableKey || '')) return;
     cloudConfig = { url: url.origin, key: config.supabasePublishableKey };
-    cloudShowFor(window.Clerk?.user?.id || null);
+    void cloudSwitchTo(window.Clerk?.user?.id || null, true);
   } catch { /* Sem Supabase configurado, o curso continua com progresso local. */ }
 })();

@@ -142,7 +142,7 @@ Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workf
 
 ### 5.2 Persistência e compatibilidade (cuidado máximo)
 - O progresso fica em `localStorage` na chave **`tech-learning-hub:v1`**.
-- A associação da cópia local à conta Clerk fica em `tech-learning-hub:local-owner:v1`; ela bloqueia envio após troca de conta até que o usuário carregue seus dados remotos ou inicie uma jornada vazia. Não confunda essa marca com autenticação ou isolamento do armazenamento local.
+- A associação da cópia local à conta Clerk fica em `tech-learning-hub:local-owner:v1`; caches por conta usam `tech-learning-hub:account:v1:<id Clerk>` e o progresso antigo de visitante usa `tech-learning-hub:guest:v1`. Ao trocar de conta, o app lê a cópia remota da nova conta quando existir. Preserve divergências locais até escolha explícita do usuário. Não confunda esses metadados com autenticação ou RLS.
 - `sanitizeState()` descarta qualquer progresso cujo id de aula/trilha/exercício **não exista mais**. Portanto:
   - **Nunca renomeie ou remova ids** de aulas, módulos, trilhas, projetos ou checks sem necessidade. Se for inevitável, escreva migração em `sanitizeState()` mapeando ids antigos para novos.
   - Ao adicionar campos ao estado, defina o valor padrão em `sanitizeState()`.
@@ -330,3 +330,4 @@ Extensão de IA (opcional): responder perguntas sobre um pequeno conjunto de mat
 - 2026-10-25 — Preparado login Clerk no frontend estático, usando chave publicável via função Vercel; progresso permanece local até a integração segura com Supabase.
 - 2026-10-26 — Preparada sincronização manual com Supabase e RLS por ID Clerk, preservando o estado local e pedindo confirmação antes de substituir progresso.
 - 2026-10-26 — Bloqueado envio de progresso local após troca de conta; a cópia local precisa ser vinculada explicitamente ao usuário Clerk antes de subir ao Supabase.
+- 2026-10-26 — Troca de conta passa a carregar automaticamente o progresso remoto da nova conta, preservando cache local por usuário e exigindo escolha em caso de divergência.

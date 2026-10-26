@@ -62,5 +62,5 @@ O comando checa sintaxe, assets, ids, relações entre aulas e guias, exercício
 
 As dependências e os atalhos entre trilhas estão documentados em [`docs/MAPA_PRE_REQUISITOS.md`](docs/MAPA_PRE_REQUISITOS.md).
 
-O login opcional com Clerk na Vercel está descrito em [`docs/CONFIGURAR_CLERK.md`](docs/CONFIGURAR_CLERK.md). O progresso continua disponível localmente; o envio e carregamento da cópia remota dependem de configuração e escolha do usuário.
+O login opcional com Clerk na Vercel está descrito em [`docs/CONFIGURAR_CLERK.md`](docs/CONFIGURAR_CLERK.md). Após configurar o Supabase, o progresso da conta é carregado ao entrar; enviar alterações e resolver versões divergentes exige escolha do usuário.
 A sincronização manual com Supabase está descrita em [`docs/CONFIGURAR_SUPABASE.md`](docs/CONFIGURAR_SUPABASE.md). Ela exige a integração nativa Clerk ↔ Supabase, a tabela com RLS e as variáveis públicas da Vercel.

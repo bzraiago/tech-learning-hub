@@ -97,7 +97,11 @@ document.addEventListener('submit', (event) => {
 
 window.addEventListener('pagehide', () => {
   clearTimeout(notesSaveTimer);
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* A indisponibilidade é informada durante o uso. */ }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const ownerId = localStorage.getItem('tech-learning-hub:local-owner:v1');
+    if (ownerId) localStorage.setItem(`tech-learning-hub:account:v1:${ownerId}`, JSON.stringify(state));
+  } catch { /* A indisponibilidade é informada durante o uso. */ }
 });
 
 $('#lesson-sections').addEventListener('keydown', (event) => {
