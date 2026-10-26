@@ -1439,7 +1439,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "docker compose ps\ndocker compose port db 5432\ndocker compose logs --tail=60 db",
         "explanation": "Conexão recusada costuma ocorrer antes da validação da senha.",
-        "expected": "Estado, porta e mensagem registrados."
+        "expected": "As verificações localizam a etapa da falha e fornecem evidências antes de qualquer mudança de credencial.",
+        "criteria": ["Registra a hipótese para serviço, porta e logs antes de executar comandos.", "Confere o estado do serviço e a publicação da porta sem expor configuração sensível.", "Relaciona a evidência observada à próxima verificação e não altera senha para tratar conexão recusada."]
       },
       {
         "prompt": "Alterar: adapte a restauração para um destino novo chamado estudos_ensaio2, sem substituir a base original.",
@@ -1449,7 +1450,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "docker compose exec db createdb -U aluno estudos_ensaio2\ndocker compose exec db pg_restore -U aluno -d estudos_ensaio2 --exit-on-error /tmp/restaurar.dump\ndocker compose exec db psql -U aluno -d estudos_ensaio2 -c \"SELECT * FROM marcador;\"",
         "explanation": "O destino diferente conserva a base original e a restauração anterior.",
-        "expected": "O marcador está no novo banco."
+        "expected": "A consulta no destino novo encontra o marcador restaurado e a base original permanece acessível.",
+        "criteria": ["Cria um banco de destino diferente da origem e do ensaio anterior.", "Restaura a cópia nesse destino com interrupção em caso de erro.", "Consulta o destino e a origem para confirmar recuperação sem substituição de dados."]
       },
       {
         "prompt": "Construir: escreva um roteiro de recuperação com cinco evidências.",
@@ -1459,7 +1461,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "1. Versão da imagem e configuração registrada.\n2. Dump gerado e copiado para o host.\n3. Banco novo criado.\n4. Restore sem erros e marcador conferido.\n5. Tempo observado e limitações anotados no README.",
         "explanation": "O roteiro conecta operação e resultado verificável.",
-        "expected": "Outra pessoa consegue reproduzir e avaliar a recuperação."
+        "expected": "O roteiro permite repetir a restauração em destino separado e conferir dados recuperados e tempo observado.",
+        "criteria": ["Registra versão e configuração necessárias sem senha ou dados pessoais.", "Mostra evidência do dump copiado para o host e da restauração sem erro em banco novo.", "Compara consultas relevantes entre origem e destino e anota tempo e limitações observados."]
       },
       {
         "prompt": "Investigar erro: um colega editou a senha em .env e recebeu password authentication failed. Investigue sem apagar o volume.",
@@ -1469,7 +1472,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Confirmar usuário, host e porta. Usar credencial vigente para administrar o usuário e alterar sua senha pelo procedimento do PostgreSQL; depois alinhar .env e cliente. Não remover o volume.",
         "explanation": "O estado de autenticação persiste no banco; recriar container não reaplica toda a inicialização.",
-        "expected": "Diagnóstico explica a divergência sem perda de dados."
+        "expected": "O diagnóstico identifica a diferença entre a senha no arquivo e a credencial persistida, preservando o volume.",
+        "criteria": ["Confere usuário, host e porta para evitar atribuir a falha à base errada.", "Explica que mudar o .env não altera automaticamente a senha de um cluster já inicializado.", "Propõe atualizar a credencial pelo PostgreSQL com acesso autorizado e alinhar os clientes, sem remover volumes."]
       }
     ],
     "quiz": [

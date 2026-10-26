@@ -52,6 +52,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `db-concurrency-boundaries`, SAVEPOINT preserva apenas a parte anterior; o envio externo tem resultado próprio e conflitos não repetem só metade da transferência.
 - [ ] Em `db-docker-basics`, imagem, container e volume são diferenciados; cliente, Engine e Compose são verificados sem apagar dados para tratar erro de conexão.
 - [ ] Em `db-docker-compose`, porta do host e porta interna são diferenciadas; o marcador persiste após down/up sem remover o volume.
+- [ ] Em `db-docker-operations`, a restauração ocorre em banco novo, com consulta à origem e ao destino; mudança de senha não remove o volume.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.
