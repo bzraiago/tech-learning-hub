@@ -527,6 +527,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 26/10/2026 | Fase 3 — modelagem NoSQL | `2f3717f` | `db-nosql-models` ganhou critérios nos quatro exercícios; acesso, custo de atualização, crescimento e sincronização ficaram observáveis. Validação de conteúdo passou; conferência manual pendente. |
 | 26/10/2026 | Fase 3 — desempenho SQL | `bbcfa47` | `db-performance` ganhou critérios nos quatro exercícios; previsão, plano observado e correção funcional foram separados. Validação de conteúdo passou; conferência manual pendente. |
 | 26/10/2026 | Fase 3 — segurança de dados | `86d209f` | `db-security` ganhou critérios nos quatro exercícios; busca, contagem e alteração exigem escopo de usuário e evidência observada. Validação de conteúdo passou; laboratório e navegador não verificados. |
+| 26/10/2026 | Fase 3 — recuperação de dados | `3dad6cf` | `db-recovery` ganhou critérios nos quatro exercícios; o enunciado da previsão foi corrigido para conferir o título na cópia. Validação de conteúdo passou; laboratório e navegador não verificados. |
 
 ## Decisões e bloqueios
 
