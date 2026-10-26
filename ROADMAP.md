@@ -136,6 +136,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Acrescentar critérios reutilizáveis aos exercícios das quatro instalações iniciais e retirar do resultado da previsão a resposta literal.
   - [x] Acrescentar critérios aos quatro exercícios de `setup-docker`, mantendo verificações separadas de cliente, Engine, Compose e permissões.
   - [x] Acrescentar critérios aos quatro exercícios de `setup-docker-alternative`, com previsão antes da execução, consulta parametrizada e evidências de retomada.
+  - [x] Acrescentar critérios aos quatro exercícios de `setup-postgresql`, verificando destino real, conexão reproduzível e diagnóstico que preserva dados e credenciais.
   - [ ] Revisar os demais resultados esperados para evitar respostas antecipadas e completar critérios específicos por aula.
 - [ ] Garantir exemplos executáveis com saída ou comportamento visível.
 - [ ] Aplicar a progressão guiado → pistas → problema novo → mudança de requisito.
