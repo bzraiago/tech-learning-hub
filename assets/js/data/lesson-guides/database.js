@@ -1673,7 +1673,11 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "SHOW CREATE TABLE matriculas;",
         "explanation": "Inspeção confirma a regra que foi criada, não apenas o texto que você tentou executar.",
-        "expected": "ENGINE=InnoDB e referência de curso_id para cursos.id."
+        "expected": "A definição real permite identificar o mecanismo e a relação entre as duas tabelas.",
+        "criteria": [
+          "Usa a definição retornada pelo MariaDB, em vez de inferir somente pelo comando de criação.",
+          "Identifica o mecanismo de armazenamento e as colunas que participam da referência entre tabelas."
+        ]
       },
       {
         "prompt": "Nos dados originais, liste apenas as matrículas pendentes de SQL, por nome.",
@@ -1683,7 +1687,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "SELECT m.aluno FROM matriculas m JOIN cursos c ON c.id=m.curso_id WHERE c.titulo='SQL' AND m.concluida=0 ORDER BY m.aluno;",
         "explanation": "O curso e o estado são filtros independentes.",
-        "expected": "Beto."
+        "expected": "A consulta retorna somente os registros que atendem aos filtros e à ordenação pedidos.",
+        "criteria": [
+          "Relaciona matrícula e curso pela chave correspondente.",
+          "Aplica os filtros do curso e do estado pendente e ordena o resultado por nome.",
+          "Confere a saída real com os dados originais antes de concluir."
+        ]
       },
       {
         "prompt": "Teste um estado inválido sem deixar alterações no banco.",
@@ -1693,7 +1702,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "START TRANSACTION;\nUPDATE matriculas SET concluida=7 WHERE id=2;\n-- Após observar o erro, execute:\nROLLBACK;\nSELECT concluida FROM matriculas WHERE id=2;",
         "explanation": "A regra restringe o inteiro a zero ou um. Se não houver rejeição, revise versão e definição antes de seguir.",
-        "expected": "Erro de CHECK; Beto permanece 0."
+        "expected": "A tentativa inválida é rejeitada e a consulta posterior confirma que o dado original foi preservado.",
+        "criteria": [
+          "Executa o valor inválido dentro de uma transação e observa a resposta do banco.",
+          "Encerra a transação sem confirmar a alteração de teste.",
+          "Consulta novamente o registro e confirma o valor que permaneceu salvo."
+        ]
       },
       {
         "prompt": "Adicione Git sem matrículas e obtenha somente cursos sem inscrições.",
@@ -1703,7 +1717,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "INSERT INTO cursos(titulo,carga) VALUES ('Git',10);\nSELECT c.titulo FROM cursos c LEFT JOIN matriculas m ON m.curso_id=c.id WHERE m.id IS NULL ORDER BY c.titulo;",
         "explanation": "NULL aqui indica ausência de correspondência; não se compara com = NULL.",
-        "expected": "Git."
+        "expected": "A consulta lista apenas cursos sem matrícula correspondente no conjunto atualizado.",
+        "criteria": [
+          "Insere o novo curso no laboratório e usa LEFT JOIN para preservar cursos sem correspondência.",
+          "Filtra a ausência de matrícula e apresenta cada curso elegível uma vez na ordem solicitada.",
+          "Compara o resultado observado com os dados do laboratório."
+        ]
       }
     ],
     "mistakes": [
