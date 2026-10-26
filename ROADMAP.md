@@ -490,6 +490,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 24/10/2026 | Fase 3.15 — projeto de dados | Revisão da oitava aula da prioridade 2 | `db-project` ficou com quatro blocos, casos verificáveis, limite das FKs explícito e decisão de banco na entrega. |
 | 24/10/2026 | Fase 3.16 — recuperação de dados | Revisão da nona aula da prioridade 2 | `db-recovery` ficou com quatro blocos, laboratório isolado, RPO/RTO observáveis e migração por expansão com plano de falha. |
 | 24/10/2026 | Fase 3.17 — segurança de dados | Conclusão da prioridade 2 | `db-security` ficou com quatro blocos, testes negativos progressivos, identidade confiável e limites explícitos do laboratório. |
+| 26/10/2026 | Fase 3 — resultado esperado visível | `19daa97` | Os 458 resultados existentes aparecem antes das soluções; validador de conteúdo passou. Conferência manual no site publicado pendente. |
 
 ## Decisões e bloqueios
 
