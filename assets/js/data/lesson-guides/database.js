@@ -2469,7 +2469,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "lab.licoes.aggregate([{$match:{concluida:true}},{$group:{_id:\"$trilha\",total:{$sum:\"$minutos\"}}}]);",
         "explanation": "Somente o documento Python satisfaz o filtro, portanto a agregação soma apenas seus 20 minutos.",
-        "expected": "{_id:\"Python\",total:20}."
+        "expected": "A previsão registra a trilha e o total do grupo filtrado antes da execução e é comparada com a saída real.",
+        "criteria": [
+          "Registra a previsão do grupo e da soma antes de executar o pipeline alterado.",
+          "Aplica o filtro solicitado antes do agrupamento e soma a duração dos documentos selecionados.",
+          "Compara os valores previstos com a saída observada."
+        ]
       },
       {
         "prompt": "Alterar: troque a soma de minutos por uma contagem de lições por trilha, sem filtrar conclusão.",
@@ -2479,7 +2484,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "lab.licoes.aggregate([{$group:{_id:\"$trilha\",quantidade:{$sum:1}}},{$sort:{_id:1}}]);",
         "explanation": "Cada documento contribui uma unidade. O resultado mede quantidade, não duração, e inclui todos os estados de progresso.",
-        "expected": "Dados com quantidade 2; Python com quantidade 1."
+        "expected": "O resultado apresenta a quantidade de lições por trilha, incluindo os dois estados de conclusão.",
+        "criteria": [
+          "Agrupa por trilha sem filtrar documentos pela conclusão.",
+          "Conta documentos em vez de somar sua duração.",
+          "Confere a quantidade de cada grupo com os documentos originais."
+        ]
       },
       {
         "prompt": "Construir: produza um resumo com trilha, total e quantidade das lições pendentes; omita _id na saída.",
@@ -2489,7 +2499,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "lab.licoes.aggregate([\n {$match:{concluida:false}},\n {$group:{_id:\"$trilha\",total:{$sum:\"$minutos\"},quantidade:{$sum:1}}},\n {$project:{_id:0,trilha:\"$_id\",total:1,quantidade:1}}\n]);",
         "explanation": "O grupo muda o formato da entrada e a projeção renomeia sua identidade sem recalcular a soma.",
-        "expected": "Um documento: {trilha:\"Dados\",total:70,quantidade:2}."
+        "expected": "Cada resumo de pendências mostra trilha, duração total e quantidade, sem expor _id.",
+        "criteria": [
+          "Filtra as lições pendentes antes de agrupá-las por trilha.",
+          "Calcula duração total e quantidade como medidas distintas do mesmo grupo.",
+          "Projeta o nome da trilha e omite _id, conferindo os números com os dados de entrada."
+        ]
       },
       {
         "prompt": "Investigar erro: tente inserir separadamente duração zero e ausência de concluida. Identifique qual regra rejeita cada entrada e confirme que a contagem continua três.",
@@ -2499,7 +2514,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "// Execute cada tentativa separadamente e observe a rejeição:\nlab.licoes.insertOne({_id:4,trilha:\"Dados\",minutos:Double(0),concluida:false});\nlab.licoes.insertOne({_id:5,trilha:\"Dados\",minutos:Double(10)});\n// Após observar ambas as falhas:\nlab.licoes.countDocuments({});",
         "explanation": "O primeiro teste verifica minimum; o segundo required. Testes separados identificam qual regra produziu a falha.",
-        "expected": "As duas entradas são rejeitadas; countDocuments devolve 3."
+        "expected": "As duas tentativas são avaliadas separadamente e a consulta final confirma o estado preservado da coleção.",
+        "criteria": [
+          "Executa cada entrada inválida em uma tentativa separada e registra a mensagem observada.",
+          "Relaciona cada rejeição à restrição correspondente do esquema declarado.",
+          "Consulta a coleção após as tentativas para verificar que nenhuma entrada inválida foi gravada."
+        ]
       }
     ],
     "mistakes": [
