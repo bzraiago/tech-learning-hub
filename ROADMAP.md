@@ -153,6 +153,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Acrescentar critérios aos quatro exercícios de `db-ddl-crud`, tornando independente a remoção e verificando filtros antes e depois das alterações.
   - [x] Acrescentar critérios aos quatro exercícios de `db-select`, verificando limites inclusivos, filtros, ordem e distinção entre `NULL` e texto vazio.
   - [x] Acrescentar critérios aos quatro exercícios de `db-aggregation`, distinguindo população, medidas por grupo e filtros antes/depois da agregação.
+  - [x] Acrescentar critérios aos quatro exercícios de `db-joins`, verificando linhas preservadas, contagem de filhos e filtros em `ON` ou `WHERE`.
   - [ ] Revisar os demais resultados esperados para evitar respostas antecipadas e completar critérios específicos por aula.
 - [ ] Garantir exemplos executáveis com saída ou comportamento visível.
 - [ ] Aplicar a progressão guiado → pistas → problema novo → mudança de requisito.

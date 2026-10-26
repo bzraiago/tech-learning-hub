@@ -769,7 +769,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "SELECT t.nome,COUNT(l.id) AS quantidade FROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id GROUP BY t.id,t.nome ORDER BY t.id;",
         "explanation": "A linha preservada de Python tem l.id NULL e não aumenta COUNT(l.id). O agrupamento reduz cada trilha a uma linha.",
-        "expected": "Dados | 2; Python | 0."
+        "expected": "O relatório apresenta uma linha por trilha, inclusive a que ainda não tem lições.",
+        "criteria": ["Desenha ou registra a previsão das linhas da junção antes de executar a consulta.", "Parte de trilhas e preserva todas elas com LEFT JOIN pela chave correspondente.", "Conta a chave da lição, agrupa por identidade da trilha e confere o zero quando não há correspondência."]
       },
       {
         "prompt": "Alterar: encontre somente as trilhas sem lições.",
@@ -779,7 +780,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "SELECT t.nome FROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id WHERE l.id IS NULL ORDER BY t.id;",
         "explanation": "O filtro é intencionalmente posterior à junção: queremos justamente as linhas sem correspondência.",
-        "expected": "Python, uma única linha."
+        "expected": "A consulta retorna somente as trilhas sem lição correspondente.",
+        "criteria": ["Preserva as trilhas durante a junção e procura ausência na chave do lado das lições.", "Não confunde ausência de correspondência com título ou duração nulos.", "Confere que cada trilha sem lições aparece uma vez e as demais ficam de fora."]
       },
       {
         "prompt": "Construir: liste todas as trilhas e somente suas lições com mais de 30 minutos, preservando trilhas sem correspondência.",
@@ -788,7 +790,8 @@ Object.assign(LESSON_GUIDES, {
           "Coloque a condição de duração no ON."
         ],
         "solution": "SELECT t.nome,l.titulo FROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id AND l.minutos>30 ORDER BY t.id,l.id;",
-        "expected": "Dados | JOIN; Python | NULL.",
+        "expected": "As lições fora do limite não aparecem, enquanto todas as trilhas continuam representadas.",
+        "criteria": ["Usa trilhas como conjunto preservado e relaciona lições pela chave.", "Restringe a duração das lições no ON, sem remover trilhas no WHERE.", "Ordena a saída e confere tanto uma correspondência elegível quanto a trilha sem correspondência."],
         "explanation": "A condição limita filhos elegíveis sem remover o pai preservado."
       },
       {
@@ -798,7 +801,8 @@ Object.assign(LESSON_GUIDES, {
           "Acrescente a condição ao ON."
         ],
         "solution": "SELECT t.nome,l.titulo FROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id AND l.minutos>30 ORDER BY t.id,l.id;",
-        "expected": "Dados | JOIN; Python | NULL.",
+        "expected": "A consulta corrigida mantém a trilha antes perdida e mostra apenas lições que atendem ao limite.",
+        "criteria": ["Explica por que o filtro do lado direito em WHERE elimina a linha preservada.", "Move a condição de duração para ON e mantém o LEFT JOIN.", "Compara os resultados antes e depois da correção, incluindo a trilha sem lições."],
         "explanation": "ON restringe os filhos elegíveis; LEFT JOIN ainda conserva cada trilha."
       }
     ],
