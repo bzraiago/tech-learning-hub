@@ -2980,14 +2980,19 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Prever: antes de executar, diga qual título deve existir somente na cópia restaurada; depois acrescente uma verificação automática no destino.",
+        "prompt": "Prever: antes de executar, diga qual título deve aparecer na cópia restaurada; depois acrescente uma verificação automática no destino.",
         "hints": [
           "Não consulte origem para validar o destino.",
           "Filtre a chave conhecida e compare o texto."
         ],
         "solution": "assert copia.execute(\"SELECT titulo FROM licoes WHERE id=?\", (1,)).fetchone()[0] == \"SQL\"",
         "explanation": "Coloque a instrução depois do backup e dentro do bloco das conexões. assert interrompe a execução se a condição não for verdadeira.",
-        "expected": "Nenhuma exceção: o título recuperado é SQL."
+        "expected": "A verificação automática consulta a cópia e confirma o título previsto sem lançar exceção.",
+        "criteria": [
+          "Registra a previsão do título antes de consultar o destino.",
+          "Verifica o valor na conexão copia após o backup, sem usar a origem como prova da restauração.",
+          "Compara o resultado observado com a previsão e identifica eventual falha da verificação."
+        ]
       },
       {
         "prompt": "Alterar: a última cópia foi às 10h e a falha ocorreu às 10h45. Sem logs de recuperação, calcule a perda potencial e avalie um RPO de 15 minutos.",
@@ -2997,7 +3002,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Janela potencial de perda: 45 minutos.\nRPO permitido: 15 minutos.\nResultado: meta não cumprida.",
         "explanation": "Sem proteção adicional, alterações depois das 10h podem se perder. É necessário reduzir a janela ou usar uma estratégia que permita recuperar alterações mais recentes.",
-        "expected": "A janela excede o limite em 30 minutos."
+        "expected": "A janela potencial de perda é calculada e comparada com o RPO informado antes da conclusão.",
+        "criteria": [
+          "Calcula o intervalo entre a última cópia e a falha sem presumir recuperação posterior.",
+          "Compara a janela calculada com o limite de RPO e declara se a meta foi atendida.",
+          "Explica o que a ausência de logs impede recuperar."
+        ]
       },
       {
         "prompt": "Construir: depois do backup e antes da migração, confira a integridade da cópia e prove que NOT NULL foi preservado. Use somente a conexão copia do laboratório.",
@@ -3007,7 +3017,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "print(copia.execute(\"PRAGMA integrity_check\").fetchone()[0])\ntry:\n    with copia:\n        copia.execute(\"INSERT INTO licoes(id,titulo) VALUES(?,?)\", (2,None))\nexcept sqlite3.IntegrityError:\n    print(\"NOT NULL preservado\")\nprint(copia.execute(\"SELECT COUNT(*) FROM licoes\").fetchone()[0])",
         "explanation": "O teste consulta o destino e tenta violar uma regra. O rollback do INSERT inválido preserva a única lição.",
-        "expected": "ok; NOT NULL preservado; 1."
+        "expected": "A cópia passa pela verificação de integridade, rejeita a entrada inválida e conserva os dados anteriores.",
+        "criteria": [
+          "Executa as verificações somente na conexão copia depois do backup.",
+          "Observa a resposta da integridade e captura especificamente a falha da restrição NOT NULL.",
+          "Consulta o destino após a tentativa para confirmar que os registros válidos permaneceram."
+        ]
       },
       {
         "prompt": "Investigar erro: uma migração torna resumo obrigatório imediatamente e falha em linhas antigas. Escreva um plano de expansão que preserve compatibilidade e inclua teste de recuperação.",
@@ -3017,7 +3032,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "1. Gerar cópia consistente e restaurá-la em ambiente isolado.\n2. Conferir título SQL, contagem e regras.\n3. Adicionar resumo opcional em migração versionada.\n4. Atualizar aplicação para aceitar NULL e novos textos.\n5. Preencher somente dados com resumo conhecido.\n6. Validar consultas e registrar duração de restauração.\n7. Avaliar uma restrição futura somente após dados e consumidores compatíveis.",
         "explanation": "Separar expansão de endurecimento da regra permite transição gradual e evita conteúdo fictício inserido apenas para satisfazer constraint.",
-        "expected": "Plano com ordem de execução, compatibilidade, validação e recuperação medida."
+        "expected": "O plano ordena expansão, compatibilidade, conferência dos dados e recuperação observável antes de endurecer a regra.",
+        "criteria": [
+          "Prepara e verifica uma cópia isolada antes de mudar o esquema usado pelo aplicativo.",
+          "Propõe a expansão compatível e identifica como registrar a versão da migração sem repetir a alteração.",
+          "Define consultas de validação, ensaio de restauração e condições para uma restrição futura."
+        ]
       }
     ],
     "mistakes": [
