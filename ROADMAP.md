@@ -150,6 +150,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Acrescentar critérios aos quatro exercícios de `db-modeling`, com evidências separadas para entidades, relações, progresso e avaliações.
   - [x] Acrescentar critérios aos quatro exercícios de `db-normalization`, cobrindo dependências, alteração localizada, chaves e ausência de data.
   - [x] Acrescentar critérios aos quatro exercícios de `db-ddl-constraints`, distinguindo previsão, teste de restrições e diagnóstico de chave estrangeira.
+  - [x] Acrescentar critérios aos quatro exercícios de `db-ddl-crud`, tornando independente a remoção e verificando filtros antes e depois das alterações.
   - [ ] Revisar os demais resultados esperados para evitar respostas antecipadas e completar critérios específicos por aula.
 - [ ] Garantir exemplos executáveis com saída ou comportamento visível.
 - [ ] Aplicar a progressão guiado → pistas → problema novo → mudança de requisito.

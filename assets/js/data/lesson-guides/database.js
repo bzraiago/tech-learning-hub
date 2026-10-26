@@ -409,17 +409,19 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "INSERT INTO licoes (id,trilha_id,titulo,minutos) VALUES (12,1,'Índices',25);\nSELECT concluida FROM licoes WHERE id=12;",
         "explanation": "Omitir a coluna permite que DEFAULT 0 seja usado. Escrever NULL não produziria o mesmo efeito.",
-        "expected": "A consulta devolve 0 e a tabela passa a ter três linhas."
+        "expected": "A nova lição aparece na consulta com o estado definido pelo esquema, sem preencher a coluna manualmente.",
+        "criteria": ["Registra a previsão antes de executar o INSERT.", "Insere a lição com id, trilha, título e duração solicitados, omitindo a coluna de estado.", "Consulta a nova linha e explica o valor observado com base no DEFAULT."]
       },
       {
-        "prompt": "Alterar: após o exercício anterior, remova apenas Índices, conferindo antes a linha selecionada.",
+        "prompt": "Alterar: partindo do exemplo inicial, cadastre Índices (id 12, 25 minutos, trilha 1) e depois remova apenas essa lição, conferindo antes a linha selecionada.",
         "hints": [
           "O id 12 identifica exclusivamente o alvo.",
           "Use o mesmo WHERE na leitura e na remoção."
         ],
-        "solution": "SELECT * FROM licoes WHERE id=12;\nDELETE FROM licoes WHERE id=12;\nSELECT COUNT(*) FROM licoes;",
-        "explanation": "A leitura confirma o alvo e DELETE remove somente esse identificador. COUNT(*) conta todas as linhas restantes.",
-        "expected": "A contagem final é 2; SELECT e JOIN continuam presentes."
+        "solution": "INSERT INTO licoes(id,trilha_id,titulo,minutos) VALUES(12,1,'Índices',25);\nSELECT * FROM licoes WHERE id=12;\nDELETE FROM licoes WHERE id=12;\nSELECT id,titulo FROM licoes ORDER BY id;",
+        "explanation": "A leitura confirma o alvo e DELETE remove somente esse identificador. A consulta final permite verificar quais lições foram preservadas.",
+        "expected": "A lição recém-cadastrada deixa de aparecer; as lições originais permanecem na consulta.",
+        "criteria": ["Cria a lição do enunciado em uma execução independente do exercício anterior.", "Confere a identidade do alvo antes de usar DELETE com o mesmo filtro.", "Consulta as linhas restantes e verifica que as lições originais não foram removidas."]
       },
       {
         "prompt": "Construir: adicione a lição Transações de 50 minutos, id 13, e marque somente ela como concluída. Confira a linha antes e depois.",
@@ -428,7 +430,8 @@ Object.assign(LESSON_GUIDES, {
           "Selecione id=13 antes de alterar."
         ],
         "solution": "INSERT INTO licoes(id,trilha_id,titulo,minutos) VALUES(13,1,'Transações',50);\nSELECT id,concluida FROM licoes WHERE id=13;\nUPDATE licoes SET concluida=1 WHERE id=13;\nSELECT id,concluida FROM licoes WHERE id=13;",
-        "expected": "Antes: 13 | 0. Depois: 13 | 1.",
+        "expected": "A consulta antes e depois mostra a mudança de estado apenas na lição adicionada.",
+        "criteria": ["Insere a lição na trilha e com a duração pedidas, sem informar o estado inicial.", "Consulta o registro antes da alteração e limita o UPDATE ao id solicitado.", "Consulta novamente a lição e confere que as demais mantiveram seu estado."],
         "explanation": "DEFAULT inicializa pendência; o filtro por identidade limita a alteração a uma lição."
       },
       {
@@ -438,7 +441,8 @@ Object.assign(LESSON_GUIDES, {
           "Use WHERE id=11 e ordene a inspeção."
         ],
         "solution": "SELECT id,titulo,minutos FROM licoes WHERE id=11;\nUPDATE licoes SET minutos=25 WHERE id=11;\nSELECT id,minutos FROM licoes ORDER BY id;",
-        "expected": "10 | 30; 11 | 25.",
+        "expected": "A consulta final mostra a nova duração de JOIN e preserva a duração da outra lição.",
+        "criteria": ["Explica por que o UPDATE sem WHERE atingiria todas as linhas e não o executa.", "Confere primeiro a linha de JOIN e usa seu id no filtro da alteração.", "Consulta as durações depois da mudança para verificar tanto o alvo quanto a linha preservada."],
         "explanation": "WHERE seleciona a linha pretendida; id 10 mantém a duração original."
       }
     ],
