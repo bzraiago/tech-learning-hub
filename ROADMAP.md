@@ -294,6 +294,7 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Criar um projeto integrador guiado usando Vercel, Clerk e Supabase, sem tratar os fornecedores como única solução possível.
 - [ ] Preparar contas, projeto local e variáveis separadas para desenvolvimento, prévia e produção.
 - [ ] Implementar cadastro, login, logout, sessão expirada e estado de carregamento com Clerk.
+  - [x] Preparar interface de entrada/saída, função de configuração pública e guia de implantação; fluxo real pendente das chaves e do domínio Clerk.
 - [ ] Configurar login social do Google pelo Clerk e ensinar os conceitos transferíveis de OAuth 2.0/OpenID Connect, redirect URI, consentimento, escopos e `state`.
 - [ ] Conectar Clerk ao Supabase pela integração nativa atual, sem usar o template JWT legado.
 - [ ] Criar tabelas e migrações no PostgreSQL do Supabase.

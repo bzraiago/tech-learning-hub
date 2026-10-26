@@ -4,18 +4,20 @@ Aplicação estática e autoguiada para aprender programação, do primeiro cont
 
 ## Executar
 
-Não há instalação, build ou dependências locais. Abra `index.html` em um navegador moderno com acesso à internet para carregar o Tailwind Browser e as fontes do Google.
+Não há instalação, build ou dependências locais. Abra `index.html` em um navegador moderno com acesso à internet para carregar o Tailwind Browser e as fontes do Google. O login Clerk requer a função `api/public-config.mjs` na Vercel; ao abrir o arquivo diretamente, o curso funciona sem login e continua salvando progresso neste navegador.
 
 ## Estrutura do projeto
 
 ```text
 .
 ├── index.html                         # Estrutura da interface e carregamento dos assets
+├── api/public-config.mjs              # Configuração pública do login na Vercel
 ├── assets/
 │   ├── css/
 │   │   └── global.css                 # Estilos globais e acessibilidade
 │   └── js/
 │       ├── app.js                     # Eventos e inicialização
+│       ├── auth.js                    # Controles de login Clerk
 │       ├── core/
 │       │   └── state.js               # Estado, persistência e sanitização
 │       ├── data/
@@ -59,3 +61,5 @@ node scripts/validate-content.js
 O comando checa sintaxe, assets, ids, relações entre aulas e guias, exercícios, quizzes, projetos e contagens estruturais. Depois, siga [`docs/CHECKLIST_REGRESSAO.md`](docs/CHECKLIST_REGRESSAO.md).
 
 As dependências e os atalhos entre trilhas estão documentados em [`docs/MAPA_PRE_REQUISITOS.md`](docs/MAPA_PRE_REQUISITOS.md).
+
+O login opcional com Clerk na Vercel está descrito em [`docs/CONFIGURAR_CLERK.md`](docs/CONFIGURAR_CLERK.md). O progresso continua local até a integração com Supabase ser concluída e testada.
