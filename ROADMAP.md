@@ -291,7 +291,7 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Ensinar respostas de sucesso e erro coerentes.
 - [ ] Ensinar migrações e evolução do esquema.
 - [ ] Ensinar transação com mais de uma alteração.
-- [ ] Criar testes unitários da regra de negócio.
+- [x] Criar testes unitários de normalização e unicidade de título em `labs/backend-layers/src/regra-titulo.test.cjs`.
 - [ ] Criar testes de integração com banco de teste.
 - [ ] Integrar o frontend real à API.
 - [ ] Documentar configuração, inicialização, parada e retomada do ambiente.

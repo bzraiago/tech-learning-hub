@@ -1,7 +1,7 @@
 'use strict';
 
 const { validarEstudo } = require('./validar-estudo.cjs');
-const { normalizarTitulo } = require('./regra-titulo.cjs');
+const { avaliarTituloUnico } = require('./regra-titulo.cjs');
 
 function criarServicoEstudos(repositorio) {
   return {
@@ -14,14 +14,17 @@ function criarServicoEstudos(repositorio) {
         return { sucesso: false, status: 400, erro: validacao.erro };
       }
 
-      const tituloCanonico = normalizarTitulo(validacao.valor.titulo);
-      if (repositorio.encontrarPorTituloCanonico(tituloCanonico)) {
+      const regraTitulo = avaliarTituloUnico(
+        validacao.valor.titulo,
+        (tituloCanonico) => repositorio.encontrarPorTituloCanonico(tituloCanonico)
+      );
+      if (regraTitulo.duplicado) {
         return { sucesso: false, status: 409, erro: 'Já existe um estudo com esse título' };
       }
 
       return {
         sucesso: true,
-        estudo: repositorio.inserir(validacao.valor.titulo, tituloCanonico)
+        estudo: repositorio.inserir(validacao.valor.titulo, regraTitulo.tituloCanonico)
       };
     }
   };

@@ -57,6 +57,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `db-sqlite`, executar o arquivo Python, verificar parâmetros e reversão, e comparar a cópia em memória com a origem.
 - [ ] Em `labs/backend-validation`, formulário válido cria um estudo; pedidos diretos inválidos retornam erro e não alteram a lista.
 - [ ] Em `labs/backend-layers`, validar um título novo e um duplicado pela API; erro não altera o repositório e cada camada mantém uma responsabilidade própria.
+- [ ] Em `labs/backend-layers`, `node --test src/regra-titulo.test.cjs` aprova os casos de normalização, título duplicado e título novo.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.

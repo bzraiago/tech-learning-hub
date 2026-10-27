@@ -263,6 +263,7 @@ Vem da análise em `ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima para baixo e
 5. [ ] **Sequência de backend com persistência**: interface → API → validação → regra de negócio → banco → resposta → testes → publicação.
    - [x] Laboratório `labs/backend-validation` demonstra validação no servidor com Node.js nativo, pedidos diretos inválidos e ausência de escrita após rejeição.
    - [x] Laboratório `labs/backend-layers` separa HTTP, validação, regra de negócio e repositório em memória sem adicionar dependências.
+   - [x] Testes unitários de regra cobrem normalização do título, duplicidade e novo título sem iniciar servidor ou banco.
 6. [ ] **CI, publicação e integração externa** como práticas guiadas e verificáveis (observar falha, corrigir, conferir URL final, voltar versão).
 7. [ ] Atividades gerais de conclusão (prova básica disponível no curso; intermediária pendente) — ver seção 9.
 8. [x] Corrigir a inconsistência da porta do PostgreSQL (55432) entre laboratório Docker e projeto relacional.

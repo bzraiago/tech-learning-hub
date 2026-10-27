@@ -40,4 +40,6 @@ Confira também a lista inicial com GET e o JSON de erro da rota ausente. O nave
 
 ## Próxima etapa
 
-Em cada mudança, anote a camada editada, o pedido observado, o status e o estado da lista antes e depois. A próxima etapa acrescenta testes unitários para regras e serviço; depois, um repositório PostgreSQL substituirá o armazenamento em memória mantendo o contrato da API.
+Em cada mudança, anote a camada editada, o pedido observado, o status e o estado da lista antes e depois. Para conferir a regra de negócio isolada do servidor, abra outro terminal nesta pasta e execute `node --test src/regra-titulo.test.cjs`. Resultado esperado: três testes aprovados, cobrindo normalização, título duplicado e título novo. Os testes usam uma função simulada para responder à busca; ainda não são testes de integração com banco.
+
+O próximo passo substitui o repositório em memória por PostgreSQL mantendo o contrato da API.
