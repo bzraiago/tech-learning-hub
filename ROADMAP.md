@@ -582,8 +582,8 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 27/10/2026 | Fase 6 — repositório assíncrono | `9bad661` | Interface de memória passou a usar Promises; smoke manual confirmou GET, criação `201` e duplicidade `409`. Testes unitários e validador passaram. |
 | 27/10/2026 | Fase 6 — integração PostgreSQL | `4c4d9f9` | `pg` isolado no laboratório, repositório parametrizado, migration rastreada, resposta de erro e teste de integração adicionados. Sete testes unitários, sintaxe, Compose config e validador passaram; aplicação real aguarda daemon Docker local. |
 | 27/10/2026 | Fase 6 — migrations e transação | `650dc10` | Aplicador percorre migrations em ordem; migration 002 cria sessões; API grava estudo/sessão atomicamente; 17 testes, sintaxe, validador, Compose config e smoke HTTP em memória passaram. Execução PostgreSQL real segue pendente. |
-| 27/10/2026 | Fase 6 — persistência e evolução verificadas | Em andamento | PostgreSQL 18 descartável aceitou as migrations 001–002, teste de integração, API real e rollback. A prática da migration 003 foi documentada e validada numa cópia temporária; testes do laboratório e validador de conteúdo passaram. |
-| 27/10/2026 | Fase 7 — reproduzir e corrigir defeito | A registrar | `labs/bug-investigation` apresenta falha reproduzível de mutação; o teste ficou vermelho com o código inicial e verde após correção em cópia temporária. |
+| 27/10/2026 | Fase 6 — persistência e evolução verificadas | `c7656ac` | PostgreSQL 18 descartável aceitou as migrations 001–002, teste de integração, API real e rollback. A prática da migration 003 foi documentada e validada numa cópia temporária; testes passaram. Docker Compose continua pendente. |
+| 27/10/2026 | Fase 7 — reproduzir e corrigir defeito | `c7656ac` | `labs/bug-investigation` apresenta falha reproduzível de mutação; o teste ficou vermelho com o código inicial e verde após correção em cópia temporária. |
 
 ## Decisões e bloqueios
 
