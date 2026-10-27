@@ -1,0 +1,19 @@
+name: techhub-backend-layers
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${PGUSER:?Defina PGUSER no arquivo .env}
+      POSTGRES_DB: ${PGDATABASE:?Defina PGDATABASE no arquivo .env}
+      POSTGRES_PASSWORD: ${PGPASSWORD:?Defina PGPASSWORD no arquivo .env}
+    ports:
+      - "127.0.0.1:${PGPORT:-55433}:5432"
+    volumes:
+      - backend-layers-dados:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PGUSER:-aluno} -d ${PGDATABASE:-backend_camadas}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  backend-layers-dados:

@@ -1,0 +1,17 @@
+{
+  "name": "tech-learning-hub-backend-layers-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Laboratório de API Node.js com PostgreSQL",
+  "scripts": {
+    "start": "node --env-file=.env server.cjs",
+    "start:memory": "node server.cjs",
+    "migrate": "node --env-file=.env scripts/aplicar-migration.cjs",
+    "db:check": "node --env-file=.env scripts/verificar-conexao.cjs",
+    "test": "node --test src/regra-titulo.test.cjs src/servico-estudos.test.cjs src/repositorio-estudos-postgres.test.cjs src/server.test.cjs",
+    "test:db": "node --env-file=.env --test src/postgres.integration.test.cjs"
+  },
+  "dependencies": {
+    "pg": "8.23.1"
+  }
+}

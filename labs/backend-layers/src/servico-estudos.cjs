@@ -22,10 +22,17 @@ function criarServicoEstudos(repositorio) {
         return { sucesso: false, status: 409, erro: 'Já existe um estudo com esse título' };
       }
 
-      return {
-        sucesso: true,
-        estudo: await repositorio.inserir(validacao.valor.titulo, regraTitulo.tituloCanonico)
-      };
+      try {
+        return {
+          sucesso: true,
+          estudo: await repositorio.inserir(validacao.valor.titulo, regraTitulo.tituloCanonico)
+        };
+      } catch (erro) {
+        if (erro.code === '23505' && erro.constraint === 'estudos_titulo_canonico_unico') {
+          return { sucesso: false, status: 409, erro: 'Já existe um estudo com esse título' };
+        }
+        throw erro;
+      }
     }
   };
 }

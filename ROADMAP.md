@@ -287,19 +287,24 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Ensinar interface → requisição HTTP → API com o laboratório executável `labs/backend-http` e teste de contrato.
 - [x] Ensinar validação de entrada no servidor com o laboratório `labs/backend-validation`, distinguindo orientação do formulário e contrato da API.
 - [x] Separar validação, regra de negócio e acesso a dados no laboratório `labs/backend-layers`, preservando o contrato HTTP e usando repositório em memória explícito.
-- [ ] Persistir dados em PostgreSQL.
+- [~] Persistir dados em PostgreSQL.
   - [x] Preparar migration `migrations/001_create_estudos.sql` com chave canônica única e dados fictícios.
   - [x] Tornar a interface do repositório assíncrona e conferir o adaptador em memória após a mudança.
-  - [ ] Adicionar o driver `pg` somente a `labs/backend-layers` (aprovação solicitada conforme `AGENTS.md`, §§ 5.5 e 10).
-  - [ ] Aplicar a migration em uma base de laboratório e comprovar leitura, criação e unicidade persistente.
-- [ ] Ensinar respostas de sucesso e erro coerentes.
-- [ ] Ensinar migrações e evolução do esquema.
+  - [x] Adicionar `pg` somente a `labs/backend-layers`, com versões fixas no manifesto e lockfile.
+  - [x] Criar repositório PostgreSQL com pool compartilhado e consultas parametrizadas.
+  - [x] Criar aplicador transacional que registra migrations e não reaplica o mesmo arquivo.
+  - [x] Criar teste de integração para leitura em outra conexão e restrição única.
+  - [ ] Aplicar a migration em uma base de laboratório e comprovar leitura, criação e unicidade persistente; Docker Desktop não iniciou neste ambiente.
+- [x] Ensinar respostas de sucesso e erro coerentes: `201`, `409` para duplicidade e `500` genérico para falha interna.
+- [~] Ensinar migrações e evolução do esquema.
+  - [x] Aplicar e rastrear a migration inicial por script, com transação e operação repetível.
+  - [ ] Executar e conferir uma segunda migration de evolução com o aluno.
 - [ ] Ensinar transação com mais de uma alteração.
 - [x] Criar testes unitários de normalização e unicidade de título em `labs/backend-layers/src/regra-titulo.test.cjs`.
-- [ ] Criar testes de integração com banco de teste.
-- [ ] Integrar o frontend real à API.
-- [ ] Documentar configuração, inicialização, parada e retomada do ambiente.
-- [ ] Proteger exemplos contra segredos e dados pessoais reais.
+- [x] Criar teste de integração com PostgreSQL em `labs/backend-layers/src/postgres.integration.test.cjs` (execução real pendente do Docker local).
+- [x] Servir o frontend do laboratório pela API e demonstrar criação e consulta no mesmo contrato HTTP.
+- [x] Documentar configuração, inicialização, parada e retomada do ambiente.
+- [x] Usar somente dados fictícios; `.env` e `node_modules` do laboratório ficam ignorados pelo Git.
 
 **Aceite:** o aluno constrói e explica um fluxo completo da interface ao banco e de volta, incluindo validação, regra, erro, persistência e testes.
 

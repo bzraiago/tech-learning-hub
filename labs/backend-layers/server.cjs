@@ -3,11 +3,11 @@
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
-const { criarRepositorioEstudos } = require('./src/repositorio-estudos-memoria.cjs');
 const { criarServicoEstudos } = require('./src/servico-estudos.cjs');
+const { criarRepositorioEstudosPostgres } = require('./src/repositorio-estudos-postgres.cjs');
+const { criarRepositorioEstudos } = require('./src/repositorio-estudos-memoria.cjs');
 
 const pagina = path.join(__dirname, 'index.html');
-const servico = criarServicoEstudos(criarRepositorioEstudos());
 const limiteCorpo = 1024;
 
 function responderJson(res, status, dados) {
@@ -30,7 +30,7 @@ async function lerJson(req) {
   }
 }
 
-async function responder(req, res) {
+async function responder(req, res, servico) {
   if (req.method === 'GET' && req.url === '/') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     fs.createReadStream(pagina).pipe(res);
@@ -61,16 +61,39 @@ async function responder(req, res) {
   responderJson(res, 404, { erro: 'Rota não encontrada' });
 }
 
-const servidor = http.createServer((req, res) => {
-  responder(req, res).catch(() => {
-    if (!res.headersSent) responderJson(res, 400, { erro: 'Não foi possível ler a requisição' });
-  });
-});
-
-if (require.main === module) {
-  servidor.listen(4180, '127.0.0.1', () => {
-    console.log('Abra http://127.0.0.1:4180');
+function criarServidor(servico) {
+  return http.createServer((req, res) => {
+    responder(req, res, servico).catch((erro) => {
+      console.error(`Falha interna na API: ${erro.code || erro.name || 'erro desconhecido'}`);
+      if (!res.headersSent) {
+        responderJson(res, 500, { erro: 'Falha interna do servidor' });
+      } else {
+        res.destroy();
+      }
+    });
   });
 }
 
-module.exports = { servidor };
+if (require.main === module) {
+  const usarMemoria = process.env.BACKEND_STORAGE === 'memory';
+  const repositorio = usarMemoria
+    ? criarRepositorioEstudos()
+    : criarRepositorioEstudosPostgres();
+  const servico = criarServicoEstudos(repositorio);
+  const servidor = criarServidor(servico);
+  servidor.listen(4180, '127.0.0.1', () => {
+    console.log(`Abra http://127.0.0.1:4180 · armazenamento: ${usarMemoria ? 'memória (temporário)' : 'PostgreSQL'}`);
+  });
+
+  function encerrar() {
+    servidor.close(async () => {
+      if (repositorio.encerrar) await repositorio.encerrar();
+      console.log('Servidor encerrado');
+    });
+  }
+
+  process.once('SIGINT', encerrar);
+  process.once('SIGTERM', encerrar);
+}
+
+module.exports = { criarServidor };
