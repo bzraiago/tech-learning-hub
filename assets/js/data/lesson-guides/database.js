@@ -1520,8 +1520,8 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "db-postgres": {
-    "prerequisites": "Modelagem relacional, SELECT, JOIN, chaves, restrições e transações das aulas anteriores. No exemplo com Python, saber executar um arquivo e reconhecer uma tupla.",
-    "setup": "1. Instale PostgreSQL pelo instalador da sua plataforma, incluindo servidor e ferramentas de linha de comando; registre a senha definida para o usuário administrativo local e mantenha o serviço iniciado. 2. Abra SQL Shell (psql) no Windows ou o terminal com psql disponível. No terminal use psql -h localhost -U postgres -d postgres; informe a senha quando solicitada. Se seu administrador configurou outro usuário, use-o. 3. Dentro de psql execute CREATE DATABASE hub_pg_aula; e depois \\connect hub_pg_aula. 4. Execute SELECT current_database(), current_user;: o banco deve ser hub_pg_aula. 5. Cole o exemplo abaixo somente nessa base nova. Para sair de psql use \\q. Os comandos com barra invertida pertencem ao psql e não ao editor SQL genérico.",
+    "prerequisites": "Conclua db-docker-compose com PostgreSQL 17 em execução e revise modelagem relacional, SELECT, JOIN, chaves, restrições e transações. Para usar psql no computador em vez de dentro do container, conclua também setup-postgresql.",
+    "setup": "No editor, abra a pasta dados-local com compose.yaml e .env da aula db-docker-compose. No terminal nessa pasta, execute docker compose up -d e docker compose ps; aguarde db healthy. Crie uma base descartável com docker compose exec db createdb -U aluno hub_pg_aula. Se o nome já existir, escolha outro e use-o em todos os comandos desta aula; não apague uma base anterior. Abra psql com docker compose exec db psql -U aluno -d hub_pg_aula. No prompt psql, execute SELECT current_database(), current_user; e confirme hub_pg_aula e aluno antes de colar o exemplo na base vazia. Use \\q para sair. Os comandos Docker vão no terminal; SELECT e \\q vão no psql. Em Windows, macOS ou Linux, a preparação do Docker está em setup-docker; se Docker não estiver disponível, setup-docker-alternative permite estudar o desenho com SQLite, mas não comprova esta prática PostgreSQL. Um cliente externo preparado em setup-postgresql pode usar 127.0.0.1:55432 com a senha local do laboratório. Para parar e retomar, use docker compose down sem -v e depois docker compose up -d na mesma pasta.",
     "why": "Um cadastro de cursos pode parecer correto na tela e ainda aceitar duas matrículas iguais ou uma matrícula para curso inexistente. Aqui o banco participa da proteção dessas regras. Você verificará tanto um relatório quanto uma alteração desfeita, habilidades úteis ao investigar dados de uma aplicação.",
     "sections": [
       {
@@ -1584,44 +1584,48 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Leia as linhas antes da agregação. Mostre título, aluno e conclusão, ordenando por título e aluno.",
+        "prompt": "Prever: antes de executar, indique quais matrículas aparecem na junção sem agregação. Depois mostre título, aluno e conclusão, ordenando por título e aluno.",
         "hints": [
           "Use a mesma condição de JOIN.",
           "Remova COUNT e GROUP BY."
         ],
         "solution": "SELECT c.titulo,m.aluno,m.concluida FROM cursos c JOIN matriculas m ON m.curso_id=c.id ORDER BY c.titulo,m.aluno;",
         "explanation": "As três matrículas explicam os totais.",
-        "expected": "Python/Ana/false; SQL/Ana/true; SQL/Beto/false."
+        "expected": "A consulta mostra uma linha por matrícula em ordem definida, permitindo conferir o relatório agregado.",
+        "criteria": ["Registra a previsão das linhas antes de executar a consulta.", "Relaciona cursos e matrículas pela chave, sem agrupar ou contar prematuramente.", "Ordena por título e aluno e compara as linhas com as contagens do relatório."]
       },
       {
-        "prompt": "Adicione o curso Git com carga 10 e execute o relatório original.",
+        "prompt": "Alterar: adicione o curso Git com carga 10 e execute o relatório original.",
         "hints": [
           "Insira apenas título e carga.",
           "LEFT JOIN deve preservar o curso novo."
         ],
-        "solution": "INSERT INTO cursos(titulo,carga) VALUES ('Git',10);",
+        "solution": "INSERT INTO cursos(titulo,carga) VALUES ('Git',10);\nSELECT c.titulo,COUNT(m.id) AS inscritos,COUNT(*) FILTER (WHERE m.concluida) AS concluidos FROM cursos c LEFT JOIN matriculas m ON m.curso_id=c.id GROUP BY c.id,c.titulo ORDER BY c.titulo;",
         "explanation": "COUNT(m.id) permanece zero para curso sem matrícula.",
-        "expected": "Git | 0 | 0; Python | 1 | 0; SQL | 2 | 1."
+        "expected": "O relatório inclui o curso recém-criado mesmo sem matrícula e preserva os totais dos cursos anteriores.",
+        "criteria": ["Insere apenas o novo curso na base inicial da aula.", "Repete o relatório com LEFT JOIN e conta a chave da matrícula para representar ausência corretamente.", "Compara os cursos existentes antes e depois da inserção."]
       },
       {
-        "prompt": "Provoque uma carga inválida sem alterar os dados confirmados.",
+        "prompt": "Investigar erro: provoque uma carga inválida sem alterar os dados confirmados. Registre a restrição que recusou a tentativa.",
         "hints": [
           "Use transação explícita.",
           "Após o erro, faça ROLLBACK."
         ],
         "solution": "BEGIN;\nINSERT INTO cursos(titulo,carga) VALUES ('Invalido',0);\n-- O comando acima deve falhar. Execute o próximo separadamente:\nROLLBACK;\nSELECT COUNT(*) FROM cursos WHERE titulo='Invalido';",
         "explanation": "A restrição CHECK rejeita zero e o rollback encerra a transação abortada.",
-        "expected": "Erro de CHECK; contagem final 0."
+        "expected": "A tentativa inválida é recusada e a base permanece pronta para novas consultas após encerrar a transação.",
+        "criteria": ["Executa a tentativa inválida em transação separada dos dados iniciais.", "Relaciona a mensagem observada à restrição de carga positiva.", "Executa ROLLBACK e consulta a ausência do curso inválido sem remover registros válidos."]
       },
       {
-        "prompt": "Nos dados originais, conclua Beto em uma transação confirmada e demonstre que SQL passou a ter duas conclusões.",
+        "prompt": "Construir: nos dados originais, conclua Beto em uma transação confirmada e demonstre que o relatório de SQL mudou, mesmo após reconectar.",
         "hints": [
           "Atualize pela chave id=2.",
           "Use COMMIT e repita a agregação."
         ],
-        "solution": "BEGIN;\nUPDATE matriculas SET concluida=TRUE WHERE id=2;\nCOMMIT;\nSELECT COUNT(*) FROM matriculas WHERE curso_id=1 AND concluida;",
+        "solution": "BEGIN;\nUPDATE matriculas SET concluida=TRUE WHERE id=2;\nCOMMIT;\nSELECT c.titulo,COUNT(m.id) AS inscritos,COUNT(*) FILTER (WHERE m.concluida) AS concluidos FROM cursos c LEFT JOIN matriculas m ON m.curso_id=c.id GROUP BY c.id,c.titulo ORDER BY c.titulo;\n-- Saia com \\q, reconecte à mesma base e repita o SELECT.",
         "explanation": "O filtro por curso evita somar conclusões de outro curso.",
-        "expected": "2; repetindo a consulta após reconectar, continua 2."
+        "expected": "O relatório reflete a conclusão confirmada e mantém o resultado após uma nova conexão.",
+        "criteria": ["Parte dos dados originais e altera somente a matrícula de Beto.", "Confirma a transação e repete a agregação para conferir o curso solicitado.", "Reconecta ao mesmo banco e verifica que a alteração permaneceu."]
       }
     ],
     "mistakes": [
