@@ -58,6 +58,24 @@ async function responder(req, res, servico) {
     responderJson(res, 201, resultado.estudo);
     return;
   }
+  if (req.method === 'POST' && req.url === '/api/estudos-com-sessao') {
+    if (!/^application\/json(?:\s*;|\s*$)/i.test(req.headers['content-type'] || '')) {
+      responderJson(res, 415, { erro: 'Use Content-Type: application/json' });
+      return;
+    }
+    const leitura = await lerJson(req);
+    if (leitura.erro) {
+      responderJson(res, leitura.status, { erro: leitura.erro });
+      return;
+    }
+    const resultado = await servico.criarComSessao(leitura.dados);
+    if (!resultado.sucesso) {
+      responderJson(res, resultado.status, { erro: resultado.erro });
+      return;
+    }
+    responderJson(res, 201, resultado.resultado);
+    return;
+  }
   responderJson(res, 404, { erro: 'Rota não encontrada' });
 }
 

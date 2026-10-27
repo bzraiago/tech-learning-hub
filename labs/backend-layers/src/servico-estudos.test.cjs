@@ -38,3 +38,35 @@ test('serviço não transforma falhas de conexão em conflito de título', async
     falhaBanco
   );
 });
+
+test('serviço envia estudo e sessão juntos ao repositório', async () => {
+  const chamadas = [];
+  const repositorio = {
+    async encontrarPorTituloCanonico() { return null; },
+    async criarComSessao(...argumentos) {
+      chamadas.push(argumentos);
+      return { estudo: { id: 3, titulo: 'CSS' }, sessao: { id: 1, minutos: 25 } };
+    }
+  };
+
+  const resultado = await criarServicoEstudos(repositorio).criarComSessao({ titulo: ' CSS ', minutos: 25 });
+
+  assert.deepEqual(chamadas, [['CSS', 'css', 25]]);
+  assert.deepEqual(resultado, {
+    sucesso: true,
+    resultado: { estudo: { id: 3, titulo: 'CSS' }, sessao: { id: 1, minutos: 25 } }
+  });
+});
+
+test('serviço recusa sessão inválida antes de consultar o repositório', async () => {
+  let consultado = false;
+  const repositorio = {
+    async encontrarPorTituloCanonico() { consultado = true; return null; }
+  };
+
+  const resultado = await criarServicoEstudos(repositorio).criarComSessao({ titulo: 'CSS', minutos: 0 });
+
+  assert.equal(resultado.sucesso, false);
+  assert.equal(resultado.status, 400);
+  assert.equal(consultado, false);
+});

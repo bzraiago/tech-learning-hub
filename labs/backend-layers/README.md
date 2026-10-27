@@ -91,7 +91,7 @@ npm.cmd run migrate
 npm run migrate
 ```
 
-Saída esperada na primeira execução: `Migration aplicada: 001_create_estudos.sql`. Execute o comando outra vez: deve informar `Migration já aplicada...` sem inserir novos registros. O aplicador registra a migration na tabela `migrations_aplicadas` e usa uma transação para não marcar como concluído um SQL que falhou.
+Saída esperada na primeira execução: `Migration aplicada: 001_create_estudos.sql` e `Migration aplicada: 002_create_sessoes_estudo.sql`. Execute o comando outra vez: deve informar `Migration já aplicada...` para os dois arquivos, sem repetir alterações. O aplicador percorre arquivos numerados em ordem, registra cada nome em `migrations_aplicadas` e usa uma transação por arquivo.
 
 Confira os registros iniciais sem instalar um cliente PostgreSQL no computador:
 
@@ -137,9 +137,9 @@ npm.cmd test
 npm test
 ```
 
-Saída esperada: sete testes aprovados, cobrindo normalização, regra de título, concorrência na unicidade, consultas parametrizadas e resposta `500` sem detalhes internos.
+Saída esperada: dezessete testes aprovados, cobrindo ordem/idempotência/rollback de migrations, validação, corrida por título único, transação, consultas parametrizadas e resposta `500` sem detalhes internos.
 
-Depois de iniciar o banco e aplicar a migration, habilite o teste real de integração:
+Depois de iniciar o banco e aplicar as migrations, habilite o teste real de integração:
 
 ```powershell
 # Windows PowerShell — nesta janela do terminal
@@ -153,7 +153,7 @@ Remove-Item Env:RUN_PG_INTEGRATION
 RUN_PG_INTEGRATION=1 npm run test:db
 ```
 
-Saída esperada: um teste aprovado que cria um título aleatório, encerra a primeira conexão, encontra o registro após reconectar e confirma que a restrição única do PostgreSQL rejeita duplicatas. O teste remove apenas o registro aleatório que criou.
+Saída esperada: um teste aprovado que confirma leitura após reconectar, sessão persistida, rollback quando a segunda gravação viola um `CHECK` e rejeição de título duplicado. O teste remove apenas os registros aleatórios que criou.
 
 ## Como parar e retomar
 
@@ -191,10 +191,29 @@ Se Docker não estiver disponível mas o computador já tiver PostgreSQL local, 
 | Regra de negócio | Compara títulos sem considerar espaços externos e caixa | `src/regra-titulo.cjs` e `src/servico-estudos.cjs` |
 | Repositório | Executa `SELECT`/`INSERT` com parâmetros e converte o resultado | `src/repositorio-estudos-postgres.cjs` |
 | Pool | Reutiliza até cinco conexões e lê as variáveis `PG*` | `src/configuracao-banco.cjs` |
-| Esquema | Cria a tabela, as restrições e os dois registros fictícios | `migrations/001_create_estudos.sql` |
-| Aplicador | Registra e aplica cada migration uma vez | `scripts/aplicar-migration.cjs` |
+| Esquema | Cria estudos, sessões e suas restrições | `migrations/001_create_estudos.sql`, `migrations/002_create_sessoes_estudo.sql` |
+| Aplicador | Executa migrations numeradas em ordem e registra cada arquivo uma vez | `scripts/aplicar-migration.cjs` |
 
 O índice único é a última barreira contra duplicidade quando pedidos simultâneos passam pela consulta de busca. O serviço transforma somente essa violação conhecida em `409`; falhas de conexão continuam como erro de servidor. `migrations_aplicadas` registra qual arquivo foi aplicado, e a migration roda na mesma transação da marcação.
+
+## Transação: estudo e primeira sessão
+
+A rota `POST /api/estudos-com-sessao` grava o estudo e sua primeira sessão na mesma transação: `BEGIN` abre a unidade, dois `INSERT`s fazem as alterações, `COMMIT` confirma ambas. Se o segundo `INSERT` falhar, `ROLLBACK` desfaz também o primeiro.
+
+No Console do navegador, envie uma sessão válida com um título novo:
+
+```js
+const resposta = await fetch('/api/estudos-com-sessao', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ titulo: 'Acessibilidade CSS', minutos: 25 })
+});
+console.log(resposta.status, await resposta.json());
+```
+
+Resultado esperado: `201`, um estudo e uma sessão com `minutos: 25`. Reenvie o mesmo título: `409` e nenhuma segunda sessão. Um pedido com minutos zero recebe `400` antes de iniciar a transação.
+
+Para observar o rollback no PostgreSQL sem guardar dados de teste, execute `npm.cmd run demo:rollback` no Windows ou `npm run demo:rollback` em macOS/Linux. O roteiro tenta inserir um estudo e uma sessão inválida; o `CHECK` rejeita a sessão, `ROLLBACK` desfaz o estudo e a consulta final confirma que ele não existe. Saída esperada: `Rollback confirmado: a falha da sessão também desfez a criação do estudo.`
 
 ## Prática
 
@@ -202,8 +221,8 @@ Antes de cada pedido, preveja status, resposta e quantidade de estudos.
 
 1. **Prever:** cadastre `CSS`, reinicie só a API e consulte novamente. Critério: o registro continua lá; explique por que o adaptador em memória teria outro resultado.
 2. **Alterar:** troque no repositório o `ORDER BY id` por `ORDER BY titulo`. Critério: a resposta fica em ordem alfabética e as consultas seguem parametrizadas.
-3. **Construir:** estenda o aplicador para percorrer migrations SQL numeradas em ordem e crie uma segunda migration para adicionar um campo `descricao` opcional. Critério: o arquivo antigo permanece intacto, a migration nova só é aplicada uma vez e os registros anteriores continuam legíveis.
-4. **Investigar erro:** pare o banco e envie `GET /api/estudos`. Critério: a API responde `500` sem exibir endereço, usuário ou senha; o terminal indica um código útil para diagnóstico. Retome o banco e confirme que os dados continuam presentes.
+3. **Construir:** crie uma terceira migration numerada para adicionar `observacao` opcional às sessões. Critério: mantenha os arquivos anteriores intactos, aplique a nova uma vez e leia sessões antigas.
+4. **Investigar erro:** execute `npm run demo:rollback` e acompanhe os `INSERT`s. Critério: a sessão inválida falha, a transação reverte e o estudo da tentativa não aparece numa busca posterior. Depois pare o banco e envie `GET /api/estudos`: a API responde `500` sem exibir endereço, usuário ou senha. Retome o banco e confira os dados válidos.
 
 Em cada mudança, anote camada alterada, comando, status e estado dos dados antes/depois. O teste de integração comprova o repositório contra o PostgreSQL real; os testes sem `RUN_PG_INTEGRATION=1` usam doubles e não comprovam uma conexão real.
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const { validarEstudo } = require('./validar-estudo.cjs');
+const { validarEstudo, validarEstudoComSessao } = require('./validar-estudo.cjs');
 const { avaliarTituloUnico } = require('./regra-titulo.cjs');
 
 function criarServicoEstudos(repositorio) {
@@ -26,6 +26,36 @@ function criarServicoEstudos(repositorio) {
         return {
           sucesso: true,
           estudo: await repositorio.inserir(validacao.valor.titulo, regraTitulo.tituloCanonico)
+        };
+      } catch (erro) {
+        if (erro.code === '23505' && erro.constraint === 'estudos_titulo_canonico_unico') {
+          return { sucesso: false, status: 409, erro: 'Já existe um estudo com esse título' };
+        }
+        throw erro;
+      }
+    },
+    async criarComSessao(entrada) {
+      const validacao = validarEstudoComSessao(entrada);
+      if (!validacao.valido) {
+        return { sucesso: false, status: 400, erro: validacao.erro };
+      }
+
+      const regraTitulo = await avaliarTituloUnico(
+        validacao.valor.titulo,
+        (tituloCanonico) => repositorio.encontrarPorTituloCanonico(tituloCanonico)
+      );
+      if (regraTitulo.duplicado) {
+        return { sucesso: false, status: 409, erro: 'Já existe um estudo com esse título' };
+      }
+
+      try {
+        return {
+          sucesso: true,
+          resultado: await repositorio.criarComSessao(
+            validacao.valor.titulo,
+            regraTitulo.tituloCanonico,
+            validacao.valor.minutos
+          )
         };
       } catch (erro) {
         if (erro.code === '23505' && erro.constraint === 'estudos_titulo_canonico_unico') {

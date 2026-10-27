@@ -8,7 +8,8 @@
     "start:memory": "node server.cjs",
     "migrate": "node --env-file=.env scripts/aplicar-migration.cjs",
     "db:check": "node --env-file=.env scripts/verificar-conexao.cjs",
-    "test": "node --test src/regra-titulo.test.cjs src/servico-estudos.test.cjs src/repositorio-estudos-postgres.test.cjs src/server.test.cjs",
+    "demo:rollback": "node --env-file=.env scripts/demonstrar-rollback.cjs",
+    "test": "node --test scripts/aplicar-migration.test.cjs src/regra-titulo.test.cjs src/repositorio-estudos-memoria.test.cjs src/validar-estudo.test.cjs src/servico-estudos.test.cjs src/repositorio-estudos-postgres.test.cjs src/server.test.cjs",
     "test:db": "node --env-file=.env --test src/postgres.integration.test.cjs"
   },
   "dependencies": {

@@ -56,11 +56,12 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `db-postgres`, criar uma base nova no Compose, verificar banco e usuário, executar os quatro exercícios e confirmar a transação após reconectar.
 - [ ] Em `db-sqlite`, executar o arquivo Python, verificar parâmetros e reversão, e comparar a cópia em memória com a origem.
 - [ ] Em `labs/backend-validation`, formulário válido cria um estudo; pedidos diretos inválidos retornam erro e não alteram a lista.
-- [ ] Em `labs/backend-layers`, `npm test` aprova os sete testes unitários sem depender do PostgreSQL.
-- [ ] Em `labs/backend-layers`, a base isolada `backend_camadas` na porta `55433` fica healthy, e a migration cria a chave única e os dois estudos fictícios.
-- [ ] Em `labs/backend-layers`, executar `npm run migrate` duas vezes aplica a migration uma vez e mantém um único registro em `migrations_aplicadas`.
-- [ ] Em `labs/backend-layers`, `npm run test:db` com `RUN_PG_INTEGRATION=1` confirma leitura em outra conexão, persistência e rejeição de duplicidade.
-- [ ] Em `labs/backend-layers`, API retorna 201 ao criar, 409 ao repetir título e mantém o item após reiniciar apenas o servidor Node.
+- [ ] Em `labs/backend-layers`, `npm test` aprova os dezessete testes sem depender do PostgreSQL.
+- [ ] Em `labs/backend-layers`, a base isolada `backend_camadas` na porta `55433` fica healthy, e as migrations criam estudos, sessões e suas restrições.
+- [ ] Em `labs/backend-layers`, executar `npm run migrate` duas vezes aplica os arquivos uma vez e mantém dois registros em `migrations_aplicadas`.
+- [ ] Em `labs/backend-layers`, `npm run test:db` com `RUN_PG_INTEGRATION=1` confirma leitura após reconectar, sessão persistida, rollback e unicidade.
+- [ ] Em `labs/backend-layers`, API retorna 201 ao criar estudo/sessão, 400 para minutos inválidos, 409 para título repetido e preserva a persistência após reiniciar Node.
+- [ ] Em `labs/backend-layers`, `npm run demo:rollback` comprova que a falha da sessão desfaz o estudo criado dentro da transação.
 - [ ] Em `labs/backend-layers`, falha de banco retorna 500 sem incluir detalhes internos; `npm run start:memory` identifica que os dados são temporários.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.

@@ -266,7 +266,8 @@ Vem da análise em `ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima para baixo e
    - [x] Testes unitários de regra cobrem normalização do título, duplicidade e novo título sem iniciar servidor ou banco.
    - [x] Preparar migration PostgreSQL e interface assíncrona do repositório antes de conectar o driver.
    - [x] Conectar `pg` apenas em `labs/backend-layers`, com consultas parametrizadas, `.env.example` local e PostgreSQL Compose isolado na porta 55433.
-   - [x] Criar migration transacional rastreada, teste de integração PostgreSQL e testes unitários para repositório/respostas HTTP.
+   - [x] Criar aplicador de migrations numeradas, segunda migration de sessões e transação estudo + sessão com rollback demonstrável.
+   - [x] Criar teste de integração PostgreSQL e testes unitários para migrations, repositório transacional e respostas HTTP.
    - [ ] Executar a migration e o teste de integração no banco real; o daemon Docker não ficou disponível no ambiente desta implementação.
 6. [ ] **CI, publicação e integração externa** como práticas guiadas e verificáveis (observar falha, corrigir, conferir URL final, voltar versão).
 7. [ ] Atividades gerais de conclusão (prova básica disponível no curso; intermediária pendente) — ver seção 9.

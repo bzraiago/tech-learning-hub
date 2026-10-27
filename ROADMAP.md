@@ -298,8 +298,14 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Ensinar respostas de sucesso e erro coerentes: `201`, `409` para duplicidade e `500` genérico para falha interna.
 - [~] Ensinar migrações e evolução do esquema.
   - [x] Aplicar e rastrear a migration inicial por script, com transação e operação repetível.
-  - [ ] Executar e conferir uma segunda migration de evolução com o aluno.
-- [ ] Ensinar transação com mais de uma alteração.
+  - [x] Aplicador percorre arquivos SQL numerados em ordem e tem testes de idempotência e rollback.
+  - [x] Migration `002_create_sessoes_estudo.sql` adiciona sessões sem reescrever a migration inicial.
+  - [ ] Aplicar as duas migrations em PostgreSQL real e conferir evolução e repetição.
+  - [ ] Executar a prática do aluno de criar uma terceira migration.
+- [~] Ensinar transação com mais de uma alteração.
+  - [x] API cria estudo e primeira sessão em uma transação e reverte ambas as alterações se a segunda falhar.
+  - [x] Incluir teste unitário de `BEGIN`/`COMMIT`/`ROLLBACK` e demonstração reproduzível de rollback.
+  - [ ] Confirmar a transação no PostgreSQL real após aplicar as migrations.
 - [x] Criar testes unitários de normalização e unicidade de título em `labs/backend-layers/src/regra-titulo.test.cjs`.
 - [x] Criar teste de integração com PostgreSQL em `labs/backend-layers/src/postgres.integration.test.cjs` (execução real pendente do Docker local).
 - [x] Servir o frontend do laboratório pela API e demonstrar criação e consulta no mesmo contrato HTTP.
