@@ -161,6 +161,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Acrescentar critérios aos quatro exercícios de `db-docker-compose`, verificando portas, configuração e persistência após recriação.
   - [x] Acrescentar critérios aos quatro exercícios de `db-docker-operations`, cobrindo diagnóstico, restauração em destino novo e credenciais persistidas.
   - [x] Alinhar `db-postgres` ao ambiente Compose existente e acrescentar critérios aos quatro exercícios de consulta, alteração, erro e transação.
+  - [x] Vincular `db-sqlite` à preparação Python e acrescentar critérios aos quatro exercícios de consulta, parâmetros, reversão e backup.
   - [ ] Revisar os demais resultados esperados para evitar respostas antecipadas e completar critérios específicos por aula.
 - [ ] Garantir exemplos executáveis com saída ou comportamento visível.
 - [ ] Aplicar a progressão guiado → pistas → problema novo → mudança de requisito.

@@ -54,6 +54,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `db-docker-compose`, porta do host e porta interna são diferenciadas; o marcador persiste após down/up sem remover o volume.
 - [ ] Em `db-docker-operations`, a restauração ocorre em banco novo, com consulta à origem e ao destino; mudança de senha não remove o volume.
 - [ ] Em `db-postgres`, criar uma base nova no Compose, verificar banco e usuário, executar os quatro exercícios e confirmar a transação após reconectar.
+- [ ] Em `db-sqlite`, executar o arquivo Python, verificar parâmetros e reversão, e comparar a cópia em memória com a origem.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.

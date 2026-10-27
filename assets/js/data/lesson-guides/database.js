@@ -1843,8 +1843,8 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "db-sqlite": {
-    "prerequisites": "Modelagem relacional, SELECT, JOIN, chaves, restrições e transações das aulas anteriores. No exemplo com Python, saber executar um arquivo e reconhecer uma tupla.",
-    "setup": "1. Instale Python 3 caso ainda não esteja disponível. No terminal execute python --version ou py --version no Windows. 2. Crie uma pasta de estudo e um arquivo sqlite_aula.py; não o chame sqlite3.py, pois isso esconderia a biblioteca. 3. Copie o exemplo inteiro. 4. Execute python sqlite_aula.py ou py sqlite_aula.py. 5. Compare as quatro linhas da saída. Não precisa instalar pacote pelo pip nas distribuições comuns que incluem sqlite3; se import sqlite3 falhar, confira sua distribuição Python. O exemplo usa :memory: para começar limpo em cada execução, sem criar ou apagar arquivos de banco.",
+    "prerequisites": "Conclua setup-python e revise modelagem relacional, SELECT, JOIN, chaves, restrições e transações das aulas anteriores. Saiba executar um arquivo Python e reconhecer uma tupla impressa.",
+    "setup": "Siga setup-python para instalar e verificar Python em Windows, macOS ou Linux. No editor, crie uma pasta de estudo e salve o exemplo inteiro como sqlite_aula.py; não o chame sqlite3.py, pois isso esconderia a biblioteca. No terminal aberto nessa pasta, execute python --version (ou py --version no Windows) e espere Python 3.x.x. Depois execute python sqlite_aula.py (ou py sqlite_aula.py no Windows) e compare as quatro linhas da saída com o exemplo. Não é necessário instalar servidor nem pacote adicional nas distribuições comuns que incluem sqlite3; se import sqlite3 falhar, confira a distribuição Python conforme setup-python. O exemplo usa :memory: para começar limpo em cada execução, sem criar ou apagar arquivos de banco. Para parar e retomar, feche o programa e execute o mesmo arquivo novamente; um computador limitado pode usar esse laboratório em memória sem Docker.",
     "why": "Um programa pode precisar armazenar registros sem configurar serviço de banco. SQLite permite praticar SQL real com uma dependência pequena. A lição combina restrições, parâmetros e uma falha controlada para mostrar que armazenamento local também exige contratos e transações.",
     "sections": [
       {
@@ -1907,44 +1907,48 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Antes do finally, consulte todos os alunos de SQL usando o id do curso como parâmetro.",
+        "prompt": "Prever: antes de executar, indique quais alunos pertencem ao curso SQL. Depois, antes do finally, consulte-os usando o id do curso como parâmetro.",
         "hints": [
           "Insira o trecho dentro do try externo.",
           "O parâmetro deve ser uma tupla."
         ],
         "solution": "print(con.execute(\"SELECT aluno FROM matriculas WHERE curso_id=? ORDER BY aluno\", (1,)).fetchall())",
         "explanation": "A consulta continua parametrizada mesmo com um número conhecido.",
-        "expected": "[('Ana',), ('Beto',)]"
+        "expected": "A consulta devolve apenas as matrículas do curso solicitado em ordem previsível.",
+        "criteria": ["Registra a previsão dos alunos antes de executar o código.", "Usa um marcador de parâmetro para o id e uma tupla de um elemento.", "Consulta dentro do try, ordena os resultados e compara com as matrículas iniciais."]
       },
       {
-        "prompt": "Antes do finally, cadastre um aluno cujo nome contém apóstrofo, usando parâmetros.",
+        "prompt": "Alterar: antes do finally, cadastre um aluno cujo nome contém apóstrofo, usando parâmetros.",
         "hints": [
           "Use with con.",
           "Não escape o texto manualmente no SQL."
         ],
         "solution": "with con:\n    con.execute(\"INSERT INTO matriculas(curso_id,aluno) VALUES (?,?)\", (1, \"D'Ávila\"))\nprint(con.execute(\"SELECT aluno FROM matriculas WHERE aluno=?\", (\"D'Ávila\",)).fetchone()[0])",
         "explanation": "O driver preserva o apóstrofo como parte do valor.",
-        "expected": "D'Ávila"
+        "expected": "O nome com apóstrofo é gravado e consultado como dado, sem alterar a sintaxe SQL.",
+        "criteria": ["Insere a nova matrícula dentro de uma transação controlada.", "Envia o nome como parâmetro, sem concatenar ou escapar manualmente o SQL.", "Consulta o registro inserido com parâmetro e confere o texto preservado."]
       },
       {
-        "prompt": "Explique por que Beto continua pendente e prove isso por uma consulta.",
+        "prompt": "Investigar erro: explique por que Beto continua pendente após a tentativa de matrícula inválida e prove isso por uma consulta.",
         "hints": [
           "O UPDATE ocorreu antes da violação.",
           "A exceção saiu do bloco transacional."
         ],
         "solution": "print(con.execute(\"SELECT aluno,concluida FROM matriculas WHERE id=?\", (2,)).fetchone())",
         "explanation": "As duas operações estavam na mesma unidade: a falha reverteu a atualização válida anterior.",
-        "expected": "('Beto', 0)"
+        "expected": "A consulta após a falha mostra que a mudança provisória de Beto não foi confirmada.",
+        "criteria": ["Identifica a violação da chave estrangeira na mesma transação que alterou Beto.", "Explica por que capturar a exceção fora do bloco with provoca a reversão da unidade.", "Consulta Beto por identificador e compara o estado com o registro inicial."]
       },
       {
-        "prompt": "Crie um backup em memória do banco original e confirme que há três matrículas, sem alterar o banco de origem. Execute antes do finally e antes dos demais exercícios.",
+        "prompt": "Construir: crie um backup em memória do banco original e confira as matrículas, sem alterar o banco de origem. Execute antes do finally e antes dos demais exercícios.",
         "hints": [
           "Abra uma segunda conexão.",
           "Use con.backup(destino), feche destino ao terminar."
         ],
-        "solution": "destino = sqlite3.connect(\":memory:\")\ntry:\n    con.backup(destino)\n    print(destino.execute(\"SELECT COUNT(*) FROM matriculas\").fetchone()[0])\nfinally:\n    destino.close()",
+        "solution": "destino = sqlite3.connect(\":memory:\")\ntry:\n    con.backup(destino)\n    print(con.execute(\"SELECT COUNT(*) FROM matriculas\").fetchone()[0])\n    print(destino.execute(\"SELECT COUNT(*) FROM matriculas\").fetchone()[0])\nfinally:\n    destino.close()",
         "explanation": "O backup copia o banco por uma API do mecanismo; a contagem verifica um aspecto simples, não toda a integridade de uma recuperação real.",
-        "expected": "3"
+        "expected": "A cópia em memória contém as matrículas originais e a conexão de origem permanece disponível durante a conferência.",
+        "criteria": ["Abre uma segunda conexão em memória e usa a API de backup do sqlite3.", "Consulta a cópia e a origem para comparar as matrículas sem alterar nenhuma delas.", "Fecha a conexão de destino mesmo se ocorrer falha e não apresenta a contagem isolada como prova completa de recuperação."]
       }
     ],
     "mistakes": [
