@@ -42,4 +42,4 @@ Confira também a lista inicial com GET e o JSON de erro da rota ausente. O nave
 
 Em cada mudança, anote a camada editada, o pedido observado, o status e o estado da lista antes e depois. Para conferir a regra de negócio isolada do servidor, abra outro terminal nesta pasta e execute `node --test src/regra-titulo.test.cjs`. Resultado esperado: três testes aprovados, cobrindo normalização, título duplicado e título novo. Os testes usam uma função simulada para responder à busca; ainda não são testes de integração com banco.
 
-O próximo passo substitui o repositório em memória por PostgreSQL mantendo o contrato da API.
+O esquema inicial que será usado na próxima etapa está em `migrations/001_create_estudos.sql`: a tabela separa o título exibido do valor canônico usado na regra de unicidade. A próxima etapa conecta um repositório PostgreSQL mantendo o contrato da API e orienta como aplicar esse esquema no banco de laboratório.
