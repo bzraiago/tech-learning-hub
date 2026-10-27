@@ -4,11 +4,11 @@ function normalizarTitulo(titulo) {
   return titulo.trim().toLocaleLowerCase('pt-BR');
 }
 
-function avaliarTituloUnico(titulo, encontrarPorTituloCanonico) {
+async function avaliarTituloUnico(titulo, encontrarPorTituloCanonico) {
   const tituloCanonico = normalizarTitulo(titulo);
   return {
     tituloCanonico,
-    duplicado: Boolean(encontrarPorTituloCanonico(tituloCanonico))
+    duplicado: Boolean(await encontrarPorTituloCanonico(tituloCanonico))
   };
 }
 

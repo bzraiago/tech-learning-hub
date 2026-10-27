@@ -11,14 +11,14 @@ function criarRepositorioEstudos() {
   }
 
   return {
-    listar() {
+    async listar() {
       return estudos.map(apresentar);
     },
-    encontrarPorTituloCanonico(tituloCanonico) {
+    async encontrarPorTituloCanonico(tituloCanonico) {
       const estudo = estudos.find((item) => item.tituloCanonico === tituloCanonico);
       return estudo ? apresentar(estudo) : null;
     },
-    inserir(titulo, tituloCanonico) {
+    async inserir(titulo, tituloCanonico) {
       const estudo = { id: estudos.at(-1).id + 1, titulo, tituloCanonico };
       estudos.push(estudo);
       return apresentar(estudo);

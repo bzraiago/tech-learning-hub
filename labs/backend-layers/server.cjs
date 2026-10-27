@@ -37,7 +37,7 @@ async function responder(req, res) {
     return;
   }
   if (req.method === 'GET' && req.url === '/api/estudos') {
-    responderJson(res, 200, servico.listar());
+    responderJson(res, 200, await servico.listar());
     return;
   }
   if (req.method === 'POST' && req.url === '/api/estudos') {
@@ -50,7 +50,7 @@ async function responder(req, res) {
       responderJson(res, leitura.status, { erro: leitura.erro });
       return;
     }
-    const resultado = servico.criar(leitura.dados);
+    const resultado = await servico.criar(leitura.dados);
     if (!resultado.sucesso) {
       responderJson(res, resultado.status, { erro: resultado.erro });
       return;

@@ -9,9 +9,9 @@ test('normalizarTitulo remove espaços externos e ignora diferenças de caixa', 
   assert.equal(normalizarTitulo('ÁRVORE'), 'árvore');
 });
 
-test('avaliarTituloUnico procura o título canônico e indica duplicidade', () => {
+test('avaliarTituloUnico procura o título canônico e indica duplicidade', async () => {
   const chamadas = [];
-  const resultado = avaliarTituloUnico('  Css ', (tituloCanonico) => {
+  const resultado = await avaliarTituloUnico('  Css ', async (tituloCanonico) => {
     chamadas.push(tituloCanonico);
     return { id: 3, titulo: 'CSS' };
   });
@@ -20,7 +20,7 @@ test('avaliarTituloUnico procura o título canônico e indica duplicidade', () =
   assert.deepEqual(resultado, { tituloCanonico: 'css', duplicado: true });
 });
 
-test('avaliarTituloUnico permite título sem correspondência', () => {
-  const resultado = avaliarTituloUnico('TypeScript', () => null);
+test('avaliarTituloUnico permite título sem correspondência', async () => {
+  const resultado = await avaliarTituloUnico('TypeScript', async () => null);
   assert.deepEqual(resultado, { tituloCanonico: 'typescript', duplicado: false });
 });

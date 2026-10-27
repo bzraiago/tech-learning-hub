@@ -288,6 +288,10 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Ensinar validação de entrada no servidor com o laboratório `labs/backend-validation`, distinguindo orientação do formulário e contrato da API.
 - [x] Separar validação, regra de negócio e acesso a dados no laboratório `labs/backend-layers`, preservando o contrato HTTP e usando repositório em memória explícito.
 - [ ] Persistir dados em PostgreSQL.
+  - [x] Preparar migration `migrations/001_create_estudos.sql` com chave canônica única e dados fictícios.
+  - [x] Tornar a interface do repositório assíncrona e conferir o adaptador em memória após a mudança.
+  - [ ] Adicionar o driver `pg` somente a `labs/backend-layers` (aprovação solicitada conforme `AGENTS.md`, §§ 5.5 e 10).
+  - [ ] Aplicar a migration em uma base de laboratório e comprovar leitura, criação e unicidade persistente.
 - [ ] Ensinar respostas de sucesso e erro coerentes.
 - [ ] Ensinar migrações e evolução do esquema.
 - [ ] Ensinar transação com mais de uma alteração.

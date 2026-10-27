@@ -17,7 +17,7 @@
 | Regra de negócio | Compara títulos sem diferenciar maiúsculas e decide se há duplicidade | `src/regra-titulo.cjs` e `src/servico-estudos.cjs` |
 | Acesso a dados | Lista, procura e insere sem decidir se o pedido é válido | `src/repositorio-estudos-memoria.cjs` |
 
-O serviço coordena validação, regra e repositório. O servidor não consulta ou altera a lista diretamente. O repositório em memória demonstra a fronteira de acesso aos dados, mas não sobrevive ao encerramento do processo e ainda não é PostgreSQL.
+O serviço coordena validação, regra e repositório. O servidor não consulta ou altera a lista diretamente. Os métodos do repositório devolvem Promises mesmo no adaptador em memória, para que a mesma interface possa aguardar consultas PostgreSQL sem mudar as rotas.
 
 ## Prática
 

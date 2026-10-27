@@ -5,16 +5,16 @@ const { avaliarTituloUnico } = require('./regra-titulo.cjs');
 
 function criarServicoEstudos(repositorio) {
   return {
-    listar() {
+    async listar() {
       return repositorio.listar();
     },
-    criar(entrada) {
+    async criar(entrada) {
       const validacao = validarEstudo(entrada);
       if (!validacao.valido) {
         return { sucesso: false, status: 400, erro: validacao.erro };
       }
 
-      const regraTitulo = avaliarTituloUnico(
+      const regraTitulo = await avaliarTituloUnico(
         validacao.valor.titulo,
         (tituloCanonico) => repositorio.encontrarPorTituloCanonico(tituloCanonico)
       );
@@ -24,7 +24,7 @@ function criarServicoEstudos(repositorio) {
 
       return {
         sucesso: true,
-        estudo: repositorio.inserir(validacao.valor.titulo, regraTitulo.tituloCanonico)
+        estudo: await repositorio.inserir(validacao.valor.titulo, regraTitulo.tituloCanonico)
       };
     }
   };
