@@ -32,6 +32,6 @@ fetch('/api/estudos', {
 
 Antes de ver o resultado, preveja status e efeito na lista. Faça cada alteração a partir de uma nova execução do servidor e registre pedido, status, corpo e quantidade de estudos antes e depois. A solução dos exercícios deve ser escrita pelo aluno; o servidor inicial demonstra o contrato básico.
 
-## Testes e próximo passo
+## Próximo passo
 
-Em outro terminal, na mesma pasta, execute `node --test server.test.cjs`. O teste deve passar e verificar criação válida, pedidos inválidos e lista preservada após recusas. A próxima etapa separa validação, regra de negócio e acesso a dados, antes de substituir o array em memória por PostgreSQL.
+O teste automatizado da etapa valida criação válida, pedidos inválidos e lista preservada após recusas. Para entender como manter essas regras organizadas conforme o backend cresce, continue em `labs/backend-layers/README.md`. A etapa seguinte substituirá o repositório em memória por PostgreSQL.

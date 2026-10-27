@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Estudos — camadas do backend</title>
+</head>
+<body>
+  <main>
+    <h1>Estudos</h1>
+    <form id="formulario">
+      <label for="titulo">Título do estudo</label>
+      <input id="titulo" name="titulo" maxlength="80" required>
+      <button type="submit">Adicionar</button>
+    </form>
+    <p id="situacao" role="status" aria-live="polite">Carregando…</p>
+    <ul id="lista"></ul>
+  </main>
+  <script>
+    const formulario = document.querySelector('#formulario');
+    const titulo = document.querySelector('#titulo');
+    const situacao = document.querySelector('#situacao');
+    const lista = document.querySelector('#lista');
+
+    function mostrarEstudos(estudos) {
+      lista.replaceChildren();
+      for (const estudo of estudos) {
+        const item = document.createElement('li');
+        item.textContent = estudo.titulo;
+        lista.append(item);
+      }
+    }
+
+    async function carregarEstudos() {
+      try {
+        const resposta = await fetch('/api/estudos');
+        if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
+        const estudos = await resposta.json();
+        mostrarEstudos(estudos);
+        situacao.textContent = `${estudos.length} estudos encontrados.`;
+      } catch {
+        situacao.textContent = 'Não foi possível carregar a lista.';
+      }
+    }
+
+    formulario.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+      const botao = formulario.querySelector('button');
+      botao.disabled = true;
+      situacao.textContent = 'Enviando…';
+      try {
+        const resposta = await fetch('/api/estudos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ titulo: titulo.value })
+        });
+        const dados = await resposta.json();
+        if (!resposta.ok) {
+          situacao.textContent = dados.erro || `Pedido recusado (HTTP ${resposta.status}).`;
+          return;
+        }
+        formulario.reset();
+        await carregarEstudos();
+        situacao.textContent = `Estudo ${dados.titulo} adicionado.`;
+      } catch {
+        situacao.textContent = 'Falha de conexão. Tente novamente.';
+      } finally {
+        botao.disabled = false;
+      }
+    });
+
+    carregarEstudos();
+  </script>
+</body>
+</html>
