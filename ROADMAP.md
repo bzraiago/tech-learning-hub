@@ -589,4 +589,4 @@ Registre aqui mudanças de direção e impedimentos que afetem a sequência.
 
 | Data | Tipo | Decisão ou bloqueio | Motivo | Próxima ação |
 |---|---|---|---|---|
-| 27/10/2026 | Bloqueio de ambiente | Não foi possível executar a migration nem o teste real de PostgreSQL porque Docker Desktop não disponibilizou o daemon local. | `docker compose config` passa, mas a conexão com `dockerDesktopLinuxEngine` não existe neste ambiente. | Ativar Docker Desktop/daemon e executar os passos de `labs/backend-layers/README.md`; então marcar a persistência como verificada. |
+| 27/10/2026 | Bloqueio de ambiente | Não foi possível executar migrations nem testes reais PostgreSQL: o daemon não está disponível, `vmcompute` está parado e iniciar o serviço retorna acesso negado; a consulta WSL também retorna acesso negado. | `docker compose config` passa, mas o named pipe Docker não existe e esta sessão não consegue abrir o serviço Hyper-V. | Iniciar Docker Desktop/`vmcompute` com a permissão necessária e executar os passos de `labs/backend-layers/README.md`; então marcar persistência, evolução e transação como verificadas. |
