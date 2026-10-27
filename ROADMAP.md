@@ -574,6 +574,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 27/10/2026 | Fase 6 — testes unitários | `4f4c705` | Regra de título único ganhou testes isolados para normalização, duplicidade e cadastro inédito. Três testes e validação de conteúdo passaram. |
 | 27/10/2026 | Fase 6 — preparação de esquema | `f653aa6` | Migration `001_create_estudos.sql` preparada para a integração PostgreSQL; aplicação e teste aguardam conclusão do repositório. |
 | 27/10/2026 | Fase 6 — repositório assíncrono | `9bad661` | Interface de memória passou a usar Promises; smoke manual confirmou GET, criação `201` e duplicidade `409`. Testes unitários e validador passaram. |
+| 27/10/2026 | Fase 6 — integração PostgreSQL | `4c4d9f9` | `pg` isolado no laboratório, repositório parametrizado, migration rastreada, resposta de erro e teste de integração adicionados. Sete testes unitários, sintaxe, Compose config e validador passaram; aplicação real aguarda daemon Docker local. |
 
 ## Decisões e bloqueios
 
@@ -581,4 +582,4 @@ Registre aqui mudanças de direção e impedimentos que afetem a sequência.
 
 | Data | Tipo | Decisão ou bloqueio | Motivo | Próxima ação |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| 27/10/2026 | Bloqueio de ambiente | Não foi possível executar a migration nem o teste real de PostgreSQL porque Docker Desktop não disponibilizou o daemon local. | `docker compose config` passa, mas a conexão com `dockerDesktopLinuxEngine` não existe neste ambiente. | Ativar Docker Desktop/daemon e executar os passos de `labs/backend-layers/README.md`; então marcar a persistência como verificada. |
