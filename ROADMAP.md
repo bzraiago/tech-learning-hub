@@ -581,6 +581,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 27/10/2026 | Fase 6 — preparação de esquema | `f653aa6` | Migration `001_create_estudos.sql` preparada para a integração PostgreSQL; aplicação e teste aguardam conclusão do repositório. |
 | 27/10/2026 | Fase 6 — repositório assíncrono | `9bad661` | Interface de memória passou a usar Promises; smoke manual confirmou GET, criação `201` e duplicidade `409`. Testes unitários e validador passaram. |
 | 27/10/2026 | Fase 6 — integração PostgreSQL | `4c4d9f9` | `pg` isolado no laboratório, repositório parametrizado, migration rastreada, resposta de erro e teste de integração adicionados. Sete testes unitários, sintaxe, Compose config e validador passaram; aplicação real aguarda daemon Docker local. |
+| 27/10/2026 | Fase 6 — migrations e transação | `650dc10` | Aplicador percorre migrations em ordem; migration 002 cria sessões; API grava estudo/sessão atomicamente; 17 testes, sintaxe, validador, Compose config e smoke HTTP em memória passaram. Execução PostgreSQL real segue pendente. |
 
 ## Decisões e bloqueios
 
