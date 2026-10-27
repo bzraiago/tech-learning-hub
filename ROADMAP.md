@@ -563,7 +563,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 26/10/2026 | Fase 6 — validação no servidor | `7fc4770` | Novo laboratório Node aceita criação válida e recusa pedidos inválidos sem alterar a lista. Testes do laboratório HTTP e do novo laboratório passaram; conferência manual no navegador pendente. |
 | 27/10/2026 | Fase 6 — camadas de backend | `a9e4349` | Novo laboratório separa HTTP, validação, regra de título único e repositório em memória. Validação de conteúdo, sintaxe e smoke manual de 201/409 passaram; interface no navegador pendente. |
 | 27/10/2026 | Fase 6 — testes unitários | `4f4c705` | Regra de título único ganhou testes isolados para normalização, duplicidade e cadastro inédito. Três testes e validação de conteúdo passaram. |
-| 27/10/2026 | Fase 6 — preparação de esquema | Migration `labs/backend-layers/migrations/001_create_estudos.sql` preparada para a integração PostgreSQL; aplicação e teste aguardam conclusão do repositório. |
+| 27/10/2026 | Fase 6 — preparação de esquema | `f653aa6` | Migration `001_create_estudos.sql` preparada para a integração PostgreSQL; aplicação e teste aguardam conclusão do repositório. |
 
 ## Decisões e bloqueios
 
