@@ -215,13 +215,54 @@ Resultado esperado: `201`, um estudo e uma sessão com `minutos: 25`. Reenvie o 
 
 Para observar o rollback no PostgreSQL sem guardar dados de teste, execute `npm.cmd run demo:rollback` no Windows ou `npm run demo:rollback` em macOS/Linux. O roteiro tenta inserir um estudo e uma sessão inválida; o `CHECK` rejeita a sessão, `ROLLBACK` desfaz o estudo e a consulta final confirma que ele não existe. Saída esperada: `Rollback confirmado: a falha da sessão também desfez a criação do estudo.`
 
+## Prática guiada: criar uma terceira migration
+
+### Objetivo e pré-requisitos
+
+Ao final, você consegue ampliar uma tabela sem alterar arquivos de migration que já foram aplicados. Conclua os passos anteriores até aplicar `001_create_estudos.sql` e `002_create_sessoes_estudo.sql`. Use somente a base descartável `backend_camadas`; não conecte esta prática ao Supabase nem a uma base com dados importantes.
+
+### Preveja e confira o resultado esperado
+
+Antes de editar, anote sua previsão: após a migration, `sessoes_estudo` terá uma coluna opcional chamada `observacao`, as migrations anteriores continuarão intactas e haverá três registros em `migrations_aplicadas`. Executar o aplicador de novo não deve criar uma quarta entrada.
+
+Depois da execução, a consulta ao catálogo do PostgreSQL deve mostrar uma linha com `column_name = observacao` e `is_nullable = YES`. Se já houver sessões, a consulta delas deve mostrar `NULL` para a nova coluna; se ainda não houver sessões, a definição da coluna é suficiente para conferir esta prática.
+
+### Faça a mudança
+
+1. No editor, dentro da pasta `labs/backend-layers`, crie `migrations/003_add_observacao_sessoes.sql`. Não edite, renomeie nem apague os arquivos `001` e `002`.
+2. Nesse arquivo, escreva uma instrução `ALTER TABLE` que adicione a `sessoes_estudo` a coluna `observacao`, do tipo `TEXT` e que aceite `NULL`. Dica: procure os comandos `ALTER TABLE` e `ADD COLUMN` na documentação SQL já consultada no curso; não é necessário adicionar um valor padrão.
+3. Salve o arquivo. No terminal aberto em `labs/backend-layers`, execute `npm.cmd run migrate` no Windows ou `npm run migrate` em macOS/Linux.
+
+Saída esperada na primeira execução: `Migration já aplicada` para `001` e `002`, e `Migration aplicada: 003_add_observacao_sessoes.sql`. Execute o comando uma segunda vez: os três nomes devem aparecer como já aplicados.
+
+### Verifique no PostgreSQL
+
+No caminho Docker, execute no terminal da pasta do laboratório:
+
+```sh
+docker compose exec -T db psql -U aluno -d backend_camadas -c "SELECT column_name, is_nullable FROM information_schema.columns WHERE table_name = 'sessoes_estudo' AND column_name = 'observacao';"
+docker compose exec -T db psql -U aluno -d backend_camadas -c "SELECT id FROM migrations_aplicadas ORDER BY id;"
+```
+
+Se estiver usando uma instalação local de PostgreSQL, execute as mesmas consultas com `psql -h 127.0.0.1 -p 55433 -U aluno -d backend_camadas -c "..."`, substituindo host, porta e usuário pelos valores configurados no `.env`.
+
+Critérios de aceite: a primeira consulta mostra `observacao | YES`; a segunda lista exatamente as migrations `001`, `002` e `003`; a segunda execução de `npm run migrate` não reaplica nenhuma delas; os arquivos `001` e `002` continuam iguais. Se já houver sessões, confira também `SELECT id, observacao FROM sessoes_estudo ORDER BY id;` e explique por que os valores antigos são `NULL`.
+
+### Erros comuns e retomada
+
+- `relation "sessoes_estudo" does not exist`: confira o banco com `npm.cmd run db:check` e aplique primeiro as migrations iniciais.
+- `column "observacao" already exists`: confira se `003_add_observacao_sessoes.sql` consta em `migrations_aplicadas`; não remova o registro nem altere uma migration já aplicada para esconder o erro.
+- A migration aparece como já aplicada: este é o resultado correto ao repetir o comando. Para refazer a atividade do zero, use outra base descartável e aplique as migrations nela.
+
+Para parar, use `Ctrl+C` na API e `docker compose down` no terminal. Para retomar, inicie o banco, confira `npm.cmd run db:check` e execute `npm.cmd run migrate`; o aplicador continua da próxima migration pendente. Não use `docker compose down -v` para reiniciar esta prática.
+
 ## Prática
 
 Antes de cada pedido, preveja status, resposta e quantidade de estudos.
 
 1. **Prever:** cadastre `CSS`, reinicie só a API e consulte novamente. Critério: o registro continua lá; explique por que o adaptador em memória teria outro resultado.
 2. **Alterar:** troque no repositório o `ORDER BY id` por `ORDER BY titulo`. Critério: a resposta fica em ordem alfabética e as consultas seguem parametrizadas.
-3. **Construir:** crie uma terceira migration numerada para adicionar `observacao` opcional às sessões. Critério: mantenha os arquivos anteriores intactos, aplique a nova uma vez e leia sessões antigas.
+3. **Construir:** complete a prática guiada acima e explique como a nova coluna preserva as sessões já existentes. Critério: mantenha os arquivos anteriores intactos, aplique a nova uma vez e leia sessões antigas.
 4. **Investigar erro:** execute `npm run demo:rollback` e acompanhe os `INSERT`s. Critério: a sessão inválida falha, a transação reverte e o estudo da tentativa não aparece numa busca posterior. Depois pare o banco e envie `GET /api/estudos`: a API responde `500` sem exibir endereço, usuário ou senha. Retome o banco e confira os dados válidos.
 
 Em cada mudança, anote camada alterada, comando, status e estado dos dados antes/depois. O teste de integração comprova o repositório contra o PostgreSQL real; os testes sem `RUN_PG_INTEGRATION=1` usam doubles e não comprovam uma conexão real.

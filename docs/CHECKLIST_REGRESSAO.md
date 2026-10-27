@@ -56,13 +56,14 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `db-postgres`, criar uma base nova no Compose, verificar banco e usuário, executar os quatro exercícios e confirmar a transação após reconectar.
 - [ ] Em `db-sqlite`, executar o arquivo Python, verificar parâmetros e reversão, e comparar a cópia em memória com a origem.
 - [ ] Em `labs/backend-validation`, formulário válido cria um estudo; pedidos diretos inválidos retornam erro e não alteram a lista.
-- [ ] Em `labs/backend-layers`, `npm test` aprova os dezessete testes sem depender do PostgreSQL.
+- [x] Em `labs/backend-layers`, `npm test` aprova os dezessete testes sem depender do PostgreSQL.
 - [ ] Em `labs/backend-layers`, a base isolada `backend_camadas` na porta `55433` fica healthy, e as migrations criam estudos, sessões e suas restrições.
-- [ ] Em `labs/backend-layers`, executar `npm run migrate` duas vezes aplica os arquivos uma vez e mantém dois registros em `migrations_aplicadas`.
-- [ ] Em `labs/backend-layers`, `npm run test:db` com `RUN_PG_INTEGRATION=1` confirma leitura após reconectar, sessão persistida, rollback e unicidade.
-- [ ] Em `labs/backend-layers`, API retorna 201 ao criar estudo/sessão, 400 para minutos inválidos, 409 para título repetido e preserva a persistência após reiniciar Node.
-- [ ] Em `labs/backend-layers`, `npm run demo:rollback` comprova que a falha da sessão desfaz o estudo criado dentro da transação.
+- [x] Em uma instância PostgreSQL 18 descartável na porta `55433`, `npm run migrate` aplicou as migrations 001–002 uma vez e a repetição as ignorou; a migration 003 de exercício também foi validada em cópia temporária.
+- [x] Em `labs/backend-layers`, `npm run test:db` com `RUN_PG_INTEGRATION=1` confirmou leitura após reconectar, sessão persistida, rollback e unicidade em PostgreSQL real.
+- [x] Em `labs/backend-layers`, API retorna 201 ao criar estudo/sessão, 400 para minutos inválidos, 409 para título repetido e preserva a persistência após reiniciar Node.
+- [x] Em `labs/backend-layers`, `npm run demo:rollback` comprova que a falha da sessão desfaz o estudo criado dentro da transação.
 - [ ] Em `labs/backend-layers`, falha de banco retorna 500 sem incluir detalhes internos; `npm run start:memory` identifica que os dados são temporários.
+- [x] Em `labs/bug-investigation`, o teste de preservação da lista reproduz a falha inicial; a suíte passa após corrigir a função numa cópia de verificação.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.

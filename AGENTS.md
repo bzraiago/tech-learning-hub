@@ -268,8 +268,9 @@ Vem da análise em `ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima para baixo e
    - [x] Conectar `pg` apenas em `labs/backend-layers`, com consultas parametrizadas, `.env.example` local e PostgreSQL Compose isolado na porta 55433.
    - [x] Criar aplicador de migrations numeradas, segunda migration de sessões e transação estudo + sessão com rollback demonstrável.
    - [x] Criar teste de integração PostgreSQL e testes unitários para migrations, repositório transacional e respostas HTTP.
-   - [ ] Executar a migration e o teste de integração no banco real; o daemon Docker não ficou disponível no ambiente desta implementação.
+   - [x] Executar migrations e teste de integração em PostgreSQL real descartável; criação, unicidade, transação e persistência após reinício foram verificadas. O caminho específico de Docker Compose segue pendente.
 6. [ ] **CI, publicação e integração externa** como práticas guiadas e verificáveis (observar falha, corrigir, conferir URL final, voltar versão).
+   - [x] Criar `labs/bug-investigation` com teste de regressão que falha antes e passa depois da correção; a execução red/green foi verificada em ambiente temporário.
 7. [ ] Atividades gerais de conclusão (prova básica disponível no curso; intermediária pendente) — ver seção 9.
 8. [x] Corrigir a inconsistência da porta do PostgreSQL (55432) entre laboratório Docker e projeto relacional.
 9. [ ] Dividir aulas com excesso de conceitos (a aula de funções em JavaScript já foi dividida; mapear as demais).

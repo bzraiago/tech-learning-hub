@@ -287,27 +287,27 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Ensinar interface → requisição HTTP → API com o laboratório executável `labs/backend-http` e teste de contrato.
 - [x] Ensinar validação de entrada no servidor com o laboratório `labs/backend-validation`, distinguindo orientação do formulário e contrato da API.
 - [x] Separar validação, regra de negócio e acesso a dados no laboratório `labs/backend-layers`, preservando o contrato HTTP e usando repositório em memória explícito.
-- [~] Persistir dados em PostgreSQL.
+- [x] Persistir dados em PostgreSQL.
   - [x] Preparar migration `migrations/001_create_estudos.sql` com chave canônica única e dados fictícios.
   - [x] Tornar a interface do repositório assíncrona e conferir o adaptador em memória após a mudança.
   - [x] Adicionar `pg` somente a `labs/backend-layers`, com versões fixas no manifesto e lockfile.
   - [x] Criar repositório PostgreSQL com pool compartilhado e consultas parametrizadas.
   - [x] Criar aplicador transacional que registra migrations e não reaplica o mesmo arquivo.
   - [x] Criar teste de integração para leitura em outra conexão e restrição única.
-  - [ ] Aplicar a migration em uma base de laboratório e comprovar leitura, criação e unicidade persistente; Docker Desktop não iniciou neste ambiente.
+  - [x] Aplicar as migrations em uma base descartável PostgreSQL 18 local na porta `55433`; conferir leitura, criação, unicidade e persistência após reiniciar a API.
 - [x] Ensinar respostas de sucesso e erro coerentes: `201`, `409` para duplicidade e `500` genérico para falha interna.
-- [~] Ensinar migrações e evolução do esquema.
+- [x] Ensinar migrações e evolução do esquema.
   - [x] Aplicar e rastrear a migration inicial por script, com transação e operação repetível.
   - [x] Aplicador percorre arquivos SQL numerados em ordem e tem testes de idempotência e rollback.
   - [x] Migration `002_create_sessoes_estudo.sql` adiciona sessões sem reescrever a migration inicial.
-  - [ ] Aplicar as duas migrations em PostgreSQL real e conferir evolução e repetição.
-  - [ ] Executar a prática do aluno de criar uma terceira migration.
-- [~] Ensinar transação com mais de uma alteração.
+  - [x] Aplicar as duas migrations em PostgreSQL real e conferir evolução e repetição.
+  - [x] Documentar a prática de criar uma terceira migration e executá-la numa cópia temporária contra PostgreSQL real.
+- [x] Ensinar transação com mais de uma alteração.
   - [x] API cria estudo e primeira sessão em uma transação e reverte ambas as alterações se a segunda falhar.
   - [x] Incluir teste unitário de `BEGIN`/`COMMIT`/`ROLLBACK` e demonstração reproduzível de rollback.
-  - [ ] Confirmar a transação no PostgreSQL real após aplicar as migrations.
+  - [x] Confirmar a transação no PostgreSQL real após aplicar as migrations; criação, rollback e persistência após reinício foram conferidos.
 - [x] Criar testes unitários de normalização e unicidade de título em `labs/backend-layers/src/regra-titulo.test.cjs`.
-- [x] Criar teste de integração com PostgreSQL em `labs/backend-layers/src/postgres.integration.test.cjs` (execução real pendente do Docker local).
+- [x] Criar e executar `labs/backend-layers/src/postgres.integration.test.cjs` em PostgreSQL real; Docker Compose continua sem verificação manual neste ambiente.
 - [x] Servir o frontend do laboratório pela API e demonstrar criação e consulta no mesmo contrato HTTP.
 - [x] Documentar configuração, inicialização, parada e retomada do ambiente.
 - [x] Usar somente dados fictícios; `.env` e `node_modules` do laboratório ficam ignorados pelo Git.
@@ -318,8 +318,8 @@ Toda implementação só pode ser considerada pronta quando:
 
 **Meta:** transformar conceitos de entrega em práticas executadas e recuperáveis.
 
-- [ ] Criar laboratório de reprodução de bug em código alheio.
-- [ ] Exigir teste que falha antes da correção e passa depois dela.
+- [x] Criar `labs/bug-investigation` para reproduzir e corrigir defeito em código preexistente, com instruções para iniciante.
+- [x] Exigir teste que falha antes da correção e passa depois dela; a falha e a correção foram verificadas em cópia temporária.
 - [ ] Criar ao menos um teste automatizado de fluxo no navegador.
 - [ ] Configurar CI em um repositório real.
 - [ ] Observar uma falha de CI e corrigi-la.
@@ -582,6 +582,8 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 27/10/2026 | Fase 6 — repositório assíncrono | `9bad661` | Interface de memória passou a usar Promises; smoke manual confirmou GET, criação `201` e duplicidade `409`. Testes unitários e validador passaram. |
 | 27/10/2026 | Fase 6 — integração PostgreSQL | `4c4d9f9` | `pg` isolado no laboratório, repositório parametrizado, migration rastreada, resposta de erro e teste de integração adicionados. Sete testes unitários, sintaxe, Compose config e validador passaram; aplicação real aguarda daemon Docker local. |
 | 27/10/2026 | Fase 6 — migrations e transação | `650dc10` | Aplicador percorre migrations em ordem; migration 002 cria sessões; API grava estudo/sessão atomicamente; 17 testes, sintaxe, validador, Compose config e smoke HTTP em memória passaram. Execução PostgreSQL real segue pendente. |
+| 27/10/2026 | Fase 6 — persistência e evolução verificadas | Em andamento | PostgreSQL 18 descartável aceitou as migrations 001–002, teste de integração, API real e rollback. A prática da migration 003 foi documentada e validada numa cópia temporária; testes do laboratório e validador de conteúdo passaram. |
+| 27/10/2026 | Fase 7 — reproduzir e corrigir defeito | A registrar | `labs/bug-investigation` apresenta falha reproduzível de mutação; o teste ficou vermelho com o código inicial e verde após correção em cópia temporária. |
 
 ## Decisões e bloqueios
 
@@ -589,4 +591,4 @@ Registre aqui mudanças de direção e impedimentos que afetem a sequência.
 
 | Data | Tipo | Decisão ou bloqueio | Motivo | Próxima ação |
 |---|---|---|---|---|
-| 27/10/2026 | Bloqueio de ambiente | Não foi possível executar migrations nem testes reais PostgreSQL: o daemon não está disponível, `vmcompute` está parado e iniciar o serviço retorna acesso negado; a consulta WSL também retorna acesso negado. | `docker compose config` passa, mas o named pipe Docker não existe e esta sessão não consegue abrir o serviço Hyper-V. | Iniciar Docker Desktop/`vmcompute` com a permissão necessária e executar os passos de `labs/backend-layers/README.md`; então marcar persistência, evolução e transação como verificadas. |
+| 27/10/2026 | Decisão de ambiente | O daemon Docker não está acessível nesta sessão; a validação PostgreSQL foi feita numa instância 18 descartável, vinculada somente a `127.0.0.1:55433`, e encerrada após os testes. | O caminho PostgreSQL real ficou verificável sem tocar no Supabase nem no banco permanente; o fluxo específico de Docker Compose não foi executado. | Seguir para a Fase 7; quando Docker estiver disponível, conferir também o caminho Compose do laboratório. |

@@ -448,7 +448,7 @@ Object.assign(LESSON_GUIDES, {
   },
 "quality-debug": {
     "prerequisites": "Funções e arrays JavaScript; aula de testes com node:test.",
-    "setup": "Salve erro.test.cjs e rode node --test erro.test.cjs. O terceiro teste deve falhar de propósito; ele representa um requisito novo: propriedades ausentes não contam como pendentes. Para depurar no Node, registre valores temporariamente com console.log ou use node inspect. Para interface no navegador, abra DevTools e marque breakpoint na linha de decisão. Faça alterações apenas depois de registrar hipótese e comportamento.",
+    "setup": "Salve erro.test.cjs e rode node --test erro.test.cjs. O terceiro teste deve falhar de propósito; ele representa um requisito novo: propriedades ausentes não contam como pendentes. Para praticar a investigação em um projeto com arquivos separados e código preexistente, abra labs/bug-investigation/README.md. Para depurar no Node, registre valores temporariamente com console.log ou use node inspect. Para interface no navegador, abra DevTools e marque breakpoint na linha de decisão. Faça alterações apenas depois de registrar hipótese e comportamento.",
     "why": "Manutenção começa quando alguém encontra um comportamento inesperado num código que já existe. Mudar linhas por tentativa pode esconder o sintoma e criar outro defeito. A rotina útil é reproduzir, reduzir o cenário, observar dados, identificar a causa, estabelecer uma expectativa que falha e corrigir. Um teste de regressão preserva o aprendizado sobre aquele defeito para futuras alterações.",
     "sections": [
       {
