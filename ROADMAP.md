@@ -568,6 +568,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 27/10/2026 | Fase 6 — camadas de backend | `a9e4349` | Novo laboratório separa HTTP, validação, regra de título único e repositório em memória. Validação de conteúdo, sintaxe e smoke manual de 201/409 passaram; interface no navegador pendente. |
 | 27/10/2026 | Fase 6 — testes unitários | `4f4c705` | Regra de título único ganhou testes isolados para normalização, duplicidade e cadastro inédito. Três testes e validação de conteúdo passaram. |
 | 27/10/2026 | Fase 6 — preparação de esquema | `f653aa6` | Migration `001_create_estudos.sql` preparada para a integração PostgreSQL; aplicação e teste aguardam conclusão do repositório. |
+| 27/10/2026 | Fase 6 — repositório assíncrono | `9bad661` | Interface de memória passou a usar Promises; smoke manual confirmou GET, criação `201` e duplicidade `409`. Testes unitários e validador passaram. |
 
 ## Decisões e bloqueios
 
