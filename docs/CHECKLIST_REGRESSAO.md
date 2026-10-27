@@ -55,6 +55,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `db-docker-operations`, a restauração ocorre em banco novo, com consulta à origem e ao destino; mudança de senha não remove o volume.
 - [ ] Em `db-postgres`, criar uma base nova no Compose, verificar banco e usuário, executar os quatro exercícios e confirmar a transação após reconectar.
 - [ ] Em `db-sqlite`, executar o arquivo Python, verificar parâmetros e reversão, e comparar a cópia em memória com a origem.
+- [ ] Em `labs/backend-validation`, formulário válido cria um estudo; pedidos diretos inválidos retornam erro e não alteram a lista.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.

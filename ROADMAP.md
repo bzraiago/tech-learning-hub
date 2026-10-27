@@ -285,7 +285,7 @@ Toda implementação só pode ser considerada pronta quando:
 
 - [x] Definir Node.js com bibliotecas nativas como caminho inicial do backend; avançar para PostgreSQL após o contrato HTTP e a validação.
 - [x] Ensinar interface → requisição HTTP → API com o laboratório executável `labs/backend-http` e teste de contrato.
-- [ ] Ensinar validação de entrada no servidor.
+- [x] Ensinar validação de entrada no servidor com o laboratório `labs/backend-validation`, distinguindo orientação do formulário e contrato da API.
 - [ ] Separar validação, regra de negócio e acesso a dados.
 - [ ] Persistir dados em PostgreSQL.
 - [ ] Ensinar respostas de sucesso e erro coerentes.

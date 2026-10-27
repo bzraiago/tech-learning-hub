@@ -22,4 +22,4 @@ Depois de alguns dias, refaça o fluxo com uma coleção diferente, sem consulta
 
 ## Testes e próximo passo
 
-Em outro terminal, na mesma pasta, execute `node --test server.test.cjs`. Resultado esperado: **1 teste aprovado**, com verificações de página, JSON e rota ausente. Não precisa instalar pacotes, banco ou serviço externo; o laboratório roda em computador limitado. Este exemplo só lê dados fixos. A próxima etapa inclui validação no servidor e persistência em PostgreSQL.
+Em outro terminal, na mesma pasta, execute `node --test server.test.cjs`. Resultado esperado: **1 teste aprovado**, com verificações de página, JSON e rota ausente. Não precisa instalar pacotes, banco ou serviço externo; o laboratório roda em computador limitado. Este exemplo só lê dados fixos. A próxima etapa é `labs/backend-validation/README.md`, que ensina validação no servidor antes da persistência em PostgreSQL.
