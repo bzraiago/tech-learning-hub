@@ -561,6 +561,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 26/10/2026 | Fase 3 — PostgreSQL | `fa52f82` | `db-postgres` passou a usar a instância Compose existente, com base própria e critérios nos quatro exercícios. Validação de conteúdo passou; laboratório PostgreSQL pendente. |
 | 26/10/2026 | Fase 3 — SQLite | `76b15ca` | `db-sqlite` passou a apontar para setup-python e ganhou critérios nos quatro exercícios; parâmetros, reversão e backup são conferidos sem antecipar saídas. Validação de conteúdo passou; execução Python pendente. |
 | 26/10/2026 | Fase 6 — validação no servidor | `7fc4770` | Novo laboratório Node aceita criação válida e recusa pedidos inválidos sem alterar a lista. Testes do laboratório HTTP e do novo laboratório passaram; conferência manual no navegador pendente. |
+| 27/10/2026 | Fase 6 — camadas de backend | `a9e4349` | Novo laboratório separa HTTP, validação, regra de título único e repositório em memória. Validação de conteúdo, sintaxe e smoke manual de 201/409 passaram; interface no navegador pendente. |
 
 ## Decisões e bloqueios
 
