@@ -9,7 +9,7 @@
     "migrate": "node --env-file=.env scripts/aplicar-migration.cjs",
     "db:check": "node --env-file=.env scripts/verificar-conexao.cjs",
     "demo:rollback": "node --env-file=.env scripts/demonstrar-rollback.cjs",
-    "test": "node --test scripts/aplicar-migration.test.cjs src/cliente-open-meteo.test.cjs src/regra-titulo.test.cjs src/repositorio-estudos-memoria.test.cjs src/validar-estudo.test.cjs src/servico-estudos.test.cjs src/repositorio-estudos-postgres.test.cjs src/server.test.cjs",
+    "test": "node --test scripts/aplicar-migration.test.cjs src/cliente-open-meteo.test.cjs src/regra-titulo.test.cjs src/repositorio-estudos-memoria.test.cjs src/validar-estudo.test.cjs src/servico-estudos.test.cjs src/repositorio-estudos-postgres.test.cjs src/server.test.cjs src/vercel-demo.test.cjs",
     "test:db": "node --env-file=.env --test src/postgres.integration.test.cjs",
     "test:e2e": "playwright test",
     "smoke:open-meteo": "node scripts/testar-open-meteo.cjs"

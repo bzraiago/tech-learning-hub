@@ -111,7 +111,7 @@ Ao revisar, nesta ordem: (1) o que está bom e por quê; (2) o defeito mais impo
 ## 5. Modo Mantenedor — regras do código
 
 ### 5.1 Arquitetura atual (não mude sem pedido explícito)
-- **Aplicação estática modularizada**: `index.html` contém a estrutura da página e carrega CSS e JavaScript de `assets/`. **Sem build, sem bundler, sem framework de frontend.** Na Vercel, `api/public-config.mjs` entrega somente URL e chaves publicáveis do Clerk e Supabase.
+- **Aplicação estática modularizada**: `index.html` contém a estrutura da página e carrega CSS e JavaScript de `assets/`. **Sem build, sem bundler, sem framework de frontend.** Na Vercel, `api/public-config.mjs` entrega somente configuração publicável do Clerk e Supabase; `api/labs/open-meteo.mjs` atende apenas à demonstração meteorológica isolada.
 - Dependências externas apenas por CDN: Tailwind (`@tailwindcss/browser@4`), fontes Google (DM Sans, Space Grotesk) e ClerkJS quando o login estiver configurado.
 - Tema escuro por padrão (`class="dark"`), `lang="pt-BR"`.
 - Ícones SVG internos via `<symbol id="i-...">`.
@@ -133,6 +133,7 @@ Arquivos principais:
 | `assets/js/auth.js` | Login opcional com Clerk e aviso de mudança de sessão para a sincronização |
 | `assets/js/cloud.js` | Carregamento por conta Clerk e salvamento automático no Supabase |
 | `api/public-config.mjs` | Função Vercel que expõe somente configuração pública ao navegador |
+| `api/labs/open-meteo.mjs` | Função Vercel isolada para a demonstração pública do laboratório; reutiliza o contrato meteorológico, aceita coordenadas de referência fixas e não usa banco nem credenciais |
 
 Os scripts são clássicos e compartilham o mesmo escopo global, carregados na ordem declarada em `index.html`. Não troque a ordem sem conferir as dependências e não converta para módulos ES sem aprovação, pois o projeto deve continuar abrindo diretamente no navegador e sem build.
 

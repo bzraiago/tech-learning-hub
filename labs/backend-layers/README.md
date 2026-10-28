@@ -247,9 +247,13 @@ npm.cmd run test:e2e
 npm run test:e2e
 ```
 
-Resultado esperado: `2 passed`. O Playwright inicia e encerra a API do laboratório; pare qualquer instância já aberta em `127.0.0.1:4180` antes de executar. O teste não lê `.env`, não conecta ao PostgreSQL e não envia dados para serviços externos; a resposta meteorológica vem de um adaptador de teste determinístico. Relatórios ficam em `test-results/` e `playwright-report/`, ambos ignorados pelo Git.
+Resultado esperado: `3 passed`. O Playwright inicia e encerra a API do laboratório; pare qualquer instância já aberta em `127.0.0.1:4180` antes de executar. O teste percorre o cadastro de estudos, a previsão na interface principal e a demonstração independente em `/demo/`. Ele não lê `.env`, não conecta ao PostgreSQL e não envia dados para serviços externos; as respostas meteorológicas vêm de um adaptador de teste determinístico. Relatórios ficam em `test-results/` e `playwright-report/`, ambos ignorados pelo Git.
 
 Se o executável do navegador não for encontrado, repita `playwright install chromium --only-shell`. Se o Linux informar bibliotecas do sistema ausentes, consulte `playwright install-deps chromium` e os requisitos da distribuição antes de instalar dependências do sistema.
+
+## Demonstração independente
+
+Com a API em execução, abra `http://127.0.0.1:4180/demo/`. Essa página usa o mesmo contrato de previsão e é servida sem alterar a interface de cadastro. Na publicação, a URL estática é `/labs/backend-layers/demo/` e a função fica em `/api/labs/open-meteo`; a rota pública aceita somente as coordenadas aproximadas fixas do exemplo e aplica cache compartilhado curto. O roteiro para a publicação, a verificação da URL e o rollback está em [DEPLOY_VERCEL.md](DEPLOY_VERCEL.md).
 
 ## CI real no GitHub Actions
 

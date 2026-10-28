@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <meta name="description" content="Demonstração pública de uma interface que consulta uma API Node.js e um serviço meteorológico externo.">
+  <title>Previsão ao vivo · Tech Learning Hub</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: system-ui, sans-serif;
+      background: #101827;
+      color: #ecf2ff;
+      line-height: 1.5;
+    }
+    * { box-sizing: border-box; }
+    body { min-height: 100vh; margin: 0; padding: clamp(1rem, 5vw, 4rem); }
+    main { width: min(100%, 44rem); margin: 0 auto; }
+    .eyebrow { color: #a99aff; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    h1 { margin: .5rem 0; font-size: clamp(2rem, 7vw, 3.5rem); line-height: 1.05; }
+    h2 { margin-top: 0; }
+    p { color: #c3cde1; }
+    .card { margin-top: 2rem; padding: clamp(1rem, 4vw, 2rem); border: 1px solid #35435d; border-radius: 1rem; background: #192438; }
+    form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: end; }
+    label { display: grid; gap: .4rem; font-weight: 600; }
+    input, button { min-height: 2.9rem; border: 1px solid #62718c; border-radius: .55rem; font: inherit; }
+    input { width: 100%; padding: .65rem; background: #111b2b; color: inherit; }
+    button { grid-column: 1 / -1; padding: .7rem 1rem; border-color: #9b86ff; background: #7359eb; color: white; font-weight: 700; cursor: pointer; }
+    button:disabled { cursor: wait; opacity: .7; }
+    :focus-visible { outline: 3px solid #f7d774; outline-offset: 3px; }
+    #mensagem { min-height: 1.5em; }
+    #resultado { font-size: 1.15rem; font-weight: 700; color: #fff; }
+    a { color: #c5baff; }
+    .nota { margin-top: 1.5rem; font-size: .92rem; }
+    @media (max-width: 34rem) { form { grid-template-columns: 1fr; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">Tech Learning Hub · demonstração publicada</p>
+    <h1>Do navegador até um serviço real</h1>
+    <p>Esta página consulta uma função Node.js no servidor. A função valida a entrada, chama o Open-Meteo e devolve apenas os campos previstos no contrato.</p>
+
+    <section class="card" aria-labelledby="titulo-previsao">
+      <h2 id="titulo-previsao">Temperatura e umidade atuais</h2>
+      <p>Local de referência: Fortaleza, com coordenadas aproximadas fixas para esta demonstração pública.</p>
+      <button id="consultar" type="button">Consultar previsão</button>
+      <p id="mensagem" role="status" aria-live="polite">Aguardando consulta.</p>
+      <p id="resultado" aria-live="polite">Nenhum resultado carregado.</p>
+      <p class="nota">Fonte: <a href="https://open-meteo.com/en/docs" target="_blank" rel="noopener noreferrer">Open-Meteo</a> · dados meteorológicos sob licença CC BY 4.0.</p>
+    </section>
+
+    <p class="nota">Demonstração educacional. A resposta depende do serviço externo e pode ficar indisponível. Consulte o <a href="https://github.com/bzraiago/tech-learning-hub/tree/main/labs/backend-layers">código e o contrato do laboratório</a>.</p>
+  </main>
+  <script src="app.js" defer></script>
+</body>
+</html>

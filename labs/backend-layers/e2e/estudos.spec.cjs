@@ -41,3 +41,18 @@ test('mostra dados retornados pelo contrato do serviço meteorológico', async (
     'Temperatura: 29.4 °C · umidade: 71% · horário: 2026-10-27T10:00 (America/Fortaleza).'
   );
 });
+
+test('demonstração independente consulta a rota local sem chamar o serviço real', async ({ page }) => {
+  await page.goto('/demo/');
+  await expect(page.getByRole('heading', { name: 'Do navegador até um serviço real' })).toBeVisible();
+  const consulta = page.waitForResponse((resposta) =>
+    resposta.url().includes('/api/labs/open-meteo?') && resposta.request().method() === 'GET'
+  );
+
+  await page.getByRole('button', { name: 'Consultar previsão' }).click();
+
+  expect((await consulta).status()).toBe(200);
+  await expect(page.locator('#resultado')).toHaveText(
+    'Temperatura: 29.4 °C · umidade: 71% · 2026-10-27T10:00 (America/Fortaleza).'
+  );
+});
