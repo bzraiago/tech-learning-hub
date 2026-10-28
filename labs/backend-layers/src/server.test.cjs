@@ -6,9 +6,61 @@ const { criarServidor } = require('../server.cjs');
 const { ErroOpenMeteo } = require('./cliente-open-meteo.cjs');
 const { criarLimitadorEmMemoria } = require('./rate-limiter-memory.cjs');
 
-function criarServidorComLimitadorMemoria(servico, previsao) {
-  return criarServidor(servico, previsao, criarLimitadorEmMemoria());
+function criarServidorComLimitadorMemoria(servico, previsao, options) {
+  return criarServidor(servico, previsao, criarLimitadorEmMemoria(), options);
 }
+
+test('health live e ready não expõem detalhes e ready verifica dependências', async (contexto) => {
+  let verificacoes = 0;
+  const servidor = criarServidorComLimitadorMemoria({}, undefined, {
+    async verificarProntidao() { verificacoes += 1; }
+  });
+  await new Promise((resolve) => servidor.listen(0, '127.0.0.1', resolve));
+  contexto.after(() => new Promise((resolve, reject) => {
+    servidor.close((erro) => erro ? reject(erro) : resolve());
+  }));
+
+  const baseUrl = `http://127.0.0.1:${servidor.address().port}`;
+  const live = await fetch(`${baseUrl}/health/live`);
+  assert.equal(live.status, 200);
+  assert.deepEqual(await live.json(), { status: 'alive' });
+  assert.equal(live.headers.get('cache-control'), 'no-store');
+  assert.equal(verificacoes, 0, 'liveness não deve sondar dependências');
+
+  const ready = await fetch(`${baseUrl}/health/ready`);
+  assert.equal(ready.status, 200);
+  assert.deepEqual(await ready.json(), { status: 'ready' });
+  assert.equal(ready.headers.get('cache-control'), 'no-store');
+  assert.equal(verificacoes, 1);
+});
+
+test('readiness retorna 503 e loga evento seguro se uma dependência falha', async (contexto) => {
+  const servidor = criarServidorComLimitadorMemoria({}, undefined, {
+    async verificarProntidao() { throw Object.assign(new Error('token privado'), { code: 'TOKEN_PRIVADO' }); }
+  });
+  await new Promise((resolve) => servidor.listen(0, '127.0.0.1', resolve));
+  contexto.after(() => new Promise((resolve, reject) => {
+    servidor.close((erro) => erro ? reject(erro) : resolve());
+  }));
+
+  const logs = [];
+  const logOriginal = console.error;
+  console.error = (linha) => logs.push(linha);
+  let resposta;
+  try {
+    resposta = await fetch(`http://127.0.0.1:${servidor.address().port}/health/ready`);
+  } finally {
+    console.error = logOriginal;
+  }
+
+  assert.equal(resposta.status, 503);
+  assert.deepEqual(await resposta.json(), { status: 'not_ready' });
+  const registro = JSON.parse(logs[0]);
+  assert.equal(registro.event, 'api.readiness.failed');
+  assert.equal(registro.route, 'GET /health/ready');
+  assert.equal(registro.errorCode, 'Error');
+  assert.equal(logs.join(' ').includes('token privado'), false);
+});
 
 test('falha inesperada do serviço retorna 500 sem expor detalhes internos', async (contexto) => {
   const servidor = criarServidorComLimitadorMemoria({

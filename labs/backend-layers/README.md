@@ -133,6 +133,14 @@ O logger não grava corpo, título, endereço IP, coordenadas, URL completa, men
 
 Para conferir os filtros e a resposta segura a uma falha interna, rode `node --test src/logger.test.cjs src/server.test.cjs` dentro desta pasta. Os testes inserem valores fictícios que parecem segredo, IP e dado pessoal e confirmam que esses campos não aparecem.
 
+## Saúde e alerta de disponibilidade local
+
+`GET /health/live` confirma que o processo responde. `GET /health/ready` confirma que a API pode atender: no modo normal, executa `SELECT 1` no PostgreSQL e `PING` no Redis; no modo memória, não há dependências externas. As respostas usam somente `alive`, `ready` ou `not_ready`, não são armazenadas em cache e os dois endpoints continuam ligados a `127.0.0.1`.
+
+Para iniciar uma sonda local, abra dois terminais nesta pasta. No primeiro, use `$env:BACKEND_STORAGE = 'memory'; npm.cmd run start:memory` no Windows ou `BACKEND_STORAGE=memory npm run start:memory` em macOS/Linux. No segundo, execute `npm.cmd run monitor:api` ou `npm run monitor:api`. A sonda consulta readiness a cada cinco segundos, abre `monitor.alert.opened` depois de duas falhas consecutivas e registra `monitor.alert.resolved` quando a API volta. Encerre o monitor com `Ctrl+C`.
+
+Para observar a transição sem banco ou Redis, pare a API de memória com `Ctrl+C`, aguarde a linha de alerta e reinicie o servidor; o monitor registra a recuperação. A automação é um alerta de demonstração em JSONL, sem webhook, serviço externo ou promessa de monitoramento contínuo. `npm test` cobre a sonda HTTP e o limiar de falhas; `npm run test:cache` também prova `ready` com PostgreSQL/Redis reais e `not_ready` quando Redis desconecta.
+
 ## Cache-aside no GET de estudos
 
 `GET /api/estudos` procura `cache:v1:backend-layers:studies:list`. Em cache miss, a aplicação consulta PostgreSQL, serializa a lista e grava Redis com `CACHE_TTL_SECONDS` (30 segundos por padrão). Em cache hit, devolve a cópia. Depois de um `POST` confirmado pelo serviço, a lista é removida do cache para que a próxima leitura volte ao PostgreSQL. `POST /api/estudos-com-sessao` também invalida a lista quando cria um estudo.

@@ -75,7 +75,13 @@ test('cache-aside usa PostgreSQL, invalida após escrita e recorre à fonte se R
     const servidorHttp = criarServidor(
       servicoCacheado,
       undefined,
-      criarLimitadorRedis(clienteRedis, { limite: 5, janelaSegundos: 60, escopo: escopoLimite })
+      criarLimitadorRedis(clienteRedis, { limite: 5, janelaSegundos: 60, escopo: escopoLimite }),
+      {
+        async verificarProntidao() {
+          if (!clienteRedis.isReady) throw new Error('Redis indisponível');
+          await Promise.all([pool.query('SELECT 1'), clienteRedis.ping()]);
+        }
+      }
     );
     servidor = servidorHttp;
     await new Promise((resolve, reject) => {
@@ -83,6 +89,10 @@ test('cache-aside usa PostgreSQL, invalida após escrita e recorre à fonte se R
       servidorHttp.listen(0, '127.0.0.1', resolve);
     });
     const baseUrl = `http://127.0.0.1:${servidorHttp.address().port}`;
+
+    const prontidaoInicial = await fetch(`${baseUrl}/health/ready`);
+    assert.equal(prontidaoInicial.status, 200);
+    assert.deepEqual(await prontidaoInicial.json(), { status: 'ready' });
 
     const primeiroGet = await fetch(`${baseUrl}/api/estudos`);
     assert.equal(primeiroGet.status, 200);
@@ -121,6 +131,22 @@ test('cache-aside usa PostgreSQL, invalida após escrita e recorre à fonte se R
     assert.equal(logsCache.length, 1);
     assert.equal(logsCache[0].evento, 'cache.read.failed');
     assert.equal(JSON.stringify(logsCache).includes(idExecucao), false);
+
+    const logsProntidao = [];
+    const logOriginal = console.error;
+    console.error = (linha) => logsProntidao.push(linha);
+    let prontidaoSemRedis;
+    try {
+      prontidaoSemRedis = await fetch(`${baseUrl}/health/ready`);
+    } finally {
+      console.error = logOriginal;
+    }
+    assert.equal(prontidaoSemRedis.status, 503);
+    assert.deepEqual(await prontidaoSemRedis.json(), { status: 'not_ready' });
+    const registroProntidao = JSON.parse(logsProntidao[0]);
+    assert.equal(registroProntidao.event, 'api.readiness.failed');
+    assert.equal(registroProntidao.route, 'GET /health/ready');
+    assert.equal(JSON.stringify(registroProntidao).includes(idExecucao), false);
   } finally {
     if (servidor && servidor.listening) {
       await new Promise((resolve) => servidor.close(resolve));

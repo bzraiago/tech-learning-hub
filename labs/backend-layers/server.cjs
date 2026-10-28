@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { criarServicoEstudos } = require('./src/servico-estudos.cjs');
 const { criarRepositorioEstudosPostgres } = require('./src/repositorio-estudos-postgres.cjs');
+const { criarPoolEstudos } = require('./src/configuracao-banco.cjs');
 const { criarRepositorioEstudos } = require('./src/repositorio-estudos-memoria.cjs');
 const { criarClienteOpenMeteo } = require('./src/cliente-open-meteo.cjs');
 const { criarRotaPrevisao } = require('./src/rota-previsao.cjs');
@@ -94,7 +95,21 @@ async function lerJson(req) {
   }
 }
 
-async function responder(req, res, servico, rotaPrevisao, limitador) {
+async function responder(req, res, servico, rotaPrevisao, limitador, verificarProntidao) {
+  if (req.method === 'GET' && req.url === '/health/live') {
+    responderJson(res, 200, { status: 'alive' }, { 'Cache-Control': 'no-store' });
+    return;
+  }
+  if (req.method === 'GET' && req.url === '/health/ready') {
+    try {
+      await verificarProntidao();
+      responderJson(res, 200, { status: 'ready' }, { 'Cache-Control': 'no-store' });
+    } catch (erro) {
+      logger.error('api.readiness.failed', erro, { route: 'GET /health/ready' });
+      responderJson(res, 503, { status: 'not_ready' }, { 'Cache-Control': 'no-store' });
+    }
+    return;
+  }
   if (req.method === 'GET' && req.url === '/') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     fs.createReadStream(pagina).pipe(res);
@@ -162,13 +177,16 @@ async function responder(req, res, servico, rotaPrevisao, limitador) {
   responderJson(res, 404, { erro: 'Rota não encontrada' });
 }
 
-function criarServidor(servico, servicoPrevisao, limitador) {
+function criarServidor(servico, servicoPrevisao, limitador, { verificarProntidao = async () => {} } = {}) {
   if (!limitador || typeof limitador.verificar !== 'function') {
     throw new TypeError('Informe um limitador de gravações com verificar()');
   }
+  if (typeof verificarProntidao !== 'function') {
+    throw new TypeError('verificarProntidao precisa ser uma função');
+  }
   const rotaPrevisao = criarRotaPrevisao(servicoPrevisao);
   return http.createServer((req, res) => {
-    responder(req, res, servico, rotaPrevisao, limitador).catch((erro) => {
+    responder(req, res, servico, rotaPrevisao, limitador, verificarProntidao).catch((erro) => {
       logger.error('api.request.failed', erro, { route: obterRotaSeguraParaLog(req) });
       if (!res.headersSent) {
         responderJson(res, 500, { erro: 'Falha interna do servidor' });
@@ -182,9 +200,10 @@ function criarServidor(servico, servicoPrevisao, limitador) {
 if (require.main === module) {
   async function iniciar() {
     const usarMemoria = process.env.BACKEND_STORAGE === 'memory';
+    const pool = usarMemoria ? undefined : criarPoolEstudos();
     const repositorio = usarMemoria
       ? criarRepositorioEstudos()
-      : criarRepositorioEstudosPostgres();
+      : criarRepositorioEstudosPostgres(pool);
     const servico = criarServicoEstudos(repositorio);
     const servicoPrevisao = criarClienteOpenMeteo();
     let clienteRedis;
@@ -222,7 +241,12 @@ if (require.main === module) {
       }
     }
 
-    const servidor = criarServidor(servicoDaApi, servicoPrevisao, limitador);
+    const verificarProntidao = async () => {
+      if (usarMemoria) return;
+      if (!clienteRedis?.isReady) throw new Error('Redis indisponível');
+      await Promise.all([pool.query('SELECT 1'), clienteRedis.ping()]);
+    };
+    const servidor = criarServidor(servicoDaApi, servicoPrevisao, limitador, { verificarProntidao });
     servidor.listen(4180, '127.0.0.1', () => {
       logger.info('api.started', {
         address: '127.0.0.1:4180',

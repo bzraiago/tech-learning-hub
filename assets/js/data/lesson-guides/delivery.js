@@ -985,6 +985,20 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
+        "title": "Separe liveness de readiness e teste o alerta",
+        "paragraphs": [
+          "No `labs/backend-layers`, `/health/live` responde se o processo está ativo; `/health/ready` verifica dependências antes de marcar a API pronta. No modo PostgreSQL e Redis, a readiness executa `SELECT 1` e `PING`; sem uma delas, retorna `503` com apenas `not_ready`. A rota não revela mensagem, host, credencial nem dado do banco.",
+          "`npm run monitor:api` consulta a readiness local a cada cinco segundos. O monitor espera duas falhas consecutivas para emitir `monitor.alert.opened`, evitando abrir um alerta por uma oscilação única; depois do alerta, uma sonda saudável registra `monitor.alert.resolved`. Os eventos aparecem no log JSONL e não enviam webhook.",
+          "Para ver a sequência sem serviços externos, inicie `BACKEND_STORAGE=memory npm run start:memory` (no PowerShell: `$env:BACKEND_STORAGE = 'memory'; npm.cmd run start:memory`) e `npm run monitor:api` em terminais separados. Pare o servidor, espere o alerta, reinicie e observe a recuperação. Os testes também usam um servidor HTTP local que alterna entre `200` e `503`, além da integração que verifica PostgreSQL e Redis reais. Isso prova a regra do alerta, não disponibilidade contínua, notificação de plantão ou cobertura de produção.",
+          "Pausa: por que uma liveness saudável não prova que a API consegue gravar no banco, e por que readiness não deve devolver detalhes da conexão?"
+        ],
+        "terms": [
+          { "term": "Liveness", "meaning": "Sonda que indica se o processo continua respondendo; não afirma que suas dependências estão prontas." },
+          { "term": "Readiness", "meaning": "Sonda de capacidade de atender tráfego, considerando dependências necessárias para a operação." },
+          { "term": "Falhas consecutivas", "meaning": "Limiar que reduz alertas provocados por uma falha isolada ou transitória." }
+        ]
+      },
+      {
         "title": "Recuperação e rollback",
         "paragraphs": [
           "Rollback é voltar a uma versão que se sabe funcionar quando a versão nova causa problema grave. Ele precisa ser planejado: identifique a versão anterior, preserve artefato ou commit, saiba como restaurar e verifique o fluxo principal depois. Se houve mudança de dados incompatível, voltar só os arquivos pode não bastar; comunique a dependência. Em exercício local, copie a versão anterior e reproduza a volta sem apagar o histórico da falha.",
@@ -1026,6 +1040,10 @@ Object.assign(LESSON_GUIDES, {
       {
         "instruction": "Em `labs/backend-layers`, rode `node --test src/logger.test.cjs src/server.test.cjs` e leia uma linha de erro JSON.",
         "result": "O registro contém timestamp, level, event, rota conhecida e código permitido; não contém mensagem/stack, IP, body, token ou query string."
+      },
+      {
+        "instruction": "Inicie `start:memory` e `monitor:api` em terminais separados; interrompa e reinicie a API depois do alerta.",
+        "result": "Duas sondas falhas abrem um evento `monitor.alert.opened`; uma sonda saudável posterior registra `monitor.alert.resolved`."
       }
     ],
     "exercises": [
@@ -1080,6 +1098,14 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "Um evento e uma categoria de rota permitem localizar a classe da falha; mensagem e payload podem vazar informação sem aumentar a evidência útil.",
         "expected": "JSONL tem somente campos operacionais autorizados e omite segredo, IP, body, stack e query string.",
         "criteria": ["Registro inclui timestamp, level, event, rota estável e código seguro.", "Token, IP, body, stack e query foram removidos.", "Diagnóstico usa categorias ou versão sem copiar entrada da pessoa."]
+      },
+      {
+        "prompt": "Construir: implemente uma sonda que recebe estados `true, false, false, false, true` com limiar de duas falhas. Indique o estado e os eventos emitidos em cada passo.",
+        "hints": ["Uma falha isolada ainda não abre o alerta.", "Falhas adicionais não devem duplicar o mesmo alerta; uma recuperação o resolve."],
+        "solution": "Estados: available, degraded, unavailable, unavailable, available. Emita `monitor.alert.opened` somente na segunda resposta falsa e `monitor.alert.resolved` na resposta true final; não repita eventos enquanto o estado não mudar.",
+        "explanation": "A máquina de estados torna a regra do alerta reproduzível e reduz ruído de uma sonda transitória.",
+        "expected": "Uma abertura após duas falhas consecutivas e uma resolução após recuperação, sem alertas duplicados.",
+        "criteria": ["Distingue falha isolada de limiar atingido.", "Mantém um único alerta enquanto indisponível.", "Resolve o alerta somente após sucesso."]
       }
     ],
     "mistakes": [
@@ -1124,7 +1150,8 @@ Object.assign(LESSON_GUIDES, {
       "Combine testes de regra, integração e navegação conforme o risco.",
       "CI repete verificações e ajuda a impedir entrega com falha conhecida.",
       "Observe, reproduza, contenha, corrija e acrescente regressão.",
-      "Use logs JSON estruturados com campos permitidos e sem payload, IP, credenciais ou stack."
+      "Use logs JSON estruturados com campos permitidos e sem payload, IP, credenciais ou stack.",
+      "Separe liveness de readiness e teste alerta local com um limiar explícito."
     ]
   },
   "delivery-threat-model": {

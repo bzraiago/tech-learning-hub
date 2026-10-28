@@ -3,8 +3,9 @@
 const EVENTOS_PERMITIDOS = new Set([
   'api.started', 'api.stopped', 'api.request.failed', 'api.rate_limit.unavailable',
   'api.redis.connection.failed', 'api.postgres.idle_connection.failed',
-  'api.weather.integration.failed', 'api.startup.failed', 'cache.read.failed',
-  'cache.fill.failed', 'cache.invalidation.failed'
+  'api.weather.integration.failed', 'api.readiness.failed', 'api.startup.failed',
+  'cache.read.failed', 'cache.fill.failed', 'cache.invalidation.failed',
+  'monitor.started', 'monitor.stopped', 'monitor.alert.opened', 'monitor.alert.resolved'
 ]);
 const CODIGOS_ERRO_SEGUROS = new Set([
   'ECONNREFUSED', 'ETIMEDOUT', 'ECONNRESET', 'ENOTFOUND', 'EAI_AGAIN',
@@ -18,7 +19,7 @@ const VALORES_DE_CAMPO = {
   address: /^127\.0\.0\.1:\d{1,5}$/,
   route: new Set([
     'GET /api/estudos', 'POST /api/estudos', 'POST /api/estudos-com-sessao',
-    'GET /api/previsao', 'GET /api/labs/open-meteo', 'other'
+    'GET /api/previsao', 'GET /api/labs/open-meteo', 'GET /health/ready', 'other'
   ]),
   storage: new Set(['memory', 'postgresql']),
   cache: new Set(['disabled', 'redis_cache_aside']),

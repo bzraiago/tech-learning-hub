@@ -10,10 +10,11 @@
     "db:check": "node --env-file=.env scripts/verificar-conexao.cjs",
     "demo:rollback": "node --env-file=.env scripts/demonstrar-rollback.cjs",
     "test:backup-restore": "node scripts/verify-backup-restore.cjs",
-    "test": "node --test scripts/aplicar-migration.test.cjs src/cliente-open-meteo.test.cjs src/logger.test.cjs src/rate-limiter-memory.test.cjs src/rate-limiter-redis.test.cjs src/regra-titulo.test.cjs src/repositorio-estudos-memoria.test.cjs src/validar-estudo.test.cjs src/servico-estudos.test.cjs src/servico-estudos-cache-aside.test.cjs src/repositorio-estudos-postgres.test.cjs src/server.test.cjs src/vercel-demo.test.cjs",
+    "test": "node --test scripts/aplicar-migration.test.cjs src/cliente-open-meteo.test.cjs src/logger.test.cjs src/monitor-disponibilidade.test.cjs src/rate-limiter-memory.test.cjs src/rate-limiter-redis.test.cjs src/regra-titulo.test.cjs src/repositorio-estudos-memoria.test.cjs src/validar-estudo.test.cjs src/servico-estudos.test.cjs src/servico-estudos-cache-aside.test.cjs src/repositorio-estudos-postgres.test.cjs src/server.test.cjs src/vercel-demo.test.cjs",
     "test:redis": "node --test src/rate-limiter-redis.integration.test.cjs",
     "test:cache": "node --env-file=.env --test src/servico-estudos-cache-aside.integration.test.cjs",
     "benchmark:cache": "node --env-file=.env scripts/benchmark-cache-aside.cjs",
+    "monitor:api": "node scripts/monitorar-api.cjs",
     "test:db": "node --env-file=.env --test src/postgres.integration.test.cjs",
     "test:e2e": "playwright test",
     "smoke:open-meteo": "node scripts/testar-open-meteo.cjs"
