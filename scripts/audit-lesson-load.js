@@ -7,7 +7,7 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const sources = [...html.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/gi)]
-  .map((match) => match[1])
+  .map((match) => match[1].split(/[?#]/, 1)[0])
   .filter((source) => source.startsWith('assets/js/data/'));
 const context = vm.createContext({ console, URL });
 

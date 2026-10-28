@@ -156,6 +156,24 @@ RUN_CACHE_INTEGRATION=1 npm run test:cache
 
 O teste usa uma key aleatória, verifica miss/hit, TTL, invalidação após `POST`, leitura atualizada e fallback ao PostgreSQL após desconectar o cliente Redis. Ele apaga a linha e as keys que criou. É uma prova local funcional, não benchmark, teste de múltiplas instâncias ou consistência de produção.
 
+## Medir PostgreSQL direto e cache aquecido
+
+Com PostgreSQL e Redis Compose saudáveis, migrations aplicadas, dependências instaladas e `.env` configurado, execute:
+
+```powershell
+# Windows PowerShell
+npm.cmd run benchmark:cache
+```
+
+```sh
+# macOS ou Linux
+npm run benchmark:cache
+```
+
+O script gera linhas fictícias numa tabela temporária ligada a uma única conexão PostgreSQL, inicia duas APIs locais e alterna pedidos sequenciais entre o mesmo `SELECT` direto e a rota com cache-aside. Faz cinco aquecimentos por modo e, por padrão, mede 30 pares; `BENCHMARK_ROWS` (1–5.000) e `BENCHMARK_ITERATIONS` (5–500) permitem ajustar esse perfil. A tabela desaparece quando a conexão fecha, e o script remove sua key Redis aleatória.
+
+O JSON registra versões, p50/p95 do GET HTTP completo, consultas PostgreSQL, leituras e taxa de hit Redis, bytes do valor e memória atribuída à key. Use o mesmo número de linhas e o mesmo perfil ao comparar execuções. O resultado mostra o custo operacional local observado — consultas evitadas, um `GET` Redis por pedido e memória da key. Não calcula preço mensal, pois os containers são locais sem tarifação. A execução é sequencial e de uma instância: não mede concorrência, CPU de produção, custo de hospedagem nem Vercel Preview. Se o cache ficar mais lento nesse perfil, registre esse resultado; a redução de consultas, por si só, não justifica a complexidade.
+
 ## Rate limit HTTP com Redis
 
 ### Contrato da demonstração

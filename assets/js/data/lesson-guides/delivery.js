@@ -2084,8 +2084,8 @@ Object.assign(LESSON_GUIDES, {
   },
   "delivery-redis-cache-aside": {
     "prerequisites": "Concluir `delivery-redis-foundations` e `db-postgres`; saber ler dados de uma fonte persistente e distinguir cópia de registro autoritativo.",
-    "setup": "No `labs/redis-fundamentals`, execute `node check-cache-aside.cjs` para observar miss/hit e valor obsoleto numa Map simulada. Depois, em `labs/backend-layers`, instale dependências, prepare `.env`, inicie PostgreSQL e Redis com Compose, aplique `npm.cmd run migrate` e execute `$env:RUN_CACHE_INTEGRATION = '1'; npm.cmd run test:cache; Remove-Item Env:RUN_CACHE_INTEGRATION` no PowerShell. Em macOS/Linux, execute `RUN_CACHE_INTEGRATION=1 npm run test:cache`. A integração usa PostgreSQL e Redis reais: confirma miss, hit, TTL, invalidação após POST e fallback para PostgreSQL quando o cliente Redis desconecta; remove a linha e keys que cria. Nenhum dado pessoal, Preview, domínio ou carga é usado.",
-    "why": "Cache-aside pode reduzir consultas repetidas, mas cria uma cópia que pode ficar velha ou indisponível. O laboratório verifica essa estratégia na API local e no PostgreSQL autoritativo, com TTL, invalidação após escrita e fallback no caminho GET.",
+    "setup": "No `labs/redis-fundamentals`, execute `node check-cache-aside.cjs` para observar miss/hit e valor obsoleto numa Map simulada. Depois, em `labs/backend-layers`, instale dependências, prepare `.env`, inicie PostgreSQL e Redis com Compose, aplique `npm.cmd run migrate` e execute `$env:RUN_CACHE_INTEGRATION = '1'; npm.cmd run test:cache; Remove-Item Env:RUN_CACHE_INTEGRATION` no PowerShell. Em macOS/Linux, execute `RUN_CACHE_INTEGRATION=1 npm run test:cache`. A integração usa PostgreSQL e Redis reais: confirma miss, hit, TTL, invalidação após POST e fallback para PostgreSQL quando o cliente Redis desconecta; remove a linha e keys que cria. Para comparar leituras locais com dados temporários, execute `npm.cmd run benchmark:cache` no Windows ou `npm run benchmark:cache` em macOS/Linux. O benchmark não usa dados pessoais, Preview, domínio ou carga concorrente.",
+    "why": "Cache-aside pode reduzir consultas repetidas, mas cria uma cópia que pode ficar velha ou indisponível. O laboratório verifica essa estratégia na API local e no PostgreSQL autoritativo, e mede latência, consultas e memória para discutir se a redução observada justifica o custo operacional.",
     "example": {
       "language": "text",
       "code": "GET /api/estudos\nGET cache:v1:backend-layers:studies:list → hit? devolver lista\n                                      └── miss → SELECT no PostgreSQL\n                                                  SET EX 30 → devolver fonte\n\nPOST /api/estudos\nPostgreSQL confirma estudo → DEL cache:v1:backend-layers:studies:list\n\nGET com falha Redis → consulta PostgreSQL e não tenta preencher cache.",
@@ -2095,7 +2095,7 @@ Object.assign(LESSON_GUIDES, {
         "Namespace e versão como `cache:v1:...` ajudam a separar tipo/formato; identificador opaco evita colocar email, token ou dado pessoal em chave/log.",
         "TTL dá limite superior planejado para vida da cópia; `DEL` após commit reduz staleness imediatamente. Se invalidar antes do commit, leitura concorrente pode repor valor antigo.",
         "Uma expiração de chave popular pode disparar muitas leituras simultâneas ao banco (cache stampede). Cache lock, jitter, refresh antecipado ou coalescing ajudam, mas aumentam complexidade.",
-        "`labs/redis-fundamentals/check-cache-aside.cjs` usa uma Map para isolar miss/hit/staleness. `labs/backend-layers` também testa API, PostgreSQL e Redis reais. Essa prova funcional não é benchmark, teste de múltiplas instâncias nem garantia de consistência de produção."
+        "`labs/redis-fundamentals/check-cache-aside.cjs` usa uma Map para isolar miss/hit/staleness. `labs/backend-layers` também testa API, PostgreSQL e Redis reais; `npm run benchmark:cache` compara latência HTTP, consultas evitadas e memória local. Esse benchmark sequencial não representa várias instâncias, concorrência, preço mensal ou desempenho de produção."
       ]
     },
     "sections": [
@@ -2132,13 +2132,27 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "O teste real `npm run test:cache` inicia um servidor HTTP com repositório PostgreSQL e key Redis aleatória. Ele mede miss/hit contando consultas ao banco, confere TTL, cria um estudo por POST, verifica `DEL`, lê a lista atualizada e depois desconecta o cliente Redis para observar fallback ao PostgreSQL. O teste também remove os dados que criou.",
           "Redis fora do ar não causa retry ilimitado: GET usa timeout e recorre à fonte; misses concorrentes deste processo compartilham uma leitura. Isso não coordena várias instâncias e fallback amplo ainda pode pressionar PostgreSQL. Gravações continuam exigindo Redis para rate limit. Não há stale-if-error: o laboratório escolhe a fonte atual e falha se o banco também estiver indisponível.",
-          "Planeje cache hit ratio, miss, falhas Redis, tempo de GET, latência e consultas ao banco. Antes/depois precisa usar mesma versão de dados, aquecimento e perfil; compare p50/p95 e memória. O teste funcional atual não mede ganho de throughput ou custo.",
+          "Planeje cache hit ratio, miss, falhas Redis, tempo de GET, latência e consultas ao banco. Antes/depois precisa usar mesma amostra, aquecimento e perfil; compare p50/p95 e memória. O teste funcional prova caminhos de dados, enquanto o benchmark local observa um perfil sequencial controlado.",
           "Pausa: se Redis cai e todos os clientes dão miss ao PostgreSQL, que limite evita transformar fallback em pico de carga?"
         ],
         "terms": [
           { "term": "Fallback", "meaning": "Caminho alternativo quando o componente primário da operação não responde, com limites e garantias definidos." },
           { "term": "Stale-if-error", "meaning": "Política explícita que aceita servir cópia antiga durante falha da fonte, quando o tipo de dado permite." },
           { "term": "Hit ratio", "meaning": "Percentual de leituras observadas respondidas pelo cache." }
+        ]
+      },
+      {
+        "title": "Meça p50/p95, consultas e memória antes de justificar cache",
+        "paragraphs": [
+          "Em `labs/backend-layers`, rode `npm run benchmark:cache` com PostgreSQL e Redis locais. O script cria linhas fictícias numa tabela temporária, inicia duas APIs, faz cinco aquecimentos por modo e alterna 30 pares de GET: SELECT no PostgreSQL ou cache Redis aquecido. Fecha a conexão que contém a tabela e remove a key aleatória ao terminar.",
+          "Leia p50 e p95 do pedido HTTP inteiro, consultas feitas em cada modo, GETs e hits Redis, bytes do valor e memória atribuída à key. Uma taxa alta de hit e menos SELECTs são evidência de trabalho deslocado; cada leitura cacheada ainda depende de uma chamada Redis. Se o perfil medido não melhora a latência, registre isso em vez de presumir benefício.",
+          "O resultado não inclui preço mensal: containers locais não têm tarifação. Também não mede concorrência, escala entre processos, CPU de produção nem Vercel Preview. Para estimar dinheiro, seriam necessários fornecedor, região, plano, retenção, tráfego e topologia reais; para decidir adoção, relacione os números locais ao gargalo que se quer resolver.",
+          "Pausa: se p95 do cache ficar maior, mas houver menos consultas PostgreSQL, qual requisito ou custo observado justificaria manter a camada?"
+        ],
+        "terms": [
+          { "term": "p50", "meaning": "Latência no meio das amostras ordenadas; metade ficou abaixo desse valor e metade acima." },
+          { "term": "p95", "meaning": "Latência abaixo da qual ficaram 95% das amostras; ajuda a observar a cauda sem usar apenas a média." },
+          { "term": "Custo operacional local", "meaning": "Recursos observados como consultas, comandos Redis e memória; não equivale a preço mensal de hospedagem." }
         ]
       }
     ],
@@ -2147,7 +2161,8 @@ Object.assign(LESSON_GUIDES, {
     "guided": [
       { "instruction": "Execute `node check-cache-aside.cjs` e `npm run test:cache`; anote que evidência cada um fornece sobre a fonte.", "result": "O primeiro usa uma Map fictícia para mostrar stale e DEL; o segundo conta consultas à fonte PostgreSQL no fluxo HTTP real e prova hit, invalidação e fallback." },
       { "instruction": "Inspecione `servico-estudos-cache-aside.cjs` e `.env.example`; localize key versionada, TTL 30 e porta loopback.", "result": "`cache:v1:backend-layers:studies:list` separa formato/escopo, `CACHE_TTL_SECONDS` define vida padrão, e Redis publica só em 127.0.0.1 sem volume." },
-      { "instruction": "Desenhe a ordem de POST, commit PostgreSQL e DEL Redis; inclua a janela concorrente e a falha de DEL.", "result": "A API invalida só após sucesso do serviço; se DEL falha, mantém 201 e a cópia pode envelhecer até TTL. Uma leitura concorrente ou outra instância ainda pode preencher valor antigo." }
+      { "instruction": "Desenhe a ordem de POST, commit PostgreSQL e DEL Redis; inclua a janela concorrente e a falha de DEL.", "result": "A API invalida só após sucesso do serviço; se DEL falha, mantém 201 e a cópia pode envelhecer até TTL. Uma leitura concorrente ou outra instância ainda pode preencher valor antigo." },
+      { "instruction": "Execute `npm run benchmark:cache` e anote p50/p95, consultas evitadas, taxa de hit e memória da key. Explique o que os números não medem.", "result": "A conclusão compara PostgreSQL direto com cache aquecido no mesmo perfil sequencial, contabiliza um GET Redis por leitura e separa custo operacional local de preço mensal e desempenho de produção." }
     ],
     "mistakes": [
       "Chamar cache-aside de fonte de verdade ou confirmar gravação antes do banco.",
@@ -2189,6 +2204,14 @@ Object.assign(LESSON_GUIDES, {
         "solution": "Compare métricas de Redis, misses, conexões e queries Postgres; confirme timeout e cause. Contenha com circuit breaker e limite de fallback; sirva stale apenas em leitura pública se política permitir; escale/recupere Redis e aqueça gradualmente; não altere serviço remoto sem evidência.",
         "explanation": "Fallback ilimitado pode multiplicar o defeito que o cache deveria absorver.",
         "hints": ["Cada miss dispara quantas consultas?", "Qual dado pode tolerar staleness?", "Como reabrir gradualmente a leitura Redis?"]
+      },
+      {
+        "prompt": "Analisar: rode `npm run benchmark:cache` duas vezes com o mesmo perfil. Compare p50/p95, consultas PostgreSQL, hits Redis e memória; decida se o cache se justifica para esse cenário e registre o limite da conclusão.",
+        "expected": "A resposta usa os valores observados, compara o mesmo número de linhas e aquecimento, conta o GET Redis por leitura, considera memória da key e vincula a decisão ao gargalo; não presume melhora nem extrapola para produção.",
+        "criteria": ["Compara os mesmos parâmetros e amostra local.", "Interpreta p50/p95 junto com consultas evitadas e hit ratio.", "Inclui comando Redis e memória como custo operacional.", "Não inventa custo mensal nem generaliza para concorrência/Preview."],
+        "solution": "Transcreva o JSON da execução; registre linhas/iterações, p50/p95 de cada modo, consultas, hits/GETs e bytes da key. Se a latência aumentar, aponte que menos SELECTs não compensam automaticamente o salto HTTP e Redis. Se cair, registre a melhora apenas nesse perfil. Preço mensal e desempenho distribuído continuam desconhecidos sem infraestrutura e carga representativas.",
+        "explanation": "Uma decisão de cache depende do gargalo e dos custos medidos, não da presença de mais uma tecnologia.",
+        "hints": ["O cache poupou consultas após aquecer?", "A chamada Redis deixou o pedido mais rápido neste perfil?", "Que medição faltaria para estimar preço ou concorrência?"]
       }
     ],
     "quiz": [
@@ -2202,7 +2225,7 @@ Object.assign(LESSON_GUIDES, {
       "Use key versionada, escopo correto e dados minimizados.",
       "Após commit no PostgreSQL, invalide; falhas de cache e DB têm tratamentos diferentes.",
       "O fallback deve ser limitado para evitar cascata; medir antes/depois com perfil controlado.",
-      "O script didático usa Map; a integração local prova API/PostgreSQL/Redis, mas não mede desempenho nem coordena instâncias."
+      "O script didático usa Map; a integração local prova API/PostgreSQL/Redis, e o benchmark sequencial compara latência e consultas sem representar concorrência ou produção."
     ]
   },
   "delivery-redis-rate-limit": {
