@@ -1521,8 +1521,8 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
   "delivery-csrf": {
-    "prerequisites": "Concluir `delivery-xss-output`, `delivery-oauth-google` e `delivery-clerk-supabase`; conhecer métodos HTTP, cookies, sessão, origem e cabeçalhos. Esta aula é análise conceitual do fluxo local do repositório. Não exige serviço remoto, navegador autenticado, domínio ou deploy.",
-    "setup": "No editor, leia `assets/js/cloud.js` (função `cloudRequest`), `assets/js/auth.js` e o diagrama de `delivery-xss-output`. No terminal aberto na raiz, você pode localizar referências com `rg -n 'credentials:|cookie|Authorization|Bearer|fetch\\(' assets/js/cloud.js assets/js/auth.js api`. A saída esperada inclui o token Clerk obtido via `session.getToken()` e enviado em `Authorization: Bearer`; o roteiro não envia pedidos nem altera configuração. Para retomar, releia a função. Se não tiver `rg`, use a busca do editor. Alternativa leve: compare os exemplos desta aula sem abrir serviços ou domínio.",
+    "prerequisites": "Concluir `setup-node`, `delivery-xss-output`, `delivery-oauth-google` e `delivery-clerk-supabase`; conhecer métodos HTTP, cookies, sessão, origem e cabeçalhos. O laboratório usa servidor Node local e sessão fictícia. Não exige serviço remoto, navegador autenticado, domínio ou deploy.",
+    "setup": "No editor, leia `assets/js/cloud.js` (função `cloudRequest`), `assets/js/auth.js` e `labs/security-csrf/README.md`. No terminal aberto na raiz do repositório, execute `cd labs/security-csrf` e `node --test server.test.cjs`; a saída esperada termina com `tests 7`, `pass 7` e `fail 0`. Os testes usam API local, poucos pedidos e estado reiniciado por caso; não enviam carga. Para retomar, repita o comando. Se Node não for reconhecido, siga `setup-node`; alternativa leve: leia a matriz e os testes sem executar servidor. A atividade não abre Preview, domínio nem painel externo.",
     "why": "Uma requisição entre sites pode chegar ao servidor mesmo quando o site atacante não consegue ler a resposta. Se o navegador acrescenta automaticamente o cookie de sessão e o servidor confia somente nesse cookie, uma ação pode ocorrer sem intenção da pessoa. A defesa precisa corresponder ao modo como a aplicação autentica as chamadas.",
     "example": {
       "language": "text",
@@ -1594,6 +1594,20 @@ Object.assign(LESSON_GUIDES, {
           { "term": "RLS", "meaning": "Políticas no PostgreSQL que restringem linhas conforme a identidade/claims validados, mesmo quando o cliente manipula o pedido." },
           { "term": "Evidência local", "meaning": "Conclusão limitada ao arquivo, trecho ou comando observado; não confirma configurações remotas." }
         ]
+      },
+      {
+        "title": "Comparar controles em laboratório isolado",
+        "paragraphs": [
+          "Em `labs/security-csrf`, a sessão `aluna_demo`, o cookie e o token são fictícios; o token é previsível e não demonstra entropia para produção. A rota `/demo/vulnerable/nota` exige somente o cookie e permite uma alteração; `/demo/protected/nota` exige uma origem exata configurada e um cabeçalho `X-CSRF-Token` correspondente. Os testes verificam respostas 200/401/403/413 e consultam a nota depois para confirmar se a escrita ocorreu.",
+          "A comparação torna uma propriedade observável: pedido recusado não muda estado; sessão válida sozinha não basta na rota protegida. O servidor é independente do produto Clerk/Supabase, não compartilha sessão com usuários e não guarda dados reais. A combinação de controles é exemplo didático de contrato, não receita universal para qualquer sessão ou proxy.",
+          "Os testes criam o cabeçalho `Cookie` explicitamente com Node fetch. Portanto, não comprovam que um browser anexou cookie automaticamente, nem exercitam `SameSite`, navegação, CORS/preflight real, XSS ou comportamento de provedor. A aula combina essa evidência limitada com o modelo de ameaça; nenhum teste do laboratório permite concluir que o Tech Learning Hub está imune.",
+          "Pausa: a rota vulnerável altera a nota, enquanto a protegida recusa uma origem externa sem escrita. Cite a evidência observada e duas conclusões que continuam fora do alcance dos testes."
+        ],
+        "terms": [
+          { "term": "Sessão fictícia", "meaning": "Marcador sem valor de autenticação real, usado apenas para isolar o comportamento do exemplo." },
+          { "term": "Regressão negativa", "meaning": "Teste que confirma que uma ação inválida é recusada e não produz efeito no estado." },
+          { "term": "Teste de política do servidor", "meaning": "Teste que fornece cabeçalhos explicitamente e verifica regra e efeito, sem reproduzir todo o comportamento do navegador." }
+        ]
       }
     ],
     "diagramTitle": "Credencial enviada automaticamente ou explicitamente",
@@ -1601,7 +1615,8 @@ Object.assign(LESSON_GUIDES, {
     "guided": [
       { "instruction": "Classifique cada peça do primeiro fluxo: identidade da pessoa, cookie enviado pelo browser, ação POST e decisão ausente no servidor. Explique qual sinal o servidor tem e qual ainda precisa validar.", "result": "O cookie pode identificar uma sessão, mas sozinho não comprova que a aplicação legítima iniciou a ação; o servidor valida um token CSRF ou outro controle contextual além de autenticação/autorização." },
       { "instruction": "Leia `cloudRequest` e copie somente os nomes de cabeçalho e chamadas relevantes, sem valores de token. Identifique se o valor Bearer é obtido de cookie automaticamente ou adicionado pelo código.", "result": "`session.getToken()` obtém o token Clerk; `Authorization` recebe explicitamente o valor Bearer. A leitura do repositório não revela internals do Clerk nem configuração externa." },
-      { "instruction": "Faça uma matriz para `POST` por formulário, `GET` de navegação e `fetch` com cabeçalho personalizado. Para cada um, diga se pode mudar estado, se navegador anexa cookie e que defesa o servidor deve verificar.", "result": "GET não deve alterar estado; POST simples pode levar cookie e exige proteção CSRF se usar sessão ambient; fetch com header personalizado depende de preflight/CORS e ainda requer autenticação, autorização e validação do modelo de sessão." }
+      { "instruction": "Faça uma matriz para `POST` por formulário, `GET` de navegação e `fetch` com cabeçalho personalizado. Para cada um, diga se pode mudar estado, se navegador anexa cookie e que defesa o servidor deve verificar.", "result": "GET não deve alterar estado; POST simples pode levar cookie e exige proteção CSRF se usar sessão ambient; fetch com header personalizado depende de preflight/CORS e ainda requer autenticação, autorização e validação do modelo de sessão." },
+      { "instruction": "Execute `node --test server.test.cjs` em `labs/security-csrf`. Separe os resultados de rota vulnerável, origem recusada, token ausente/inválido, pedido válido, sessão ausente e corpo grande; depois diga o que o cliente não simula.", "result": "São sete testes determinísticos: cookie sozinho aceita a rota vulnerável; a protegida recusa origem/token incorretos sem escrita, permite origem/token fictícios válidos, retorna 401 sem sessão e 413 para corpo acima do limite. O teste não simula cookie autoenviado nem política SameSite/CORS de navegador." }
     ],
     "mistakes": [
       "Confundir CSRF com XSS ou achar que uma das falhas é apenas outro nome da outra.",
@@ -1631,12 +1646,12 @@ Object.assign(LESSON_GUIDES, {
         "hints": ["Que credencial o browser anexa sem código explícito?", "Quais cabeçalhos provocam preflight?", "O CORS permite acesso ou só controla compartilhamento de origem?"]
       },
       {
-        "prompt": "Construir: a partir de `cloudRequest` em `assets/js/cloud.js`, monte uma tabela com: observação do código, consequência possível para CSRF clássico e hipótese que ainda precisa ser verificada remotamente. Use apenas nomes de cabeçalho, sem token.",
-        "expected": "A tabela observa obtenção de token via Clerk e envio explícito em `Authorization`, `apikey` e JSON quando há corpo; aponta que o fluxo difere da sessão cookie autoanexada, mas deixa pendentes configuração CORS, internals/auth do Clerk, RLS remota e demais endpoints.",
-        "criteria": ["Cita observações verificáveis no arquivo.", "Não classifica o app como vulnerável ou imune sem evidência.", "Separa pelo menos duas hipóteses externas pendentes.", "Não copia valor de segredo/token."],
-        "solution": "Observação: `session.getToken()` e cabeçalho `Authorization: Bearer`, `apikey`, `Content-Type: application/json`; o código não define `credentials: include`. Implicação limitada: a chamada REST analisada não usa cookie ambient explícito para autenticar a chamada. Pendências: CORS remoto, configuração Clerk/Supabase e outros caminhos não analisados. RLS segue necessária.",
-        "explanation": "Inspeção estática é evidência sobre o trecho lido, não sobre toda a configuração distribuída.",
-        "hints": ["Não copie os valores; registre só os nomes.", "O que o código mostra diretamente e o que está no painel do fornecedor?"]
+        "prompt": "Construir: execute os sete testes de `labs/security-csrf/server.test.cjs` e registre numa matriz a rota, cabeçalhos fictícios, status e se a nota mudou. Acrescente uma coluna com o limite dos testes; não use navegador autenticado nem dados reais.",
+        "expected": "A matriz confirma que cookie sozinho altera a rota vulnerável; origem/token inválidos são recusados na rota protegida sem escrita; origem/token válidos alteram; sessão ausente recebe 401 e corpo grande recebe 413 sem escrita. Explica que o cliente Node fornece Cookie explicitamente e não simula envio automático do navegador. Não conclui nada sobre serviços remotos.",
+        "criteria": ["Registra status e efeito observado nos casos vulnerável/protegidos.", "Confirma que pedidos recusados não gravam nota.", "Identifica cookie/token como marcadores fictícios.", "Declara limite de simulação de navegador e de serviço remoto."],
+        "solution": "Execute `cd labs/security-csrf` e `node --test server.test.cjs`. Matriz: cookie sem origem/token na rota vulnerável → 200 e alteração; origem externa → 403 sem alteração; token ausente/inválido → 403 sem alteração; origem e token de teste válidos → 200 e alteração; sem sessão → 401; corpo acima de 512 bytes → 413 sem alteração. Limite: fetch Node define Cookie manualmente e não exercita envio automático do browser, SameSite, CORS real, Clerk/Supabase ou Preview.",
+        "explanation": "O laboratório demonstra uma propriedade de validação no servidor em ambiente local, não reproduz o browser ou a configuração completa de uma aplicação.",
+        "hints": ["Depois de cada recusa, consulte a nota em memória.", "O Cookie veio do navegador ou foi escrito pelo teste?", "Quais controles dependem de um browser de verdade?"]
       },
       {
         "prompt": "Investigar erro: uma chamada legítima para de funcionar após a equipe ativar validação de `Origin` e bloqueio de cookies cross-site. Escreva um diagnóstico sem afrouxar a política: confira origem exata, métodos seguros, fluxo de login/retorno, `SameSite`, preflight e token CSRF; mantenha dados fictícios.",
@@ -1658,7 +1673,7 @@ Object.assign(LESSON_GUIDES, {
       "CORS limita compartilhamento e certas chamadas; não substitui autenticação, autorização nem defesa de formulário.",
       "Combine métodos seguros, token CSRF no servidor, política de cookie e verificações de origem conforme o modelo.",
       "Bearer anexado explicitamente a uma API difere de cookie autoenviado; continue exigindo RLS e análise de CORS.",
-      "Esta aula lê código e não comprova comportamento de painéis ou serviços remotos."
+      "O teste usa cabeçalhos explícitos e não simula o navegador nem comprova comportamento de painéis ou serviços remotos."
     ]
   },
   "delivery-api-abuse": {
