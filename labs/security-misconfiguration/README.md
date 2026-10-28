@@ -117,6 +117,8 @@ Os testes não verificam parsing de CSP por um navegador, violação em Console/
 
 ## Como avaliar CSP num produto real
 
+Para o estudo de caso do Tech Learning Hub, consulte também o [inventário estático de recursos](../../docs/CSP_INVENTORY.md). Ele separa evidência de código, valores configurados por ambiente e comportamento que exige navegador; não contém uma política pronta nem substitui o teste no Preview.
+
 Não comece ativando uma política restrita sem inventário. Liste cada tipo de documento e recurso: scripts, estilos, imagens, fontes, `fetch`, WebSocket, frames, formulários, CDN e serviço de autenticação. Identifique quem mantém cada origem, qual função depende dela e se há alternativa local.
 
 Uma sequência revisável é: registrar estado atual; preparar uma hipótese de política mínima; avaliar em modo `Report-Only` num ambiente permitido; classificar violações esperadas e inesperadas; testar login, saída, tela e interações; corrigir uso de scripts in-line com caminhos apropriados; revisar logs de relatório; só depois planejar enforcement, rollback e novo teste. Não adicione `unsafe-inline`, `unsafe-eval` ou `*` automaticamente para silenciar bloqueios.

@@ -5316,7 +5316,7 @@
               "Comparar as políticas do laboratório, executar os testes e dizer exatamente o que a resposta HTTP comprova.",
               "Montar um plano de inventário, Report-Only, compatibilidade, rollback e enforcement sem aplicar uma política ao site real."
             ],
-            "exercise": "Leia `labs/security-misconfiguration/README.md`, preveja o resultado antes de comparar `/demo/loose` e `/demo/strict`, e rode `node --test labs/security-misconfiguration/server.test.cjs`. Se não puder iniciar o servidor, os exemplos, saídas esperadas e respostas comentadas permitem completar a prática no papel.",
+            "exercise": "Leia `labs/security-misconfiguration/README.md` e `docs/CSP_INVENTORY.md`, preveja o resultado antes de comparar `/demo/loose` e `/demo/strict`, e rode `node --test labs/security-misconfiguration/server.test.cjs`. Se não puder iniciar o servidor, os exemplos, saídas esperadas e respostas comentadas permitem completar a prática no papel.",
             "code": "CSP ampla (somente exemplo local):\ndefault-src *; script-src * 'unsafe-inline' 'unsafe-eval'\n\nCSP restrita (hipótese didática, não receita para o site):\ndefault-src 'none'; script-src 'self'; style-src 'self';\nobject-src 'none'; base-uri 'none'; frame-ancestors 'none'\n\nnode --test labs/security-misconfiguration/server.test.cjs\nVerifica HTTP local; não comprova enforcement no navegador.",
             "docs": [
               { "kind": "doc", "title": "W3C · Content Security Policy Level 3", "url": "https://www.w3.org/TR/CSP/", "language": "EN" },

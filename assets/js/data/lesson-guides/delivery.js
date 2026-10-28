@@ -1778,6 +1778,10 @@ Object.assign(LESSON_GUIDES, {
     },
     "guided": [
       {
+        "instruction": "Leia docs/CSP_INVENTORY.md e classifique cada item como evidência estática, valor dependente de configuração ou comportamento que exige navegador. Para cada um, ligue recurso, diretiva candidata e função do produto.",
+        "result": "Tailwind e Google Fonts têm origens explícitas no HTML; Clerk injeta scripts no host derivado da configuração; Supabase vem da URL configurada; API pública e Open-Meteo passam pela origem do site; iframes/worker e Toolbar precisam de observação real. A lista é inventário, não uma política pronta."
+      },
+      {
         "instruction": "Antes de ler os exemplos, explique que recursos o navegador usa numa página com HTML, script, CSS, imagem, login externo e chamada REST.",
         "result": "Há tipos e origens diferentes; cada recurso precisa ser inventariado e ligado a função/responsável. Nenhuma origem se torna necessária só por aparecer numa configuração antiga."
       },
@@ -1836,6 +1840,11 @@ Object.assign(LESSON_GUIDES, {
       {
         "title": "Inventarie antes de restringir",
         "paragraphs": [
+          "Caso estático do próprio Tech Learning Hub (revisado em 28/10/2026): `index.html` carrega JavaScript e CSS locais, Tailwind Browser (script que lê as classes HTML e gera CSS no navegador) por `cdn.jsdelivr.net` e uma folha Google Fonts; `fonts.gstatic.com` fornece arquivos de fonte. Isso separa pelo menos `script-src`, `style-src` e `font-src`. O Tailwind também processa um bloco `style type=\"text/tailwindcss\"` e gera estilos no navegador, então só permitir o arquivo CSS local não descreve todo o comportamento da página.",
+          "`auth.js` busca `/api/public-config` na origem do site, decodifica o host da chave pública Clerk do ambiente e carrega os scripts `@clerk/ui` e `clerk-js` daquele host. O fluxo também pode usar conexões, imagens, frames, workers e estilos do provedor. `cloud.js` busca configuração na mesma origem e chama o endereço Supabase definido nela; este projeto valida HTTPS e domínio `*.supabase.co`, mas o host de Preview não aparece no código. Mapeie scripts em `script-src`, chamadas do browser em `connect-src` e investigue as demais diretivas no fluxo real. O fato de `/api/labs/open-meteo` chamar Open-Meteo do servidor não adiciona Open-Meteo à política de conexão do navegador.",
+          "A página também cria quadros isolados `iframe` (área que mostra outro documento) cuja propriedade `srcdoc` recebe HTML do próprio app. O verificador executa um `worker` (ambiente JavaScript separado para não travar a tela) via URL temporária `blob:`; o documento filho tem CSP própria. `frame-src` trata documentos incorporados e `worker-src`, os workers. A política do documento pai pode interagir com esses quadros de formas que uma leitura de arquivos não comprova. Links de biblioteca só são navegados quando o aluno clica e não devem virar origens permitidas por aparecerem no catálogo. A Toolbar da Vercel pode acrescentar recursos no Preview se estiver habilitada; a configuração depende do projeto remoto.",
+          "Há duas dependências que pedem decisão consciente: a documentação oficial informa que Tailwind Play CDN é para desenvolvimento, não produção, e `AGENTS.md` mantém a arquitetura sem build; passar a gerar CSS local muda essa decisão de arquitetura e exige aprovação do dono. A documentação oficial do Clerk explica que seus componentes pré-prontos de login/cadastro usam CSS-in-JS, ou seja, JavaScript cria estilos enquanto a página está rodando e precisam de estilos inline. Isso registra um requisito do SDK, não uma autorização automática para `unsafe-inline`. Consulte `docs/CSP_INVENTORY.md` para a lista de arquivos, pontos a observar e roteiro de validação; os conceitos desta aula continuam suficientes para concluir a atividade sem ler páginas externas.",
+          "Esta é evidência estática, não captura de tráfego. O `vercel.json` atual não contém CSP. Não invente o host Clerk, o projeto Supabase, recursos secundários do SDK nem o estado da Toolbar. Antes de decidir uma diretiva, observe o Preview com e sem login, valide Tailwind e fontes, chamadas de progresso, os dois tipos de iframe e a largura móvel; classifique cada violação pelo recurso e pela função, sem liberar domínios amplos para fazê-la desaparecer.",
           "Comece pelas páginas e recursos reais: script in-line e externo, módulos, estilos, fontes, imagens, `fetch`, WebSocket, frames, formulários, CDN, Clerk e retorno de login. Para cada origem, anote quem a mantém, dado enviado, comportamento dependente e alternativa local. Uma página simples pode usar poucos recursos; a aplicação completa pode precisar de mais origens e caminhos.",
           "Prepare uma política mínima como hipótese e observe em ambiente permitido. Report-Only não bloqueia e pode indicar tentativas legítimas e inesperadas; classifique cada uma com contexto e responsável. Relatórios podem conter URLs e outras informações do usuário, então endpoint, acesso e retenção também precisam de projeto. Ausência de relatório não prova ausência de dependência ou ataque.",
           "Antes de enforcement, rode fluxos que importam: login, callback, páginas, chamadas REST, estilos, arquivos, erros e janela móvel. Confirme em navegador que recursos permitidos carregam e os não autorizados são bloqueados conforme esperado. Documente exceções, rollback e teste depois de alteração de build/fornecedor; não use `'self'` ou CDN genérico como substituto de inventário."
@@ -1871,6 +1880,23 @@ Object.assign(LESSON_GUIDES, {
       "Ativar CSP em Production/Preview sem teste de login, callback, UI, erro e rollback."
     ],
     "exercises": [
+      {
+        "prompt": "Construir: usando docs/CSP_INVENTORY.md, monte uma tabela com recurso, evidência no código, diretiva a investigar, estado do dado (estático/configuração/runtime), teste funcional e efeito se falhar. Inclua Tailwind, Google Fonts, Clerk, Supabase, API da própria origem, iframes/worker e Toolbar do Preview.",
+        "expected": "A tabela identifica Tailwind e Google Fonts como recursos visíveis no HTML; o host Clerk é derivado da chave pública do ambiente; o endpoint Supabase vem da configuração e é limitado a HTTPS em *.supabase.co; API e função meteorológica são chamadas da origem do site; iframes/worker e Toolbar precisam de validação real. Nenhuma linha inventa o host de Preview nem prova compatibilidade.",
+        "criteria": [
+          "Liga cada recurso à diretiva que governa seu tipo.",
+          "Separa valor visível no código, configuração por ambiente e comportamento runtime.",
+          "Diz qual fluxo funcional observar e o que o teste prova.",
+          "Mantém desconhecidos como pendentes e não propõe curinga como correção automática."
+        ],
+        "solution": "Use script-src para scripts e style-src para estilos; font-src para arquivos de fonte; connect-src para fetch feito pelo navegador; investigue frame-src e worker-src junto dos documentos filhos. O código mostra os nomes dos serviços, mas não o host Clerk/Supabase real nem as chamadas secundárias do SDK. A documentação oficial do Tailwind limita Play CDN a desenvolvimento; Clerk documenta CSS runtime inline. Registre esses requisitos e leve a decisão arquitetural ao dono; não transforme o inventário em uma lista de permissões sem captura de rede e teste no Preview.",
+        "explanation": "CSP depende tanto do tipo do recurso quanto de sua origem e do momento em que é carregado. Código estático mostra algumas fontes; só o fluxo no navegador revela requisições adicionadas por SDKs e pelo Preview.",
+        "hints": [
+          "Qual host está escrito diretamente no HTML?",
+          "Qual host é formado a partir da configuração recebida?",
+          "O teste HTTP local consegue mostrar recursos carregados pelo Clerk ou pela Toolbar?"
+        ]
+      },
       {
         "prompt": "Prever: `script-src 'self'` recebe uma página de `https://curso.example.test:443`. A página tenta carregar `/assets/app.js` no mesmo host/porta e depois tenta carregar `https://cdn.example.test/app.js`. O que a regra permite e o que ainda não decide?",
         "expected": "Permite o recurso da mesma origem se esquema/host/porta coincidirem; o CDN é outra origem e não está permitido por essa diretiva. Não decide autorização a dados de API.",
