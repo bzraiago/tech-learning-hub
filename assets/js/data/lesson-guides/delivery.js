@@ -2274,6 +2274,288 @@ Object.assign(LESSON_GUIDES, {
       "A inspeção desta aula é estática; não afirma estado atual de vulnerabilidades nem execução de auditoria."
     ]
   },
+  "delivery-secret-lifecycle": {
+    "prerequisites": "Concluir `delivery-environments`, `delivery-clerk-supabase` e `delivery-supply-chain`; saber diferenciar configuração pública de credencial privada. A atividade usa apenas nomes e valores fictícios; não exige abrir `.env`, painéis ou serviços remotos.",
+    "setup": "No editor, abra apenas os nomes de configuração em `api/public-config.mjs` e leia os diagramas desta aula. Não abra `.env`, não copie, gere ou cole credenciais e não altere painéis. Use os marcadores `segredo_demo_antigo` e `segredo_demo_novo` como texto sem valor secreto. O resultado esperado é uma matriz com finalidade, consumidor, ambientes, privilégio, responsável, caminho de rotação e prova de revogação. Não há comando nem serviço para iniciar. Se não puder consultar os arquivos, faça a matriz pelo cenário fictício; a análise continua válida sem computador.",
+    "why": "Uma credencial precisa ter propósito, escopo, consumidores e caminho de desativação conhecidos. Trocar o valor armazenado no projeto não invalida automaticamente o valor antigo no provedor, e apagar uma linha do código não desfaz uma exposição que já chegou ao histórico, a logs ou a uma versão publicada (deployment). Uma rotação precisa atualizar todos os consumidores e provar qual credencial permanece válida. Os links oficiais ao final são aprofundamento opcional: conceitos, exemplo, sequência, soluções e critérios desta aula estão explicados aqui, sem exigir conta, serviço ou leitura externa.",
+    "example": {
+      "language": "text",
+      "code": "IDENTIFICADORES FICTÍCIOS — nenhum valor de segredo é exibido\n\nClerk: pk_test_<publica>       → pode aparecer no cliente\nClerk: sk_test_<segredo>       → manter em componente controlado\nSupabase: sb_publishable_<publica> → cliente; políticas RLS continuam necessárias\nSupabase: sb_secret_<segredo>  → backend controlado; acesso elevado, ignora RLS\n\nRotação planejada:\ncriar nova → atualizar consumidores e ambientes → implantar → verificar\n→ revogar antiga → confirmar rejeição da antiga\n\nSegredo possivelmente exposto:\nconter e revogar a antiga no provedor → substituir consumidores → implantar\n→ verificar nova/antiga → monitorar uso e registrar evidência",
+      "expected": "A matriz classifica valores publicáveis e segredos pelo tipo e pelo local de uso. O plano de rotação planejada permite uma transição compatível se o provedor oferecer sobreposição; diante de exposição suspeita, o plano prioriza contenção e revogação, mesmo que uma interrupção controlada seja necessária. Em ambos os casos, a equipe verifica todos os ambientes e consumidores sem registrar o valor da credencial.",
+      "explanation": [
+        "Um nome de configuração não revela o valor e ajuda a inventariar a credencial sem copiá-la. Valores públicos identificam o componente que chama o serviço, mas não substituem autorização; uma chave secreta de servidor tem alcance elevado e nunca deve entrar no código entregue ao navegador.",
+        "A documentação atual do Supabase distingue `sb_publishable_` de `sb_secret_` e ainda descreve `anon`/`service_role` como chaves legadas. Criar uma chave nova não desativa automaticamente a antiga: revogação é uma ação separada no provedor. Confira a documentação vigente antes de qualquer operação real.",
+        "Na rotação planejada, alguns provedores permitem que duas chaves coexistam por uma janela curta. Uma chave suspeita de comprometimento exige contenção: não mantenha a antiga válida apenas para evitar uma falha temporária. A decisão operacional deve considerar alcance, uso e disponibilidade.",
+        "Vercel aplica uma mudança de variável de ambiente a novos deployments; variáveis de Preview, Development e Production e projetos ligados precisam ser identificados. Um deployment antigo pode continuar usando a configuração anterior até ser atualizado ou deixar de ser usado.",
+        "Verificar uma chave nova funcionando não prova que a antiga foi revogada. A evidência inclui testar o fluxo esperado com a nova, observar que a antiga é recusada no provedor e conferir tentativas de uso nos logs disponíveis, sem compartilhar tokens ou dados de usuários."
+      ]
+    },
+    "guided": [
+      { "instruction": "Classifique os quatro rótulos fictícios do exemplo como publicáveis ou secretos e indique onde cada tipo pode ser usado.", "result": "As chaves `pk_test_...` e `sb_publishable_...` são publicáveis; `sk_test_...` e `sb_secret_...` são segredos de componentes controlados. O valor nunca é necessário para fazer a classificação." },
+      { "instruction": "No cenário de manutenção planejada, liste os consumidores, ambientes, deploys e testes antes de revogar a credencial antiga.", "result": "O inventário inclui local autorizado, Preview, Development, Production, CI e automações que realmente usam a chave. Cada consumer precisa receber configuração e verificação próprias." },
+      { "instruction": "Agora considere que a credencial privilegiada foi publicada. Reordene os passos para reduzir o uso indevido e anote o que não deve ser copiado para a evidência.", "result": "A resposta prioriza avisar responsável e conter/revogar no emissor, depois substituir consumidores e verificar. O valor do segredo, tokens e dados pessoais ficam fora dos registros." }
+    ],
+    "sections": [
+      {
+        "title": "Classifique a credencial antes de trocá-la",
+        "paragraphs": [
+          "Comece perguntando o que a credencial identifica, onde o código roda e qual autoridade ela concede. Clerk diferencia a chave publicável (publishable key, `pk_...`) da chave secreta (secret key, `sk_...`) e do segredo de assinatura de webhook (aviso autenticado que um serviço envia à aplicação). Supabase diferencia a chave publicável da chave secreta. Os prefixos nos exemplos são apenas rótulos; nunca copie um valor real para uma aula, chamado público (issue) ou log.",
+          "Uma chave publicável pode ser vista no cliente por projeto; isso não a transforma em autorização para ler dados. RLS e a identidade autenticada continuam a controlar o acesso a linhas. Chaves secretas Supabase são de backend controlado e têm autoridade elevada, pois ignoram RLS. `service_role` é o nome de uma chave legada ainda descrita na documentação atual. Não deduza a segurança de uma chave apenas por ela parecer longa ou escondida.",
+          "Para cada segredo, registre somente metadados: identificador ou nome da variável, finalidade, sistema e papel, responsável, consumidores, ambientes, data de emissão/último uso conhecido, privilégios e caminho para revogar. Não registre o valor, nem o copie para a matriz. Separe credenciais por consumidor quando o provedor permitir; isso limita o impacto e torna a rotação mais localizada."
+        ],
+        "terms": [
+          { "term": "Segredo", "meaning": "Credencial que precisa permanecer restrita e pode autorizar acesso a um serviço ou recurso." },
+          { "term": "Rotação", "meaning": "Substituição planejada de uma credencial por outra, seguida de atualização e verificação dos consumidores." },
+          { "term": "Revogação", "meaning": "Ação no sistema emissor que invalida uma credencial, impedindo que continue autorizando pedidos." },
+          { "term": "Emissor", "meaning": "Serviço ou sistema que cria e controla a validade da credencial; é nele que a revogação deve ser confirmada." },
+          { "term": "RLS", "meaning": "Row Level Security (segurança em nível de linha): regras do banco que filtram linhas acessíveis; uma chave privilegiada pode ignorá-las." }
+        ]
+      },
+      {
+        "title": "Planeje uma rotação sem perder consumidores",
+        "paragraphs": [
+          "Em uma manutenção planejada, inventarie todos os lugares que usam a credencial: ambiente local autorizado, CI (integração contínua), Preview (prévia), Development (desenvolvimento), Production (produção), rotinas agendadas e integrações. Confirme quem pode emitir e revogar, se existe chave de sobreposição e quais fluxos comprovam funcionamento. A documentação de cada provedor define a sequência exata; não aplique um comando genérico a todos.",
+          "Quando o provedor permite, crie a nova credencial sem invalidar ainda a anterior, substitua a variável em cada ambiente e consumidor, publique novos deployments, teste os fluxos relevantes e confirme o uso da nova chave. Só depois revogue a antiga. Se duas credenciais ativas não forem suportadas, planeje uma janela e um rollback seguro sem aumentar o privilégio.",
+          "Vercel documenta que variáveis alteradas valem para deployments novos e que Preview/Development/Production e projetos ligados podem precisar de implantação própria. Clerk documenta múltiplas secret keys ativas para uma transição gradual. Essas regras são específicas dos produtos e podem mudar; use as fontes atuais e não assuma que o mesmo mecanismo existe em Supabase, GitHub ou outro serviço."
+        ],
+        "terms": [
+          { "term": "Consumidor", "meaning": "Aplicação, processo ou automação que usa a credencial para falar com o serviço." },
+          { "term": "Janela de sobreposição", "meaning": "Período curto em que chave antiga e nova podem ser aceitas para concluir uma migração planejada." },
+          { "term": "Deployment", "meaning": "Versão publicada de uma aplicação, com a configuração que recebeu ao ser criada." },
+          { "term": "CI", "meaning": "Integração contínua: automação que executa verificações e pode usar credenciais próprias, separadas das variáveis do site." }
+        ]
+      },
+      {
+        "title": "Trate exposição suspeita como contenção",
+        "paragraphs": [
+          "Se um segredo foi enviado ao repositório, log, gravação de tela ou canal sem acesso restrito, considere-o comprometido até a equipe responsável confirmar o contrário. Não publique o valor outra vez para provar a exposição. Registre repositório, commit, horário, ambiente e tipo da credencial usando identificadores não secretos; avise quem pode agir no provedor.",
+          "A prioridade é conter a autoridade exposta: revogue ou desative a credencial no sistema emissor e, quando necessário, limite temporariamente o componente afetado. Depois gere uma substituta e atualize os consumidores. Remover o texto do último commit não invalida a credencial e não remove cópias, caches, logs ou históricos já distribuídos.",
+          "Em um incidente, pode ser mais seguro aceitar uma interrupção limitada que manter ativa uma credencial privilegiada. Não reative a chave comprometida como rollback. Use outra credencial verificada ou mantenha a função indisponível até recuperar uma configuração segura. Siga o procedimento e os contatos responsáveis do projeto; esta aula não substitui uma resposta profissional a incidente."
+        ],
+        "terms": [
+          { "term": "Contenção", "meaning": "Ações imediatas que limitam o uso e o impacto de uma credencial suspeita." },
+          { "term": "Escopo", "meaning": "Conjunto de serviços, dados, ambientes e períodos que podem ter sido afetados." },
+          { "term": "Risco residual", "meaning": "Possibilidade que permanece depois da revogação e da atualização dos consumidores." }
+        ]
+      },
+      {
+        "title": "Verifique a troca e feche o ciclo",
+        "paragraphs": [
+          "Defina antes quais sinais mostram que a nova credencial funciona: health check autorizado, operação de leitura/escrita fictícia, deployment bem-sucedido ou evento de último uso, conforme o serviço. Confirme também que a antiga é rejeitada e que nenhum ambiente ficou para trás. Uma página saudável sozinha pode não executar o fluxo que usa aquela chave.",
+          "A documentação Supabase alerta que criar chaves novas pode deixar as chaves legadas válidas; a ação de desativar a chave antiga é separada. Também pode haver mais de um ambiente ou consumer usando um mesmo identificador. A conclusão registra quem confirmou, quando, que teste foi feito e qual fonte mostra a revogação, sem incluir o segredo.",
+          "Se a verificação falhar, registre mensagem sem token, ambiente, horário e deployment. Confira primeiro escopo/ambiente/consumidor e estado da credencial no emissor. Para uma manutenção planejada, a chave anterior pode permanecer ativa apenas enquanto ainda não há suspeita de exposição e a documentação permite isso; diante de comprometimento, não restaure a chave antiga para contornar a falha."
+        ],
+        "terms": [
+          { "term": "Evidência", "meaning": "Registro observável que sustenta uma afirmação específica, como um teste aprovado ou um evento de revogação." },
+          { "term": "Rollback", "meaning": "Retorno controlado a uma versão conhecida, sem reintroduzir uma credencial comprometida." },
+          { "term": "Least privilege", "meaning": "Princípio do menor privilégio: conceder apenas o acesso necessário ao consumidor." }
+        ]
+      }
+    ],
+    "mistakes": [
+      "Achar que remover um segredo do arquivo ou do commit mais recente torna inválida a credencial já exposta.",
+      "Tratar toda chave visível como segredo ou, no sentido oposto, colocar uma chave de servidor no navegador por confiar em um prefixo desconhecido.",
+      "Criar uma chave Supabase nova e presumir que `service_role` antigo foi revogado automaticamente.",
+      "Atualizar apenas Production e esquecer Preview, Development, CI, jobs ou outros projetos que consomem a mesma variável.",
+      "Manter ativa uma chave suspeita durante um incidente apenas para evitar uma interrupção, ou reutilizá-la como rollback."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: um identificador `sb_secret_<ficticio>` aparece em um commit de exemplo. Antes de qualquer ação, classifique a credencial, diga que evidência o commit oferece, o que ainda não prova e qual deve ser a primeira medida de contenção.",
+        "expected": "O aluno classifica o rótulo como secret key de backend com acesso elevado e considera o segredo comprometido. O commit prova que um valor com aparência de credencial foi versionado, mas não prova uso indevido. A resposta inicial coordena revogação no emissor, preserva metadados sem copiar o valor e mapeia consumidores.",
+        "criteria": ["Distingue secret key de publishable key e menciona o limite de RLS.", "Separa fato observado de uso indevido ainda não comprovado.", "Prioriza revogação/containment sem republicar o valor.", "Registra apenas identificadores e metadados não secretos."],
+        "solution": "Classifique `sb_secret_<ficticio>` como credencial privada de servidor e de autoridade elevada. O commit demonstra exposição do marcador, não que alguém chamou a API. Avise o responsável, revogue a credencial real no emissor em procedimento privado, inventarie consumidores e ambientes e registre commit/horário sem adicionar o valor à evidência.",
+        "explanation": "Classificação e escopo orientam a primeira ação; uma evidência de exposição não deve ser confundida com prova de abuso.",
+        "hints": ["A chave é para o navegador ou para código controlado?", "RLS protege pedidos que usam uma chave com bypass?", "Você precisa reproduzir a exposição copiando o segredo?"]
+      },
+      {
+        "prompt": "Alterar: no cenário fictício, uma secret key Clerk precisa de rotação planejada e o provedor permite duas chaves simultâneas. Altere a lista inicial de passos para incluir todos os consumidores, ambientes, uma verificação funcional e uma condição objetiva para revogar a anterior.",
+        "expected": "O plano cria a nova chave, atualiza todos os consumidores e ambientes, publica os deployments aplicáveis, verifica os fluxos atendidos pela chave e confirma uso recente da nova; então revoga a antiga e confirma que ela não é mais aceita. Valores não aparecem no roteiro.",
+        "criteria": ["Inclui Preview/Development/Production e CI ou documenta por que não usam a credencial.", "Não revoga a antiga antes de migrar todos os consumidores em uma rotação planejada compatível.", "Usa um teste que exercita o caminho que consome a credencial.", "Confirma a revogação de forma independente do sucesso da nova."],
+        "solution": "1) Inventariar usos autorizados e ambientes; 2) criar a nova chave no provedor; 3) substituir o valor nos ambientes identificados; 4) implantar cada consumidor afetado; 5) testar o fluxo de Backend API e revisar o último uso; 6) apagar/revogar a antiga no emissor; 7) registrar hora, pessoa, teste e confirmação sem registrar nenhuma chave.",
+        "explanation": "Rotação planejada e resposta a comprometimento têm prioridades diferentes. A sobreposição é apropriada somente quando não há suspeita de exposição e o provedor suporta esse processo.",
+        "hints": ["Onde o sistema guarda cada cópia da variável?", "A página carregou, mas exercitou uma rota que usa a secret key?", "Qual evento confirma que a antiga deixou de autorizar pedidos?"]
+      },
+      {
+        "prompt": "Construir: preencha uma ficha fictícia de inventário para `CREDENCIAL_DEMO_API` com finalidade, tipo, serviço, responsável, consumidor, ambientes, privilégio, data de revisão, procedimento de rotação/revogação, teste positivo/negativo e evidência esperada. Use marcadores, nunca um valor real.",
+        "expected": "A ficha identifica propósito e escopo, separa quem emite de quem usa, lista todos os ambientes conhecidos, descreve rotação e revogação específicas do emissor e define teste positivo da substituta e rejeição da antiga. Campos sem evidência ficam como pendentes.",
+        "criteria": ["Não contém valor bruto, token, senha ou dado pessoal.", "Lista proprietário, consumers, ambientes e permissões mínimas.", "Define ações de rotação planejada e de exposição suspeita separadamente.", "Inclui evidência e itens que ainda exigem confirmação no provedor."],
+        "solution": "Nome: `CREDENCIAL_DEMO_API`; finalidade: `<ação permitida>`; emissor: `<serviço>`; responsável: `<papel>`; consumidor(es): `<processo>`; ambientes: `<local/Preview/Production/CI>`; privilégio: `<mínimo necessário>`; revisada em: `<data>`; última rotação: `<data ou pendente>`; em rotação: `<sequência oficial>`; em exposição: `<revogar no emissor, conter e substituir>`; teste novo: `<fluxo controlado>`; teste antigo: `<recusa confirmada>`; evidência: `<evento/registro sem valor>`.",
+        "explanation": "Metadados permitem encontrar o ponto de uso sem expor o próprio segredo e reduzem o risco de esquecer um consumer.",
+        "hints": ["A credencial tem um nome que revela o consumidor?", "Há algum ambiente que não consta do inventário?", "Como você provaria a revogação sem colar a chave?"]
+      },
+      {
+        "prompt": "Investigar erro: a equipe criou uma chave Supabase `sb_secret_<nova-ficticia>`, atualizou Preview e declarou a rotação concluída, mas uma automação antiga ainda usa `service_role` e nenhum evento de revogação foi observado. Registre esperado, observado, hipótese e próximos testes antes de fechar a mudança.",
+        "expected": "A análise identifica que a chave nova não desativa automaticamente a chave legada; a declaração de conclusão não é sustentada sem identificar a automação, atualizar o consumer, confirmar ambientes e observar a revogação separada no emissor. Não presume uso indevido nem executa uma alteração remota.",
+        "criteria": ["Distingue adição de chave nova de revogação da antiga.", "Localiza o consumer que ainda usa a chave antiga.", "Define teste funcional e evidência de rejeição antiga.", "Marca o estado remoto como não verificado e não expõe credenciais."],
+        "solution": "Esperado: todos os consumers usam a nova credencial e a antiga está revogada. Observado: Preview mudou, uma automação usa `service_role` e falta evento de revogação. Hipótese: migração incompleta; não prova que a automação foi executada ou abusada. Em procedimento autorizado, inventariar e migrar a automação, implantar/testar e então usar a ação específica do emissor para desativar a chave legada; registrar a evidência sem valor de segredo.",
+        "explanation": "Em serviços com chaves simultâneas, emitir outra credencial pode ser uma etapa de migração, não a desativação automática do token antigo.",
+        "hints": ["O que o painel confirma: criação, uso ou revogação?", "Preview é o único consumidor listado?", "Qual página oficial descreve o ciclo da chave legada?"]
+      },
+      {
+        "prompt": "Mudança inesperada: no meio de uma rotação, o novo deployment falha e o provedor não permite manter duas chaves ativas. Faça um plano para os dois casos — manutenção planejada sem exposição e suspeita de comprometimento — e indique que comportamento nunca deve ser usado como rollback.",
+        "expected": "Sem suspeita, a equipe pode pausar a troca e manter a chave antiga enquanto corrige o novo consumer, se a política e o emissor permitirem. Com suspeita, deve revogar/conter a antiga e aceitar uma interrupção limitada ou usar alternativa segura. Em nenhum caso deve reativar/reimplantar a credencial comprometida para restaurar disponibilidade.",
+        "criteria": ["Separa a manutenção planejada do incidente suspeito.", "Inclui comunicação/impacto e alternativa segura de recuperação.", "Não deixa uma chave suspeita ativa por conveniência.", "Não reintroduz credencial comprometida no rollback."],
+        "solution": "Na manutenção sem exposição: interromper o rollout, manter a chave antiga válida apenas se o provedor/política permitir, corrigir a nova configuração, repetir testes e revogar depois. Na exposição suspeita: conter, revogar a chave antiga, notificar o responsável e recuperar com chave substituta, deployment seguro ou indisponibilidade controlada. Nunca restaurar a chave comprometida.",
+        "explanation": "Disponibilidade e contenção podem entrar em conflito. O plano depende da evidência e do emissor, e não deve ampliar o tempo de uso de uma credencial suspeita.",
+        "hints": ["Existe evidência de exposição ou só uma falha de implantação?", "Quem consegue decidir a janela e comunicar impacto?", "Que rollback usa uma credencial diferente e previamente verificada?"]
+      }
+    ],
+    "quiz": [
+      { "question": "Criar uma chave Supabase nova faz a chave `service_role` legada deixar de funcionar?", "options": ["Sim, a criação revoga automaticamente todas as chaves antigas.", "Não necessariamente; a documentação descreve a desativação da chave antiga como uma ação separada.", "Sim, mas só quando a API não está em uso."], "correctIndex": 1, "explanation": "A criação e a revogação são eventos distintos; confirme no emissor o status da chave antiga." },
+      { "question": "O que fazer quando uma credencial privilegiada é suspeita de exposição?", "options": ["Apagar só a linha do repositório e esperar o próximo deploy.", "Conter e revogar no sistema emissor, mapear consumers e substituir a credencial sem publicar o valor.", "Manter a antiga ativa até toda equipe terminar a documentação."], "correctIndex": 1, "explanation": "A chave pode continuar válida fora do repositório; contenção precisa atuar no emissor." },
+      { "question": "Qual sequência descreve uma rotação planejada quando o provedor aceita sobreposição?", "options": ["Criar nova, atualizar/implantar consumers, verificar, revogar antiga e confirmar rejeição.", "Revogar antiga, remover do código e presumir que todas as cópias mudaram.", "Criar nova e nunca revisar usos ou revogar a antiga."], "correctIndex": 0, "explanation": "A sequência reduz falhas de continuidade sem esquecer a invalidação final." },
+      { "question": "Que prova sustenta melhor que a rotação foi concluída?", "options": ["Um deployment está verde.", "A nova credencial funciona no fluxo esperado e o emissor confirma que a antiga foi revogada.", "A chave antiga não aparece na busca do arquivo atual."], "correctIndex": 1, "explanation": "Sucesso do código e rejeição da credencial antiga são afirmações diferentes e exigem evidências próprias." }
+    ],
+    "summary": [
+      "Classifique cada credencial pelo consumidor e privilégio; prefixo público não substitui autorização e segredo de servidor não vai ao cliente.",
+      "Inventarie propósito, responsável, consumidores, ambientes, privilégios e procedimento de revogação sem guardar o valor na documentação.",
+      "Rotação planejada pode usar sobreposição quando o emissor a suporta; exposição suspeita prioriza contenção e revogação.",
+      "Atualizar variáveis exige localizar e implantar todos os consumidores/ambientes; deployments antigos podem manter configuração anterior.",
+      "Criar uma chave nova não prova revogação da antiga; verifique fluxo novo, rejeição antiga e registro do emissor."
+    ]
+  },
+  "delivery-audit-response": {
+    "prerequisites": "Concluir `delivery-threat-model`, `delivery-supply-chain` e `delivery-secret-lifecycle`; saber distinguir evidência observada de hipótese. A prática usa um conjunto de eventos fictícios e não exige conta, painel, plano pago ou domínio.",
+    "setup": "Leia os eventos redigidos no exemplo desta aula e marque horário, ator, ação, recurso e resultado. Use nomes fictícios como `member_demo_2`, `project_demo` e `CREDENCIAL_DEMO_API`; não abra os logs de uma conta real nem procure tokens. O resultado esperado é uma linha do tempo com fatos, lacunas e perguntas de verificação, mais um checklist inicial de resposta. Não há comandos ou serviços para iniciar. Se não tiver computador, escreva a análise no papel; não é necessário inspecionar o Preview.",
+    "why": "Uma alteração administrativa, um pedido de autenticação e o uso de uma chave aparecem em registros diferentes. Um audit log (trilha de auditoria) pode ajudar a atribuir quem fez o quê e quando, mas cobertura, retenção, plano e permissões variam entre provedores. Uma resposta segura precisa proteger os próprios logs, conter a credencial e registrar o que foi verificado sem vazar mais dados. Os links oficiais ao final são aprofundamento opcional: conceitos, exemplo redigido, linha do tempo, soluções e critérios desta aula estão explicados aqui, sem exigir conta, painel ou leitura externa.",
+    "example": {
+      "language": "text",
+      "code": "LINHA DO TEMPO FICTÍCIA — campos reduzidos e sem segredos\n2026-10-20T14:05Z | actor=member_demo_2 | action=secret_metadata.viewed | resource=CREDENCIAL_DEMO_API | result=success\n2026-10-20T14:19Z | actor=member_demo_2 | action=environment.updated | resource=Preview | result=success\n2026-10-20T14:31Z | actor=deployment_demo_7 | action=deployment.completed | resource=project_demo | result=success\n2026-10-20T14:42Z | actor=unknown_demo | action=authentication.failed | resource=service_demo | result=denied\n\nCampo ausente: confirmação de revogação no emissor\nNão inferir: uso indevido, leitura de dados ou ausência de outro evento\n\nChecklist inicial: preservar registros redigidos → avisar responsável\n→ conter/revogar credencial suspeita → substituir consumers → verificar\n→ avaliar escopo e registrar acompanhamento",
+      "expected": "A análise identifica ações observadas em sequência, sinaliza uma tentativa negada e percebe que falta evidência sobre a revogação. Ela não conclui que o ator desconhecido usou a credencial nem que todos os eventos estão presentes. O relatório preserva hora e identificadores fictícios e nunca contém token, segredo ou dados pessoais.",
+      "explanation": [
+        "Trilha de auditoria é um registro de eventos administrativos ou de acesso. Um log operacional pode descrever erros e pedidos de uma aplicação; são fontes complementares, com cobertura diferente. Antes de investigar, confira o que cada sistema registra, quem pode ler os dados e por quanto tempo ficam disponíveis.",
+        "Para uma linha do tempo útil, procure horário e fuso, ator ou identidade de serviço, ação, recurso, ambiente, origem disponível, resultado e um identificador de correlação. Use o mínimo necessário. Não inclua valores de credenciais, tokens de sessão, senhas, conteúdo de request ou dados pessoais sem necessidade e autorização.",
+        "Um evento de configuração alterada confirma que uma alteração foi registrada, mas não necessariamente que um deployment novo recebeu a variável ou que a chave antiga foi revogada. Uma falha de autenticação confirma uma recusa registrada; sem outros eventos, não prova que não houve sucesso por outra rota ou que a cobertura é completa.",
+        "A resposta inicial ao incidente organiza contenção e investigação: preservar a evidência com acesso controlado, avisar o responsável, limitar o uso da credencial, revogar no emissor, atualizar consumidores e verificar. Depois se monitora, recupera o serviço e registra o aprendizado. A sequência precisa ser adaptada à urgência e às regras da organização.",
+        "Vercel distingue Activity Log de Audit Logs, e os Audit Logs podem depender do plano e do papel do membro. Clerk documenta Admin Logs e eventos de gestão de chaves. Essas fontes ajudam a conhecer as possibilidades do produto; não provam que um painel ou evento está disponível na sua conta."
+      ]
+    },
+    "guided": [
+      { "instruction": "Na tabela fictícia, marque ator, ação, recurso, horário e resultado. Em outra coluna, escreva uma conclusão que a tabela ainda não permite.", "result": "Os campos observados são copiados com referência à fonte; uso indevido e ausência de outros eventos permanecem não comprovados." },
+      { "instruction": "Compare log de auditoria, log de aplicação e registro de uso de chave no exemplo. Anote que perguntas cada um poderia responder e qual lacuna permanece.", "result": "Eventos administrativos, pedidos/erros da aplicação e uso da credencial são registros distintos. A confirmação de revogação ainda depende do emissor." },
+      { "instruction": "Diante de uma credencial exposta no cenário, ordene a resposta inicial e escolha o que deve ficar fora de um issue público.", "result": "Preserve referências redigidas, avise o responsável, contenha/revogue, atualize consumidores, verifique e acompanhe. Logs brutos, segredo e dados pessoais ficam em evidência restrita, não no issue." }
+    ],
+    "sections": [
+      {
+        "title": "Leia registros como evidência limitada",
+        "paragraphs": [
+          "Registros de auditoria costumam mostrar atividades de membros e automações: criação de credencial, alteração de ambiente, mudança de papel, início de deployment ou configuração. Logs de aplicação podem mostrar respostas, erros e recusas de autenticação. São camadas diferentes e podem não registrar o mesmo evento.",
+          "Organize um evento por horário, ator, ação, recurso, ambiente e resultado. Se estiver disponível, use origem e request ID para relacionar registros sem expor conteúdo. Compare eventos de emissão/alteração, deployment, uso ou autenticação e revogação; marque explicitamente quais sistemas não forneceram registro ou cuja retenção não foi conferida.",
+          "Não confunda ausência de linha com ausência de atividade. O provedor pode não registrar uso, o plano pode limitar exportação, a retenção pode ter expirado ou a pessoa pode não ter permissão para ver o log. Registre o limite da fonte e procure evidência complementar autorizada antes de afirmar que algo não ocorreu."
+        ],
+        "terms": [
+          { "term": "Trilha de auditoria", "meaning": "Registro cronológico de ações relevantes, com contexto suficiente para revisar autoria e resultado." },
+          { "term": "Correlação", "meaning": "Relação entre eventos de sistemas diferentes por horário e identificadores comuns, sem assumir que a ligação está provada." },
+          { "term": "ID da requisição", "meaning": "Identificador não secreto que um serviço pode anexar a um pedido para procurar eventos relacionados; sua presença não prova quem agiu." },
+          { "term": "Retenção", "meaning": "Período durante o qual os registros ficam disponíveis segundo produto, configuração e política aplicável." }
+        ]
+      },
+      {
+        "title": "Proteja os logs durante a análise",
+        "paragraphs": [
+          "Logs também podem conter dados sensíveis e ser alvo de alteração ou exclusão. Restrinja a leitura às pessoas que respondem ao caso, use uma cópia redigida para o exercício e registre quem exportou ou compartilhou material. Não copie um segredo encontrado em log para chat, issue, e-mail ou outro sistema de observabilidade.",
+          "Não grave valores de tokens, senhas, chaves privadas, connection strings ou identificadores de sessão. Para relacionar eventos, prefira o nome lógico da credencial, um ID não secreto, um hash aprovado pela organização ou uma referência ao cofre de evidências. Logs devem ser protegidos contra acesso indevido e alteração, com política de retenção que atenda finalidade e regras aplicáveis.",
+          "Os nomes e capacidades de painéis variam. A documentação atual do Vercel informa diferença entre Activity Log e Audit Logs, incluindo restrições por plano/acesso; a do Clerk lista ações administrativas de chaves. Antes de uma análise real, confirme plano, escopo do log, retenção e permissões no material oficial e com o responsável da conta. Esta aula não afirma que o projeto atual tem esses logs habilitados."
+        ],
+        "terms": [
+          { "term": "Minimização", "meaning": "Registrar e compartilhar apenas os dados necessários para a finalidade da investigação." },
+          { "term": "Integridade do log", "meaning": "Propriedade de manter o registro protegido contra alteração, remoção ou inserção sem autorização." },
+          { "term": "Redação", "meaning": "Remoção ou mascaramento de valores e dados que não precisam circular na cópia de trabalho." }
+        ]
+      },
+      {
+        "title": "Execute a resposta inicial com passos rastreáveis",
+        "paragraphs": [
+          "Quando houver suspeita de credencial exposta, avise o responsável pelo serviço e siga o canal de resposta da organização. Registre quando a suspeita foi recebida, que sistema pode estar envolvido e quais decisões precisam de aprovação. Não investigue em conta alheia nem espere um relatório perfeito antes de limitar uma credencial claramente exposta.",
+          "Preserve a referência da evidência e limite quem pode acessá-la. Depois contenha o acesso: revogue ou desative a credencial no emissor, reduza o escopo da conta relacionada se necessário e atualize os consumidores com uma nova credencial. Uma equipe pode aceitar interrupção limitada para evitar manter ativa uma chave comprometida.",
+          "Verifique que o novo fluxo funciona, que a credencial antiga é recusada e que os ambientes afetados foram atualizados. Revise registros disponíveis antes e depois da contenção em busca de atividade não explicada; classifique cada linha como fato, interpretação ou hipótese. Recupere o serviço com configuração segura, acompanhe sinais relevantes e faça revisão posterior de causa e controles.",
+          "NIST SP 800-61 Rev. 3 enquadra resposta a incidentes junto à gestão contínua de risco e ao CSF 2.0. Este roteiro é uma introdução educacional para um cenário pequeno, não um plano completo de forense, obrigação legal, notificação ou resposta profissional. Escale dúvidas de impacto, pessoas afetadas ou comunicação para a organização e especialistas responsáveis."
+        ],
+        "terms": [
+          { "term": "Incidente", "meaning": "Ocorrência que afeta ou ameaça confidencialidade, integridade, disponibilidade ou regras autorizadas de um sistema." },
+          { "term": "Contenção", "meaning": "Medida para limitar o uso, o alcance ou a duração do evento enquanto se investiga." },
+          { "term": "Recuperação", "meaning": "Retorno controlado do serviço após remover a causa imediata e verificar os controles relevantes." }
+        ]
+      },
+      {
+        "title": "Feche a análise sem extrapolar conclusões",
+        "paragraphs": [
+          "Uma linha do tempo deve incluir fonte e fuso de cada horário, identificador redigido, ação observada, interpretação e lacuna. Confirme diferenças entre hora local e UTC e possíveis atrasos de ingestão. Se uma ação foi executada por uma automação, procure o dono do job e o evento que a iniciou; o nome do serviço não identifica automaticamente a pessoa que apertou o botão.",
+          "O relatório inicial responde: o que sabemos, que segredo/recurso pode estar envolvido, o que foi contido, que consumidores foram atualizados, quais testes passaram ou falharam, que atividade permanece sem explicação e quem acompanha. Mantenha valores secretos fora do relatório. A conclusão informa limites do log e não transforma ausência de registro em prova de ausência de impacto.",
+          "Retenção, acesso e notificação podem depender de política interna, contrato ou lei. Não invente prazo nem conclua obrigações legais pela interface de um provedor. Guarde o material apenas pelo período e no local aprovados pela organização; leve perguntas de privacidade ou comunicação a quem responde por esse domínio."
+        ],
+        "terms": [
+          { "term": "Fato observado", "meaning": "Informação diretamente sustentada por uma fonte consultada e identificada." },
+          { "term": "Hipótese", "meaning": "Explicação possível que ainda exige evidência adicional." },
+          { "term": "UTC", "meaning": "Tempo Universal Coordenado, referência comum para comparar horários registrados por sistemas em fusos diferentes." },
+          { "term": "Lacuna de evidência", "meaning": "Pergunta que a fonte e os registros disponíveis ainda não respondem." }
+        ]
+      }
+    ],
+    "mistakes": [
+      "Tratar o Activity Log, Audit Log, log de aplicação e monitoramento como se registrassem os mesmos eventos.",
+      "Interpretar uma falha registrada como prova de que nenhum uso foi bem-sucedido em outro momento ou sistema.",
+      "Copiar um token ou valor de ambiente para facilitar a busca, ampliando a exposição durante a resposta.",
+      "Apagar a evidência original antes de preservá-la com acesso controlado e seguir a política de integridade.",
+      "Declarar que a ausência de evento prova ausência de atividade sem checar escopo, retenção, permissões e cobertura do provedor."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: observe a linha do tempo fictícia. Antes de ler a solução, diga qual fato ela sustenta sobre `member_demo_2`, o que a tentativa negada de `unknown_demo` não prova e qual evidência falta para confirmar a revogação da credencial.",
+        "expected": "A linha sustenta que ações administrativas fictícias foram registradas para um ator e horários; a autenticação negada não prova uso bem-sucedido nem que não houve atividade em outra fonte. Falta um evento/estado do emissor que confirme revogação da credencial antiga.",
+        "criteria": ["Cita horário/fonte e ação observada como fato.", "Não infere invasão ou uso indevido a partir de uma tentativa negada.", "Identifica a confirmação de revogação como lacuna.", "Não presume que a sequência é completa."],
+        "solution": "Fato: o conjunto fictício registra visualização de metadados por `member_demo_2` e atualização de ambiente Preview em seguida. A linha de autenticação de `unknown_demo` informa que aquele pedido foi negado, não que houve uso indevido ou que os demais sistemas não tiveram sucesso. A evidência de revogação no emissor está ausente.",
+        "explanation": "Uma conclusão deve corresponder ao campo que a fonte realmente registra; interpretação e lacuna ficam separadas.",
+        "hints": ["Qual ação e ator aparecem literalmente na primeira linha?", "Qual foi o resultado da linha de 14:42Z?", "A linha de deployment confirma a revogação no provedor?" ]
+      },
+      {
+        "prompt": "Alterar: a linha do tempo passa a incluir `project.env_variable.updated` sem nome de ator, mas há request ID e horário. Atualize a investigação para levantar uma hipótese, localizar a próxima fonte de correlação e preservar o evento sem tentar adivinhar a pessoa.",
+        "expected": "A análise marca ator como desconhecido naquele registro, usa request ID/horário para buscar em fonte autorizada, compara fuso e permissões e mantém a hipótese separada do fato. Não atribui a ação a uma pessoa pela proximidade temporal.",
+        "criteria": ["Preserva o evento original e seu request ID redigido.", "Não inventa ator nem associa identidade por coincidência de horário.", "Propõe consulta autorizada à fonte complementar apropriada.", "Registra fonte, horário/fuso e resultado da correlação."],
+        "solution": "Fato: a alteração de variável aparece no request ID fictício e não traz ator. Hipótese: outra fonte pode registrar a identidade que iniciou o pedido. Próxima ação: consultar, com acesso autorizado, o audit log do provedor e o registro do deployment pelo request ID e horário UTC, registrando resultado positivo ou ausência de correspondência sem expor conteúdo da variável.",
+        "explanation": "Identificadores de correlação ajudam a ligar registros, mas a ligação deve ser observada e documentada.",
+        "hints": ["Qual campo existe mesmo sem nome de ator?", "Qual sistema executou a atualização?", "Que fonte precisa confirmar a identidade em vez de uma suposição?" ]
+      },
+      {
+        "prompt": "Construir: usando apenas o conjunto fictício, escreva uma ficha inicial de incidente com resumo, cronologia UTC, fatos, hipóteses, lacunas, contenção, consumidores/ambientes para revisar, verificações da chave nova e antiga, responsável e próximo horário de atualização. Inclua uma regra para nunca colocar valores secretos no relatório.",
+        "expected": "A ficha separa fato/hipótese/lacuna, indica o que já foi contido e o que continua pendente, referencia evidências redigidas, atribui responsável e próximo checkpoint e lista testes de aceite para chave nova e antiga sem revelar valor.",
+        "criteria": ["Inclui cronologia com UTC e referência a fontes fictícias.", "Separa evidência, interpretação e informação pendente.", "Registra responsável, próximo passo e estado de contenção.", "Não inclui token, segredo, senha, conteúdo pessoal nem valor de variável."],
+        "solution": "Resumo: possível exposição de credencial fictícia; impacto ainda não confirmado. Fatos: horários/eventos da tabela. Hipóteses: uso fora do fluxo esperado, ainda sem prova. Lacunas: escopo de log e revogação no emissor. Contenção: estado `<confirmar com responsável>`. Próximos passos: revisar todos os consumidores/ambientes, substituir a chave, testar fluxo autorizado com a nova, confirmar recusa da antiga, verificar logs disponíveis. Responsável: `<papel>`; próximo checkpoint: `<UTC>`. Anexos: referências redigidas, nunca valores.",
+        "explanation": "Uma ficha curta torna decisões e pendências compartilháveis sem expor a própria credencial.",
+        "hints": ["Quais informações da tabela são fatos e quais são apenas hipóteses?", "O que significa preservar evidência sem copiar o token?", "Que duas verificações mostram a mudança de credencial?" ]
+      },
+      {
+        "prompt": "Investigar erro: o relatório mostra três falhas de autenticação e nenhuma linha de sucesso. Alguém concluiu que a credencial nunca foi usada. Avalie a conclusão, liste no mínimo três limites que precisam ser verificados e indique uma ação imediata que não dependa de conhecer todo o histórico.",
+        "expected": "A conclusão não é sustentada: pode haver fonte, intervalo, retenção, consumer ou nível de logging ausente. Deve-se verificar escopo/horário/permissões/cobertura e correlacionar com provedor/deployment; se a credencial está exposta, conter/revogar sem esperar completar a investigação.",
+        "criteria": ["Explica que ausência de sucesso visível não prova ausência de uso.", "Lista pelo menos três limites concretos da fonte.", "Separa análise histórica da contenção imediata.", "Não conclui impacto nem inocuidade sem evidência."],
+        "solution": "Verifique: (1) se o log registra uso de credencial ou apenas autenticação; (2) intervalo coberto e retenção; (3) ambientes, aplicações e projetos incluídos; (4) papel e filtros da consulta; (5) atraso/integração com outro log. Enquanto isso, se a chave foi exposta, notifique o responsável e contenha/revogue no emissor seguindo o procedimento, preservando a referência ao evento.",
+        "explanation": "A ausência de dados em uma fonte é limitada pela cobertura da própria fonte e não deve atrasar uma contenção urgente.",
+        "hints": ["O que a fonte registra exatamente?", "Todos os ambientes e o período aparecem?", "A exposição está confirmada mesmo sem evidência de uso?" ]
+      },
+      {
+        "prompt": "Mudança inesperada: uma pessoa pede para publicar em um issue aberto a exportação bruta de logs para acelerar a resposta. Faça a alteração segura do plano: descreva quem recebe a evidência completa, o que pode circular no issue, como registrar decisões e a quem escalar dúvidas de comunicação/impacto.",
+        "expected": "A evidência completa fica em local aprovado e com acesso restrito; no issue público circula apenas um resumo redigido sem segredo, sessão ou dados pessoais e com referência interna segura. A equipe registra autor/horário/decisão e escala avaliação de impacto e notificações às pessoas responsáveis, sem fazer conclusão jurídica.",
+        "criteria": ["Não publica log bruto nem dados de autenticação ou pessoais.", "Preserva a evidência original com controle de acesso e integridade.", "Define resumo minimizado e trilha de decisões.", "Escala comunicação e avaliação legal/privacidade sem inventar obrigação."],
+        "solution": "Recusar a exportação bruta no issue aberto. Guardar a cópia original no repositório de evidências aprovado com acesso restrito e registrar quem a preservou. No issue, informar apenas identificador do incidente, estado geral de contenção, próximo passo e responsável, usando referência interna não pública. Encaminhar decisões sobre impacto, titulares ou notificação aos papéis de segurança/privacidade/jurídico apropriados.",
+        "explanation": "A velocidade da resposta não justifica ampliar a exposição dos próprios logs nem emitir conclusão fora da autoridade do mantenedor.",
+        "hints": ["Quem precisa consultar o material completo?", "Qual é o nível de acesso do issue?", "Quem pode avaliar impacto e obrigações de comunicação?" ]
+      }
+    ],
+    "quiz": [
+      { "question": "O que uma tentativa de autenticação negada prova?", "options": ["Que aquela tentativa registrada foi recusada, sem provar se houve sucesso em outra fonte ou horário.", "Que a credencial nunca foi usada.", "Que houve invasão confirmada."], "correctIndex": 0, "explanation": "A evidência sustenta apenas o evento observado; cobertura e outras fontes precisam ser avaliadas." },
+      { "question": "Qual dado deve ficar fora de logs e relatórios de exercício?", "options": ["Um request ID fictício.", "O valor bruto do token ou da chave privada.", "O horário UTC do evento."], "correctIndex": 1, "explanation": "Credenciais e identificadores de sessão podem ser usados para acesso e não devem ser repetidos na investigação." },
+      { "question": "Qual é uma resposta inicial adequada a segredo comprovadamente exposto?", "options": ["Publicar o valor no issue para pedir confirmação.", "Preservar referências redigidas, avisar o responsável e conter/revogar no emissor.", "Aguardar todos os logs históricos antes de limitar a chave."], "correctIndex": 1, "explanation": "Contenção e investigação começam em paralelo; os logs não devem ampliar a exposição." },
+      { "question": "Como interpretar uma lacuna no audit log?", "options": ["Como prova de que nenhuma ação ocorreu.", "Como motivo para verificar retenção, escopo, permissões e cobertura antes de concluir.", "Como prova de que a pessoa autora apagou o evento."], "correctIndex": 1, "explanation": "Ausência de evento pode ter várias causas e precisa ser tratada como uma lacuna de evidência." }
+    ],
+    "summary": [
+      "Audit logs, logs de aplicação e registros de uso respondem perguntas diferentes e têm cobertura e retenção próprias.",
+      "Linha do tempo registra ator, ação, recurso, ambiente, horário, resultado e correlação, sem guardar credenciais ou dados desnecessários.",
+      "Ausência de evento não prova ausência de atividade; declare fonte, intervalo, permissões e lacunas.",
+      "A resposta inicial preserva evidência com acesso restrito, avisa o responsável, contém a chave e verifica consumidores e efeitos.",
+      "Recuperação confirma chave nova, rejeição da antiga e funcionamento dos fluxos; impacto e obrigações devem ser escalados às pessoas responsáveis."
+    ]
+  },
   "delivery-redis-foundations": {
     "prerequisites": "Concluir `setup-docker`, `setup-node`, `db-postgres` e `delivery-api-abuse`; conhecer banco relacional, API e execução de containers. A decisão arquitetural usa o PostgreSQL/Supabase existente como fonte de verdade.",
     "setup": "No editor, leia `labs/redis-fundamentals/README.md` e `compose.yaml`. No terminal, abra a pasta `labs/redis-fundamentals`, execute `docker compose config` e depois `docker compose up -d --wait`; com Compose standalone, use `docker-compose`. A saída esperada inclui um serviço `redis` saudável publicado em 127.0.0.1:56379. Execute `docker compose exec -T redis redis-cli PING`; a resposta esperada é `PONG`. A primeira execução baixa a imagem oficial. Não usa rede pública de dados, domínio, Preview ou credenciais reais. Pare com `docker compose down`; para retomar, repita `up -d --wait`. Se Docker não estiver disponível, desenhe o fluxo sem instalar nada.",
@@ -3735,6 +4017,16 @@ Object.assign(LESSON_GUIDES, {
       prompt: "Uma dependência direta parece saudável, mas o lockfile mostra muitos pacotes transitivos. Faça triagem de necessidade, origem, integridade registrada, manutenção/licença, avisos conhecidos, CI e plano de atualização sem instalar nem auditar automaticamente.",
       expected: "A triagem separa campos observados no manifesto/lockfile de consultas atuais pendentes, verifica origem e licença, avalia a árvore transitiva, confere escopo de CI e exige responsável/testes/rollback; não chama lockfile ou scanner de garantia de segurança.",
       hint: "Marque cada afirmação como observada no repositório ou pendente de verificação atual."
+    },
+    "delivery-secret-lifecycle": {
+      prompt: "Uma variável de servidor chamada `SUPABASE_SECRET_KEY` foi atualizada em Preview, mas a equipe não sabe se CI, Development e uma automação ainda usam a chave antiga. Monte uma verificação de transferência que inventarie consumers e ambientes, confirme a chave nova e prove revogação, sem consultar nem imprimir valores.",
+      expected: "O plano identifica cada consumer/ambiente e responsável, consulta fontes autorizadas, diferencia atualização de configuração de revogação no emissor, exercita o fluxo e confirma rejeição da chave antiga antes de declarar conclusão. Qualquer item sem evidência fica pendente.",
+      hint: "Uma alteração de variável só alcança os deployments e consumers cobertos por ela; qual fonte prova que a chave foi invalidada?"
+    },
+    "delivery-audit-response": {
+      prompt: "Uma exportação fictícia tem eventos às 10:00Z e 10:12Z, mas nenhum evento de uso de chave. Escreva um relato com fatos observados, lacunas de cobertura, ação de contenção se o segredo foi exposto e a fonte autorizada que você consultaria em seguida; mantenha o token e dados pessoais fora do relato.",
+      expected: "O relato não interpreta a ausência como prova, verifica período/serviço/permissão/retenção, contém uma credencial exposta sem aguardar histórico completo, e relaciona cada próximo passo a uma fonte e responsável.",
+      hint: "Que tipo de evento aquela exportação realmente registra e que conclusão cabe a esse escopo?"
     },
     "delivery-redis-foundations": {
       prompt: "Uma proposta adiciona Redis para guardar progresso, cache e contadores. Faça um mapa separando fonte persistente, dados reconstruíveis, TTL, custo operacional e evidência necessária para justificar cada uso.",

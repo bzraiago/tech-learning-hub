@@ -5412,6 +5412,49 @@
             ]
           },
           {
+            "id": "delivery-secret-lifecycle",
+            "title": "Segredos: rotação, revogação e continuidade",
+            "minutes": 90,
+            "concept": "Classifique credenciais pelo uso e privilégio, inventarie consumidores e ambientes e diferencie rotação planejada de contenção urgente quando um segredo pode ter sido exposto.",
+            "objectives": [
+              "Distinguir credencial publicável, segredo de servidor e identidade autenticada usando exemplos Clerk e Supabase sem expor valores.",
+              "Montar inventário de propósito, emissor, consumidor, ambiente, privilégio, responsável e mecanismo de revogação.",
+              "Planejar rotação com todos os consumidores, deployments, verificação da chave nova e prova separada da revogação antiga.",
+              "Priorizar contenção e revogação após suspeita de exposição e evitar reintroduzir credencial comprometida em um rollback.",
+              "Separar evidência local/documental de uma alteração real em provedor, CI ou painel autenticado."
+            ],
+            "exercise": "Use a ficha de inventário e o cenário fictício para comparar manutenção planejada e segredo exposto. Não abra arquivos `.env`, copie credenciais nem altere serviço remoto.",
+            "code": "NOMES FICTÍCIOS — valores omitidos\nClerk: pk_test_<publica> / sk_test_<segredo>\nSupabase: sb_publishable_<publica> / sb_secret_<segredo>\n\nPlano sem exposição suspeita: criar nova → atualizar consumers/envs →\nimplantar → testar → revogar antiga → confirmar recusa.\n\nSuspeita de exposição: conter e revogar no emissor → substituir consumers →\nimplantar → testar nova e antiga → monitorar e registrar sem valor secreto.\n\nNão conclua rotação só porque o deployment ficou verde.",
+            "docs": [
+              { "kind": "doc", "title": "OWASP · Secrets Management Cheat Sheet", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html", "language": "EN" },
+              { "kind": "doc", "title": "Vercel · Rotating environment variables", "url": "https://vercel.com/docs/environment-variables/rotating-secrets", "language": "EN" },
+              { "kind": "doc", "title": "Clerk · Rotate your API keys", "url": "https://clerk.com/docs/guides/secure/rotate-api-keys", "language": "EN" },
+              { "kind": "doc", "title": "Supabase · API keys", "url": "https://supabase.com/docs/guides/getting-started/api-keys", "language": "EN" }
+            ]
+          },
+          {
+            "id": "delivery-audit-response",
+            "title": "Logs de auditoria e resposta inicial a incidente",
+            "minutes": 95,
+            "concept": "Investigue uma linha do tempo fictícia separando audit logs, logs de aplicação, fatos e lacunas; contenha uma credencial suspeita e proteja evidências sem registrar segredos ou exceder a autoridade do aluno.",
+            "objectives": [
+              "Diferenciar trilha de auditoria, log operacional e registro de uso de credencial por evento e finalidade.",
+              "Construir uma linha do tempo com ator, ação, recurso, horário, resultado e fonte, marcando limites de cobertura e retenção.",
+              "Descrever uma resposta inicial rastreável: preservar evidência com acesso controlado, avisar responsável, conter/revogar, atualizar consumidores e verificar recuperação.",
+              "Evitar registrar valores de segredos, tokens, sessões e dados pessoais em logs, issues ou relatórios.",
+              "Separar fatos, interpretações e hipóteses e escalar perguntas de impacto, comunicação ou obrigação às pessoas responsáveis."
+            ],
+            "exercise": "Analise a tabela redigida e complete uma ficha inicial de incidente. Não consulte a conta real, não publique logs e não conclua que a ausência de uma linha prova ausência de atividade.",
+            "code": "LINHA DO TEMPO FICTÍCIA — sem valores secretos\n14:05Z | ator member_demo_2 | metadados consultados | success\n14:19Z | ambiente Preview atualizado | success\n14:31Z | deployment_demo_7 concluído | success\n14:42Z | autenticação de unknown_demo | denied\n\nLacuna: confirmação de revogação no emissor.\nNão comprovado: uso indevido, leitura de dados ou ausência de outros eventos.\n\nPreservar referências redigidas → avisar responsável → conter/revogar →\natualizar consumers → validar chave nova e recusa da antiga → acompanhar.",
+            "docs": [
+              { "kind": "doc", "title": "NIST · SP 800-61 Rev. 3 Incident Response", "url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final", "language": "EN" },
+              { "kind": "doc", "title": "OWASP · Logging Cheat Sheet", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html", "language": "EN" },
+              { "kind": "doc", "title": "Vercel · Audit Logs", "url": "https://vercel.com/docs/audit-log", "language": "EN" },
+              { "kind": "doc", "title": "Clerk · Admin Logs", "url": "https://clerk.com/docs/guides/dashboard/logs/admin-logs", "language": "EN" },
+              { "kind": "doc", "title": "GitHub · Resolving alerts from secret scanning", "url": "https://docs.github.com/en/code-security/how-tos/manage-security-alerts/manage-secret-scanning-alerts/resolving-alerts", "language": "EN" }
+            ]
+          },
+          {
             "id": "delivery-redis-foundations",
             "title": "Redis: quando usar e como opera",
             "minutes": 70,

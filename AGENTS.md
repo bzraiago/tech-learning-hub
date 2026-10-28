@@ -139,7 +139,7 @@ Os scripts são clássicos e compartilham o mesmo escopo global, carregados na o
 
 Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workflow`, `quality`, `delivery`.
 
-> Os números atuais (9 trilhas, 28 módulos, 134 aulas, 547 exercícios, 418 questões, 24 projetos) foram conferidos no código em 28/10/2026. **Confira no código antes de citá-los** e atualize `contexto/ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
+> Os números atuais (9 trilhas, 28 módulos, 136 aulas, 557 exercícios, 426 questões, 24 projetos) foram conferidos no código em 28/10/2026. **Confira no código antes de citá-los** e atualize `contexto/ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
 
 ### 5.2 Persistência e compatibilidade (cuidado máximo)
 - O curso exige login Clerk antes de mostrar o conteúdo. O progresso persistente fica somente em `public.learning_state` no Supabase, protegido por RLS e vinculado ao ID Clerk. `state` permanece em memória durante a sessão. Ao trocar de conta, a interface aguarda a leitura da nova conta antes de aceitar edição.
@@ -261,7 +261,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 1. [x] **Etapa 0** de computador, arquivos, editor e terminal, disponível antes do primeiro exercício que dependa deles.
 2. [x] **Mapa de pré-requisitos** e instruções de instalação por sistema (Python, Git, Node.js + npm, Docker/WSL, PostgreSQL, MariaDB, Firebird, MongoDB/`mongosh`), seguindo o padrão 6.2.
 3. [x] **Resultado esperado visível** separado da solução em todos os exercícios; checkpoints distintos para *li / pratiquei / revisão / resolvi sozinho*.
-   - [x] Os 547 exercícios exibem resultado esperado e critérios específicos; o validador exige critérios nas aulas revisadas.
+   - [x] Os 557 exercícios exibem resultado esperado e critérios específicos; o validador exige critérios nas aulas revisadas.
    - [x] As aulas `prep-tools`, `prep-files`, `prep-workspace`, `prep-cycle`, `prep-errors`, as quatro instalações iniciais, `setup-docker`, `setup-docker-alternative`, `setup-postgresql`, as preparações opcionais de MariaDB, Firebird e MongoDB, `db-mariadb`, `db-firebird`, `db-mongo-crud`, `db-mongo-pipelines`, `db-nosql-models`, `db-performance`, `db-security`, `db-recovery`, `db-project`, `db-modeling`, `db-normalization`, `db-ddl-constraints`, `db-ddl-crud`, `db-select`, `db-aggregation`, `db-joins`, `db-subqueries-ctes`, `db-transactions`, `db-concurrency-boundaries`, `db-docker-basics`, `db-docker-compose`, `db-docker-operations`, `db-postgres` e `db-sqlite` iniciam os critérios específicos.
    - [x] As 13 aulas HTML/CSS contêm critérios nos 52 exercícios; 14 resultados foram revisados para que previsão, investigação e comparação não mostrem a conclusão antes da tentativa.
    - [x] As 14 aulas JavaScript contêm critérios nos 56 exercícios; 22 resultados foram revisados para preservar a previsão, investigação e diagnóstico antes da conclusão.
