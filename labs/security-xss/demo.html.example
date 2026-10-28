@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Laboratório local de saída segura</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { max-width: 52rem; margin: 0 auto; padding: 1.5rem; line-height: 1.55; color: #18212b; }
+    h1, h2 { line-height: 1.2; }
+    label, textarea, button { display: block; width: 100%; }
+    textarea { box-sizing: border-box; min-height: 7rem; margin: .5rem 0 1rem; padding: .75rem; }
+    button { margin: .5rem 0; padding: .75rem; text-align: left; cursor: pointer; }
+    button:focus-visible, textarea:focus-visible { outline: 3px solid #185abd; outline-offset: 2px; }
+    .panel { border: 1px solid #9aa5b1; border-radius: .5rem; margin-block: 1rem; padding: 1rem; overflow-wrap: anywhere; }
+    #signal { min-height: 1.5em; font-weight: 700; }
+    code { overflow-wrap: anywhere; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Saída segura de texto</h1>
+    <p>Este arquivo deve ser aberto apenas como cópia local. O exemplo não envia dados nem usa serviços.</p>
+
+    <label for="untrustedText">Mensagem fictícia não confiável</label>
+    <textarea id="untrustedText" spellcheck="false">&lt;img src="arquivo-inexistente.png" onerror="document.getElementById('signal').textContent='Evento local executado nesta demonstração.'"&gt;</textarea>
+
+    <button type="button" id="runUnsafe">Renderizar no exemplo vulnerável</button>
+    <button type="button" id="runSafe">Renderizar no exemplo corrigido</button>
+
+    <p id="signal" role="status" aria-live="polite">O evento ainda não foi executado.</p>
+
+    <section class="panel" aria-labelledby="unsafeHeading">
+      <h2 id="unsafeHeading">Saída com `innerHTML`</h2>
+      <div id="unsafeOutput">A saída aparecerá aqui.</div>
+    </section>
+
+    <section class="panel" aria-labelledby="safeHeading">
+      <h2 id="safeHeading">Saída com `textContent`</h2>
+      <div id="safeOutput">A saída aparecerá aqui.</div>
+    </section>
+
+    <details>
+      <summary>Ver o trecho de código</summary>
+      <pre><code>const nota = campo.value;
+vulneravel.innerHTML = nota;
+seguro.textContent = nota;</code></pre>
+    </details>
+  </main>
+
+  <script>
+    "use strict";
+
+    const campo = document.querySelector("#untrustedText");
+    const vulneravel = document.querySelector("#unsafeOutput");
+    const seguro = document.querySelector("#safeOutput");
+    const aviso = document.querySelector("#signal");
+
+    document.querySelector("#runUnsafe").addEventListener("click", () => {
+      aviso.textContent = "O evento ainda não foi executado.";
+      vulneravel.innerHTML = campo.value;
+    });
+
+    document.querySelector("#runSafe").addEventListener("click", () => {
+      aviso.textContent = "O evento ainda não foi executado.";
+      seguro.textContent = campo.value;
+    });
+  </script>
+</body>
+</html>

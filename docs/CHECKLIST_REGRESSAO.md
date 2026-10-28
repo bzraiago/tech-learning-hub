@@ -11,7 +11,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 
 ## Carregamento e navegação
 
-- [ ] A página inicial mostra 9 trilhas e 125 aulas no total.
+- [ ] A página inicial mostra 9 trilhas e 126 aulas no total.
 - [ ] A trilha ativa, os módulos e os cards de progresso aparecem corretamente.
 - [ ] Busca encontra uma aula de outra trilha e permite limpar o resultado.
 - [ ] Filtros “Todas”, “Pendentes” e “Concluídas” atualizam a listagem.
@@ -24,6 +24,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Na aula `delivery-clerk-supabase`, a pessoa liga o token Clerk ao claim `sub`, distingue `USING`, `WITH CHECK`, grants e roles, e identifica a diferença entre chave publicável e credencial que contorna RLS.
 - [ ] Na aula `delivery-threat-model`, a pessoa desenha escopo e fronteiras, liga ameaças a ativos, controles e evidências, marca hipóteses não verificadas e entende que OWASP Top 10 não certifica o sistema.
 - [ ] Na aula `delivery-owasp-top10`, a pessoa distingue autenticação de autorização e BOLA/IDOR; os seis testes de `labs/security-basics` passam localmente e não são apresentados como prova de segurança remota ou cobertura completa do OWASP Top 10.
+- [ ] Na aula `delivery-xss-output`, a cópia executável fica fora do repositório/Preview, `innerHTML` demonstra apenas a alteração do aviso local e `textContent` deixa o marcador literal; a pessoa navega pelos controles com teclado.
 - [ ] O plano de autorização para `learning_state` concede apenas SELECT/INSERT/UPDATE às próprias linhas; os testes de isolamento por duas contas ficam identificados como planejados até haver evidência real.
 - [ ] Na aula HTTPS, o checklist verifica certificado, redirecionamento e recursos ativos sem afirmar que TLS substitui autorização da aplicação.
 - [ ] O laboratório `labs/deployment-static` abre localmente, tem layout para 375 px e permite usar o link para pular o conteúdo com teclado. A conferência do Preview usa o caminho `/labs/deployment-static/`; domínio próprio e acesso anônimo não são requisitos.

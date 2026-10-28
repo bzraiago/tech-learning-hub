@@ -1381,6 +1381,144 @@ Object.assign(LESSON_GUIDES, {
       "O laboratório local reproduz A01/BOLA com dados fictícios; os testes não validam Preview, domínio ou Supabase remoto."
     ]
   },
+  "delivery-xss-output": {
+    "prerequisites": "Concluir `delivery-owasp-top10`; conhecer strings, eventos, DOM e `textContent` de `js-dom`/`js-events`. A atividade demonstra uma falha DOM XSS somente em cópia local fora do repositório. Não exige servidor, conta, domínio ou deploy.",
+    "setup": "Leia `labs/security-xss/README.md`. Faça uma cópia de `labs/security-xss/demo.html.example` para fora do repositório e renomeie a cópia para `demo-local.html`. No Windows, no PowerShell aberto na pasta do repositório, execute `Copy-Item labs/security-xss/demo.html.example \"$env:TEMP\\demo-local.html\"`; no macOS/Linux execute `cp labs/security-xss/demo.html.example /tmp/demo-local.html`. Abra a cópia no navegador e use Tab/Enter. O resultado esperado é: botão vulnerável altera o aviso local; botão corrigido mostra a marcação literalmente e não altera o aviso. Feche a aba para parar; para retomar, abra a cópia. Se ela não abrir, confira a extensão `.html`; como alternativa, compare os dois sinks no código sem executar. O arquivo `.html.example` fica inerte no Preview e nenhuma validação de domínio é necessária.",
+    "why": "O navegador interpreta HTML e JavaScript. Se dados não confiáveis forem enviados ao contexto errado, uma anotação pode virar estrutura ou código e agir na sessão de quem a visualiza. A defesa depende de como o valor é inserido no destino, não só de como foi validado ao entrar.",
+    "example": {
+      "language": "js",
+      "code": "const nota = campo.value;\n\n// O navegador analisa o valor como HTML: sink perigoso para texto externo.\nsaidaVulneravel.innerHTML = nota;\n\n// O valor vira nó de texto, apropriado quando a intenção é mostrar texto.\nsaidaSegura.textContent = nota;",
+      "expected": "No primeiro caso, o navegador interpreta elementos e atributos presentes no valor. No segundo, a sequência com sinais `<` e `>` aparece como texto literal; nenhum elemento é criado.",
+      "explanation": [
+        "Fonte é o lugar de onde pode vir conteúdo não confiável, como campo, URL ou resposta de API. Sink é o ponto em que o valor é usado; alguns sinks interpretam HTML ou código.",
+        "XSS refletido aparece quando dado de uma requisição volta na resposta; XSS armazenado envolve dado guardado e mostrado depois; XSS baseado em DOM surge quando JavaScript do cliente leva um valor até um sink inseguro. Essas descrições podem se sobrepor no mesmo fluxo.",
+        "Para texto simples em um elemento comum, `textContent` evita analisar a string como marcação. Isso não torna qualquer uso seguro: atributos, URLs, CSS, JavaScript e HTML têm contextos e regras diferentes.",
+        "Se o produto precisa aceitar HTML formatado, mostrar a string como texto pode quebrar a intenção. Use sanitização mantida e política explícita de elementos/atributos permitidos; não tente criar um filtro caseiro removendo apenas `<script>`."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Como texto passa a ser conteúdo executável",
+        "paragraphs": [
+          "A aplicação frequentemente mistura conteúdo vindo de pessoas, URLs ou APIs com a página. Um texto como `Olá` em uma anotação é dado. Se a aplicação usa um sink que manda interpretar a string como HTML, o navegador cria elementos e pode processar atributos com comportamento ativo. A falha é o fluxo fonte→sink sem proteção adequada para o contexto de saída.",
+          "Cross-Site Scripting (XSS) descreve a execução de código não confiável no contexto de um site confiável. O impacto depende de permissões da página e da sessão, mas pode permitir ações como a própria pessoa, ler conteúdo disponível ao script ou alterar a interface. Não é necessário que o invasor controle o servidor do site: conteúdo pode entrar por formulário, URL, API ou dado persistido.",
+          "Refletido: valor recebido numa requisição aparece de volta na resposta. Armazenado: o valor é guardado e outra visualização o renderiza. Baseado em DOM: JavaScript no navegador lê uma fonte e altera o DOM por um sink. Use os rótulos para rastrear caminhos; uma vulnerabilidade pode combinar etapas de mais de uma classe.",
+          "Pausa: marque no exemplo qual elemento é fonte e quais linhas são sinks. Antes de apertar qualquer botão, preveja o que o navegador fará com os sinais `<` e `>`."
+        ],
+        "terms": [
+          { "term": "XSS", "meaning": "Falha que permite conteúdo não confiável ser interpretado como código no contexto de uma página confiável." },
+          { "term": "Fonte", "meaning": "Origem de um valor que deve ser tratado como não confiável, como campo, URL ou resposta externa." },
+          { "term": "Sink", "meaning": "Ponto de uso que pode interpretar um valor como HTML, JavaScript, URL ou outro contexto." },
+          { "term": "DOM XSS", "meaning": "Caminho em que código cliente transforma uma fonte controlável em alteração insegura do DOM." }
+        ]
+      },
+      {
+        "title": "Inserir texto conforme o contexto",
+        "paragraphs": [
+          "O laboratório tem dois destinos. `innerHTML` interpreta a string como fragmento HTML. A cópia local usa uma imagem que aponta para um arquivo inexistente e um manipulador que só muda um aviso nessa mesma página. Ao escolher o botão vulnerável, o navegador cria a imagem, ocorre o erro local e o aviso mostra que o manipulador executou. Essa demonstração não usa rede, cookie ou outro dado.",
+          "`textContent` substitui o conteúdo por texto. A mesma sequência aparece com `<img ...>` visível; não há elemento de imagem, então o evento não existe. Para mostrar texto comum, prefira `textContent` ou o mecanismo padrão de escape do framework/template. Se o destino for outro contexto, escolha uma defesa compatível com ele: texto HTML, atributo entre aspas, URL permitida, CSS ou JavaScript não são intercambiáveis.",
+          "Validação de entrada continua útil para formato e regra de negócio, mas não substitui codificação/escape de saída. Uma nota com caracteres permitidos ainda pode ser interpretada como HTML. Escape genérico também não resolve todos os contextos: encode para o destino correto e evite construir código ou atributos de evento com dados.",
+          "Se usuários devem escrever conteúdo formatado, defina uma lista permitida e use sanitizador mantido, como DOMPurify, atualizado conforme orientação do fornecedor. Não altere o HTML já sanitizado de modo que invalide a proteção e não adicione biblioteca ao projeto principal como parte deste exemplo."
+        ],
+        "terms": [
+          { "term": "Codificação de saída", "meaning": "Representação de um valor de modo que seja tratado como dado no contexto específico de saída." },
+          { "term": "Sanitização HTML", "meaning": "Remoção/normalização controlada de estruturas HTML fora de uma política permitida quando rich text é requisito." },
+          { "term": "HTML confiável", "meaning": "Marcação produzida ou validada conforme uma política explícita; uma string arbitrária não se torna confiável por ser salva no banco." }
+        ]
+      },
+      {
+        "title": "Testar a cópia isolada sem atingir um site",
+        "paragraphs": [
+          "O fonte do laboratório termina em `.html.example` para não ser servido como página executável pelo deployment. A atividade manda copiar para uma pasta temporária fora do repositório e renomear a cópia. Abra somente `demo-local.html` pelo computador. O texto do campo é fictício e a execução limitada só altera o aviso local.",
+          "Use teclado: Tab até o campo, observe o valor e depois escolha um botão com Enter. O botão vulnerável mostra execução no aviso; o corrigido imprime a marcação e mantém o aviso inalterado. Depois confira no código as atribuições a `innerHTML` e `textContent`. Não é preciso clicar nem abrir o laboratório no Preview Vercel.",
+          "Se o botão vulnerável não alterar o aviso, confira se abriu a cópia `.html` e se pressionou o botão correto. Não desative controles de segurança do navegador nem tente outros payloads. Como alternativa, analise o fluxo no código e escreva a previsão sem executar a página.",
+          "O teste demonstra apenas esse sink e esse navegador local. Não prova que uma aplicação inteira esteja protegida: examine caminhos de renderização, bibliotecas, atributos/URLs, dados persistidos e permissões do site separadamente."
+        ],
+        "terms": [
+          { "term": "Isolamento de demonstração", "meaning": "Limitar a atividade a uma cópia local, dados inventados e um efeito visível que não sai da própria página." },
+          { "term": "Defesa em profundidade", "meaning": "Combinação de controles complementares; uma política adicional não substitui o uso seguro do sink." },
+          { "term": "CSP", "meaning": "Content Security Policy: política HTTP de defesa adicional que pode limitar fontes de scripts, sem corrigir um sink inseguro por si só." }
+        ]
+      },
+      {
+        "title": "Escolher critérios de correção e limites",
+        "paragraphs": [
+          "Um critério útil diz o que deve acontecer com uma entrada de exemplo e qual sinal comprova. Para uma anotação simples: ao salvar `<b>nota</b>`, a interface deve mostrar literalmente as tags; o DOM não deve conter um elemento `b` criado a partir do valor. Repita na leitura depois de recarregar, porque dado persistido continua não confiável.",
+          "Revise todos os caminhos que exibem a mesma propriedade: lista, resumo, busca, diálogo, exportação e visualização em outro dispositivo. Uma única tela protegida não corrige outros sinks. Em código de servidor, use template com escape contextual por padrão e não concatene strings HTML com dados do aluno.",
+          "Para uma exigência de rich text, documente quais elementos e atributos são permitidos, sanitizador e versão, ordem de sanitização e teste de regressão. CSP e Trusted Types podem reduzir alguns riscos em navegadores compatíveis, mas não devem ser apresentados como substitutos para tratar dados corretamente.",
+          "Feche a aba local e apague a cópia temporária. Marque como ‘pratiquei localmente’ apenas o comportamento observado; não confunda a atividade com auditoria do site Preview ou prova de domínio sobre segurança."
+        ],
+        "terms": [
+          { "term": "Trusted Types", "meaning": "Mecanismo de plataforma que pode exigir tipos confiáveis em certos sinks DOM; defesa adicional sujeita a suporte e configuração." },
+          { "term": "Regressão de segurança", "meaning": "Teste que mantém uma propriedade de proteção e falha se uma alteração voltar a permitir comportamento inseguro." },
+          { "term": "CSP", "meaning": "Cabeçalho que declara fontes e restrições de conteúdo para navegadores; não é a única defesa contra XSS." }
+        ]
+      }
+    ],
+    "diagramTitle": "Caminho do dado até o DOM",
+    "diagram": "Campo do usuário (fonte não confiável)\n                │\n                ├── innerHTML ── navegador analisa HTML ── elemento/evento ativo\n                │\n                └── textContent ─ navegador cria nó de texto ── marcação permanece literal\n\nA escolha do sink depende do contexto e da intenção do produto.",
+    "guided": [
+      { "instruction": "Antes de abrir a cópia local, identifique fonte, dois sinks e o aviso que serve como sinal. Preveja o conteúdo e o estado do aviso depois de cada botão.", "result": "A textarea é a fonte; `innerHTML` interpreta marcação e pode mudar o aviso local; `textContent` mostra a sequência literalmente e não executa o evento." },
+      { "instruction": "Execute os dois botões usando somente a cópia local. Registre a observação para a saída vulnerável e para a saída corrigida sem ampliar o payload.", "result": "O exemplo vulnerável cria a imagem e muda o aviso ao ocorrer o erro local; a saída corrigida mostra a marcação como texto e mantém o aviso anterior." },
+      { "instruction": "Pense em uma lista do curso que renderiza anotações em mais de um lugar. Liste os pontos onde a mesma anotação deve ser rastreada como fonte até um sink.", "result": "A revisão identifica lista, detalhe, busca, diálogo e qualquer outra tela/exportação que mostre a anotação; cada saída tem um sink apropriado e casos de regressão." }
+    ],
+    "mistakes": [
+      "Achar que validar comprimento ou remover a palavra `script` torna a saída HTML segura.",
+      "Usar `innerHTML` para texto simples porque a entrada veio de uma conta autenticada.",
+      "Supor que `textContent` é uma defesa universal para URL, atributos, CSS e código JavaScript.",
+      "Escapar todo valor uma vez na entrada e reutilizá-lo em qualquer destino/contexto.",
+      "Corrigir somente a tela de criação e ignorar a leitura posterior de dado armazenado.",
+      "Acreditar que CSP ou Trusted Types tornam dispensável corrigir o sink.",
+      "Publicar a cópia vulnerável ou testar payloads em site de terceiros."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: o campo contém `<b>Revisão</b>`. Antes de clicar nos botões, explique qual saída cria um elemento em negrito e qual mostra literalmente os sinais de marcação.",
+        "expected": "A atribuição a `innerHTML` cria elemento HTML e mostra texto em negrito; `textContent` mostra `<b>Revisão</b>` literalmente.",
+        "criteria": ["Prevê o resultado de cada sink.", "Explica que `innerHTML` analisa HTML.", "Explica que `textContent` insere texto no exemplo."],
+        "solution": "O navegador interpreta a string em `innerHTML`; em `textContent`, a string vira nó de texto e as tags aparecem visivelmente.",
+        "explanation": "A diferença é o comportamento do destino no DOM, não a aparência da string na variável.",
+        "hints": ["Qual propriedade altera parsing da árvore HTML?", "Qual propriedade expressa intenção de texto simples?"]
+      },
+      {
+        "prompt": "Alterar: uma anotação aparece dentro de um elemento com `innerHTML`. Troque somente a forma de saída para texto e descreva como o teste deve provar que nenhum elemento vindo da nota foi criado.",
+        "expected": "Use `textContent` para texto simples; o teste verifica a string literal visível e confirma que a saída não contém o elemento `b` criado a partir da entrada.",
+        "criteria": ["Escolhe uma API compatível com texto simples.", "Verifica o texto que a pessoa vê.", "Verifica também ausência de elemento interpretado."],
+        "solution": "Atribua `saida.textContent = anotacao`; com `<b>nota</b>` o texto aparece incluindo as tags e a árvore de elementos não ganha um `b` a partir da anotação.",
+        "explanation": "Um teste de segurança observa o efeito no DOM e não apenas se a função retornou sem erro.",
+        "hints": ["A anotação deveria oferecer formatação ou ser exibida como texto?", "Qual observação separa texto literal de HTML interpretado?"]
+      },
+      {
+        "prompt": "Construir: escreva três critérios de aceite para adicionar anotações ao curso: um para criação, outro para leitura após recarga e outro para busca. Use entradas inertes como `<b>teste</b>` e não inclua payload que acesse dados ou rede.",
+        "expected": "Os critérios requerem que a entrada seja exibida literalmente em cada fluxo, que nenhum elemento HTML da anotação seja criado e que não ocorra efeito ativo depois de salvar, recarregar ou buscar.",
+        "criteria": ["Cobre criação, leitura persistida e busca.", "Usa marcador sem efeito externo.", "Define um resultado observável e ausência de efeito ativo."],
+        "solution": "1) Ao digitar `<b>teste</b>` e salvar, o painel exibe a string com tags. 2) Após recarregar, a nota segue literal e o DOM não contém um `b` originado do valor. 3) Buscar `teste` encontra a nota sem interpretar nem executar HTML.",
+        "explanation": "Vulnerabilidades de saída podem reaparecer em qualquer tela que reusa o mesmo dado, inclusive depois de persistência.",
+        "hints": ["Siga o dado depois de salvar.", "Busque um sinal de parsing além do texto na tela."]
+      },
+      {
+        "prompt": "Investigar erro: após uma mudança visual, as tags de uma anotação voltaram a renderizar como elementos. Descreva uma investigação segura começando pela saída DOM e rastreando o valor; não experimente outros payloads nem use o Preview.",
+        "expected": "Reproduz com marcador inerte na cópia local, localiza todos os usos do campo e distingue fonte/sink, confere se alguém voltou a usar `innerHTML` ou mudou o contexto, aplica o sink correto e repete critérios de lista/detalhe/busca sem enviar dados.",
+        "criteria": ["Usa somente a cópia local e um marcador inerte.", "Rastreia o dado até o sink que o interpreta.", "Confere todas as saídas da anotação.", "Define resultado literal e ausência de elemento ativo após correção."],
+        "solution": "Reproduza localmente com `<b>teste</b>`, inspecione a árvore do DOM e busque os sinks usados para nota. Compare o código antes/depois do ajuste visual, substitua a inserção de texto por `textContent` ou o escape contextual do template e confirme os mesmos critérios nas telas que reusam o dado.",
+        "explanation": "Uma alteração de apresentação pode reintroduzir um sink perigoso sem mudar a origem do dado; investigar o fluxo é mais confiável que tentar filtrar strings isoladas.",
+        "hints": ["A entrada mudou ou o ponto de renderização mudou?", "Qual saída usa a anotação depois da busca e depois da recarga?"]
+      }
+    ],
+    "quiz": [
+      { "question": "Para mostrar uma anotação como texto em um elemento comum, qual abordagem é adequada?", "options": ["Atribuir o valor a `textContent`.", "Interpolar a string em `innerHTML`.", "Remover apenas a palavra `script`."], "correctIndex": 0, "explanation": "`textContent` cria texto no DOM sem analisar a string como HTML nesse contexto." },
+      { "question": "O que caracteriza um sink relevante para DOM XSS?", "options": ["Ponto em que um valor não confiável é interpretado ou usado para alterar o DOM.", "Qualquer variável dentro do navegador.", "Um arquivo CSS sem minificação."], "correctIndex": 0, "explanation": "Investigue caminhos entre fontes de dados e APIs que interpretam o valor." },
+      { "question": "Por que validar a entrada não substitui tratar a saída?", "options": ["Um valor permitido pela regra ainda pode ter significado especial no contexto de saída.", "Validação nunca tem utilidade.", "O navegador ignora todas as entradas com aspas."], "correctIndex": 0, "explanation": "A defesa de saída depende do contexto de interpretação específico." },
+      { "question": "O que a cópia local do laboratório comprova?", "options": ["O comportamento observado de dois sinks num exemplo isolado.", "Que o site Preview inteiro não tem XSS.", "Que o domínio ou as políticas Vercel foram validados."], "correctIndex": 0, "explanation": "O experimento é didático, local e restrito aos casos apresentados." }
+    ],
+    "summary": [
+      "Rastreie fonte não confiável até cada sink e avalie o contexto onde o valor será interpretado.",
+      "`innerHTML` analisa marcação; `textContent` é o caminho simples para mostrar texto em elemento comum.",
+      "Validação, CSP e Trusted Types são camadas complementares; escolha saída contextual correta.",
+      "Rich text precisa de política e sanitizador mantido; não filtre HTML com regras improvisadas.",
+      "A demonstração é uma cópia local com efeito inofensivo; não se executa nem valida no Preview."
+    ]
+  },
   "delivery-requirements": {
     "prerequisites": "Concluir setup-node, delivery-forms e delivery-ci; ter a lista de estudos do laboratório e saber alterar funções e testes. O exemplo usa apenas Node.",
     "setup": "Na pasta da aula, salve o exemplo como requisito.js no editor. No terminal aberto nessa pasta, execute node requisito.js; a saída esperada é false e true em linhas separadas. O processo termina sozinho; para retomar, execute o mesmo comando. Se node não for reconhecido, revise setup-node. Use a lista de estudos da aula delivery-forms para planejar a integração, mas este arquivo não altera server.js. Escreva critérios antes de editar o projeto.",
@@ -2373,6 +2511,11 @@ Object.assign(LESSON_GUIDES, {
       prompt: "Uma pessoa A autentica normalmente, mas a rota usa o ID da URL para carregar o progresso de B. Explique a diferença entre autenticação e autorização, descreva a correção no servidor e proponha um teste positivo e um negativo para leitura e atualização, somente com os dados fictícios do laboratório local.",
       expected: "A sessão válida identifica A, mas não autoriza acesso a B; a API deve derivar a identidade da sessão validada e conferir o dono do objeto em cada ação. Testes permitem A→A e recusam A→B, confirmando que nenhuma resposta ou alteração de B ocorre.",
       hint: "O cliente controla o ID solicitado. Qual identidade confiável o servidor deve comparar com o proprietário do registro?"
+    },
+    "delivery-xss-output": {
+      prompt: "Uma anotação simples é mostrada em cinco telas. Uma revisão encontrou `innerHTML` na busca, mas não sabe como os outros caminhos renderizam o valor. Defina como rastrear fonte e sinks e critérios de teste que mostrem texto literal após criação, leitura, busca e recarga, usando apenas o exemplo local e um marcador sem efeito externo.",
+      expected: "A revisão inventaria cada tela que exibe a anotação, identifica API de parsing por destino e exige que texto simples permaneça literal sem criar nós HTML após gravação, busca ou recarga; a cópia vulnerável não é publicada.",
+      hint: "Corrigir um ponto não altera automaticamente os outros lugares que leem o mesmo dado."
     },
     "delivery-ci": {
       prompt: "Uma publicação altera a validação de minutos e o POST começa a aceitar -5. Defina um teste que falhe antes da correção, indique onde a CI deve executá-lo e descreva como conter a versão ruim enquanto investiga.",

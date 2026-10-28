@@ -5262,6 +5262,40 @@
             ]
           },
           {
+            "id": "delivery-xss-output",
+            "title": "XSS: texto seguro no DOM",
+            "minutes": 95,
+            "concept": "Identifique fontes de conteúdo não confiável e pontos de interpretação HTML; reproduza DOM XSS com marcador inofensivo em arquivo local e corrija a saída de texto com textContent.",
+            "objectives": [
+              "Explicar como texto fornecido por usuário pode virar marcação ou código ao chegar a um sink inseguro.",
+              "Distinguir XSS refletido, armazenado e baseado em DOM em exemplos simples.",
+              "Usar textContent para texto simples e justificar quando conteúdo HTML requer sanitização contextual.",
+              "Executar somente a cópia local do laboratório e confirmar que a versão corrigida deixa o marcador inerte."
+            ],
+            "exercise": "Siga `labs/security-xss/README.md` para executar a cópia local, compare `innerHTML` e `textContent` e proponha uma correção para um campo de anotação.",
+            "code": "// O valor abaixo vem de uma caixa de texto controlada pelo usuário.\nconst nota = campo.value;\n\n// Vulnerável: interpreta o valor como marcação HTML.\nsaidaVulneravel.innerHTML = nota;\n\n// Para conteúdo que deve permanecer texto, não é interpretado como HTML.\nsaidaSegura.textContent = nota;",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "OWASP · Cross Site Scripting Prevention Cheat Sheet",
+                "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "OWASP · DOM based XSS Prevention Cheat Sheet",
+                "url": "https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "MDN · Element.innerHTML",
+                "url": "https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML",
+                "language": "EN"
+              }
+            ]
+          },
+          {
             "id": "delivery-requirements",
             "title": "Requisitos novos, colaboração e portfólio",
             "minutes": 140,
