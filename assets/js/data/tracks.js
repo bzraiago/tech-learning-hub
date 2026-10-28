@@ -5232,7 +5232,8 @@
               "Executar o laboratório local com contas e progresso fictícios, observar a rota vulnerável e a corrigida.",
               "Propor testes positivos e negativos que confirmem acesso próprio e bloqueiem acesso cruzado.",
               "Relacionar A05 Injection à aula `db-security`, que usa parâmetros SQLite e testa entrada de aparência SQL como dado literal.",
-              "Relacionar A03 Software Supply Chain Failures à aula `delivery-supply-chain` sem reduzir a categoria a dependências com CVE."
+              "Relacionar A03 Software Supply Chain Failures à aula `delivery-supply-chain` sem reduzir a categoria a dependências com CVE.",
+              "Continuar A04 Cryptographic Failures em `delivery-cryptography`, distinguindo hash, senha, Base64, criptografia e gestão de chave."
             ],
             "exercise": "Siga `labs/security-basics/README.md`, compare a resposta das rotas vulnerável e corrigida e explique qual verificação falta em cada requisição.",
             "code": "OWASP Top 10 2025 — categorias de conscientização\nA01 Broken Access Control             A06 Insecure Design\nA02 Security Misconfiguration          A07 Authentication Failures\nA03 Software Supply Chain Failures     A08 Software or Data Integrity Failures\nA04 Cryptographic Failures              A09 Security Logging & Alerting Failures\nA05 Injection                           A10 Mishandling of Exceptional Conditions\n\nExperimento local (somente IDs e tokens fictícios):\nGET /demo/vulnerable/progress/aluno-b  → token A; resposta 200 com marcador B\nGET /demo/fixed/progress/aluno-b      → token A; resposta 404 sem dados de B\n\nA01: a sessão está autenticada, mas a autorização do objeto não foi verificada.",
@@ -5261,6 +5262,26 @@
                 "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html",
                 "language": "EN"
               }
+            ]
+          },
+          {
+            "id": "delivery-cryptography",
+            "title": "Criptografia aplicada: hashes, senhas e chaves",
+            "minutes": 110,
+            "concept": "Diferencie hash, criptografia reversível, Base64 e armazenamento de senha; execute um exemplo isolado AES-256-GCM com texto inventado e trace integridade, IV, chave e ciclo de vida.",
+            "objectives": [
+              "Explicar quando hash, criptografia reversível, HTTPS/TLS e armazenamento adaptativo de senha resolvem necessidades diferentes.",
+              "Desenhar um envelope GCM com algoritmo, IV, ciphertext e tag, mantendo a chave sob controle separado.",
+              "Executar o laboratório fictício e interpretar a recusa de ciphertext, tag ou chave alterados.",
+              "Planejar minimização, acesso, geração, rotação, restauração e revogação de chaves sem apresentar a demonstração como solução de produção."
+            ],
+            "exercise": "Siga `labs/security-crypto/README.md`, classifique cada necessidade antes de executar o exemplo e explique por que os testes de AES-GCM não provam que dados reais estão seguros. Use somente texto inventado.",
+            "code": "DADO FICTÍCIO: ‘Tópico de estudo: funções JavaScript’\n\nSHA-256 → resumo determinístico; não recupera a entrada\nAES-256-GCM → algoritmo + IV + ciphertext + tag\nA mesma chave da execução → decifra e verifica tag\nByte/tag/chave alterado → operação recusada\n\nChave: aleatória, só em memória, não impressa\nSenha de login: Clerk ou armazenamento adaptativo aprovado\nBase64: representação textual, não criptografia",
+            "docs": [
+              { "kind": "doc", "title": "OWASP Top 10 2025 · A04 Cryptographic Failures", "url": "https://top10.owasp.org/2025/A04_2025-Cryptographic_Failures/", "language": "EN" },
+              { "kind": "doc", "title": "OWASP · Cryptographic Storage Cheat Sheet", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html", "language": "EN" },
+              { "kind": "doc", "title": "OWASP · Password Storage Cheat Sheet", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html", "language": "EN" },
+              { "kind": "doc", "title": "Node.js · crypto", "url": "https://nodejs.org/api/crypto.html", "language": "EN" }
             ]
           },
           {

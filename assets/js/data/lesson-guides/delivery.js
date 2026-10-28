@@ -1502,7 +1502,171 @@ Object.assign(LESSON_GUIDES, {
       "Autenticação identifica a sessão; autorização decide cada ação sobre cada objeto.",
       "BOLA/IDOR acontece quando uma API aceita referência a objeto sem conferir acesso.",
       "O servidor deriva identidade de sessão validada, ignora propriedade forjada pelo cliente e aplica negação por padrão.",
-      "O laboratório local reproduz A01/BOLA com dados fictícios; os testes não validam Preview, domínio ou Supabase remoto."
+      "O laboratório local reproduz A01/BOLA com dados fictícios; os testes não validam Preview, domínio ou Supabase remoto.",
+      "A04 Cryptographic Failures segue em `delivery-cryptography`, com conceitos e laboratório próprios para hash, cifra, senha e chaves."
+    ]
+  },
+  "delivery-cryptography": {
+    "prerequisites": "Concluir delivery-owasp-top10, delivery-https e setup-node. Saber o que é uma requisição HTTP e executar JavaScript pelo terminal. Não é necessário conhecimento prévio de matemática avançada, provedor de chaves ou banco de dados.",
+    "setup": "Leia labs/security-crypto/README.md. Node.js 20.6 ou posterior e terminal preparado são suficientes; execute node labs/security-crypto/crypto.cjs e node --test labs/security-crypto/crypto.test.cjs na raiz. Não instala dependências, não usa conta/serviço e só processa texto inventado. A leitura conceitual e os exercícios da aula são completos sem computador. Nunca use senha, token, chave de API ou dado pessoal real.",
+    "why": "Falha criptográfica não se corrige apenas escolhendo um algoritmo: é preciso saber qual propriedade proteger, reduzir dados armazenados, separar hash de criptografia e planejar acesso e ciclo de vida da chave. Esta aula demonstra propriedades básicas de um modo autenticado sem propor uma receita de produção. Links oficiais são aprofundamento opcional; conceitos, prática e respostas estão aqui.",
+    "example": {
+      "language": "text",
+      "code": "Texto inventado: Tópico de estudo: funções JavaScript\n\nHash SHA-256 → resumo fixo; não recupera o texto\nCriptografia AES-256-GCM → ciphertext + IV + tag\nDecifragem com a mesma chave → texto original\nDecifragem com chave/bytes/tag incorretos → erro; nenhum texto é aceito\n\nEnvelope transmite algorithm, iv, ciphertext e authTag.\nA chave fica fora do envelope e não é impressa.",
+      "expected": "O hash é determinístico para a mesma entrada; o envelope muda devido à chave/IV novos; a decifragem restaura a frase só com a chave da mesma execução e recusa alteração.",
+      "explanation": ["Hash é um resumo de sentido único e não substitui criptografia quando a aplicação precisa recuperar o valor.", "A tag do GCM detecta alteração, mas não autoriza por si só quem pode pedir decifragem.", "Base64 representa bytes; não esconde nem protege uma chave.", "A chave efêmera não é persistida: reiniciar o script elimina a capacidade de decifrar o envelope anterior."]
+    },
+    "guided": [
+      {
+        "instruction": "Classifique quatro necessidades fictícias: comparar integridade de arquivo, mostrar e-mail no perfil, autenticar uma senha e proteger comunicação entre navegador e servidor.",
+        "result": "Hash pode servir a uma comparação de integridade contextual; e-mail recuperável pede minimização e controle de acesso/possível criptografia; senha usa provedor ou hash adaptativo próprio; transporte usa HTTPS/TLS. Nenhum mecanismo substitui autorização."
+      },
+      {
+        "instruction": "Antes de executar o exemplo, preveja o que pode ser recuperado com chave e o que muda entre duas execuções. Em seguida compare hash, envelope e chave não impressa.",
+        "result": "Hash repete para a mesma frase; ciphertext/IV variam; apenas a chave da execução decifra. A chave permanece em memória e não acompanha o envelope."
+      },
+      {
+        "instruction": "Abra crypto.cjs e trace key, IV, ciphertext e authTag. Rode node --test labs/security-crypto/crypto.test.cjs e identifique o teste que altera bytes/tag.",
+        "result": "A chave tem 32 bytes, o IV aleatório do exemplo tem 12 bytes, o GCM produz ciphertext/tag, e a finalização recusa alteração ou chave errada. O teste cobre o exemplo local, não um sistema de produção."
+      },
+      {
+        "instruction": "Desenhe o ciclo da chave em produção: criação, local de guarda separado dos dados, permissões, uso, rotação, leitura de backups e revogação. Marque responsáveis e fatos que faltariam confirmar.",
+        "result": "Há responsável, fonte de aleatoriedade, armazenamento aprovado, menor privilégio, consumidores, rotação/migração de dados, recuperação de backup e procedimento de comprometimento; requisitos não conhecidos ficam explícitos."
+      }
+    ],
+    "sections": [
+      {
+        "title": "Comece pela necessidade e pelo dado",
+        "paragraphs": [
+          "A04 Cryptographic Failures reúne situações em que criptografia ausente, inadequada ou mal usada deixa dados e operações expostos. Primeiro pergunte qual informação existe, por que armazená-la, quem precisa usá-la, por quanto tempo e o que um atacante poderia obter. Não coletar ou reter um dado desnecessário costuma reduzir risco e esforço melhor do que cifrá-lo depois.",
+          "Dados podem existir em trânsito (entre sistemas), em repouso (em banco, arquivo ou backup) e durante o uso (na memória ou exibidos). HTTPS/TLS protege a comunicação enquanto ela ocorre; criptografia de disco/banco atua no armazenamento segundo o modelo do serviço; a aplicação normalmente vê texto decifrado para processar. Nenhuma dessas medidas impede sozinha uma pessoa autorizada de consultar dado fora de sua permissão.",
+          "Defina a propriedade: confidencialidade limita quem lê; integridade ajuda a perceber alteração; disponibilidade permite uso quando necessário. Uma transformação só é útil se protege a propriedade necessária sem quebrar o comportamento legítimo. A aula usa exemplos didáticos; um sistema real requer modelo de ameaça, dados minimizados, responsáveis e avaliação técnica apropriada."
+        ],
+        "terms": [
+          { "term": "A04 Cryptographic Failures", "meaning": "Categoria OWASP de falhas no uso ou na ausência de mecanismos criptográficos adequados ao risco." },
+          { "term": "Confidencialidade", "meaning": "Propriedade de limitar a leitura de informação a identidades autorizadas." },
+          { "term": "Integridade", "meaning": "Capacidade de detectar ou impedir alteração não autorizada, conforme o mecanismo e contexto." },
+          { "term": "Em trânsito / em repouso", "meaning": "Dados que estão sendo enviados entre componentes / dados armazenados em algum destino." }
+        ]
+      },
+      {
+        "title": "Escolha hash, criptografia e senha pelo objetivo",
+        "paragraphs": [
+          "Hash criptográfico calcula um resumo a partir do conteúdo. A aplicação pode comparar resumos em um fluxo apropriado, mas não deve esperar recuperar o valor original. SHA-256 é um hash geral determinístico: mesmos bytes produzem mesmo resumo. Ser rápido é útil em vários usos de integridade, mas permite testar muitas tentativas rapidamente e o torna inadequado, sozinho, para armazenar senhas.",
+          "Criptografia simétrica é reversível para quem tem a chave correta. É apropriada apenas quando a aplicação tem uma necessidade real de recuperar o dado; a chave deve ter acesso e guarda próprios. Não cifre uma senha de login para depois compará-la: use um provedor estabelecido, como o Clerk deste curso, ou armazenamento de senha especificamente projetado e avaliado. O curso não pede que o aluno implemente autenticação de senha.",
+          "Assinaturas e códigos de autenticação de mensagem (MAC) tratam de verificar origem/integridade sob modelos e chaves diferentes; não são sinônimos de hash nem de criptografia. Base64 apenas representa bytes em caracteres para transporte. Se alguém consegue reverter Base64 sem segredo, ele não transformou o dado em segredo."
+        ],
+        "terms": [
+          { "term": "Hash criptográfico", "meaning": "Resumo determinístico de tamanho definido, projetado para tornar inviável recuperar a entrada ou achar colisões úteis." },
+          { "term": "Criptografia simétrica", "meaning": "Transformação reversível que usa a mesma chave secreta para cifrar e decifrar." },
+          { "term": "Salt", "meaning": "Valor aleatório distinto por registro usado por algoritmos de armazenamento de senha para reduzir ataques pré-calculados; não torna SHA-256 rápido adequado." },
+          { "term": "Base64", "meaning": "Codificação textual de bytes, sem segredo e sem propriedade de criptografia." },
+          { "term": "MAC", "meaning": "Código calculado com uma chave para que quem a compartilha confira integridade; não esconde o conteúdo." },
+          { "term": "Assinatura digital", "meaning": "Prova verificável com chave pública correspondente de que uma mensagem foi assinada pela chave privada; não cifra o conteúdo." }
+        ]
+      },
+      {
+        "title": "Entenda a criptografia autenticada do laboratório",
+        "paragraphs": [
+          "O laboratório usa a API nativa `node:crypto` para aplicar AES-256-GCM somente a uma frase inventada. AES é o algoritmo simétrico, 256 indica a quantidade de bits da chave, e GCM é um modo autenticado que fornece confidencialidade e uma verificação de integridade/autenticidade para o texto cifrado. Usar essa combinação em uma amostra não significa que a arquitetura inteira seja segura.",
+          "O envelope contém algoritmo, ciphertext, IV/nonce e tag de autenticação. A chave de 32 bytes é criada com aleatoriedade criptográfica e fica em memória. O IV de 12 bytes é enviado com o ciphertext; não precisa ser segredo, mas a construção escolhida deve respeitar os requisitos do modo. Para GCM, repetir um IV sob a mesma chave pode comprometer garantias; produção precisa controlar unicidade, volume de uso e instâncias compartilhadas.",
+          "Na leitura, a aplicação informa a tag antes de finalizar a decifragem. Se ciphertext, IV, tag ou chave não corresponderem, a finalização falha. Interrompa a operação e não use texto parcial. Os testes alteram bytes e a tag em valores fictícios. Eles verificam o contrato deste exemplo, não criptografia completa, segurança de memória, auditoria, configuração de produção ou gestão de chaves."
+        ],
+        "terms": [
+          { "term": "Ciphertext", "meaning": "Bytes de saída da operação de cifragem; o termo não inclui necessariamente IV e tag." },
+          { "term": "AES", "meaning": "Algoritmo simétrico usado para cifrar; neste nome, 256 indica o tamanho da chave em bits." },
+          { "term": "GCM", "meaning": "Modo de uso do AES que, nesta operação, calcula tag para detectar alteração durante a decifragem." },
+          { "term": "IV / nonce", "meaning": "Valor público que participa da operação; requisitos de unicidade ou imprevisibilidade dependem do algoritmo/modo." },
+          { "term": "Tag de autenticação", "meaning": "Valor verificado pelo modo autenticado para recusar conteúdo/chave/IV incorretos ou alterados." },
+          { "term": "Autenticidade criptográfica", "meaning": "Verificação de que conteúdo combina com chave e tag; não confirma, por si só, a identidade de uma pessoa." }
+        ]
+      },
+      {
+        "title": "Cuide da chave e dos limites ao longo do tempo",
+        "paragraphs": [
+          "Criptografia depende de chave. Gere-a por mecanismo criptográfico confiável; controle quem pode ler, usar, exportar e substituir; separe chave dos dados quando a arquitetura permitir; mantenha inventário de sistemas consumidores e não coloque chave em código, Git ou log. Um cofre de chaves/serviço de segredos aprovado costuma ser preferível a inventar armazenamento próprio, mas deve ser escolhido conforme o ambiente.",
+          "Planeje o que acontece se a chave for exposta, perdida, renovada ou incompatível. Rotação pode exigir identificar registros antigos, decifrar e recifrar, manter chaves antigas por período aprovado para backups ou migrar leitores. Sem uma recuperação testada, a perda da chave pode tornar dado irrecuperável. Decisões dependem de sensibilidade, quantidade, cópias e obrigações responsáveis.",
+          "Criptografia não anonimiza dados, não esconde todos os metadados, não elimina a necessidade de autorização e não protege a chave enquanto a aplicação comprometida consegue usá-la. Nunca escreva algoritmo próprio nem transporte a chave ao lado dos dados por conveniência. Comece minimizando o armazenamento; documente limites, acesso, rotação, restauração e evidências."
+        ],
+        "terms": [
+          { "term": "Gestão de chaves", "meaning": "Processos e controles para gerar, proteger, distribuir, usar, renovar, recuperar e revogar chaves." },
+          { "term": "Rotação", "meaning": "Troca controlada de uma chave, coordenada com operações e dados cifrados por chaves anteriores." },
+          { "term": "Privilégio mínimo", "meaning": "Limitar acesso a dados e chaves às ações e pessoas que realmente precisam deles." },
+          { "term": "Envelope de criptografia", "meaning": "Estrutura que reúne metadados, IV, ciphertext e tag, mantendo a chave secreta sob controle separado." }
+        ]
+      }
+    ],
+    "mistakes": [
+      "Usar hash rápido como armazenamento de senha.",
+      "Chamar Base64 de criptografia.",
+      "Guardar chave junto dos dados e presumir que eles ficam protegidos.",
+      "Repetir IV sob a mesma chave ou supor que IV precisa ser secreto.",
+      "Ignorar falha de autenticação na decifragem ou aceitar saída parcial.",
+      "Acreditar que criptografia substitui autorização, minimização, TLS ou gestão de chaves."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: a tela precisa mostrar o e-mail fictício novamente após login. Hash SHA-256 ou criptografia reversível atende à necessidade? O que precisa ser decidido antes?",
+        "expected": "Hash não recupera o endereço; criptografia é reversível com chave, mas primeiro se confirma necessidade de armazenar, acesso e ciclo de vida. A amostra não decide base legal nem arquitetura real.",
+        "criteria": ["Distingue resumo de texto recuperável.", "Menciona a chave como controle separado.", "Questiona necessidade e autorização antes de armazenar."],
+        "solution": "Hash não serve para reexibir o e-mail. Se o produto demonstrar necessidade, pode avaliar armazenamento recuperável com controles adequados, minimização e chave gerida separadamente; a decisão real deve ser revisada. Não use os exemplos com dado pessoal.",
+        "explanation": "O mecanismo segue a ação que a aplicação precisa fazer; criptografia não autoriza qualquer usuário a ler o valor.",
+        "hints": ["A aplicação precisa comparar ou recuperar o valor?", "Quem poderia solicitar a decifragem?"]
+      },
+      {
+        "prompt": "Alterar: uma equipe guarda senhas com SHA-256 porque 'hash não pode ser decifrado'. Reescreva o fluxo de login e explique o risco do algoritmo rápido.",
+        "expected": "Usa provedor de identidade ou armazenamento adaptativo de senha aprovado com salt e parâmetros atuais; não cifra senhas nem usa SHA-256 isolado.",
+        "criteria": ["Reconhece ataques de tentativa offline rápidos.", "Diferencia senha de dado que precisa ser exibido.", "Propõe provedor ou algoritmo de armazenamento apropriado sem inventar configuração."],
+        "solution": "Delegue autenticação ao Clerk já preparado no curso ou encaminhe avaliação de solução de senha própria com algoritmo adaptativo especializado, salt e parâmetros validados. Não salve texto nem SHA-256 rápido; esta aula não implementa login.",
+        "explanation": "Hash de senha precisa aumentar o custo de cada tentativa; um hash geral rápido não tem esse propósito.",
+        "hints": ["A senha deve voltar a ser exibida?", "Qual é a diferença entre hash rápido e armazenamento adaptativo?"]
+      },
+      {
+        "prompt": "Construir: desenhe envelope com algoritmo, IV, ciphertext e tag; indique o local da chave, quem pode usar a decifragem e quais dados ainda podem aparecer em metadados.",
+        "expected": "Os campos de formato acompanham o ciphertext; chave fica sob controle separado; autorização e tamanho/tempo/acesso continuam sendo considerados.",
+        "criteria": ["Inclui os quatro campos do envelope.", "Não inclui chave no registro/transporte público.", "Menciona autorização e pelo menos um metadado/limite."],
+        "solution": "Registro fictício: algorithm=aes-256-gcm; iv=<bytes-base64>; ciphertext=<bytes-base64>; authTag=<bytes-base64>. Chave de 32 bytes em mecanismo de guarda separado; serviço com permissão mínima decide qual identidade pode decifrar. O tamanho e momento de acesso podem continuar observáveis.",
+        "explanation": "O IV e a tag participam do formato, mas a chave é o segredo que precisa de proteção própria.",
+        "hints": ["Quais campos o decifrador precisa além da chave?", "Base64 torna algum campo secreto?"]
+      },
+      {
+        "prompt": "Investigar erro: `decipher.final()` falha depois que alguém altera um byte do ciphertext. Separe hipóteses e descreva a resposta segura sem mostrar a chave.",
+        "expected": "Investiga alteração/truncamento, IV, tag, algoritmo e chave. Recusa a operação, evita usar saída parcial e preserva registro técnico minimizado.",
+        "criteria": ["Considera campos e chave do envelope.", "Não ignora a falha nem libera texto parcial.", "Não registra chave ou dado secreto."],
+        "solution": "Compare algoritmo/formato, versão do registro, IV, tag e chave designada por um identificador seguro; não copie segredos para log. Trate como falha de autenticidade, interrompa processamento e encaminhe se inesperada. O teste local demonstra somente o comportamento da API nativa.",
+        "explanation": "A tag protege contra aceitar bytes alterados; suprimir o erro anula esse controle.",
+        "hints": ["Que elementos são validados na finalização?", "Que informação é útil para diagnóstico sem expor o conteúdo?"]
+      },
+      {
+        "prompt": "Mudança inesperada: suspeita-se que uma chave usada em vários ambientes foi copiada para um log. Planeje resposta, rotação e recuperação sem presumir quais cópias existem.",
+        "expected": "Contém e escala, inventaria consumidores/cópias, substitui/revoga por processo aprovado e prova leitura/escrita e restauração dos dados legados antes de encerrar.",
+        "criteria": ["Trata exposição como incidente e identifica responsável.", "Considera dados anteriores e backups.", "Define provas positivas/negativas e evita inserir chaves em logs/issues."],
+        "solution": "Restrinja acesso ao log e acione responsáveis de segurança; levante ambientes/serviços que usam a chave, pare novos usos conforme plano, gere uma substituta em armazenamento aprovado, coordene recifragem e leitura de backups necessários, revogue a antiga após validar consumidores e registre evidência redigida. O laboratório não simula rotação.",
+        "explanation": "Trocar o valor na configuração não resolve dados antigos nem serviços que ainda dependem da chave exposta.",
+        "hints": ["Quais sistemas precisam da chave antiga para ler backups?", "Que prova demonstra que nenhum consumidor ficou sem acesso?"]
+      },
+      {
+        "prompt": "Transferir: um fornecedor externo só oferece integração usando senha reutilizável de outra conta. Proponha uma alternativa e diga quais decisões não pertencem ao código de cifra.",
+        "expected": "Evita guardar senha reutilizável e propõe delegação protocolar/credencial restrita; decisões incluem autorização, escopo, prazo, revogação, consentimento e responsável.",
+        "criteria": ["Questiona necessidade de armazenar senha.", "Considera delegação ou credencial com menor escopo.", "Separa criptografia de autorização e ciclo de vida."],
+        "solution": "Peça OAuth/OIDC ou credencial de integração restrita emitida pelo fornecedor; valide escopos, expiração, revogação e quem autoriza. Se a senha devesse mesmo ser recuperada, pause para revisar arquitetura e guarda da chave. AES não resolve a decisão de acesso nem torna reutilização necessária.",
+        "explanation": "Minimizar segredo e delegar capacidade limita o impacto melhor do que cifrar uma credencial excessiva.",
+        "hints": ["O fornecedor permite delegar sem compartilhar a senha principal?", "O que a aplicação realmente precisa fazer?"]
+      }
+    ],
+    "quiz": [
+      { "question": "Qual afirmação descreve corretamente Base64?", "options": ["Codifica bytes em texto, sem esconder o conteúdo com uma chave.", "É a cifra AES usada no Node.", "É um hash de senha adaptativo."], "correctIndex": 0, "explanation": "Qualquer pessoa pode reverter Base64; não é criptografia." },
+      { "question": "Se a aplicação precisa comparar uma senha durante login, qual caminho é apropriado?", "options": ["Guardar em texto para recuperar.", "Usar SHA-256 rápido sem salt.", "Delegar a provedor ou usar armazenamento de senha adaptativo aprovado."], "correctIndex": 2, "explanation": "Senha não precisa ser recuperada; armazenamento especializado dificulta tentativas." },
+      { "question": "No envelope AES-GCM, o que ocorre se ciphertext ou tag for alterado?", "options": ["A verificação deve falhar e a aplicação deve recusar o resultado.", "A tag reconstrói automaticamente a entrada original.", "A alteração sempre é corrigida por Base64."], "correctIndex": 0, "explanation": "GCM autentica a operação; falha não deve ser ignorada." },
+      { "question": "O que a criptografia não substitui?", "options": ["Autorização, minimização e gestão da chave.", "Um IV enviado junto ao ciphertext.", "A chamada de decifragem pela aplicação."], "correctIndex": 0, "explanation": "Proteção criptográfica é uma camada dentro de uma arquitetura maior." }
+    ],
+    "summary": [
+      "Reduza dados antes de escolher mecanismo criptográfico.",
+      "Hash, criptografia reversível, Base64 e armazenamento de senha resolvem problemas diferentes.",
+      "O envelope GCM inclui algoritmo, IV, ciphertext e tag; a chave não acompanha os dados.",
+      "Falha de verificação interrompe o fluxo; não use texto parcial.",
+      "Geração, guarda, acesso, rotação, recuperação e revogação fazem parte da segurança da chave.",
+      "O laboratório usa apenas fixtures e não comprova arquitetura nem prontidão de produção."
     ]
   },
   "delivery-server-hardening": {
@@ -5079,6 +5243,11 @@ Object.assign(LESSON_GUIDES, {
       prompt: "Uma pessoa A autentica normalmente, mas a rota usa o ID da URL para carregar o progresso de B. Explique a diferença entre autenticação e autorização, descreva a correção no servidor e proponha um teste positivo e um negativo para leitura e atualização, somente com os dados fictícios do laboratório local.",
       expected: "A sessão válida identifica A, mas não autoriza acesso a B; a API deve derivar a identidade da sessão validada e conferir o dono do objeto em cada ação. Testes permitem A→A e recusam A→B, confirmando que nenhuma resposta ou alteração de B ocorre.",
       hint: "O cliente controla o ID solicitado. Qual identidade confiável o servidor deve comparar com o proprietário do registro?"
+    },
+    "delivery-cryptography": {
+      prompt: "Uma equipe armazena uma frase inventada em envelope AES-GCM e precisa migrar para uma nova chave; uma segunda coluna contém senhas de login em SHA-256. Classifique ambos os desenhos e planeje ações sem acessar conta ou dado real.",
+      expected: "A equipe controla o ciclo da chave e planeja leitura/recifragem e backups; hash SHA-256 geral não é armazenamento adequado de senha e deve ser substituído por provedor ou solução adaptativa aprovada.",
+      hint: "O primeiro dado precisa ser recuperado; a senha de login não. Que responsabilidades cada caso cria?"
     },
     "delivery-server-hardening": {
       prompt: "Uma rota de erro 500 perdeu um dos cabeçalhos, enquanto os caminhos de sucesso ainda o exibem. Planeje como reproduzir a resposta local, comparar ordem do middleware, configurar Vercel e teste e separar a causa local da evidência de Preview; registre também o que CSP ainda exigiria.",
