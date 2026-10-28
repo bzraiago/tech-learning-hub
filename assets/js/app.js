@@ -6,7 +6,9 @@ function closeDialog() { if (dialog.open) dialog.close(); }
 $('#close-dialog').addEventListener('click', closeDialog);
 dialog.addEventListener('close', () => {
   document.body.style.overflow = '';
+  const closedProject = dialogContext?.type === 'project';
   dialogContext = null;
+  if (closedProject) renderReadiness();
   const original = dialogReturnFocus;
   const restored = original?.isConnected ? original : original?.dataset.focus ? document.querySelector(`[data-focus="${original.dataset.focus}"]`) : null;
   (restored || $('#resume')).focus({ preventScroll: true });

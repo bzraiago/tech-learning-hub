@@ -25,18 +25,29 @@ const lessonsOf = (track) => track.modules.flatMap((module) => module.lessons);
 let startupNotice = '';
 
 const READINESS_EVIDENCE = [
-  { id: 'history', title: 'Histórico compreensível', detail: 'Repositório com commits pequenos, README reproduzível e uma mudança feita em branch.', track: 'git-workflow' },
-  { id: 'review', title: 'Colaboração verificável', detail: 'Issue com critérios de aceite, proposta de alteração e revisão incorporada.', track: 'git-workflow' },
-  { id: 'tests', title: 'Teste e correção de falha', detail: 'Teste que falha para um defeito, correção correspondente e teste de regressão aprovado.', track: 'quality' },
-  { id: 'maintenance', title: 'Manutenção segura', detail: 'Refatoração pequena com comportamento preservado, dependências documentadas e verificação de acessibilidade.', track: 'quality' },
-  { id: 'data', title: 'Dados consultáveis', detail: 'Modelo simples e consultas SQL que respondem a requisitos, com entradas e resultados explicados.', track: 'database' },
-  { id: 'service', title: 'Integração com serviço', detail: 'Interface que trata carregamento, sucesso, vazio e falha, com dados validados.', track: 'delivery' },
-  { id: 'delivery', title: 'Entrega e novo requisito', detail: 'Aplicação publicada, instruções de execução e mudança de requisito demonstrada com critérios de aceite.', track: 'delivery' }
+  { id: 'history', title: 'Histórico compreensível', detail: 'Repositório com commits pequenos, README reproduzível e uma mudança feita em branch.', track: 'git-workflow', projectId: 'project-git-capstone', projectNote: 'Confira o histórico e o README no repositório; o dashboard não inspeciona Git.' },
+  { id: 'review', title: 'Colaboração verificável', detail: 'Issue com critérios de aceite, proposta de alteração e revisão incorporada.', track: 'git-workflow', projectId: 'project-git-capstone', projectNote: 'A revisão pode ser real ou simulada e precisa estar identificada no artefato; o dashboard não verifica uma pessoa revisora.' },
+  { id: 'tests', title: 'Teste e correção de falha', detail: 'Teste que falha para um defeito, correção correspondente e teste de regressão aprovado.', track: 'quality', projectId: 'project-quality-capstone', projectNote: 'O projeto pede evidência de vermelho → verde; o dashboard não executa seu repositório.' },
+  { id: 'maintenance', title: 'Manutenção segura', detail: 'Refatoração pequena com comportamento preservado, dependências documentadas e verificação de acessibilidade.', track: 'quality', projectId: 'project-quality-capstone', projectNote: 'Confira a refatoração, as dependências e o roteiro de interface nos artefatos do projeto.' },
+  { id: 'data', title: 'Dados consultáveis', detail: 'Modelo simples e consultas SQL que respondem a requisitos, com entradas e resultados explicados.', track: 'database', projectId: 'project-basic-capstone', projectNote: 'A prova básica pede relatório Python sobre JSON e consultas SQLite; registre comandos e saídas observadas.' },
+  { id: 'service', title: 'Integração com serviço', detail: 'Interface que trata carregamento, sucesso, vazio e falha, com dados validados.', track: 'delivery', projectId: 'project-delivery-capstone', projectNote: 'O projeto usa API local simulada em memória; não prova autenticação ou persistência de produção.' },
+  { id: 'delivery', title: 'Entrega e novo requisito', detail: 'Aplicação publicada, instruções de execução e mudança de requisito demonstrada com critérios de aceite.', track: 'delivery', projectId: 'project-delivery-capstone', projectNote: 'O projeto relacionado prepara um plano de publicação, não faz deploy; confira URL, HTTPS e mudança fora do dashboard.' }
 ];
+function readinessProjectMarkup(item) {
+  const project = PROJECTS.find(candidate => candidate.id === item.projectId);
+  if (!project) return '';
+  const entry = state.projects[project.id];
+  const status = entry?.delivered
+    ? entry.explanation?.trim()
+      ? 'Entrega registrada no curso como autoavaliação.'
+      : 'Entrega anterior registrada; explicação ainda pendente.'
+    : 'Nenhuma entrega registrada no curso.';
+  return `<div class="mt-3 rounded-xl border border-white/8 bg-white/[.025] p-3"><p class="text-xs font-semibold text-slate-300">Projeto relacionado: ${escapeHTML(project.title)}</p><p role="status" aria-live="polite" class="mt-1 text-xs leading-5 text-sky-200">${status}</p><p class="mt-1 text-xs leading-5 text-slate-400">${escapeHTML(item.projectNote)}</p><button type="button" aria-label="Abrir projeto: ${escapeHTML(project.title)}" data-project="${escapeHTML(project.id)}" data-focus="project-${escapeHTML(project.id)}" class="mt-2 rounded-lg border border-amber-300/25 px-3 py-2 text-xs font-semibold text-amber-100 hover:bg-amber-300/10">Abrir projeto relacionado</button></div>`;
+}
 function renderReadiness() {
   const count = READINESS_EVIDENCE.filter(item => state.readiness[item.id]).length;
   $('#readiness-count').textContent = `${count} de ${READINESS_EVIDENCE.length} evidências registradas`;
-  $('#readiness-items').innerHTML = READINESS_EVIDENCE.map(item => `<li class="rounded-xl border border-white/10 bg-[#101522] p-4"><label class="flex cursor-pointer items-start gap-3"><input type="checkbox" data-readiness="${item.id}" ${state.readiness[item.id] ? 'checked' : ''} class="mt-1 h-4 w-4 shrink-0 accent-emerald-400"><span><strong class="block text-sm text-slate-100">${item.title}</strong><span class="mt-1 block text-xs leading-6 text-slate-400">${item.detail}</span></span></label><button data-track="${item.track}" data-focus="card-${item.track}" class="mt-3 pl-7 text-xs font-semibold text-violet-300 hover:text-violet-100">Abrir trilha relacionada →</button></li>`).join('');
+  $('#readiness-items').innerHTML = READINESS_EVIDENCE.map(item => `<li class="rounded-xl border border-white/10 bg-[#101522] p-4"><label class="flex cursor-pointer items-start gap-3"><input type="checkbox" data-readiness="${item.id}" ${state.readiness[item.id] ? 'checked' : ''} class="mt-1 h-4 w-4 shrink-0 accent-emerald-400"><span><strong class="block text-sm text-slate-100">${item.title}</strong><span class="mt-1 block text-xs leading-6 text-slate-400">${item.detail}</span></span></label>${readinessProjectMarkup(item)}<button type="button" data-track="${item.track}" data-focus="card-${item.track}" class="mt-3 pl-7 text-xs font-semibold text-violet-300 hover:text-violet-100">Abrir trilha relacionada →</button></li>`).join('');
 }
 
 function validEvidenceDate(value) {
