@@ -1004,11 +1004,16 @@ Object.assign(LESSON_GUIDES, {
           "Rollback é voltar a uma versão que se sabe funcionar quando a versão nova causa problema grave. Ele precisa ser planejado: identifique a versão anterior, preserve artefato ou commit, saiba como restaurar e verifique o fluxo principal depois. Se houve mudança de dados incompatível, voltar só os arquivos pode não bastar; comunique a dependência. Em exercício local, copie a versão anterior e reproduza a volta sem apagar o histórico da falha.",
           "Não confunda corrigir rapidamente com esconder o problema. Quando impacto é alto, restaurar primeiro pode reduzir dano; depois investigue com tempo. Registre causa, proteção adicionada e como o defeito foi detectado. Isso é parte da manutenção profissional de um projeto, mesmo em uma equipe pequena.",
           "O roteiro `labs/backend-layers/BACKUP_RESTORE.md` restaura um dump PostgreSQL numa base separada; `PROVIDER_MIGRATION.md` amplia o ensaio para inventariar roles, extensões, identidade, Redis, arquivos e configuração. Um `pg_dump` comum contém uma base, não transfere todos os serviços do produto. Compare dados e comportamento no destino, preserve a origem e defina como tratar gravações depois do corte antes de autorizar retorno.",
+          "Para manter versões de aplicação compatíveis, use uma sequência expansiva e depois contrativa. Primeiro acrescente um campo opcional (`003_add_observacao_sessoes.sql`); a versão antiga, que declara as colunas que usa, continua lendo e gravando. Uma versão posterior pode começar a preencher o campo. Só planeje remover campos depois que nenhum deployment antigo depender deles, os dados tiverem destino decidido e uma migration separada tiver sido ensaiada. O [`ALTER TABLE` do PostgreSQL](https://www.postgresql.org/docs/17/sql-altertable.html) pode exigir locks; numa base real, verifique a operação e o tamanho antes da janela.",
+          "Para reverter o Preview `testes`, `labs/backend-layers/DEPLOY_VERCEL.md` orienta o [`git revert`](https://git-scm.com/docs/git-revert) seguido de um novo push; a [integração Git da Vercel](https://vercel.com/docs/git) cria um deployment associado ao commit. A reversão da aplicação deixa a migration expansiva aplicada; ela não apaga observações nem deve disparar uma migration destrutiva automaticamente.",
           "Pausa: ordene registrar versão, restaurar versão estável, verificar o fluxo principal e investigar a causa. Indique quando uma migração de dados exige cuidado adicional."
         ],
         "terms": [
           { "term": "Ponto de corte", "meaning": "Momento planejado em que o tráfego ou as gravações passam da origem para o destino." },
-          { "term": "Ensaio de restauração", "meaning": "Prova de que um backup pode ser restaurado num destino separado e verificado antes de depender dele." }
+          { "term": "Ensaio de restauração", "meaning": "Prova de que um backup pode ser restaurado num destino separado e verificado antes de depender dele." },
+          { "term": "Migration expansiva", "meaning": "Mudança aditiva que permite coexistência temporária entre código antigo e novo, como uma coluna opcional." },
+          { "term": "Migration contrativa", "meaning": "Etapa posterior que remove uma estrutura antiga após verificar que versões e dados não dependem mais dela." },
+          { "term": "Compatibilidade reversa", "meaning": "Capacidade do esquema novo de continuar atendendo a versão anterior da aplicação durante um rollback planejado." }
         ]
       },
       {
@@ -1053,6 +1058,10 @@ Object.assign(LESSON_GUIDES, {
       {
         "instruction": "Leia `labs/backend-layers/BACKUP_RESTORE.md` e `PROVIDER_MIGRATION.md`; anote o que o dump copia, o que precisa ser criado/configurado à parte e qual evidência libera o corte.",
         "result": "A análise separa uma base PostgreSQL de roles, identidade, Redis, arquivos e configuração; exige restaurar e comparar num destino isolado, manter a origem e definir condição de retorno."
+      },
+      {
+        "instruction": "Com PostgreSQL descartável e migrations aplicadas, use o comando por sistema descrito no README: no PowerShell defina `$env:RUN_MIGRATION_COMPATIBILITY = '1'` e rode `npm.cmd run test:migration-compatibility`; em macOS/Linux rode `RUN_MIGRATION_COMPATIBILITY=1 npm run test:migration-compatibility`. Compare o contrato do repositório antes e depois de `003`.",
+        "result": "A versão antiga opera antes e depois da coluna opcional; a nova escrita preserva os campos lidos pelo código antigo. O teste usa uma base temporária e não faz deploy."
       }
     ],
     "exercises": [
@@ -1123,13 +1132,22 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "Uma nova restrição de indisponibilidade muda o método de migração; omitir validação para caber no prazo aumenta o risco de perda ou divergência de dados.",
         "expected": "O plano é adiado ou substituído por uma estratégia comprovada; origem e destino ficam identificados, e existe critério verificável para prosseguir ou abortar.",
         "criteria": ["Compara a janela nova ao tempo medido e não promete zero downtime sem prova.", "Preserva a origem e define validação final, condição de aborto e tratamento de escritas no destino.", "Qualquer estratégia incremental ou com dois sistemas é ensaiada e inclui reconciliação e retorno." ]
+      },
+      {
+        "prompt": "Mudança de requisito: a versão nova já gravou valores em `observacao`, mas um defeito exige voltar à aplicação anterior. Decida o que deve ser revertido agora e o que precisa continuar no banco; indique uma condição verificável para considerar uma migration contrativa mais tarde.",
+        "hints": ["Separe o commit/deployment da migration SQL.", "O repositório anterior nomeia as colunas que lê e escreve; confirme esse contrato no teste de compatibilidade."],
+        "solution": "Reverter o commit da aplicação no Preview com `git revert` e manter `003_add_observacao_sessoes.sql` aplicada. A aplicação anterior pode ler/escrever suas colunas, enquanto observações existentes permanecem no banco. Considere remover a coluna somente depois de não haver deployments que a leiam/escrevam, decidir como preservar ou descartar esses valores e testar uma migration contrativa em uma cópia.",
+        "explanation": "Um rollback do código não é uma restauração do esquema. Remover a coluna junto com o código pode apagar dados ou impedir que uma versão ainda ativa funcione.",
+        "expected": "A aplicação volta por commit revertido; o schema permanece expandido e o dado novo não é apagado automaticamente. A contração fica condicionada a uma verificação separada de versões, dados e plano de recuperação.",
+        "criteria": ["Distingue rollback de deployment de rollback de migration.", "Mantém a migration 003 e confere que o repositório antigo opera após ela.", "Define evidência e destino dos valores antes de qualquer remoção futura."]
       }
     ],
     "mistakes": [
       "Confundir testes passando com garantia de ausência de defeitos.",
       "Usar uma expectativa calculada pela própria função testada.",
       "Ignorar o primeiro erro da CI e tentar publicar mesmo assim.",
-      "Fazer rollback sem considerar mudanças de dados."
+      "Fazer rollback sem considerar mudanças de dados.",
+      "Remover automaticamente uma coluna porque o código novo foi revertido."
     ],
     "quiz": [
       {
@@ -1167,6 +1185,12 @@ Object.assign(LESSON_GUIDES, {
         "options": ["As linhas das tabelas da base exportada.", "Roles globais do cluster e configurações dos outros serviços, como identidade e arquivos.", "O schema e os objetos que estiverem incluídos no dump."],
         "correctIndex": 1,
         "explanation": "Um dump cobre uma base PostgreSQL; roles/tablespaces são globais, e identidade, cache, arquivos e configuração exigem plano próprio."
+      },
+      {
+        "question": "Depois de reverter a aplicação para a versão anterior, o que fazer com uma coluna opcional já aplicada?",
+        "options": ["Removê-la imediatamente para que o schema volte a coincidir com o código.", "Manter a migration expansiva enquanto a versão antiga for compatível; planejar uma contração separada após avaliar deployments e dados.", "Apagar a tabela e recriá-la com as colunas antigas."],
+        "correctIndex": 1,
+        "explanation": "Código e esquema têm ciclos distintos; uma migration aditiva pode continuar aplicada, preservando compatibilidade e dados até uma contração segura."
       }
     ],
     "summary": [
@@ -1175,7 +1199,8 @@ Object.assign(LESSON_GUIDES, {
       "Observe, reproduza, contenha, corrija e acrescente regressão.",
       "Use logs JSON estruturados com campos permitidos e sem payload, IP, credenciais ou stack.",
       "Separe liveness de readiness e teste alerta local com um limiar explícito.",
-      "Restaure backups em destino separado e valide comportamento; `pg_dump` não migra identidade, Redis, arquivos ou configuração por conta própria."
+      "Restaure backups em destino separado e valide comportamento; `pg_dump` não migra identidade, Redis, arquivos ou configuração por conta própria.",
+      "Prefira expandir o esquema antes de mudar a aplicação; um rollback de código pode deixar a migration aplicada até a contração ser segura."
     ]
   },
   "delivery-threat-model": {

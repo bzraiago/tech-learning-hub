@@ -91,6 +91,12 @@ jobs:
           RUN_PG_INTEGRATION: '1'
         run: npm run test:db
 
+      - name: Test compatibility with the previous application version
+        working-directory: labs/backend-layers
+        env:
+          RUN_MIGRATION_COMPATIBILITY: '1'
+        run: npm run test:migration-compatibility
+
       - name: Test cache-aside with PostgreSQL and Redis
         working-directory: labs/backend-layers
         env:

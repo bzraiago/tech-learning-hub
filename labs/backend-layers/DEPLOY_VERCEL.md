@@ -60,6 +60,47 @@ O rollback recupera a implantação, mas não desfaz mudanças de dados, migrati
 
 O comando equivalente da CLI é `vercel rollback`; ele exige a CLI instalada, o projeto vinculado e uma sessão autenticada. Para este primeiro procedimento, use o painel e não execute o rollback em produção como exercício sem planejar a janela e verificar o alvo.
 
+## Reverter um Preview da branch `testes`
+
+Este repositório usa `testes` como branch de Preview. Para tirar uma alteração defeituosa desse Preview, crie um commit [`git revert`](https://git-scm.com/docs/git-revert) que a desfaça; a [integração Git da Vercel](https://vercel.com/docs/git) cria um deployment para o novo commit enviado à branch. O histórico permanece visível e a ação não altera `main`.
+
+1. Abra o terminal na raiz do repositório, confira que o working tree está limpo e identifique o SHA do commit defeituoso e o Preview correspondente:
+
+   ```sh
+   git switch testes
+   git status --short
+   git log -5 --oneline
+   ```
+
+2. Confira que o commit escolhido introduziu a regressão. Em seguida, reverta esse SHA:
+
+   ```sh
+   git revert --no-edit <sha-do-commit-defeituoso>
+   git show --stat --oneline HEAD
+   ```
+
+   `git revert` cria um commit novo que desfaz as alterações selecionadas. Se houver conflito, leia o diff e resolva somente a reversão pretendida antes de continuar; não force a atualização do histórico remoto.
+
+3. Publique a reversão somente em `testes`:
+
+   ```sh
+   git push origin testes
+   ```
+
+4. No painel Vercel, confirme que o novo deployment aponta à branch `testes` e ao commit de reversão. Aguarde **Ready** e repita o teste do fluxo que falhou na URL Preview. Se o Preview pedir autenticação Vercel, registre a barreira sem tentar removê-la.
+
+5. Depois da correção, uma nova reversão do commit de rollback reaplica as alterações. Antes disso, confira o diff, os testes e a compatibilidade do esquema:
+
+   ```sh
+   git log -5 --oneline
+   git revert --no-edit <sha-do-commit-de-rollback>
+   git push origin testes
+   ```
+
+Esse procedimento reverte código e gera outro Preview; ele não desfaz escritas, migrations ou variáveis dos serviços externos. A migration expansiva `003_add_observacao_sessoes.sql` deve continuar aplicada ao voltar à versão anterior, pois essa versão não depende da coluna. Só planeje remover uma coluna em uma migration futura, depois de confirmar que nenhum código antigo ou novo depende dela e decidir o destino dos valores já gravados.
+
+O teste `npm run test:migration-compatibility` ensaia a compatibilidade do repositório anterior com esse schema expandido numa base PostgreSQL temporária; ele não executa `git revert`, não publica um deployment nem substitui a conferência real da URL Preview.
+
 ## Limites observáveis
 
 - O serviço externo pode falhar, limitar chamadas ou mudar o contrato; a tela não promete disponibilidade contínua.

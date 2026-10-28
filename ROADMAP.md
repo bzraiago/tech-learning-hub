@@ -465,7 +465,12 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Manter `BACKUP_RESTORE.md` como procedimento PostgreSQL e criar `PROVIDER_MIGRATION.md` para inventariar roles, extensões, identidade, Redis, arquivos, configuração, corte, retorno e validação numa cópia isolada.
   - [x] Ligar a prática ao README e à aula `delivery-ci`; explicitar que o dump local não migra Clerk, RLS gerenciado, Redis, arquivos nem segredos.
   - [x] Reexecutar restauração em PostgreSQL 17 descartável com dados fictícios: `estudos=2`, `sessoes=1`, hashes iguais e origem preservada; `src/postgres.integration.test.cjs` passou 1/1 contra a base restaurada. Não houve migração remota, de Clerk ou Supabase.
-- [ ] Criar rollback da aplicação e migração de banco compatível com a versão anterior quando necessário.
+- [x] Criar rollback da aplicação e migration de banco compatível com a versão anterior quando necessário.
+  - [x] `003_add_observacao_sessoes.sql` acrescenta uma coluna opcional; `migration-compatibility.integration.test.cjs` aceita somente host de loopback e o banco `backend_camadas`, aplica `001` e `002`, usa o repositório anterior, aplica a expansão e confirma leituras e gravações antigas antes e depois, inclusive após uma observação fictícia ser gravada pela forma nova.
+  - [x] Validar no PostgreSQL 17 descartável do Compose: compatibilidade passou 1/1; a base temporária, volume e rede exclusivos foram removidos. Simulação em repositório Git descartável confirmou que `git revert` cria um commit novo e restaura o conteúdo anterior.
+  - [x] Documentar em `DEPLOY_VERCEL.md` o rollback do Preview `testes` por `git revert`, push e conferência do novo deployment; manter a migration expansiva aplicada e separar o procedimento de Production Instant Rollback.
+  - [x] Atualizar `delivery-ci` com prática, erros e quiz sobre compatibilidade expansiva/contrativa; validador registrou 132 aulas, 536 exercícios e 409 questões; auditoria de carga, 57 testes unitários, 3 E2E, sintaxe e `git diff --check` passaram. Revisão visual da aula não executada.
+  - [x] Não houve rollback nem deploy Vercel remoto nesta sessão; o roteiro requer conferência autenticada do Preview após o push.
 - [ ] Produzir runbook de deploy, falha de autenticação, falha de banco, incidente e recuperação.
 
 **Aceite:** existem evidências da execução remota da CI, do Preview acessível com HTTPS, da recuperação de versão e dados e da correção de uma falha protegida por regressão. Domínio próprio não é requisito de publicação para este projeto.

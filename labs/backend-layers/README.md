@@ -91,7 +91,7 @@ npm.cmd run migrate
 npm run migrate
 ```
 
-Saída esperada na primeira execução: `Migration aplicada: 001_create_estudos.sql` e `Migration aplicada: 002_create_sessoes_estudo.sql`. Execute o comando outra vez: deve informar `Migration já aplicada...` para os dois arquivos, sem repetir alterações. O aplicador percorre arquivos numerados em ordem, registra cada nome em `migrations_aplicadas` e usa uma transação por arquivo.
+Saída esperada na primeira execução: `Migration aplicada` para `001_create_estudos.sql`, `002_create_sessoes_estudo.sql` e `003_add_observacao_sessoes.sql`. Execute o comando outra vez: os três arquivos devem aparecer como já aplicados, sem repetir alterações. O aplicador percorre migrations numeradas em ordem, registra cada nome em `migrations_aplicadas` e usa uma transação por arquivo.
 
 Confira os registros iniciais sem instalar um cliente PostgreSQL no computador:
 
@@ -406,7 +406,7 @@ Se Docker não estiver disponível mas o computador já tiver PostgreSQL local, 
 | Regra de negócio | Compara títulos sem considerar espaços externos e caixa | `src/regra-titulo.cjs` e `src/servico-estudos.cjs` |
 | Repositório | Executa `SELECT`/`INSERT` com parâmetros e converte o resultado | `src/repositorio-estudos-postgres.cjs` |
 | Pool | Reutiliza até cinco conexões e lê as variáveis `PG*` | `src/configuracao-banco.cjs` |
-| Esquema | Cria estudos, sessões e suas restrições | `migrations/001_create_estudos.sql`, `migrations/002_create_sessoes_estudo.sql` |
+| Esquema | Cria estudos, sessões e suas restrições; a 003 adiciona `observacao` opcional às sessões | `migrations/001_create_estudos.sql` a `migrations/003_add_observacao_sessoes.sql` |
 | Aplicador | Executa migrations numeradas em ordem e registra cada arquivo uma vez | `scripts/aplicar-migration.cjs` |
 
 O índice único é a última barreira contra duplicidade quando pedidos simultâneos passam pela consulta de busca. O serviço transforma somente essa violação conhecida em `409`; falhas de conexão continuam como erro de servidor. `migrations_aplicadas` registra qual arquivo foi aplicado, e a migration roda na mesma transação da marcação.
@@ -430,43 +430,67 @@ Resultado esperado: `201`, um estudo e uma sessão com `minutos: 25`. Reenvie o 
 
 Para observar o rollback no PostgreSQL sem guardar dados de teste, execute `npm.cmd run demo:rollback` no Windows ou `npm run demo:rollback` em macOS/Linux. O roteiro tenta inserir um estudo e uma sessão inválida; o `CHECK` rejeita a sessão, `ROLLBACK` desfaz o estudo e a consulta final confirma que ele não existe. Saída esperada: `Rollback confirmado: a falha da sessão também desfez a criação do estudo.`
 
-## Prática guiada: criar uma terceira migration
+## Compatibilidade antes de reverter a aplicação
+
+A migration `003_add_observacao_sessoes.sql` é expansiva: acrescenta `observacao TEXT` aceitando `NULL`. O código anterior nomeia explicitamente as colunas de sessão em `INSERT` e `SELECT`; a coluna opcional não exige alteração imediata desse código. A coluna não deve ser removida só porque a aplicação voltou a uma versão anterior.
+
+O teste automatizado só prossegue com um host de loopback (`127.0.0.1`, `::1` ou `localhost`) e `PGDATABASE=backend_camadas`. Ele cria uma base PostgreSQL temporária, aplica primeiro `001` e `002`, usa o repositório anterior, aplica `003` e repete operações com o mesmo contrato antigo. Em seguida grava uma observação fictícia pela forma de escrita nova, confirma que uma consulta antiga ainda lê os demais campos e executa outra gravação com o repositório anterior. O valor da observação deve continuar preservado. O script remove somente a base que criou e exige que o usuário PostgreSQL possa criar e remover uma base de teste. Rode apenas no Compose descartável do laboratório, nunca no Supabase ou numa base com dados reais.
+
+Com PostgreSQL saudável, terminal em `labs/backend-layers` e `.env` local configurado:
+
+```powershell
+# Windows PowerShell
+$env:RUN_MIGRATION_COMPATIBILITY = '1'
+npm.cmd run test:migration-compatibility
+Remove-Item Env:RUN_MIGRATION_COMPATIBILITY
+```
+
+```sh
+# macOS ou Linux
+RUN_MIGRATION_COMPATIBILITY=1 npm run test:migration-compatibility
+```
+
+Saída esperada: `Compatibilidade confirmada: versão anterior operou antes e depois da migration expansiva.` e `1` teste aprovado. A verificação não faz deploy nem altera uma instância Vercel. O roteiro de Preview abaixo explica como reverter um commit por Git.
+
+Uma mudança que não for mais necessária passa por uma etapa separada de contração: primeiro confirme que nenhum deployment antigo depende dela e decida como preservar ou descartar os dados da coluna. Só então avalie uma nova migration destrutiva, com backup e ensaio próprios; não edite a migration já aplicada.
+
+## Prática guiada: criar uma quarta migration
 
 ### Objetivo e pré-requisitos
 
-Ao final, você consegue ampliar uma tabela sem alterar arquivos de migration que já foram aplicados. Conclua os passos anteriores até aplicar `001_create_estudos.sql` e `002_create_sessoes_estudo.sql`. Use somente a base descartável `backend_camadas`; não conecte esta prática ao Supabase nem a uma base com dados importantes.
+Ao final, você consegue ampliar uma tabela sem alterar arquivos de migration que já foram aplicados. Conclua os passos anteriores até aplicar as migrations `001`, `002` e `003`. Use somente a base descartável `backend_camadas`; não conecte esta prática ao Supabase nem a uma base com dados importantes.
 
 ### Preveja e confira o resultado esperado
 
-Antes de editar, anote sua previsão: após a migration, `sessoes_estudo` terá uma coluna opcional chamada `observacao`, as migrations anteriores continuarão intactas e haverá três registros em `migrations_aplicadas`. Executar o aplicador de novo não deve criar uma quarta entrada.
+Antes de editar, anote sua previsão: após a migration, `estudos` terá uma coluna opcional `revisada_em`, as migrations anteriores continuarão intactas e haverá quatro registros em `migrations_aplicadas`. Executar o aplicador de novo não deve criar uma quinta entrada.
 
-Depois da execução, a consulta ao catálogo do PostgreSQL deve mostrar uma linha com `column_name = observacao` e `is_nullable = YES`. Se já houver sessões, a consulta delas deve mostrar `NULL` para a nova coluna; se ainda não houver sessões, a definição da coluna é suficiente para conferir esta prática.
+Depois da execução, a consulta ao catálogo do PostgreSQL deve mostrar uma linha com `column_name = revisada_em` e `is_nullable = YES`. Registros de estudo existentes devem apresentar `NULL` nessa coluna.
 
 ### Faça a mudança
 
-1. No editor, dentro da pasta `labs/backend-layers`, crie `migrations/003_add_observacao_sessoes.sql`. Não edite, renomeie nem apague os arquivos `001` e `002`.
-2. Nesse arquivo, escreva uma instrução `ALTER TABLE` que adicione a `sessoes_estudo` a coluna `observacao`, do tipo `TEXT` e que aceite `NULL`. Dica: procure os comandos `ALTER TABLE` e `ADD COLUMN` na documentação SQL já consultada no curso; não é necessário adicionar um valor padrão.
+1. No editor, dentro da pasta `labs/backend-layers`, crie `migrations/004_add_revisada_em_estudos.sql`. Não edite, renomeie nem apague os arquivos `001`, `002` ou `003`.
+2. Nesse arquivo, escreva uma instrução `ALTER TABLE` que adicione a `estudos` a coluna `revisada_em`, do tipo `TIMESTAMPTZ` e que aceite `NULL`. Não é necessário adicionar um valor padrão.
 3. Salve o arquivo. No terminal aberto em `labs/backend-layers`, execute `npm.cmd run migrate` no Windows ou `npm run migrate` em macOS/Linux.
 
-Saída esperada na primeira execução: `Migration já aplicada` para `001` e `002`, e `Migration aplicada: 003_add_observacao_sessoes.sql`. Execute o comando uma segunda vez: os três nomes devem aparecer como já aplicados.
+Saída esperada na primeira execução: `Migration já aplicada` para `001`, `002` e `003`, e `Migration aplicada: 004_add_revisada_em_estudos.sql`. Execute o comando uma segunda vez: os quatro nomes devem aparecer como já aplicados.
 
 ### Verifique no PostgreSQL
 
 No caminho Docker, execute no terminal da pasta do laboratório:
 
 ```sh
-docker compose exec -T db psql -U aluno -d backend_camadas -c "SELECT column_name, is_nullable FROM information_schema.columns WHERE table_name = 'sessoes_estudo' AND column_name = 'observacao';"
+docker compose exec -T db psql -U aluno -d backend_camadas -c "SELECT column_name, is_nullable FROM information_schema.columns WHERE table_name = 'estudos' AND column_name = 'revisada_em';"
 docker compose exec -T db psql -U aluno -d backend_camadas -c "SELECT id FROM migrations_aplicadas ORDER BY id;"
 ```
 
 Se estiver usando uma instalação local de PostgreSQL, execute as mesmas consultas com `psql -h 127.0.0.1 -p 55433 -U aluno -d backend_camadas -c "..."`, substituindo host, porta e usuário pelos valores configurados no `.env`.
 
-Critérios de aceite: a primeira consulta mostra `observacao | YES`; a segunda lista exatamente as migrations `001`, `002` e `003`; a segunda execução de `npm run migrate` não reaplica nenhuma delas; os arquivos `001` e `002` continuam iguais. Se já houver sessões, confira também `SELECT id, observacao FROM sessoes_estudo ORDER BY id;` e explique por que os valores antigos são `NULL`.
+Critérios de aceite: a primeira consulta mostra `revisada_em | YES`; a segunda lista exatamente as migrations `001`, `002`, `003` e `004`; a segunda execução de `npm run migrate` não reaplica nenhuma delas; os três arquivos anteriores continuam iguais. Confira também `SELECT id, revisada_em FROM estudos ORDER BY id;` e explique por que os valores anteriores são `NULL`.
 
 ### Erros comuns e retomada
 
 - `relation "sessoes_estudo" does not exist`: confira o banco com `npm.cmd run db:check` e aplique primeiro as migrations iniciais.
-- `column "observacao" already exists`: confira se `003_add_observacao_sessoes.sql` consta em `migrations_aplicadas`; não remova o registro nem altere uma migration já aplicada para esconder o erro.
+- `column "revisada_em" already exists`: confira se `004_add_revisada_em_estudos.sql` consta em `migrations_aplicadas`; não remova o registro nem altere uma migration já aplicada para esconder o erro.
 - A migration aparece como já aplicada: este é o resultado correto ao repetir o comando. Para refazer a atividade do zero, use outra base descartável e aplique as migrations nela.
 
 Para parar, use `Ctrl+C` na API e `docker compose down` no terminal. Para retomar, inicie o banco, confira `npm.cmd run db:check` e execute `npm.cmd run migrate`; o aplicador continua da próxima migration pendente. Não use `docker compose down -v` para reiniciar esta prática.
@@ -484,7 +508,8 @@ Em cada mudança, anote camada alterada, comando, status e estado dos dados ante
 
 ## Referências oficiais consultadas
 
-- [Node.js: opção `--env-file`](https://nodejs.org/api/cli.html#--env-fileconfig) — carregar o `.env` local sem dependência adicional.
+- [Node.js: opção `--env-file`](https://nodejs.org/api/cli.html#--env-filefile) — carregar o `.env` local sem dependência adicional; variável definida no processo tem precedência.
+- [PostgreSQL 17: `ALTER TABLE`](https://www.postgresql.org/docs/17/sql-altertable.html) — acrescentar, alterar ou remover colunas e restrições.
 - [node-postgres: instalação e visão geral](https://node-postgres.com/) — pacote `pg` e compatibilidade.
 - [node-postgres: conexão e variáveis de ambiente](https://node-postgres.com/features/connecting) — configuração do pool com `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD` e `PGDATABASE`.
 - [node-postgres: consultas parametrizadas](https://node-postgres.com/features/queries) — enviar valores separados do texto SQL.

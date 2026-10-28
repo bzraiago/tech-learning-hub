@@ -39,7 +39,7 @@ npm run db:check
 npm run migrate
 ```
 
-Resultado esperado: `Conexão OK` e as migrations `001` e `002` aparecem como aplicadas ou já aplicadas. Em uma base recém-criada, `estudos` contém `HTML` e `JavaScript`, e `sessoes_estudo` começa vazia.
+Resultado esperado: `Conexão OK` e as migrations `001`, `002` e `003` aparecem como aplicadas ou já aplicadas. Em uma base recém-criada, `estudos` contém `HTML` e `JavaScript`, `sessoes_estudo` começa vazia e a coluna opcional `observacao` aceita `NULL`.
 
 ## 2. Criar e conferir o backup
 

@@ -16,6 +16,7 @@
     "benchmark:cache": "node --env-file=.env scripts/benchmark-cache-aside.cjs",
     "monitor:api": "node scripts/monitorar-api.cjs",
     "test:db": "node --env-file=.env --test src/postgres.integration.test.cjs",
+    "test:migration-compatibility": "node --env-file=.env --test src/migration-compatibility.integration.test.cjs",
     "test:e2e": "playwright test",
     "smoke:open-meteo": "node scripts/testar-open-meteo.cjs"
   },
