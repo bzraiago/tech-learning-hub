@@ -1764,6 +1764,174 @@ Object.assign(LESSON_GUIDES, {
       "Teste local e regra Vercel versionada não equivalem a inspeção manual do Preview."
     ]
   },
+  "delivery-security-misconfiguration": {
+    "prerequisites": "Concluir delivery-server-hardening e setup-node. A aula retoma pedido, resposta, status e cabeçalho HTTP antes de explicar CSP; não exige conhecimento prévio de segurança de navegador.",
+    "setup": "Leia labs/security-misconfiguration/README.md. Node.js 20.6 ou posterior basta; não há dependências. Na raiz, execute node --test labs/security-misconfiguration/server.test.cjs. Para abrir as páginas, inicie node labs/security-misconfiguration/server.cjs e use somente 127.0.0.1:4183. Testes HTTP não verificam enforcement do navegador; a aula funciona no papel se não houver navegador/computador.",
+    "why": "Configuração segura depende do que uma aplicação realmente carrega e de quem pode fazer o quê. CSP restringe recursos que o navegador aceita, mas não é login nem autorização. Esta aula explica a regra, compara uma política ampla e uma restrita em servidor local e planeja a adoção sem adicionar uma lista de origens às cegas. Referências oficiais são opcionais; os conceitos e respostas estão aqui.",
+    "example": {
+      "language": "text",
+      "code": "Página estrita:\nContent-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'\n\nHTML usa /assets/app.js e /assets/style.css da mesma origem.\nHTML não tem script in-line nem chamada externa.\n\nTeste de HTTP observa cabeçalho e caminhos.\nSomente navegador executando a página pode verificar bloqueios reais.",
+      "expected": "Cabeçalho restringe origens e inclui exceções explícitas; recursos locais são compatíveis com a hipótese. A resposta HTTP comprova o texto entregue, não o comportamento do browser.",
+      "explanation": ["`default-src 'none'` nega fontes como padrão; diretivas específicas permitem recursos necessários.", "`'self'` identifica a mesma origem, incluindo esquema e porta.", "Política CSP não autentica nem autoriza contas.", "Report-Only permite observar política sem aplicá-la como bloqueio; enforcement requer teste funcional no navegador."]
+    },
+    "guided": [
+      {
+        "instruction": "Antes de ler os exemplos, explique que recursos o navegador usa numa página com HTML, script, CSS, imagem, login externo e chamada REST.",
+        "result": "Há tipos e origens diferentes; cada recurso precisa ser inventariado e ligado a função/responsável. Nenhuma origem se torna necessária só por aparecer numa configuração antiga."
+      },
+      {
+        "instruction": "Compare `/demo/loose` e `/demo/strict` no README. Preveja quais regras permitem o script in-line e o arquivo local.",
+        "result": "A política ampla permite in-line e fontes genéricas; a restrita permite `self` para script/estilo e nega fontes restantes. A página restrita é só cenário didático, não configuração recomendada para outro site."
+      },
+      {
+        "instruction": "Rode os cinco testes e separe as asserções que verificam cabeçalhos/MIME daquilo que exigiria um browser.",
+        "result": "Os testes leem status, política, MIME e caminhos locais. Não executam JavaScript nem verificam Console/DevTools, bloqueios, Clerk ou compatibilidade Preview."
+      },
+      {
+        "instruction": "Desenhe plano de adoção CSP para um Preview fictício: inventário, hipótese, observação, teste de login/página, decisão, rollback e evidência.",
+        "result": "Plano registra origens e responsáveis, começa em Report-Only se autorizado, classifica violações, testa fluxos e larguras, aplica enforcement somente após compatibilidade e documenta rollback."
+      }
+    ],
+    "sections": [
+      {
+        "title": "Entenda a falha de configuração",
+        "paragraphs": [
+          "Quando você abre uma página, o navegador envia um pedido (request) ao servidor. O servidor devolve uma resposta (response) com um status, cabeçalhos e, muitas vezes, um corpo HTML. O método descreve a ação pedida (por exemplo, `GET` para buscar); `200` costuma indicar sucesso e `404`, recurso não encontrado. `Content-Type` informa o formato do corpo, como `text/html`. Um cabeçalho é um par nome/valor que acompanha a resposta; MIME é a família de formatos usada para descrever esse conteúdo.",
+          "A02 Security Misconfiguration cobre risco criado por definições ausentes, permissivas ou incompatíveis com o propósito do sistema. A mesma regra pode ser adequada numa página e inadequada numa API ou ambiente. Inventarie recurso, dado, ator, origem, necessidade e efeito antes de copiar configuração de outro produto.",
+          "Cabeçalhos HTTP são controles distintos. `X-Content-Type-Options: nosniff` reduz interpretação de MIME diferente do declarado; `Referrer-Policy` limita informação de referência; `X-Frame-Options` restringe enquadramento; `Permissions-Policy` limita recursos do navegador. Compare resposta de sucesso, erro e arquivo estático, porque configuração aplicada só num handler pode desaparecer nos outros caminhos.",
+          "CSP é uma política de defesa em profundidade para conteúdo de documentos no navegador. Ela não valida a pessoa, não concede acesso a dados e não corrige por si só um sink XSS inseguro. Mantenha práticas de saída segura como `textContent`; CSP reduz certos efeitos caso outra barreira falhe."
+        ],
+        "terms": [
+          { "term": "Pedido e resposta HTTP", "meaning": "Troca em que o cliente, como um navegador, pede um recurso ao servidor e recebe status, cabeçalhos e possivelmente um corpo." },
+          { "term": "Método e status", "meaning": "O método indica a ação do pedido; o status numérico resume o resultado da resposta, por exemplo 200 ou 404." },
+          { "term": "Content-Type e MIME", "meaning": "Cabeçalho e família de formatos que identificam o tipo do corpo, como `text/html` para HTML ou `application/json` para JSON." },
+          { "term": "Misconfiguration", "meaning": "Definição ausente, permissiva ou desalinhada com o comportamento que o sistema precisa permitir." },
+          { "term": "Cabeçalho de resposta", "meaning": "Metadado enviado pelo servidor junto ao status e corpo HTTP; navegador pode usá-lo para tratar a resposta." },
+          { "term": "Defesa em profundidade", "meaning": "Camadas independentes reduzem risco; uma não substitui validação ou autorização necessária." },
+          { "term": "CSP", "meaning": "Content Security Policy: política entregue pelo servidor que restringe quais recursos um navegador pode carregar ou executar num documento." }
+        ]
+      },
+      {
+        "title": "Leia origens e diretivas CSP",
+        "paragraphs": [
+          "Content Security Policy (CSP) é um cabeçalho que o navegador lê ao receber um documento e usa para decidir quais recursos relacionados pode carregar ou executar. Uma política usa diretivas separadas por ponto e vírgula. `default-src` fornece padrão para várias diretivas de busca; `script-src`, `style-src`, `img-src` e `connect-src` especificam tipos diferentes. `object-src 'none'` desativa plugins de objeto; `base-uri 'none'` evita que documento redefina a base; `frame-ancestors` limita quem pode embutir a página; `form-action` delimita destinos de formulário. Confira a semântica da diretiva e o contexto HTML antes de concluir que outra regra será herdada.",
+          "`'self'` significa a própria origem: esquema, hostname e porta correspondentes. `*` permite uma gama ampla de fontes. `'unsafe-inline'` e `'unsafe-eval'` retiram barreiras para código in-line ou avaliação dinâmica em diretivas aplicáveis; adicioná-los para fazer a tela funcionar amplia o que o navegador aceita e deve exigir justificativa e avaliação específica.",
+          "Um cabeçalho `Content-Security-Policy` é aplicado pelo navegador; uma resposta vista em `curl` só mostra o que o servidor entregou. `Content-Security-Policy-Report-Only` permite observar violações sem bloquear o recurso; não conte isso como enforcement. CSP tampouco é CORS: uma política de origem e execução de documentos não autentica nem autoriza uma chamada de API."
+        ],
+        "terms": [
+          { "term": "Origem", "meaning": "Combinação de esquema, host e porta usada pelo navegador para diferenciar locais de conteúdo." },
+          { "term": "Esquema, host e porta", "meaning": "Partes de um endereço: `https`, o nome do servidor e o número de porta. Os três juntos identificam a origem; `localhost` e `127.0.0.1` também são hosts diferentes." },
+          { "term": "Diretiva", "meaning": "Regra CSP que trata um tipo de recurso ou uma ação do documento." },
+          { "term": "`'self'`", "meaning": "Fonte que corresponde à própria origem do documento, incluindo esquema e porta." },
+          { "term": "`unsafe-inline` / `unsafe-eval`", "meaning": "Palavras-chave que permitem formas de código in-line/dinâmico; evitá-las quando arquitetura permite e avaliar qualquer exceção." },
+          { "term": "Report-Only", "meaning": "Modo de observação de uma CSP que relata violações sem aplicar bloqueio; precisa de mecanismo de reporte para coletar eventos." },
+          { "term": "API e REST", "meaning": "API é uma interface para programas trocarem pedidos e respostas; REST é um estilo comum de organizar esses recursos por rotas e métodos HTTP." },
+          { "term": "CORS", "meaning": "Regra de compartilhamento de respostas entre origens; é diferente da CSP e não substitui autenticação ou autorização." },
+          { "term": "XSS e sink", "meaning": "XSS é a execução de conteúdo controlado por outra pessoa como código no navegador; sink é o ponto do programa que interpreta ou exibe esse conteúdo." },
+          { "term": "CDN, Clerk e callback", "meaning": "CDN distribui arquivos por uma origem de rede; Clerk é o provedor de identidade usado no projeto; callback é a rota de retorno usada ao terminar um fluxo, como login." }
+        ]
+      },
+      {
+        "title": "Inventarie antes de restringir",
+        "paragraphs": [
+          "Comece pelas páginas e recursos reais: script in-line e externo, módulos, estilos, fontes, imagens, `fetch`, WebSocket, frames, formulários, CDN, Clerk e retorno de login. Para cada origem, anote quem a mantém, dado enviado, comportamento dependente e alternativa local. Uma página simples pode usar poucos recursos; a aplicação completa pode precisar de mais origens e caminhos.",
+          "Prepare uma política mínima como hipótese e observe em ambiente permitido. Report-Only não bloqueia e pode indicar tentativas legítimas e inesperadas; classifique cada uma com contexto e responsável. Relatórios podem conter URLs e outras informações do usuário, então endpoint, acesso e retenção também precisam de projeto. Ausência de relatório não prova ausência de dependência ou ataque.",
+          "Antes de enforcement, rode fluxos que importam: login, callback, páginas, chamadas REST, estilos, arquivos, erros e janela móvel. Confirme em navegador que recursos permitidos carregam e os não autorizados são bloqueados conforme esperado. Documente exceções, rollback e teste depois de alteração de build/fornecedor; não use `'self'` ou CDN genérico como substituto de inventário."
+        ],
+        "terms": [
+          { "term": "Inventário de recursos", "meaning": "Lista de fontes, funções, donos e dependências que precisam ser comparadas à política." },
+          { "term": "Violação reportada", "meaning": "Registro de política observada que teria bloqueado uma ação em modo enforcement; exige triagem, não liberação automática." },
+          { "term": "Rollback", "meaning": "Plano verificável para retornar à configuração anterior se a mudança impedir função necessária." },
+          { "term": "Compatibilidade", "meaning": "Evidência de que páginas e fluxos legítimos continuam funcionando com a nova política." }
+        ]
+      },
+      {
+        "title": "Separe contrato HTTP de efeito no navegador",
+        "paragraphs": [
+          "`labs/security-misconfiguration` compara política ampla e restrita em duas páginas sem contas, dados ou recursos externos. A primeira permite código in-line fixo e a segunda carrega arquivos da mesma origem. O servidor liga somente ao loopback e aplica MIME e cabeçalhos de base também em caminhos de erro.",
+          "Os testes verificam status, conteúdo, CSP, MIME e presença de cabeçalhos por leitura HTTP. Não interpretam CSP, não executam scripts, não inspecionam Console/DevTools e não modelam políticas do navegador. O resultado `pass` comprova as asserções listadas no teste, nada além disso.",
+          "No projeto principal, já existem quatro cabeçalhos globais; CSP permanece pendente de inventário e compatibilidade do site real. Não acrescente uma política de teste à Vercel, não mude valores de Preview e não marque a etapa manual como concluída com base nesta API local."
+        ],
+        "terms": [
+          { "term": "Contrato HTTP", "meaning": "Método, rota, status, cabeçalhos e corpo que o servidor efetivamente envia." },
+          { "term": "Enforcement", "meaning": "Aplicação da regra pelo navegador, que pode permitir ou bloquear carregamentos da página." },
+          { "term": "Escopo de evidência", "meaning": "Conjunto exato de comportamentos que um teste observou; não deve ser ampliado por inferência." },
+          { "term": "Recurso externo", "meaning": "Script, estilo, conexão ou outro conteúdo servido por origem diferente da página." }
+        ]
+      }
+    ],
+    "mistakes": [
+      "Copiar um CSP genérico sem mapear scripts, estilos, login e APIs necessários.",
+      "Tratar Report-Only como se já bloqueasse comportamento.",
+      "Adicionar `*`, `unsafe-inline` ou `unsafe-eval` para silenciar erros sem localizar dependência.",
+      "Confundir CSP/CORS com autenticação ou autorização.",
+      "Concluir que `curl` ou teste de cabeçalho verifica enforcement de navegador.",
+      "Ativar CSP em Production/Preview sem teste de login, callback, UI, erro e rollback."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: `script-src 'self'` recebe uma página de `https://curso.example.test:443`. A página tenta carregar `/assets/app.js` no mesmo host/porta e depois tenta carregar `https://cdn.example.test/app.js`. O que a regra permite e o que ainda não decide?",
+        "expected": "Permite o recurso da mesma origem se esquema/host/porta coincidirem; o CDN é outra origem e não está permitido por essa diretiva. Não decide autorização a dados de API.",
+        "criteria": ["Usa combinação da origem, não só hostname.", "Distingue próprio e CDN.", "Separa CSP de autorização."],
+        "solution": "`/assets/app.js` corresponde à própria origem se protocolo/host/porta forem iguais; `cdn.example.test` é origem distinta. CSP só regula recursos do documento no navegador, não a identidade nem permissões na API.",
+        "explanation": "A cadeia de origem evita presumir que todos os subdomínios ou portas são equivalentes.",
+        "hints": ["A porta faz parte da origem?", "A política decide qual conta o servidor permite ler?"]
+      },
+      {
+        "prompt": "Alterar: a política atual contém `script-src * 'unsafe-inline' 'unsafe-eval'`. Proponha um primeiro inventário e uma hipótese mais restrita para página que só usa JavaScript local, sem ainda ativar política no site real.",
+        "expected": "Inventaria dependências e responsáveis; hipótese permite `script-src 'self'`, nega demais fontes com `default-src 'none'` e lista outras diretivas necessárias; teste ocorre em Report-Only/ambiente isolado.",
+        "criteria": ["Remove permissão ampla sem aplicá-la cegamente.", "Nomeia recursos/responsáveis a inventariar.", "Separa hipótese, observação e enforcement."],
+        "solution": "Anote páginas, scripts in-line/CDN, módulos, login e callback; confirme uso e dono. Para página que usa apenas script local, hipótese inicial `default-src 'none'; script-src 'self'` e diretivas específicas conforme os recursos restantes. Avalie em ambiente permitido antes do enforcement.",
+        "explanation": "Uma política melhor não é uma string universal; é o conjunto mínimo que atende necessidades verificadas.",
+        "hints": ["O código usa fontes além da origem local?", "O que garante que a restrição não quebra login?"]
+      },
+      {
+        "prompt": "Construir: complete matriz para script, CSS, imagens, fetch/API, frame e formulário: diretiva, origem, responsável, função, modo de teste e rollback.",
+        "expected": "A matriz liga cada recurso real à diretiva e origem necessária, dono e fluxo positivo, mantendo os itens desconhecidos como pendentes e planejando rollback.",
+        "criteria": ["Inclui seis tipos de recurso/ação.", "Identifica origem e responsável.", "Inclui teste funcional, evidência e retorno."],
+        "solution": "Exemplo: script→`script-src`→origem confirmada→dono frontend→login/carregamento; CSS→`style-src`; imagem→`img-src`; fetch→`connect-src`; frame→`frame-ancestors`; formulário→`form-action`. Valores reais vêm do Preview e dos responsáveis. Registre report-only, funções testadas, enforcement e commit de retorno.",
+        "explanation": "Diretivas diferentes cobrem comportamentos diferentes; uma lista única de domínios esconde dependências.",
+        "hints": ["Qual recurso faz requisição de rede?", "Qual diretiva controla quem pode embutir a página?"]
+      },
+      {
+        "prompt": "Investigar erro: o login falha após CSP. Descreva evidência mínima e sequência que localiza uma violação legítima sem liberar qualquer origem desconhecida.",
+        "expected": "Registra rota, ambiente, diretiva, recurso bloqueado, responsável e hora; identifica se origem/função é legítima; corrige política ou arquitetura específica; retesta login e regressões.",
+        "criteria": ["Não amplia para `*` ou `unsafe-inline` automaticamente.", "Diferencia recurso e diretiva.", "Repete fluxo positivo e verifica regressão."],
+        "solution": "Confirme o ambiente e o passo do login, identifique diretiva e URL reportada, verifique origem com dono do serviço e requisito; prefira corrigir uso de inline ou adicionar origem estrita justificada. Teste login, retorno, sessão e demais páginas. Reverte política se evidência de produção não for segura.",
+        "explanation": "Uma violação precisa ser entendida antes de relaxar a barreira; pode ser dependência válida ou comportamento indevido.",
+        "hints": ["Qual diretiva bloqueou qual recurso?", "A origem é parte oficial do fluxo atual ou apenas aparece em log?"]
+      },
+      {
+        "prompt": "Mudança inesperada: relatório `Report-Only` mostra centenas de URLs, inclusive query strings com parâmetros. Planeje triagem e proteção sem ativar nem descartar tudo.",
+        "expected": "Restringe acesso/retenção dos relatórios, verifica se coletam conteúdo sensível, agrupa por diretiva/recurso, diferencia navegadores e funções, identifica responsáveis e ajusta política/endpoint.",
+        "criteria": ["Não trata relatório como prova de ataque ou de necessidade.", "Considera minimização e acesso ao endpoint.", "Define agrupamento, responsável e próxima validação."],
+        "solution": "Avalie campos coletados e exposição; controle endpoint e retenção; deduplique por diretiva/origem/rota sem copiar query pessoal; determine recursos legítimos com seus donos; teste hipótese revisada em amostra e registre limites. Report-only observa, não bloqueia.",
+        "explanation": "Telemetria de segurança também pode carregar URLs e contexto; sua coleta deve ser minimizada e protegida.",
+        "hints": ["O relatório pode conter identificador ou consulta?", "Quem consegue ler as violações e por quanto tempo?"]
+      },
+      {
+        "prompt": "Transferir: um JSON de API não renderiza HTML, mas o time pede CSP como substituto de autorização por linha. Explique o que cada controle protege e proponha evidência separada.",
+        "expected": "CSP orienta navegador sobre documento/recursos; autorização/RLS decide acesso ao registro. Testes HTTP/browsers observam política e testes de API/DB validam acesso próprio e negam cruzado.",
+        "criteria": ["Não confunde políticas de navegador com regra de dados.", "Propõe teste de CSP e autorização distintos.", "Usa evidência positiva e negativa para linha."],
+        "solution": "CSP não impede que um cliente autorizado altere chamadas ou leia API indevida. Valide grants/RLS e teste conta A→A e A→B no serviço autorizado; separadamente verifique CSP aplicada em browser em documento HTML. JSON precisa de Content-Type correto e acesso controlado no servidor.",
+        "explanation": "Defesa de documento e controle de acesso a dados atuam em fronteiras diferentes.",
+        "hints": ["Quem aplica CSP?", "Onde se decide a permissão da linha retornada pela API?"]
+      }
+    ],
+    "quiz": [
+      { "question": "O que `Content-Security-Policy` define?", "options": ["Quais recursos um navegador pode carregar/executar para o documento, conforme as diretivas.", "Quem é dono de cada linha no banco.", "A senha de quem abriu a página."], "correctIndex": 0, "explanation": "CSP é uma política de documento/navegador, não uma identidade ou policy de banco." },
+      { "question": "O que significa `script-src 'self'`?", "options": ["Permite script da própria origem correspondente; não autoriza leitura de contas.", "Permite todos os subdomínios em qualquer porta.", "É equivalente a autenticação Clerk."], "correctIndex": 0, "explanation": "Origem inclui esquema, host e porta." },
+      { "question": "`Content-Security-Policy-Report-Only`:", "options": ["Observa violações sem aplicar bloqueio.", "Bloqueia todos os recursos automaticamente.", "Substitui os testes de browser."], "correctIndex": 0, "explanation": "Report-Only não é enforcement." },
+      { "question": "O que um teste Node que lê cabeçalho CSP comprova?", "options": ["O servidor enviou os valores esperados neste caminho local.", "Navegador real bloqueou todos os recursos incompatíveis.", "Login e Preview funcionam."], "correctIndex": 0, "explanation": "O teste não aplica política de navegador nem valida Preview." }
+    ],
+    "summary": [
+      "A02 inclui configuração ausente ou permissiva, avaliada no contexto do sistema.",
+      "CSP restringe recursos no navegador; não substitui XSS seguro, autenticação ou autorização.",
+      "Origem é esquema, host e porta; cada diretiva controla comportamentos diferentes.",
+      "Inventarie recursos e donos, observe violações, teste funções e planeje rollback antes de enforcement.",
+      "Cabeçalho HTTP verificado não comprova enforcement de navegador ou CSP do Preview real."
+    ]
+  },
   "delivery-db-privileges": {
     "prerequisites": "Concluir `db-postgres`, `delivery-http`, `delivery-owasp-top10` e `setup-node`; conhecer tabelas, migrations e variáveis de ambiente. A prática usa exclusivamente PostgreSQL descartável local ou serviço efêmero CI, com dados e senhas fictícios; não usa Supabase.",
     "setup": "Leia `labs/backend-layers/README.md`, `.env.example`, `migrations/001_create_estudos.sql` a `004_privilegios_minimos.sql` e `src/configuracao-banco.cjs`. Se Docker estiver disponível, em `labs/backend-layers` copie `.env.example` para `.env`, configure senhas fictícias separadas com ao menos 12 caracteres, preserve as credenciais já usadas pelo volume existente, execute `docker compose up -d --wait db`, `npm run migrate` e `npm run db:check`. Depois defina `RUN_LEAST_PRIVILEGE_INTEGRATION=1` no PowerShell com `$env:RUN_LEAST_PRIVILEGE_INTEGRATION='1'; npm run test:least-privilege; Remove-Item Env:RUN_LEAST_PRIVILEGE_INTEGRATION`; em macOS/Linux use `RUN_LEAST_PRIVILEGE_INTEGRATION=1 npm run test:least-privilege`. Resultado esperado: integração conclui sem falhas. Para encerrar use `docker compose down`, sem `-v`; para retomar, suba o mesmo serviço e verifique `db:check`. Se Docker não estiver disponível, estude as migrations e rode os testes unitários; marque verificação de PostgreSQL real como pendente. Nunca reutilize senha real nem imprima `.env`.",
@@ -5253,6 +5421,11 @@ Object.assign(LESSON_GUIDES, {
       prompt: "Uma rota de erro 500 perdeu um dos cabeçalhos, enquanto os caminhos de sucesso ainda o exibem. Planeje como reproduzir a resposta local, comparar ordem do middleware, configurar Vercel e teste e separar a causa local da evidência de Preview; registre também o que CSP ainda exigiria.",
       expected: "O plano reproduz o 500 com teste local, registra header esperado/observado, compara aplicação comum antes do despacho e regra global Vercel, acrescenta regressão sem reduzir cobertura e executa validador/suíte. Inspeção publicada é separada; CSP exige inventário e teste funcional das origens inline/CDN/Clerk.",
       hint: "Uma exceção pode contornar cabeçalhos definidos somente no caminho de sucesso; compare a ordem em ambos os fluxos."
+    },
+    "delivery-security-misconfiguration": {
+      prompt: "Uma página para de carregar o script depois que uma CSP entra em vigor. Registre o endereço da página, a diretiva, a origem e o arquivo afetado; explique como verificar se o arquivo é necessário e quem o mantém antes de sugerir uma exceção. Diga que evidência um teste HTTP e um navegador forneceriam.",
+      expected: "A pessoa relaciona a falha ao documento e a diretiva correta, confirma a origem e a função do recurso, não libera * nem unsafe-inline automaticamente, usa ambiente observável para revisar hipótese e compara teste de resposta HTTP com enforcement funcional em navegador.",
+      hint: "Uma resposta pode conter o cabeçalho certo sem que um teste Node tenha executado JavaScript ou observado o Console do navegador."
     },
     "delivery-db-privileges": {
       prompt: "O runtime consegue selecionar e inserir, mas um requisito novo pede que cada pessoa altere apenas as próprias linhas. Explique por que o grant atual não basta e planeje uma prova com A/B, operação por ação, identidade confiável e ausência de efeito cruzado, sem modificar o projeto remoto.",

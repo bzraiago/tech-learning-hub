@@ -5305,6 +5305,26 @@
             ]
           },
           {
+            "id": "delivery-security-misconfiguration",
+            "title": "Configuração segura no navegador: CSP e cabeçalhos",
+            "minutes": 110,
+            "concept": "Aprenda desde o básico de pedidos e cabeçalhos HTTP a ler uma CSP; compare uma política ampla e outra restrita num laboratório local e planeje inventário, observação e testes antes de enforcement.",
+            "objectives": [
+              "Explicar pedido, resposta, método, status, Content-Type e cabeçalho sem depender de experiência prévia com HTTP.",
+              "Interpretar origem e as diretivas CSP mais usadas e separar CSP de CORS, autenticação e autorização.",
+              "Comparar as políticas do laboratório, executar os testes e dizer exatamente o que a resposta HTTP comprova.",
+              "Montar um plano de inventário, Report-Only, compatibilidade, rollback e enforcement sem aplicar uma política ao site real."
+            ],
+            "exercise": "Leia `labs/security-misconfiguration/README.md`, preveja o resultado antes de comparar `/demo/loose` e `/demo/strict`, e rode `node --test labs/security-misconfiguration/server.test.cjs`. Se não puder iniciar o servidor, os exemplos, saídas esperadas e respostas comentadas permitem completar a prática no papel.",
+            "code": "CSP ampla (somente exemplo local):\ndefault-src *; script-src * 'unsafe-inline' 'unsafe-eval'\n\nCSP restrita (hipótese didática, não receita para o site):\ndefault-src 'none'; script-src 'self'; style-src 'self';\nobject-src 'none'; base-uri 'none'; frame-ancestors 'none'\n\nnode --test labs/security-misconfiguration/server.test.cjs\nVerifica HTTP local; não comprova enforcement no navegador.",
+            "docs": [
+              { "kind": "doc", "title": "W3C · Content Security Policy Level 3", "url": "https://www.w3.org/TR/CSP/", "language": "EN" },
+              { "kind": "doc", "title": "OWASP · Content Security Policy Cheat Sheet", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html", "language": "EN" },
+              { "kind": "doc", "title": "OWASP · HTTP Security Response Headers Cheat Sheet", "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html", "language": "EN" },
+              { "kind": "doc", "title": "MDN · Content-Security-Policy", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy", "language": "EN" }
+            ]
+          },
+          {
             "id": "delivery-db-privileges",
             "title": "Privilégios mínimos para a aplicação",
             "minutes": 110,
