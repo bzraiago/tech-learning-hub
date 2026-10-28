@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: aluno
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: backend_camadas
+        ports:
+          - 55433:5432
+        options: >-
+          --health-cmd "pg_isready -U aluno -d backend_camadas"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: labs/backend-layers/package-lock.json
+
+      - name: Validate course content
+        run: node scripts/validate-content.js
+
+      - name: Install lab dependencies
+        working-directory: labs/backend-layers
+        run: npm ci
+
+      - name: Run unit tests
+        working-directory: labs/backend-layers
+        run: npm test
+
+      - name: Configure disposable PostgreSQL connection
+        working-directory: labs/backend-layers
+        shell: bash
+        run: |
+          cat > .env <<'EOF'
+          PGHOST=127.0.0.1
+          PGPORT=55433
+          PGUSER=aluno
+          PGDATABASE=backend_camadas
+          PGPASSWORD=ci-only-password
+          EOF
+
+      - name: Check database connection
+        working-directory: labs/backend-layers
+        run: npm run db:check
+
+      - name: Apply database migrations
+        working-directory: labs/backend-layers
+        run: npm run migrate
+
+      - name: Run PostgreSQL integration test
+        working-directory: labs/backend-layers
+        env:
+          RUN_PG_INTEGRATION: '1'
+        run: npm run test:db
+
+      - name: Install headless Chromium and system dependencies
+        working-directory: labs/backend-layers
+        run: npx playwright install --with-deps chromium --only-shell
+
+      - name: Run browser flow
+        working-directory: labs/backend-layers
+        run: npm run test:e2e

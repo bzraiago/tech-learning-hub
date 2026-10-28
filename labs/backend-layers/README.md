@@ -155,6 +155,48 @@ RUN_PG_INTEGRATION=1 npm run test:db
 
 Saída esperada: um teste aprovado que confirma leitura após reconectar, sessão persistida, rollback quando a segunda gravação viola um `CHECK` e rejeição de título duplicado. O teste remove apenas os registros aleatórios que criou.
 
+## Fluxo automatizado no navegador
+
+Este teste usa Chromium headless e inicia a API em modo memória. Ele percorre a interface real: carrega a lista, cria um estudo com `201`, tenta um título duplicado e confere `409` sem alterar a lista. O modo memória deixa os dados temporários e não comprova persistência no banco; essa evidência vem de `npm run test:db`.
+
+Na pasta `labs/backend-layers`, instale as dependências locais e o Chromium headless uma vez:
+
+```powershell
+# Windows PowerShell
+npm.cmd ci
+npx.cmd playwright install chromium --only-shell
+```
+
+```sh
+# macOS ou Linux
+npm ci
+npx playwright install chromium --only-shell
+```
+
+Execute o fluxo:
+
+```powershell
+# Windows PowerShell
+npm.cmd run test:e2e
+```
+
+```sh
+# macOS ou Linux
+npm run test:e2e
+```
+
+Resultado esperado: `1 passed`. O Playwright inicia e encerra a API do laboratório; pare qualquer instância já aberta em `127.0.0.1:4180` antes de executar. O teste não lê `.env`, não conecta ao PostgreSQL e não envia dados para serviços externos. Relatórios ficam em `test-results/` e `playwright-report/`, ambos ignorados pelo Git.
+
+Se o executável do navegador não for encontrado, repita `playwright install chromium --only-shell`. Se o Linux informar bibliotecas do sistema ausentes, consulte `playwright install-deps chromium` e os requisitos da distribuição antes de instalar dependências do sistema.
+
+## CI real no GitHub Actions
+
+O workflow `.github/workflows/ci.yml`, na raiz do repositório, executa a validação do curso, os testes unitários, migrations e integração PostgreSQL em um serviço descartável, e o fluxo Chromium. Ele roda em `push` para `main`, em pull requests direcionados a `main` e por acionamento manual. A senha da base é fictícia e usada somente no container efêmero do CI.
+
+Depois que uma alteração chegar ao GitHub, abra a aba **Actions**, selecione a execução mais recente de **CI** e confira cada etapa. Se algo falhar, registre o primeiro passo vermelho, leia a mensagem completa, reproduza o comando correspondente no ambiente local e faça uma correção pequena. Uma execução verde confirma somente os cenários que o workflow rodou; ela não comprova que todos os comportamentos possíveis estão corretos.
+
+Para conferir localmente os mesmos passos, execute `node scripts/validate-content.js` na raiz do repositório. Em `labs/backend-layers`, rode `npm ci`, `npm test`, configure uma base descartável PostgreSQL conforme a seção de migrations, execute `npm run db:check`, `npm run migrate`, `RUN_PG_INTEGRATION=1 npm run test:db` (no Windows, use `$env:RUN_PG_INTEGRATION = '1'` antes do comando) e `npm run test:e2e`.
+
 ## Como parar e retomar
 
 - Pare a API com `Ctrl+C`; o pool fecha junto com o servidor.

@@ -320,8 +320,10 @@ Toda implementação só pode ser considerada pronta quando:
 
 - [x] Criar `labs/bug-investigation` para reproduzir e corrigir defeito em código preexistente, com instruções para iniciante.
 - [x] Exigir teste que falha antes da correção e passa depois dela; a falha e a correção foram verificadas em cópia temporária.
-- [ ] Criar ao menos um teste automatizado de fluxo no navegador.
-- [ ] Configurar CI em um repositório real.
+- [x] Criar teste Playwright de interface: carregar lista, criar estudo (`201`) e validar duplicidade (`409`) sem alterar a lista.
+- [~] Configurar CI em um repositório real.
+  - [x] Criar `.github/workflows/ci.yml` para validar conteúdo, testes unitários, PostgreSQL real descartável e fluxo Playwright.
+  - [ ] Confirmar execução no GitHub Actions e corrigir falhas observadas.
 - [ ] Observar uma falha de CI e corrigi-la.
 - [ ] Integrar ao menos um serviço externo real com contrato documentado.
 - [ ] Simular falhas de rede, autenticação e resposta inválida sem expor credenciais.
@@ -584,6 +586,8 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 27/10/2026 | Fase 6 — migrations e transação | `650dc10` | Aplicador percorre migrations em ordem; migration 002 cria sessões; API grava estudo/sessão atomicamente; 17 testes, sintaxe, validador, Compose config e smoke HTTP em memória passaram. Execução PostgreSQL real segue pendente. |
 | 27/10/2026 | Fase 6 — persistência e evolução verificadas | `c7656ac` | PostgreSQL 18 descartável aceitou as migrations 001–002, teste de integração, API real e rollback. A prática da migration 003 foi documentada e validada numa cópia temporária; testes passaram. Docker Compose continua pendente. |
 | 27/10/2026 | Fase 7 — reproduzir e corrigir defeito | `c7656ac` | `labs/bug-investigation` apresenta falha reproduzível de mutação; o teste ficou vermelho com o código inicial e verde após correção em cópia temporária. |
+| 27/10/2026 | Fase 7 — fluxo automatizado no navegador | A registrar | `labs/backend-layers/e2e` executa Chromium headless contra a interface e API reais do laboratório em memória; 1 fluxo passou. O teste não comprova persistência PostgreSQL. |
+| 27/10/2026 | Fase 7 — configuração de CI | A registrar | Workflow no GitHub Actions executa conteúdo, testes, PostgreSQL 17 descartável e Playwright; a primeira execução remota ainda será observada. |
 
 ## Decisões e bloqueios
 

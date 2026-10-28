@@ -300,7 +300,7 @@ Object.assign(LESSON_GUIDES, {
   },
 "quality-ci": {
     "prerequisites": "Casos e afirmações com node:test; noções de Git para a parte opcional de execução remota.",
-    "setup": "Salve verificacao.test.cjs em uma pasta e execute node --test verificacao.test.cjs no terminal. Observe a contagem de aprovados e o código de saída do comando (no PowerShell use $LASTEXITCODE; em shells POSIX use echo $? logo após). Para publicar a verificação, um repositório no GitHub seria necessário, mas toda a análise do arquivo e o comando local funcionam sem conta ou rede.",
+    "setup": "Salve verificacao.test.cjs em uma pasta e execute node --test verificacao.test.cjs no terminal. Observe a contagem de aprovados e o código de saída do comando (no PowerShell use $LASTEXITCODE; em shells POSIX use echo $? logo após). Para observar uma CI real neste projeto, depois dos testes locais siga a seção de GitHub Actions em labs/backend-layers/README.md. A análise do arquivo e o comando local continuam funcionando sem conta ou rede.",
     "why": "Repetir testes manualmente após cada alteração é fácil de esquecer. Integração contínua executa comandos em eventos como push ou pull request e fornece um resultado visível para a equipe. O serviço não inventa testes: ele executa os comandos que você configurou. Antes de criar o workflow, consiga rodar a mesma suíte localmente e saiba distinguir um teste vermelho de uma instalação que falhou.",
     "sections": [
       {
