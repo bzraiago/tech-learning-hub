@@ -3090,13 +3090,13 @@ Object.assign(LESSON_GUIDES, {
   },
   "delivery-lgpd-rights-lifecycle": {
     "prerequisites": "Concluir delivery-lgpd-foundations e delivery-lgpd-legal-bases. Usar somente REQ-DEMO-14; nunca testar com conta, exportação ou dado real.",
-    "setup": "Use pedidos fictícios em papel ou editor. A matriz opcional está em labs/lgpd-data-rights/INVENTORY.md e pode ser feita sem instalar ferramentas; se não tiver o repositório, as tabelas desta aula contêm o exercício completo. Liste sistemas, cópias e responsáveis. Não entre em conta, envie pedido real ou execute exclusão. Marque evidência e escale conflitos de conservação.",
+    "setup": "Use pedidos fictícios em papel ou editor. A matriz opcional está em labs/lgpd-data-rights/INVENTORY.md e pode ser feita sem instalar ferramentas; se não tiver o repositório, as tabelas desta aula contêm o exercício completo. Para uma prática técnica opcional, leia labs/lgpd-data-rights/README.md e execute o servidor/testes com Node.js já preparado; o laboratório não instala pacotes, usa só memória local e dados inventados. Não entre em conta, envie pedido real ou execute exclusão. Marque evidência e escale conflitos de conservação.",
     "why": "Titulares precisam exercer direitos com segurança, e a equipe precisa saber onde dados estão e o que encerra cada uso. Excluir da tela pode deixar cópias; apagar tudo imediatamente também pode ignorar conservação legal. A aula ensina a rastrear e responder por etapas. Fontes oficiais são opcionais; conceitos e soluções estão aqui.",
     "example": {
       "language": "text",
-      "code": "Ciclo: mostrar histórico de estudo da própria conta\nTérmino: finalidade cumprida, dado desnecessário ou período encerrado\nLocais: serviço principal, logs, exportações, fornecedores, backups\nAo encerrar: interromper uso; eliminar nos limites técnicos; analisar art. 16; propagar quando aplicável; registrar resultado mínimo\nAcesso não autoriza envio a endereço não verificado.",
-      "expected": "Validar solicitante, buscar por escopo, conferir retenção, responder pelo canal apropriado e registrar pendências.",
-      "explanation": ["Pedido de direito precisa de resposta segura, escopo e verificação de identidade.","Término do tratamento e conservação após o término são decisões diferentes.","Uma tela atualizada não comprova mudança em todas as cópias."]
+      "code": "Ciclo: mostrar histórico de estudo da própria conta\nTérmino: finalidade cumprida, dado desnecessário ou período encerrado\nLocais: serviço principal, logs, exportações, fornecedores, backups\nAo encerrar: interromper uso; eliminar nos limites técnicos; analisar art. 16; propagar quando aplicável; registrar resultado mínimo\nAcesso não autoriza envio a endereço não verificado.\n\nPrática local opcional: GET /api/me/export → PATCH /api/me/email → DELETE /api/me\nA identidade vem do token de demonstração reconhecido no servidor; os dados são reiniciados com o processo.",
+      "expected": "Validar solicitante, buscar por escopo, conferir retenção, responder pelo canal apropriado e registrar pendências. Na prática local, distinguir o estado fictício em memória das cópias e obrigações que a API não cobre.",
+      "explanation": ["Pedido de direito precisa de resposta segura, escopo e verificação de identidade.","Término do tratamento e conservação após o término são decisões diferentes.","Uma tela atualizada não comprova mudança em todas as cópias.","O token público do laboratório é fixture de ensino, não autenticação para produção."]
     },
     "guided": [
       {
@@ -3110,6 +3110,10 @@ Object.assign(LESSON_GUIDES, {
       {
         "instruction": "Receba pedido de eliminação. Verifique término, conservação e comportamento das cópias.",
         "result": "Interrompe usos encerrados, elimina no escopo técnico, avalia exceções e verifica cópias; não afirma que backups sumiram sem prova."
+      },
+      {
+        "instruction": "Opcional: siga labs/lgpd-data-rights/README.md. Antes de executar cada rota, preveja a resposta; depois compare exportação, correção e exclusão de dois perfis fictícios e rode node --test labs/lgpd-data-rights/server.test.cjs.",
+        "result": "GET exporta somente o perfil associado ao token; PATCH altera só o campo validado desse perfil; DELETE remove perfil e itens relacionados da memória. Os testes conferem isolamento e recusas. Isso não verifica identidade real, backups, logs, terceiros, prazos ou exclusão fora do processo local."
       }
     ],
     "sections": [
@@ -3303,6 +3307,21 @@ Object.assign(LESSON_GUIDES, {
         "hints": [
           "Que fonte sustenta obrigação?",
           "Qual cópia está em uso normal?"
+        ]
+      },
+      {
+        "prompt": "Prever no laboratório: uma requisição usa o token fictício de Bruno e envia profileId de Ana no JSON. Qual e-mail muda e por quê?",
+        "expected": "Somente o perfil associado ao token de Bruno muda; o servidor não usa o profileId controlado pelo cliente. O token público continua sendo apenas uma fixture insegura para produção.",
+        "criteria": [
+          "Rastreia token até a identidade mapeada no servidor.",
+          "Não confia no identificador do corpo.",
+          "Distingue autorização demonstrativa de autenticação real."
+        ],
+        "solution": "Bruno muda. A função findProfile mapeia demo-token-bruno a person-bruno no servidor; PATCH seleciona esse perfil e lê somente email do corpo. profileId é ignorado. Como o token está publicado no código, qualquer pessoa pode usá-lo: não protege dado real nem confirma identidade.",
+        "explanation": "Identidade e autorização precisam vir de uma fonte confiável do servidor, não de um identificador livre enviado pelo cliente.",
+        "hints": [
+          "Qual valor o servidor consulta primeiro: token ou profileId?",
+          "Quem consegue ler o token deste exercício?"
         ]
       }
     ],

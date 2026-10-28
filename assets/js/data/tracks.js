@@ -5515,17 +5515,18 @@
           {
             "id": "delivery-lgpd-rights-lifecycle",
             "title": "Dados pessoais: retenção e direitos do titular",
-            "minutes": 100,
-            "concept": "Desenhe ciclo de vida e retenção por finalidade, responda a pedidos fictícios com controle de identidade e entenda por que acesso, correção, portabilidade, revogação e eliminação têm efeitos diferentes.",
+            "minutes": 120,
+            "concept": "Desenhe ciclo de vida e retenção por finalidade, responda a pedidos fictícios com controle de identidade e entenda por que acesso, correção, portabilidade, revogação e eliminação têm efeitos diferentes. Como prática opcional, observe exportação, correção e exclusão em uma API isolada de dados fictícios.",
             "objectives": [
               "Criar tabela de retenção com finalidade, término, cópias e regra de eliminação/conservação.",
               "Explicar direitos do art. 18 e diferença entre revogar consentimento e apagar todos os dados.",
               "Planejar busca, correção e exportação sem revelar dados à pessoa errada.",
               "Reconhecer término do tratamento e exceções do art. 16.",
-              "Registrar resposta e lacunas sem prometer prazo ou exclusão não comprovados."
+              "Registrar resposta e lacunas sem prometer prazo ou exclusão não comprovados.",
+              "Distinguir o que um laboratório em memória comprova do que depende de sistemas, cópias e identidade reais."
             ],
-            "exercise": "Resolva pedidos inventados usando o mapa em labs/lgpd-data-rights/INVENTORY.md ou as tabelas desta aula. Não abra contas nem processe registros reais.",
-            "code": "PEDIDO FICTÍCIO REQ-DEMO-14\nPedido: acesso e correção de e-mail de teste\nCópias: perfil, atividade e exportação de demonstração\nRegra: validar pessoa; localizar escopo; conferir finalidade/exceções; executar ou explicar impedimento; verificar cópias compartilhadas\nApagar a tela não prova que backups, logs ou fornecedores foram atualizados.",
+            "exercise": "Resolva pedidos inventados usando o mapa em labs/lgpd-data-rights/INVENTORY.md ou as tabelas desta aula. Se já tiver Node.js preparado, execute opcionalmente labs/lgpd-data-rights/README.md e seus testes. Não abra contas nem processe registros reais.",
+            "code": "PEDIDO FICTÍCIO REQ-DEMO-14\nPedido: acesso e correção de e-mail de teste\nCópias: perfil, atividade e exportação de demonstração\nRegra: validar pessoa; localizar escopo; conferir finalidade/exceções; executar ou explicar impedimento; verificar cópias compartilhadas\n\nAPI didática isolada:\nGET /api/me/export → perfil do token fictício\nPATCH /api/me/email → corrige campo validado\nDELETE /api/me → remove perfil e relações da memória\n\nTokens públicos não são login; resposta local não prova eliminação em logs, cópias, terceiros ou backups.",
             "docs": [
               {
                 "kind": "doc",
