@@ -6,6 +6,8 @@ Conectar uma API Node.js ao PostgreSQL, aplicar uma migration reproduzível, per
 
 Os registros `HTML` e `JavaScript` são fictícios. Este laboratório usa um banco Docker isolado chamado `backend_camadas`, uma porta própria `55433` e um volume próprio. O Redis também é local, publicado somente em `127.0.0.1:56380`, sem volume ou persistência. Não conecte a API ao banco Supabase do Tech Learning Hub nem use dados pessoais.
 
+Para diagnosticar Preview, login e persistência na nuvem separadamente da API e do PostgreSQL local, siga o [runbook de operação e recuperação](RUNBOOK.md).
+
 ## Pré-requisitos
 
 1. Conclua `setup-node`, `setup-docker`, `setup-postgresql`, `delivery-http` e `labs/backend-validation/README.md`. Não é necessário concluir toda a trilha de banco.

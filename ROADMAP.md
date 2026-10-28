@@ -471,9 +471,19 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Documentar em `DEPLOY_VERCEL.md` o rollback do Preview `testes` por `git revert`, push e conferência do novo deployment; manter a migration expansiva aplicada e separar o procedimento de Production Instant Rollback.
   - [x] Atualizar `delivery-ci` com prática, erros e quiz sobre compatibilidade expansiva/contrativa; validador registrou 132 aulas, 536 exercícios e 409 questões; auditoria de carga, 57 testes unitários, 3 E2E, sintaxe e `git diff --check` passaram. Revisão visual da aula não executada.
   - [x] Não houve rollback nem deploy Vercel remoto nesta sessão; o roteiro requer conferência autenticada do Preview após o push.
-- [ ] Produzir runbook de deploy, falha de autenticação, falha de banco, incidente e recuperação.
+- [x] Produzir runbook de deploy, falha de autenticação, falha de banco, incidente e recuperação.
+  - [x] Criar `labs/backend-layers/RUNBOOK.md` separando Preview Vercel, login Clerk, autorização/progresso Supabase e PostgreSQL/Redis local; incluir triagem por status, segurança de evidências, prioridade de incidente, rollback de `testes`, recuperação e critérios verificáveis.
+  - [x] Ligar o runbook ao README, ao guia de deploy e à aula `delivery-ci`; acrescentar um cenário guiado simulado de 403, exercício e questão sem exigir acesso a contas reais.
+  - [x] Validador 132 aulas/537 exercícios/410 questões, auditoria de carga (delivery-ci: 7 seções, 8 passos guiados, 4 tipos de exercício), sintaxe, `git diff --check`, suíte 57/57 e E2E 3/3 passaram.
+  - [x] Conferir fontes oficiais atuais GitHub Actions, Vercel, Clerk, Supabase e PostgreSQL; não houve verificação remota de autenticação, isolamento de duas contas ou deploy nesta sessão.
 
 **Aceite:** existem evidências da execução remota da CI, do Preview acessível com HTTPS, da recuperação de versão e dados e da correção de uma falha protegida por regressão. Domínio próprio não é requisito de publicação para este projeto.
+
+**Pendências de aceite remoto:**
+
+- [ ] Conferir em GitHub Actions que os jobs `validate-and-test` e `backup-restore` estão verdes para o SHA mais recente. O `gh` não está instalado neste computador e a consulta web às páginas/API do repositório não abriu nesta sessão.
+- [ ] Com acesso autenticado, confirmar Preview da branch `testes` em HTTPS e verificar o SHA/estado Ready; o deploy e rollback Vercel não foram observados remotamente.
+- [ ] Com duas contas fictícias autorizadas, comprovar que login, gravação, recarga e isolamento de progresso funcionam no Supabase; nenhuma conta real foi usada.
 
 **Aceite adicional da stack guiada:** duas contas reais de teste acessam somente seus próprios dados; o login Google usa URLs autorizadas; nenhum segredo aparece no repositório ou bundle do navegador; o Preview `vercel.app` funciona com HTTPS; uma falha e um rollback são observados; o aluno explica o papel de Clerk, Supabase, Vercel, DNS e Redis e consegue indicar alternativas. Domínio próprio é opcional: seu funcionamento é ensinado conceitualmente, sem exigir compra, configuração ou validação real.
 

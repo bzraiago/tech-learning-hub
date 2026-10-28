@@ -1006,6 +1006,7 @@ Object.assign(LESSON_GUIDES, {
           "O roteiro `labs/backend-layers/BACKUP_RESTORE.md` restaura um dump PostgreSQL numa base separada; `PROVIDER_MIGRATION.md` amplia o ensaio para inventariar roles, extensões, identidade, Redis, arquivos e configuração. Um `pg_dump` comum contém uma base, não transfere todos os serviços do produto. Compare dados e comportamento no destino, preserve a origem e defina como tratar gravações depois do corte antes de autorizar retorno.",
           "Para manter versões de aplicação compatíveis, use uma sequência expansiva e depois contrativa. Primeiro acrescente um campo opcional (`003_add_observacao_sessoes.sql`); a versão antiga, que declara as colunas que usa, continua lendo e gravando. Uma versão posterior pode começar a preencher o campo. Só planeje remover campos depois que nenhum deployment antigo depender deles, os dados tiverem destino decidido e uma migration separada tiver sido ensaiada. O [`ALTER TABLE` do PostgreSQL](https://www.postgresql.org/docs/17/sql-altertable.html) pode exigir locks; numa base real, verifique a operação e o tamanho antes da janela.",
           "Para reverter o Preview `testes`, `labs/backend-layers/DEPLOY_VERCEL.md` orienta o [`git revert`](https://git-scm.com/docs/git-revert) seguido de um novo push; a [integração Git da Vercel](https://vercel.com/docs/git) cria um deployment associado ao commit. A reversão da aplicação deixa a migration expansiva aplicada; ela não apaga observações nem deve disparar uma migration destrutiva automaticamente.",
+          "Use `labs/backend-layers/RUNBOOK.md` para separar o deploy Vercel do login Clerk, da autorização Supabase e do PostgreSQL local. Uma tela de proteção Vercel aparece antes da aplicação; `Login indisponível` aponta ao fluxo Clerk; falha ao salvar precisa ser localizada na requisição Supabase. `/health/ready` verifica somente as dependências da API local. Registre branch, SHA, rota e status HTTP sem copiar tokens, cookies, progresso ou cabeçalhos.",
           "Pausa: ordene registrar versão, restaurar versão estável, verificar o fluxo principal e investigar a causa. Indique quando uma migração de dados exige cuidado adicional."
         ],
         "terms": [
@@ -1062,6 +1063,10 @@ Object.assign(LESSON_GUIDES, {
       {
         "instruction": "Com PostgreSQL descartável e migrations aplicadas, use o comando por sistema descrito no README: no PowerShell defina `$env:RUN_MIGRATION_COMPATIBILITY = '1'` e rode `npm.cmd run test:migration-compatibility`; em macOS/Linux rode `RUN_MIGRATION_COMPATIBILITY=1 npm run test:migration-compatibility`. Compare o contrato do repositório antes e depois de `003`.",
         "result": "A versão antiga opera antes e depois da coluna opcional; a nova escrita preserva os campos lidos pelo código antigo. O teste usa uma base temporária e não faz deploy."
+      },
+      {
+        "instruction": "Leia `labs/backend-layers/RUNBOOK.md`. Em um cenário simulado, classifique: Preview está Ready, a pessoa entra pelo Clerk, mas salvar progresso retorna HTTP 403; a API local responde readiness 200. Registre duas conferências seguras e a condição de recuperação, sem abrir painéis nem usar contas reais.",
+        "result": "A pessoa separa a implantação do Preview da autorização Supabase; compara SHA/rota/status e propõe que o responsável confira a integração Clerk–Supabase e RLS. A recuperação planejada usa duas contas fictícias para confirmar salvamento e isolamento; readiness local não comprova o serviço remoto."
       }
     ],
     "exercises": [
@@ -1140,6 +1145,14 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "Um rollback do código não é uma restauração do esquema. Remover a coluna junto com o código pode apagar dados ou impedir que uma versão ainda ativa funcione.",
         "expected": "A aplicação volta por commit revertido; o schema permanece expandido e o dado novo não é apagado automaticamente. A contração fica condicionada a uma verificação separada de versões, dados e plano de recuperação.",
         "criteria": ["Distingue rollback de deployment de rollback de migration.", "Mantém a migration 003 e confere que o repositório antigo opera após ela.", "Define evidência e destino dos valores antes de qualquer remoção futura."]
+      },
+      {
+        "prompt": "Investigar erro: o Preview está Ready e o login Clerk funciona, mas a gravação de progresso retorna HTTP 403. Use o runbook para registrar branch/SHA, rota e status, identificar a camada provável e propor duas conferências seguras e um critério de recuperação. Não compartilhe dados da requisição.",
+        "hints": ["Ready confirma o deploy, não a autorização no banco remoto.", "A API PostgreSQL local do laboratório não está no caminho do progresso do site."],
+        "solution": "Confirmar URL, branch, SHA e Ready; registrar apenas método/rota/status da chamada `/rest/v1/learning_state`; pedir ao responsável que confira a integração de autenticação Clerk no Supabase e as políticas RLS. Não desativar RLS. Com contas fictícias, confirmar que cada pessoa salva/recarrega seu progresso e não acessa o da outra.",
+        "explanation": "Um 403 localiza a recusa na requisição observada, mas sozinho não identifica qual configuração ou política a causou. O Preview, Clerk, Supabase e laboratório local são camadas distintas.",
+        "expected": "O registro mantém a evidência mínima e redigida, aponta verificações que distinguem as camadas e define sucesso com persistência e isolamento de duas contas fictícias.",
+        "criteria": ["Registra branch/SHA, método/rota e status sem token, cookie ou corpo.", "Não confunde Ready ou readiness local com autorização remota.", "Inclui confirmação de salvamento e isolamento de contas no critério de recuperação."]
       }
     ],
     "mistakes": [
@@ -1191,6 +1204,12 @@ Object.assign(LESSON_GUIDES, {
         "options": ["Removê-la imediatamente para que o schema volte a coincidir com o código.", "Manter a migration expansiva enquanto a versão antiga for compatível; planejar uma contração separada após avaliar deployments e dados.", "Apagar a tabela e recriá-la com as colunas antigas."],
         "correctIndex": 1,
         "explanation": "Código e esquema têm ciclos distintos; uma migration aditiva pode continuar aplicada, preservando compatibilidade e dados até uma contração segura."
+      },
+      {
+        "question": "O Preview está Ready, o login funciona e a gravação em Supabase retorna 403. Qual conclusão é segura?",
+        "options": ["A readiness PostgreSQL local provou que a autorização remota está correta.", "O deploy e o login passaram por partes do fluxo; a chamada Supabase precisa ser conferida com a integração Clerk e RLS, sem expor o token.", "A proteção Vercel bloqueou a requisição depois do login."],
+        "correctIndex": 1,
+        "explanation": "Deploy, autenticação e autorização dos dados são verificações distintas; um status deve ser ligado à rota e à camada observadas."
       }
     ],
     "summary": [
@@ -1200,7 +1219,8 @@ Object.assign(LESSON_GUIDES, {
       "Use logs JSON estruturados com campos permitidos e sem payload, IP, credenciais ou stack.",
       "Separe liveness de readiness e teste alerta local com um limiar explícito.",
       "Restaure backups em destino separado e valide comportamento; `pg_dump` não migra identidade, Redis, arquivos ou configuração por conta própria.",
-      "Prefira expandir o esquema antes de mudar a aplicação; um rollback de código pode deixar a migration aplicada até a contração ser segura."
+      "Prefira expandir o esquema antes de mudar a aplicação; um rollback de código pode deixar a migration aplicada até a contração ser segura.",
+      "No incidente, registre SHA, rota e status; separe Preview, Clerk, autorização Supabase e dependências locais antes de escolher a recuperação."
     ]
   },
   "delivery-threat-model": {

@@ -4,6 +4,8 @@
 
 Publicar a página independente em `labs/backend-layers/demo/` e a função Node.js em `api/labs/open-meteo.mjs`. A função chama Open-Meteo sem chave. Esta demonstração não usa Clerk, Supabase nem PostgreSQL; não informe dados pessoais e não confunda a página com o curso principal. A rota pública limita a consulta a um ponto geográfico de referência e permite cache compartilhado por cinco minutos para reduzir chamadas ao provedor.
 
+Para a rotina de Preview, autenticação Clerk/Supabase, diagnóstico do PostgreSQL local e resposta a incidentes, consulte [`RUNBOOK.md`](RUNBOOK.md).
+
 O repositório já tem uma função Vercel em `api/public-config.mjs`. A demonstração acrescenta uma rota no mesmo projeto, sem mudar a raiz ou os domínios atuais. A Vercel encontra funções Node.js na pasta `api/`; arquivos estáticos da raiz e subpastas são servidos no mesmo projeto. Consulte a [documentação do runtime Node.js da Vercel](https://vercel.com/docs/functions/runtimes/node-js) e as notas sobre [deploys conectados ao Git](https://vercel.com/docs/builds).
 
 ## Conferir o projeto antes do deploy
