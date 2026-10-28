@@ -63,3 +63,23 @@ test('logger rejeita nome de evento que possa carregar dados arbitrários', () =
   const logger = criarLogger({ escreverInfo: () => {} });
   assert.throws(() => logger.info('api.started aluno@example.test'), /identificador estruturado seguro/);
 });
+
+test('logger registra falha segura da quota por conta sem incluir identidade ou token', () => {
+  const lines = [];
+  const logger = criarLogger({ escreverErro: (line) => lines.push(line) });
+
+  logger.error('api.account_rate_limit.unavailable', new Error('private subject'), {
+    route: 'POST /api/estudos-por-conta',
+    subject: 'account-secret',
+    token: 'fixture-token'
+  });
+
+  const record = JSON.parse(lines[0]);
+  assert.equal(record.level, 'error');
+  assert.equal(record.event, 'api.account_rate_limit.unavailable');
+  assert.equal(record.route, 'POST /api/estudos-por-conta');
+  assert.equal(record.errorCode, 'Error');
+  assert.equal(lines[0].includes('account-secret'), false);
+  assert.equal(lines[0].includes('fixture-token'), false);
+  assert.equal(lines[0].includes('private subject'), false);
+});

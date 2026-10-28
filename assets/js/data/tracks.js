@@ -5750,10 +5750,11 @@
               "Reconhecer API4:2023 (consumo irrestrito de recursos) e API6:2023 (acesso sem restrição a fluxos sensíveis) como riscos distintos.",
               "Definir limites de corpo, página, custo, tempo, concorrência e operações conforme o recurso e o impacto do produto.",
               "Explicar o uso de 429/Retry-After, limites por identidade/tenant/IP e por que IP isolado, CAPTCHA ou idempotência não resolvem todos os casos.",
+              "Distinguir quota por IP de quota por conta e explicar por que o subject precisa vir de uma sessão validada no servidor.",
               "Planejar uma revisão controlada sem gerar carga contra Preview, serviços públicos ou contas reais."
             ],
-            "exercise": "Use a matriz de cenários com números fictícios para propor limites, sinais de observabilidade e resposta segura; compare com limites já presentes nos laboratórios backend.",
-            "code": "EXEMPLO DE ANÁLISE (números fictícios, sem enviar pedidos):\nEndpoint: exportar um relatório de estudos\nRisco de recurso: relatório aceita 100.000 linhas em uma chamada\nRisco de fluxo: uma pessoa automatiza 5.000 exportações repetidas\n\nControles independentes:\n- validar identidade e permissão para o relatório\n- limitar página/tamanho e tempo de processamento\n- estabelecer quota e concorrência por conta/tenant\n- responder 429 com orientação de retry quando a quota temporal for atingida\n- monitorar custo e erro sem registrar tokens ou conteúdo privado",
+            "exercise": "Use a matriz de cenários com números fictícios para propor limites e sinais; compare a quota por IP com o fixture local de quota por subject e explique por que o fixture não é autenticação real.",
+            "code": "EXEMPLO DE ANÁLISE (números fictícios; os pedidos descritos ocorrem apenas no teste local):\n\nAPI normal do laboratório\nPOST /api/estudos -> IP observado pelo servidor -> contador Redis -> gravação\n\nRota de quota por conta, habilitada somente no servidor de teste\nAuthorization: Bearer fixture-session-a\n  -> adaptador injetado reconhece marcador fictício e retorna subject inventado\n  -> HMAC-SHA-256(subject, segredo privado) produz pseudônimo estável\n  -> contador Redis separado: três tentativas permitidas, a quarta recebe 429\n\nO cliente não escolhe a conta com X-Account-Id nem accountId no JSON. Sem adaptador/limitador/chave injetados, o servidor principal responde 404. O fixture não valida JWT nem login Clerk.\n\nEm um sistema real: validar token/sessão, emissor, público e validade; depois autorizar o recurso. O segredo HMAC fica fora do repositório e deve ser compartilhado pelas instâncias. Redis indisponível responde 503 sem gravar (fail-closed); token inválido recebe 401 antes do contador.",
             "docs": [
               {
                 "kind": "doc",
@@ -5777,6 +5778,18 @@
                 "kind": "doc",
                 "title": "OWASP · REST Security Cheat Sheet",
                 "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Node.js · crypto.createHmac",
+                "url": "https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Redis · Rate limiter use case",
+                "url": "https://redis.io/docs/latest/develop/use-cases/rate-limiter/",
                 "language": "EN"
               }
             ]

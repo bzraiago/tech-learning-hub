@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const { criarServidor } = require('../server.cjs');
 const { ErroOpenMeteo } = require('./cliente-open-meteo.cjs');
 const { criarLimitadorEmMemoria } = require('./rate-limiter-memory.cjs');
+const { criarIdentidadeLimitadorPorConta } = require('./account-rate-limit-identity.cjs');
 
 function criarServidorComLimitadorMemoria(servico, previsao, options) {
   return criarServidor(servico, previsao, criarLimitadorEmMemoria(), options);
@@ -336,4 +337,161 @@ test('GET permanece disponível e não consulta o limitador Redis', async (conte
   assert.equal(resposta.status, 200);
   assert.deepEqual(await resposta.json(), [{ id: 1, titulo: 'HTML' }]);
   assert.equal(chamadasAoLimitador, 0);
+});
+
+test('rota demo de quota usa subject do verificador injetado e separa contas, não campos do cliente', async (contexto) => {
+  const chavePseudonimizada = Buffer.alloc(32, 0x71);
+  const sessoesFicticias = new Map([
+    ['Bearer fixture-session-a', { subject: 'account-ficticia-a' }],
+    ['Bearer fixture-session-b', { subject: 'account-ficticia-b' }]
+  ]);
+  const identidadesConsultadas = [];
+  const contagensPorIdentidade = new Map();
+  let gravacoes = 0;
+  let chamadasLimitadorBase = 0;
+  const servidor = criarServidor({
+    async criar(entrada) {
+      gravacoes += 1;
+      return { sucesso: true, estudo: { id: gravacoes, titulo: entrada.titulo } };
+    }
+  }, undefined, {
+    async verificar() {
+      chamadasLimitadorBase += 1;
+      throw new Error('A rota de conta não deve usar o contador base por IP.');
+    }
+  }, {
+    async resolverIdentidadeAutenticada(req) {
+      return sessoesFicticias.get(req.headers.authorization) || null;
+    },
+    limitadorPorConta: {
+      async verificar(identidade) {
+        identidadesConsultadas.push(identidade);
+        const total = (contagensPorIdentidade.get(identidade) || 0) + 1;
+        contagensPorIdentidade.set(identidade, total);
+        return { permitido: total <= 2, total, tentarDepoisDeSegundos: 17 };
+      }
+    },
+    segredoHmacRateLimitConta: chavePseudonimizada
+  });
+
+  await new Promise((resolve) => servidor.listen(0, '127.0.0.1', resolve));
+  contexto.after(() => new Promise((resolve, reject) => {
+    servidor.close((erro) => erro ? reject(erro) : resolve());
+  }));
+
+  const url = `http://127.0.0.1:${servidor.address().port}/api/estudos-por-conta`;
+  async function criarEstudo(token, accountIdNoCliente, numero) {
+    return fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json',
+        'X-Account-Id': accountIdNoCliente
+      },
+      body: JSON.stringify({ titulo: `Registro ${numero}`, accountId: accountIdNoCliente })
+    });
+  }
+
+  const semSessao = await criarEstudo('Bearer token-falso', 'account-ficticia-a', 0);
+  assert.equal(semSessao.status, 401);
+
+  const respostasContaA = [];
+  for (let numero = 1; numero <= 3; numero += 1) {
+    respostasContaA.push(await criarEstudo('Bearer fixture-session-a', 'account-ficticia-b', numero));
+  }
+  const respostaContaB = await criarEstudo('Bearer fixture-session-b', 'account-ficticia-a', 4);
+
+  assert.deepEqual(respostasContaA.map((resposta) => resposta.status), [201, 201, 429]);
+  assert.equal(respostasContaA[2].headers.get('retry-after'), '17');
+  assert.equal(respostaContaB.status, 201);
+  assert.equal(gravacoes, 3);
+  assert.equal(chamadasLimitadorBase, 0);
+  assert.deepEqual(identidadesConsultadas, [
+    criarIdentidadeLimitadorPorConta('account-ficticia-a', chavePseudonimizada),
+    criarIdentidadeLimitadorPorConta('account-ficticia-a', chavePseudonimizada),
+    criarIdentidadeLimitadorPorConta('account-ficticia-a', chavePseudonimizada),
+    criarIdentidadeLimitadorPorConta('account-ficticia-b', chavePseudonimizada)
+  ]);
+});
+
+test('rota demo de quota por conta fica fechada quando o servidor não recebe um verificador', async (contexto) => {
+  let gravacoes = 0;
+  const servidor = criarServidorComLimitadorMemoria({
+    async criar() {
+      gravacoes += 1;
+      return { sucesso: true, estudo: { id: gravacoes, titulo: 'Não deve ser criado' } };
+    }
+  });
+
+  await new Promise((resolve) => servidor.listen(0, '127.0.0.1', resolve));
+  contexto.after(() => new Promise((resolve, reject) => {
+    servidor.close((erro) => erro ? reject(erro) : resolve());
+  }));
+
+  const resposta = await fetch(`http://127.0.0.1:${servidor.address().port}/api/estudos-por-conta`, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer fixture-session-a', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ titulo: 'Teste' })
+  });
+  assert.equal(resposta.status, 404);
+  assert.equal(gravacoes, 0);
+});
+
+test('falha do verificador de sessão responde 503 sem consultar contador ou registrar token', async (contexto) => {
+  const linhasDeLog = [];
+  const erroOriginal = console.error;
+  let gravacoes = 0;
+  let consultasAoLimitador = 0;
+  const servidor = criarServidor({
+    async criar() {
+      gravacoes += 1;
+      return { sucesso: true, estudo: { id: gravacoes, titulo: 'Não deve gravar' } };
+    }
+  }, undefined, {
+    async verificar() {
+      consultasAoLimitador += 1;
+      throw new Error('A rota por conta não deve consultar o limite por IP.');
+    }
+  }, {
+    async resolverIdentidadeAutenticada() {
+      throw new Error('token=segredo-de-fixture');
+    },
+    limitadorPorConta: {
+      async verificar() {
+        consultasAoLimitador += 1;
+        throw new Error('A identidade não foi validada.');
+      }
+    },
+    segredoHmacRateLimitConta: Buffer.alloc(32, 0x72)
+  });
+
+  await new Promise((resolve) => servidor.listen(0, '127.0.0.1', resolve));
+  contexto.after(() => new Promise((resolve, reject) => {
+    servidor.close((erro) => erro ? reject(erro) : resolve());
+  }));
+
+  console.error = (...argumentos) => linhasDeLog.push(argumentos.join(' '));
+  let resposta;
+  try {
+    resposta = await fetch(`http://127.0.0.1:${servidor.address().port}/api/estudos-por-conta`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer fixture-token-secret',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ titulo: 'Registro' })
+    });
+  } finally {
+    console.error = erroOriginal;
+  }
+
+  assert.equal(resposta.status, 503);
+  assert.deepEqual(await resposta.json(), { erro: 'Verificação de sessão temporariamente indisponível.' });
+  assert.equal(consultasAoLimitador, 0);
+  assert.equal(gravacoes, 0);
+  assert.equal(linhasDeLog.length, 1);
+  assert.equal(JSON.parse(linhasDeLog[0]).event, 'api.account_auth.unavailable');
+  assert.equal(JSON.parse(linhasDeLog[0]).route, 'POST /api/estudos-por-conta');
+  assert.equal(linhasDeLog[0].includes('segredo-de-fixture'), false);
+  assert.equal(linhasDeLog[0].includes('fixture-token-secret'), false);
 });

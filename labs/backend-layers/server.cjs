@@ -11,6 +11,7 @@ const { criarClienteOpenMeteo } = require('./src/cliente-open-meteo.cjs');
 const { criarRotaPrevisao } = require('./src/rota-previsao.cjs');
 const { criarLimitadorRedis } = require('./src/rate-limiter-redis.cjs');
 const { criarLimitadorEmMemoria } = require('./src/rate-limiter-memory.cjs');
+const { criarIdentidadeLimitadorPorConta } = require('./src/account-rate-limit-identity.cjs');
 const { criarServicoEstudosComCache } = require('./src/servico-estudos-cache-aside.cjs');
 const { logger } = require('./src/logger.cjs');
 const { createClient } = require('redis');
@@ -52,15 +53,16 @@ function obterRotaSeguraParaLog(req) {
   const rotasConhecidas = new Set([
     'GET /api/estudos',
     'POST /api/estudos',
-    'POST /api/estudos-com-sessao'
+    'POST /api/estudos-com-sessao',
+    'POST /api/estudos-por-conta'
   ]);
   return rotasConhecidas.has(rota) ? rota : 'other';
 }
 
-async function verificarLimiteDeGravacao(req, res, limitador) {
+async function verificarLimitePorIdentidade(req, res, limitador, obterIdentidade, eventoFalha) {
   let decisao;
   try {
-    decisao = await limitador.verificar(obterIdentidadePorIpObservado(req));
+    decisao = await limitador.verificar(obterIdentidade(req));
     if (
       !decisao ||
       typeof decisao.permitido !== 'boolean' ||
@@ -70,7 +72,7 @@ async function verificarLimiteDeGravacao(req, res, limitador) {
       throw new Error('Resposta inválida do limitador');
     }
   } catch (erro) {
-    logger.error('api.rate_limit.unavailable', erro, { route: obterRotaSeguraParaLog(req) });
+    logger.error(eventoFalha, erro, { route: obterRotaSeguraParaLog(req) });
     responderJson(res, 503, { erro: 'Limitador temporariamente indisponível.' });
     return false;
   }
@@ -85,6 +87,34 @@ async function verificarLimiteDeGravacao(req, res, limitador) {
     return false;
   }
   return true;
+}
+
+async function verificarLimiteDeGravacao(req, res, limitador) {
+  return verificarLimitePorIdentidade(
+    req,
+    res,
+    limitador,
+    () => obterIdentidadePorIpObservado(req),
+    'api.rate_limit.unavailable'
+  );
+}
+
+async function obterSubjectVerificado(req, res, resolverIdentidadeAutenticada) {
+  let identidade;
+  try {
+    identidade = await resolverIdentidadeAutenticada(req);
+  } catch (erro) {
+    logger.error('api.account_auth.unavailable', erro, { route: 'POST /api/estudos-por-conta' });
+    responderJson(res, 503, { erro: 'Verificação de sessão temporariamente indisponível.' });
+    return null;
+  }
+
+  const subject = identidade?.subject;
+  if (typeof subject !== 'string' || !subject.trim() || subject.length > 256) {
+    responderJson(res, 401, { erro: 'Sessão inválida ou ausente.' });
+    return null;
+  }
+  return subject;
 }
 
 async function lerJson(req) {
@@ -102,7 +132,7 @@ async function lerJson(req) {
   }
 }
 
-async function responder(req, res, servico, rotaPrevisao, limitador, verificarProntidao) {
+async function responder(req, res, servico, rotaPrevisao, limitador, verificarProntidao, configuracaoConta) {
   if (req.method === 'GET' && req.url === '/health/live') {
     responderJson(res, 200, { status: 'alive' }, { 'Cache-Control': 'no-store' });
     return;
@@ -181,20 +211,83 @@ async function responder(req, res, servico, rotaPrevisao, limitador, verificarPr
     responderJson(res, 201, resultado.resultado);
     return;
   }
+  if (req.method === 'POST' && req.url === '/api/estudos-por-conta') {
+    if (!configuracaoConta) {
+      responderJson(res, 404, { erro: 'Rota não encontrada' });
+      return;
+    }
+    const subject = await obterSubjectVerificado(req, res, configuracaoConta.resolverIdentidadeAutenticada);
+    if (!subject) return;
+
+    let identidadePseudonimizada;
+    try {
+      identidadePseudonimizada = criarIdentidadeLimitadorPorConta(subject, configuracaoConta.segredoHmacRateLimitConta);
+    } catch (erro) {
+      logger.error('api.account_rate_limit.unavailable', erro, { route: 'POST /api/estudos-por-conta' });
+      responderJson(res, 503, { erro: 'Limitador temporariamente indisponível.' });
+      return;
+    }
+    if (!await verificarLimitePorIdentidade(
+      req,
+      res,
+      configuracaoConta.limitadorPorConta,
+      () => identidadePseudonimizada,
+      'api.account_rate_limit.unavailable'
+    )) return;
+
+    if (!/^application\/json(?:\s*;|\s*$)/i.test(req.headers['content-type'] || '')) {
+      responderJson(res, 415, { erro: 'Use Content-Type: application/json' });
+      return;
+    }
+    const leitura = await lerJson(req);
+    if (leitura.erro) {
+      responderJson(res, leitura.status, { erro: leitura.erro });
+      return;
+    }
+    const resultado = await servico.criar(leitura.dados);
+    if (!resultado.sucesso) {
+      responderJson(res, resultado.status, { erro: resultado.erro });
+      return;
+    }
+    responderJson(res, 201, resultado.estudo);
+    return;
+  }
   responderJson(res, 404, { erro: 'Rota não encontrada' });
 }
 
-function criarServidor(servico, servicoPrevisao, limitador, { verificarProntidao = async () => {} } = {}) {
+function criarServidor(servico, servicoPrevisao, limitador, {
+  verificarProntidao = async () => {},
+  resolverIdentidadeAutenticada,
+  limitadorPorConta,
+  segredoHmacRateLimitConta
+} = {}) {
   if (!limitador || typeof limitador.verificar !== 'function') {
     throw new TypeError('Informe um limitador de gravações com verificar()');
   }
   if (typeof verificarProntidao !== 'function') {
     throw new TypeError('verificarProntidao precisa ser uma função');
   }
+  const configuracoesConta = [resolverIdentidadeAutenticada, limitadorPorConta, segredoHmacRateLimitConta];
+  const configuracoesContaFornecidas = configuracoesConta.filter((valor) => valor !== undefined).length;
+  if (configuracoesContaFornecidas !== 0 && configuracoesContaFornecidas !== configuracoesConta.length) {
+    throw new TypeError('Informe verificador de identidade, limitador e chave HMAC juntos.');
+  }
+  if (resolverIdentidadeAutenticada !== undefined && typeof resolverIdentidadeAutenticada !== 'function') {
+    throw new TypeError('resolverIdentidadeAutenticada precisa ser uma função confiável');
+  }
+  if (limitadorPorConta !== undefined && (!limitadorPorConta || typeof limitadorPorConta.verificar !== 'function')) {
+    throw new TypeError('limitadorPorConta precisa oferecer verificar()');
+  }
+  if (segredoHmacRateLimitConta !== undefined) {
+    criarIdentidadeLimitadorPorConta('configuracao-valida', segredoHmacRateLimitConta);
+  }
   const rotaPrevisao = criarRotaPrevisao(servicoPrevisao);
+  const configuracaoConta = configuracoesContaFornecidas
+    ? { resolverIdentidadeAutenticada, limitadorPorConta, segredoHmacRateLimitConta }
+    : null;
   return http.createServer((req, res) => {
     aplicarCabecalhosSeguros(res);
-    responder(req, res, servico, rotaPrevisao, limitador, verificarProntidao).catch((erro) => {
+    responder(req, res, servico, rotaPrevisao, limitador, verificarProntidao, configuracaoConta).catch((erro) => {
       logger.error('api.request.failed', erro, { route: obterRotaSeguraParaLog(req) });
       if (!res.headersSent) {
         responderJson(res, 500, { erro: 'Falha interna do servidor' });
