@@ -3080,17 +3080,37 @@ Object.assign(LESSON_GUIDES, {
         ],
         "diagramTitle": "Um mapa possível para uma aplicação de estudos",
         "diagram": "Navegador\n   │ HTTPS\n   ▼\nArquivos HTML/CSS/JS ── CDN / hospedagem estática\n   │ Fetch / HTTPS\n   ▼\nAPI ── função sob demanda OU servidor persistente\n   │ conexão protegida\n   ▼\nPostgreSQL ── serviço gerenciado OU operação própria"
+      },
+      {
+        "title": "Projetar custo, quotas e caminho de saída",
+        "paragraphs": [
+          "Preço não é uma propriedade só do plano. Monte uma estimativa por componente e período: valor base + unidades previstas além da franquia + adicionais + tributos/conversão. Registre a unidade que gera cobrança, a janela de medição, quota incluída, excedente e comportamento ao atingir o limite. Exemplos de métricas que podem importar são transferência, invocações e duração de função, builds, compute e disco de banco, egress, usuários ativos conforme a definição do produto, SMS, comandos ou memória de cache.",
+          "Faça três cenários com as mesmas hipóteses: uso esperado, crescimento e pico. Consulte as páginas oficiais e o painel de uso no momento da decisão: [modelo de preços da Vercel](https://vercel.com/docs/pricing), [uso e controle de gastos da Vercel](https://vercel.com/docs/pricing/manage-and-optimize-usage), [cobrança e quotas da Supabase](https://supabase.com/docs/guides/platform/billing-on-supabase) e [preços atuais do Clerk](https://clerk.com/pricing). Planos, unidades, franquias e regras mudam; anote a data da consulta, sem copiar valores para uma aula permanente como se fossem garantidos. MAU, MRU e outros contadores podem ter definições diferentes entre produtos.",
+          "Separe quota financeira de limite técnico. Um produto pode cobrar excedente, pausar recursos, restringir operações ou permitir configurar teto e alerta. Verifique o que acontece quando o limite é alcançado e quem recebe notificação; defina um alerta antes do teto e uma resposta operacional. ‘Plano gratuito’ ainda pode consumir limite, interromper um recurso ou exigir migração quando o uso cresce.",
+          "Portabilidade também tem custo. Liste APIs proprietárias, modelo de identidade, extensões do banco, funções de borda, formato de exportação, região, backups e configuração de deploy. A dependência pode ser aceitável quando reduz trabalho operacional; compare esse benefício com o esforço para exportar registros, mapear IDs/permissões, trocar adaptadores e testar a restauração. O [guia de migração do Clerk](https://clerk.com/docs/guides/development/migrating/overview) documenta opções de exportação; exportar arquivo não conclui a migração de autenticação nem comprova que senhas, sessões e permissões são compatíveis.",
+          "Pausa: qual unidade da sua estimativa poderia crescer sem aumentar o número de usuários — transferência, duração, armazenamento, logs ou SMS? Como você perceberia e conteria esse crescimento?"
+        ],
+        "terms": [
+          { "term": "Quota", "meaning": "Quantidade incluída ou limite de uso de um recurso durante uma janela definida pelo fornecedor." },
+          { "term": "Excedente", "meaning": "Uso acima de uma franquia incluída; pode gerar cobrança ou restrição conforme o plano." },
+          { "term": "Vendor lock-in", "meaning": "Custo ou dificuldade de trocar fornecedor por dependência de APIs, formatos, serviços ou operação específicos." },
+          { "term": "Custo de saída", "meaning": "Trabalho, risco e recursos para exportar, converter, validar e operar dados e fluxos em outra solução." }
+        ]
       }
     ],
     "guided": [
       { "instruction": "Marque no exemplo quais componentes servem arquivos, executam regras e mantêm dados duráveis.", "result": "Interface serve os arquivos; API executa regras; banco é a fonte de dados duráveis." },
       { "instruction": "Troque o backend sob demanda por um servidor persistente e liste uma responsabilidade operacional que passa a ser explícita.", "result": "O plano inclui monitorar e atualizar o processo, além de manter sua disponibilidade." },
-      { "instruction": "Compare duas regiões hipotéticas e localize quais saltos da requisição devem ser medidos antes de escolher.", "result": "A análise considera usuário, função/API e banco, sem presumir que CDN distribui todos os componentes." }
+      { "instruction": "Compare duas regiões hipotéticas e localize quais saltos da requisição devem ser medidos antes de escolher.", "result": "A análise considera usuário, função/API e banco, sem presumir que CDN distribui todos os componentes." },
+      { "instruction": "Preencha uma matriz de custo e saída para Vercel, Supabase e Clerk usando as páginas oficiais atuais; anote data, plano, unidade, quota, excedente e mecanismo de alerta ou informe que ele não está disponível.", "result": "A comparação não presume que a mesma definição de usuário ou limite vale para todos. Inclui cenários esperado/crescimento/pico e registra os dados, identidades e APIs que exigiriam trabalho para sair." }
     ],
     "mistakes": [
       "Achar que um site estático não pode ter JavaScript ou consumir API.",
       "Achar que serverless significa ausência de servidor ou de limites.",
       "Guardar estado compartilhado apenas na memória de uma função ou processo temporário.",
+      "Escolher região ou plano comparando apenas o valor-base, sem identificar unidade, janela, quota ou comportamento no limite.",
+      "Tratar MAU, MRU e outros contadores de usuários como se tivessem a mesma definição em todos os produtos.",
+      "Presumir que um arquivo exportado de contas conclui uma migração de autenticação ou mantém permissões e sessões compatíveis.",
       "Escolher região ou plano sem verificar latência, custo, limites e recuperação atuais."
     ],
     "exercises": [
@@ -3125,17 +3145,27 @@ Object.assign(LESSON_GUIDES, {
         "solution": "Inspecionar onde a API grava e se a instância preserva esse armazenamento. Criar registro fictício em ambiente de teste, reiniciar/reimplantar e consultar novamente; se desaparece, mover a fonte de verdade para banco durável e repetir teste.",
         "explanation": "Uma publicação de arquivos e o ciclo de vida da computação não garantem permanência do armazenamento local.",
         "hints": ["Descubra se o dado foi gravado em banco externo, arquivo local ou variável em memória.", "Use dados de teste e confirme que a origem não será alterada."]
+      },
+      {
+        "prompt": "Mudança de requisito: a equipe precisa conseguir sair de um fornecedor em prazo definido, e uma métrica de uso mudou desde a última estimativa. Atualize a matriz: indique o que consultar de novo, recalcule os cenários esperado/crescimento/pico e proponha um ensaio de exportação e restauração em ambiente separado.",
+        "expected": "A matriz recebe a data e a métrica atualizadas; cada cenário usa a mesma unidade e janela de medição. O ensaio exporta dados fictícios, mapeia IDs e permissões, restaura em destino isolado e compara os registros antes de planejar a troca.",
+        "criteria": ["Consulta novamente documentação oficial e registra a data, sem reutilizar quota desatualizada.", "Mantém unidade, janela e definição de usuários explícitas ao comparar cenários.", "O plano testa exportação e restauração sem substituir a origem e inclui dependências proprietárias que exigem adaptação."],
+        "solution": "Revisar páginas de preços, billing e uso de cada fornecedor; atualizar unidade, quota, excedente e o comportamento no limite; refazer as três projeções. Em cópia isolada, exportar registros fictícios, registrar formato e relações/IDs, importar, validar contagens e permissões e só então estimar a substituição de APIs e o período de coexistência.",
+        "explanation": "Uma mudança de métrica invalida parte da estimativa, enquanto uma exportação sem restauração comprovada não demonstra que a aplicação consegue operar no destino.",
+        "hints": ["Comece anotando qual versão da unidade e da quota usou antes.", "Faça a restauração numa base nova e compare a origem com o destino antes de considerar qualquer corte."]
       }
     ],
     "quiz": [
       { "question": "Qual afirmação descreve uma hospedagem estática?", "options": ["Entrega arquivos e ainda pode chamar uma API remota.", "Não pode conter JavaScript.", "Sempre guarda os dados em PostgreSQL."], "correctIndex": 0, "explanation": "Arquivos estáticos podem executar JavaScript no navegador e consumir serviços remotos." },
       { "question": "O que serverless significa neste contexto?", "options": ["A aplicação não usa servidores.", "O provedor administra a infraestrutura de execução, com limites e responsabilidades próprios.", "Todo dado é persistido automaticamente."], "correctIndex": 1, "explanation": "O provedor administra a infraestrutura, mas serviços continuam tendo servidores, limites e operação." },
+      { "question": "O que comparar antes de escolher um plano de hospedagem e autenticação?", "options": ["Somente o preço-base anunciado.", "Unidade e janela de cobrança, quota, excedente, efeito do limite e cenário de uso; depois, o esforço de saída.", "A mesma contagem de usuários presumindo que tem a mesma definição em todos os produtos."], "correctIndex": 1, "explanation": "O custo depende de métricas e regras do produto; definições de usuários podem divergir, e a portabilidade inclui dados, IDs, permissões e APIs." },
       { "question": "Como verificar se a persistência é durável?", "options": ["Abrir a página uma vez.", "Criar dados fictícios, reiniciar em ambiente isolado e confirmar a leitura depois.", "Ver se o nome do projeto contém database."], "correctIndex": 1, "explanation": "A persistência precisa ser observada após um ciclo de reinício controlado." }
     ],
     "summary": [
       "Estático entrega arquivos; API executa regras; banco durável mantém dados compartilhados.",
       "Funções e servidores persistentes têm ciclos operacionais e limites diferentes.",
-      "Compare requisitos, região, latência, custo, limites e recuperação antes de escolher um fornecedor."
+      "Estime cada serviço por unidade, janela, quota e excedente, com cenários e data de consulta; não presuma que métricas de usuários são equivalentes.",
+      "Compare benefício operacional com o custo de exportar dados, mapear identidades e substituir APIs; prove a restauração numa cópia isolada."
     ]
   },
   "delivery-static-deploy": {
