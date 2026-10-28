@@ -6,6 +6,7 @@ const path = require('node:path');
 const { criarServicoEstudos } = require('./src/servico-estudos.cjs');
 const { criarRepositorioEstudosPostgres } = require('./src/repositorio-estudos-postgres.cjs');
 const { criarRepositorioEstudos } = require('./src/repositorio-estudos-memoria.cjs');
+const { ErroOpenMeteo, criarClienteOpenMeteo } = require('./src/cliente-open-meteo.cjs');
 
 const pagina = path.join(__dirname, 'index.html');
 const limiteCorpo = 1024;
@@ -30,7 +31,7 @@ async function lerJson(req) {
   }
 }
 
-async function responder(req, res, servico) {
+async function responder(req, res, servico, servicoPrevisao) {
   if (req.method === 'GET' && req.url === '/') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     fs.createReadStream(pagina).pipe(res);
@@ -38,6 +39,38 @@ async function responder(req, res, servico) {
   }
   if (req.method === 'GET' && req.url === '/api/estudos') {
     responderJson(res, 200, await servico.listar());
+    return;
+  }
+  if (req.method === 'GET' && (req.url === '/api/previsao' || req.url.startsWith('/api/previsao?'))) {
+    const url = new URL(req.url, 'http://127.0.0.1');
+    const latitude = Number(url.searchParams.get('latitude'));
+    const longitude = Number(url.searchParams.get('longitude'));
+    if (
+      url.searchParams.get('latitude')?.trim() === '' ||
+      url.searchParams.get('longitude')?.trim() === '' ||
+      url.searchParams.get('latitude') === null ||
+      url.searchParams.get('longitude') === null ||
+      !Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
+      !Number.isFinite(longitude) || longitude < -180 || longitude > 180
+    ) {
+      responderJson(res, 400, { erro: 'Informe latitude e longitude válidas.' });
+      return;
+    }
+    if (!servicoPrevisao) {
+      responderJson(res, 503, { erro: 'Integração meteorológica não configurada.' });
+      return;
+    }
+    try {
+      responderJson(res, 200, await servicoPrevisao.consultar({ latitude, longitude }));
+    } catch (erro) {
+      const status = erro instanceof ErroOpenMeteo && erro.tipo === 'tempo_limite' ? 504 : 502;
+      const categoria = erro instanceof ErroOpenMeteo ? erro.tipo : 'integracao';
+      console.error(`Falha na integração externa: ${categoria}`);
+      responderJson(res, status, {
+        erro: 'Não foi possível obter a previsão agora.',
+        codigo: categoria
+      });
+    }
     return;
   }
   if (req.method === 'POST' && req.url === '/api/estudos') {
@@ -79,9 +112,9 @@ async function responder(req, res, servico) {
   responderJson(res, 404, { erro: 'Rota não encontrada' });
 }
 
-function criarServidor(servico) {
+function criarServidor(servico, servicoPrevisao) {
   return http.createServer((req, res) => {
-    responder(req, res, servico).catch((erro) => {
+    responder(req, res, servico, servicoPrevisao).catch((erro) => {
       console.error(`Falha interna na API: ${erro.code || erro.name || 'erro desconhecido'}`);
       if (!res.headersSent) {
         responderJson(res, 500, { erro: 'Falha interna do servidor' });
@@ -98,7 +131,8 @@ if (require.main === module) {
     ? criarRepositorioEstudos()
     : criarRepositorioEstudosPostgres();
   const servico = criarServicoEstudos(repositorio);
-  const servidor = criarServidor(servico);
+  const servicoPrevisao = criarClienteOpenMeteo();
+  const servidor = criarServidor(servico, servicoPrevisao);
   servidor.listen(4180, '127.0.0.1', () => {
     console.log(`Abra http://127.0.0.1:4180 · armazenamento: ${usarMemoria ? 'memória (temporário)' : 'PostgreSQL'}`);
   });

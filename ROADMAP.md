@@ -324,9 +324,13 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Configurar CI em um repositório real.
   - [x] Criar `.github/workflows/ci.yml` para validar conteúdo, testes unitários, PostgreSQL real descartável e fluxo Playwright.
   - [x] Confirmar a execução no GitHub Actions em `main`; run `40605904963` passou em todas as etapas.
-- [ ] Observar uma falha de CI numa branch temporária e corrigi-la; manter `main` verde.
-- [ ] Integrar ao menos um serviço externo real com contrato documentado.
-- [ ] Simular falhas de rede, autenticação e resposta inválida sem expor credenciais.
+- [x] Observar uma falha de CI numa branch temporária e corrigi-la; manter `main` verde.
+  - [x] Run [40606364491](https://github.com/bzraiago/tech-learning-hub/actions/runs/40606364491) falhou em `Run unit tests` após uma expectativa controlada incorreta (`valido: false`); o branch foi corrigido e a asserção restaurada para `true`.
+  - [x] Run [40606768881](https://github.com/bzraiago/tech-learning-hub/actions/runs/40606768881) passou em todas as etapas, incluindo PostgreSQL e Playwright; `main` permaneceu verde e o branch temporário foi removido.
+- [x] Integrar ao menos um serviço externo real com contrato documentado.
+  - [x] `labs/backend-layers` consulta o Open-Meteo, valida e normaliza temperatura/umidade; smoke real passou sem credenciais e a interface atribui a fonte.
+- [x] Simular falhas de rede, autenticação e resposta inválida sem expor credenciais.
+  - [x] Testes controlados cobrem erro de rede, timeout, `401` simulado e contrato JSON inválido; API retorna mensagens públicas sem detalhes internos. O serviço escolhido não exige autenticação.
 - [ ] Publicar uma aplicação de demonstração.
 - [ ] Conferir a URL final e o comportamento publicado.
 - [ ] Ensinar rollback para uma versão anterior.
@@ -587,7 +591,8 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 27/10/2026 | Fase 6 — persistência e evolução verificadas | `c7656ac` | PostgreSQL 18 descartável aceitou as migrations 001–002, teste de integração, API real e rollback. A prática da migration 003 foi documentada e validada numa cópia temporária; testes passaram. Docker Compose continua pendente. |
 | 27/10/2026 | Fase 7 — reproduzir e corrigir defeito | `c7656ac` | `labs/bug-investigation` apresenta falha reproduzível de mutação; o teste ficou vermelho com o código inicial e verde após correção em cópia temporária. |
 | 27/10/2026 | Fase 7 — fluxo automatizado no navegador | `66636e5` | `labs/backend-layers/e2e` executa Chromium headless contra a interface e API reais do laboratório em memória; 1 fluxo passou. O teste não comprova persistência PostgreSQL. |
-| 27/10/2026 | Fase 7 — CI real | `66636e5` | Run [40605904963](https://github.com/bzraiago/tech-learning-hub/actions/runs/40605904963) passou no GitHub Actions: validação, 17 testes unitários, migrations, integração PostgreSQL 17 e Playwright. A prática de diagnosticar uma falha controlada segue pendente. |
+| 27/10/2026 | Fase 7 — CI real | `66636e5` | Run [40605904963](https://github.com/bzraiago/tech-learning-hub/actions/runs/40605904963) passou no GitHub Actions: validação, 17 testes unitários, migrations, integração PostgreSQL 17 e Playwright. |
+| 27/10/2026 | Fase 7 — recuperação de falha na CI | `92fb73d` | Na branch temporária, o run [40606364491](https://github.com/bzraiago/tech-learning-hub/actions/runs/40606364491) identificou a asserção incorreta; após restaurar `valido: true`, o run [40606768881](https://github.com/bzraiago/tech-learning-hub/actions/runs/40606768881) passou em todas as etapas. `main` não foi alterada durante a prática e o branch foi removido. |
 
 ## Decisões e bloqueios
 
@@ -596,3 +601,4 @@ Registre aqui mudanças de direção e impedimentos que afetem a sequência.
 | Data | Tipo | Decisão ou bloqueio | Motivo | Próxima ação |
 |---|---|---|---|---|
 | 27/10/2026 | Decisão de ambiente | O daemon Docker não está acessível nesta sessão; a validação PostgreSQL foi feita numa instância 18 descartável, vinculada somente a `127.0.0.1:55433`, e encerrada após os testes. | O caminho PostgreSQL real ficou verificável sem tocar no Supabase nem no banco permanente; o fluxo específico de Docker Compose não foi executado. | Seguir para a Fase 7; quando Docker estiver disponível, conferir também o caminho Compose do laboratório. |
+| 27/10/2026 | Prática CI | Foi introduzida e corrigida uma expectativa de teste incorreta em branch temporária; `main` permaneceu intacta e verde. | A prática demonstrou localizar a primeira etapa vermelha, comparar esperado/observado, restaurar a asserção e esperar a CI confirmar os testes seguintes. | Integrar e documentar um serviço externo real no laboratório backend. |

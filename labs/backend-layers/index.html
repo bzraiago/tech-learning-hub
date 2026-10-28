@@ -15,12 +15,26 @@
     </form>
     <p id="situacao" role="status" aria-live="polite">Carregando…</p>
     <ul id="lista"></ul>
+    <section aria-labelledby="titulo-previsao">
+      <h2 id="titulo-previsao">Temperatura e umidade atuais</h2>
+      <form id="formulario-previsao">
+        <label for="latitude">Latitude</label>
+        <input id="latitude" name="latitude" type="number" min="-90" max="90" step="any" value="-3.73" required>
+        <label for="longitude">Longitude</label>
+        <input id="longitude" name="longitude" type="number" min="-180" max="180" step="any" value="-38.52" required>
+        <button type="submit">Consultar Open-Meteo</button>
+      </form>
+      <p id="resultado-previsao" aria-live="polite">Nenhuma consulta realizada.</p>
+      <p>Fonte dos dados: <a href="https://open-meteo.com/en/docs" target="_blank" rel="noopener noreferrer">Open-Meteo</a> · dados sob licença CC BY 4.0.</p>
+    </section>
   </main>
   <script>
     const formulario = document.querySelector('#formulario');
     const titulo = document.querySelector('#titulo');
     const situacao = document.querySelector('#situacao');
     const lista = document.querySelector('#lista');
+    const formularioPrevisao = document.querySelector('#formulario-previsao');
+    const resultadoPrevisao = document.querySelector('#resultado-previsao');
 
     function mostrarEstudos(estudos) {
       lista.replaceChildren();
@@ -64,6 +78,29 @@
         situacao.textContent = `Estudo ${dados.titulo} adicionado.`;
       } catch {
         situacao.textContent = 'Falha de conexão. Tente novamente.';
+      } finally {
+        botao.disabled = false;
+      }
+    });
+
+    formularioPrevisao.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+      const botao = formularioPrevisao.querySelector('button');
+      const parametros = new URLSearchParams({
+        latitude: formularioPrevisao.elements.latitude.value,
+        longitude: formularioPrevisao.elements.longitude.value
+      });
+      botao.disabled = true;
+      resultadoPrevisao.textContent = 'Consultando serviço externo…';
+      try {
+        const resposta = await fetch(`/api/previsao?${parametros}`);
+        const dados = await resposta.json();
+        if (!resposta.ok) throw new Error(dados.erro || `Pedido recusado (HTTP ${resposta.status}).`);
+        resultadoPrevisao.textContent = `Temperatura: ${dados.temperatura} ${dados.unidade} · umidade: ${dados.umidade}${dados.unidadeUmidade} · horário: ${dados.horario} (${dados.fusoHorario}).`;
+      } catch (erro) {
+        resultadoPrevisao.textContent = erro.message === 'Failed to fetch'
+          ? 'Falha de conexão com a API local. Tente novamente.'
+          : erro.message;
       } finally {
         botao.disabled = false;
       }

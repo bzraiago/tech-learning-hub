@@ -27,3 +27,17 @@ test('cria estudo pela interface e mostra erro de duplicidade', async ({ page })
   await expect(page.getByRole('status')).toHaveText(/já existe um estudo com esse título/i);
   await expect(page.getByRole('listitem')).toHaveText(['HTML', 'JavaScript', 'CSS']);
 });
+
+test('mostra dados retornados pelo contrato do serviço meteorológico', async ({ page }) => {
+  await page.goto('/');
+  const consulta = page.waitForResponse((resposta) =>
+    resposta.url().includes('/api/previsao?') && resposta.request().method() === 'GET'
+  );
+
+  await page.getByRole('button', { name: 'Consultar Open-Meteo' }).click();
+
+  expect((await consulta).status()).toBe(200);
+  await expect(page.locator('#resultado-previsao')).toHaveText(
+    'Temperatura: 29.4 °C · umidade: 71% · horário: 2026-10-27T10:00 (America/Fortaleza).'
+  );
+});

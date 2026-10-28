@@ -66,7 +66,9 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [x] Em `labs/bug-investigation`, o teste de preservação da lista reproduz a falha inicial; a suíte passa após corrigir a função numa cópia de verificação.
 - [x] Em `labs/backend-layers`, `npm run test:e2e` abre Chromium headless, cria um estudo pela interface, confirma `201`, rejeita duplicidade com `409` e encerra a API em memória.
 - [x] Em GitHub Actions, run `40605904963` passou na validação de conteúdo, testes unitários, migrations, integração PostgreSQL 17 e fluxo Playwright.
-- [ ] Numa branch temporária, observar uma falha de teste no CI, corrigir sua causa e confirmar nova execução verde sem deixar `main` quebrada.
+- [x] Numa branch temporária, observar a falha controlada no run [40606364491](https://github.com/bzraiago/tech-learning-hub/actions/runs/40606364491), corrigir a expectativa e confirmar o run verde [40606768881](https://github.com/bzraiago/tech-learning-hub/actions/runs/40606768881); `main` permaneceu intacta.
+- [x] `labs/backend-layers`: `npm run smoke:open-meteo` consulta serviço real sem chave e confere campos; testes automatizados simulam rede, timeout, `401` e JSON inválido sem enviar credenciais.
+- [x] Interface do laboratório identifica e vincula Open-Meteo como fonte dos dados meteorológicos.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.

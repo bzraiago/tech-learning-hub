@@ -5,7 +5,21 @@ const { criarServicoEstudos } = require('../src/servico-estudos.cjs');
 const { criarRepositorioEstudos } = require('../src/repositorio-estudos-memoria.cjs');
 
 module.exports = async function iniciarServidorDeTeste() {
-  const servidor = criarServidor(criarServicoEstudos(criarRepositorioEstudos()));
+  const servicoPrevisao = {
+    async consultar() {
+      return {
+        latitude: -3.75,
+        longitude: -38.5,
+        temperatura: 29.4,
+        unidade: '°C',
+        umidade: 71,
+        unidadeUmidade: '%',
+        horario: '2026-10-27T10:00',
+        fusoHorario: 'America/Fortaleza'
+      };
+    }
+  };
+  const servidor = criarServidor(criarServicoEstudos(criarRepositorioEstudos()), servicoPrevisao);
 
   await new Promise((resolve, reject) => {
     servidor.once('error', reject);

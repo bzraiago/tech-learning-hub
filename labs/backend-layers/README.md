@@ -123,6 +123,68 @@ Resultado esperado: `409` e uma mensagem de título já existente. A lista perma
 
 Para ver o contrato por fora do formulário, o Console também pode executar `fetch('/api/estudos').then(async r => console.log(r.status, await r.json()))`. O `GET` responde `200` com JSON. Erros inesperados do banco viram `500` genérico; detalhes internos ficam apenas no terminal.
 
+## Integração externa real: Open-Meteo
+
+### Objetivo
+
+Observar uma chamada real entre o backend Node.js e um serviço externo, validar o contrato da resposta e manter mensagens seguras quando a rede, a autenticação simulada ou o formato recebido falharem. O fluxo é **navegador → API local → Open-Meteo**; a chave do serviço não é necessária e nenhuma credencial é enviada.
+
+### Contrato antes de executar
+
+| Direção | Método e rota | Entrada/saída |
+|---|---|---|
+| Navegador → API do laboratório | `GET /api/previsao?latitude=-3.73&longitude=-38.52` | Latitude entre `-90` e `90`; longitude entre `-180` e `180`. |
+| API do laboratório → navegador | `200 application/json` | `{ latitude:number, longitude:number, temperatura:number, unidade:string, umidade:number, unidadeUmidade:string, horario:string, fusoHorario:string }` |
+| API do laboratório → navegador | `400` | Coordenadas ausentes, não numéricas ou fora dos limites. A API externa não é chamada. |
+| API do laboratório → navegador | `502` ou `504` | Falha externa, autenticação simulada, resposta inválida ou tempo limite; o corpo não inclui mensagens internas. |
+| Backend → Open-Meteo | `GET https://api.open-meteo.com/v1/forecast` | Envia `latitude`, `longitude`, `current=temperature_2m,relative_humidity_2m` e `timezone=America/Fortaleza`; consome `current`, `current_units` e `timezone`. |
+
+**Resultado esperado antes da solução:** ao abrir a interface, os campos começam com coordenadas de exemplo. Ao consultar, a interface mostra temperatura, umidade e horário recebidos. Os números e o horário variam; não os use como valores fixos de teste. Open-Meteo descreve a condição atual como dado de modelo meteorológico em intervalo de 15 minutos, portanto isto não é leitura instantânea de uma estação. Consulte o [contrato da Weather Forecast API](https://open-meteo.com/en/docs) antes de mudar os campos.
+
+### Preparar e executar
+
+Abra um terminal em `labs/backend-layers`. Para executar sem Docker ou PostgreSQL, inicie o servidor em memória.
+
+```powershell
+# Windows PowerShell
+$env:BACKEND_STORAGE = 'memory'
+npm.cmd run start:memory
+```
+
+```sh
+# macOS ou Linux
+BACKEND_STORAGE=memory npm run start:memory
+```
+
+Saída esperada: `Abra http://127.0.0.1:4180 · armazenamento: memória (temporário)`. Mantenha este terminal aberto, acesse o endereço no navegador e consulte a previsão. Em outra aba, abra `http://127.0.0.1:4180/api/previsao?latitude=-3.73&longitude=-38.52` para observar o JSON e o status `200`.
+
+Para conferir o contrato real sem abrir o navegador, pare o servidor com `Ctrl+C` e execute:
+
+```powershell
+# Windows PowerShell
+npm.cmd run smoke:open-meteo
+```
+
+```sh
+# macOS ou Linux
+npm run smoke:open-meteo
+```
+
+Saída esperada: `Contrato Open-Meteo válido:` seguido dos campos normalizados. Os valores são variáveis. O comando exige rede; se a conexão não estiver disponível, a saída informa somente a categoria da falha. Para retomar a interface, inicie novamente o servidor em memória. No PowerShell, ao encerrar o exercício, use `Remove-Item Env:BACKEND_STORAGE`.
+
+Open-Meteo informa que o endpoint gratuito não exige chave, é destinado a uso não comercial, exige atribuição CC BY 4.0, possui limites de requisição e não oferece garantia de disponibilidade. A interface mantém uma atribuição visível e vinculada à documentação. Este material é educacional; antes de usar a API em produto comercial, confira os [termos vigentes](https://open-meteo.com/en/terms) e a licença. A coordenada enviada é aproximada e fictícia para o exercício; a aplicação não a armazena. A política do provedor informa que registros técnicos podem conter coordenadas e são removidos após 90 dias.
+
+### Prática progressiva
+
+Faça as previsões e anotações antes de executar cada mudança. Os testes automáticos usam respostas controladas para não depender de internet; somente `smoke:open-meteo` e a consulta na interface chamam o serviço real.
+
+1. **Prever:** antes da consulta, escreva os parâmetros da requisição e a estrutura de resposta que espera. Critério: listar método, caminho, nomes e tipos sem inventar a temperatura.
+2. **Alterar:** troque as coordenadas pelos valores `0` e `0`. Compare a URL e os campos, sem exigir que a temperatura seja igual à primeira consulta. Critério: status `200` e campos dentro do contrato.
+3. **Construir:** acrescente o código meteorológico retornado por `current.weather_code`. Atualize o adaptador e um teste unitário com uma resposta fictícia. Critério: o número aparece no JSON local e a saída antiga continua preservada.
+4. **Investigar erro:** rode `npm test` e leia os casos de rede, status `401` e resposta inválida. Registre esperado, observado, categoria e camada responsável. Critério: os testes provam cada caso com `fetch` substituído e nenhuma credencial real ou detalhe interno aparece na resposta.
+
+O status `401` é uma simulação controlada: Open-Meteo não exige autenticação para este endpoint. Não crie nem envie uma chave falsa. O código exercita como classificar uma rejeição de autenticação que pode existir em outro fornecedor.
+
 ## Verificações automatizadas
 
 Os testes unitários não precisam de Docker nem de conexão de rede:
@@ -137,7 +199,7 @@ npm.cmd test
 npm test
 ```
 
-Saída esperada: dezessete testes aprovados, cobrindo ordem/idempotência/rollback de migrations, validação, corrida por título único, transação, consultas parametrizadas e resposta `500` sem detalhes internos.
+Saída esperada: testes aprovados, cobrindo contrato/falhas simuladas do cliente Open-Meteo, rota de integração, ordem/idempotência/rollback de migrations, validação, corrida por título único, transação, consultas parametrizadas e respostas seguras. O número pode crescer conforme novos casos são adicionados.
 
 Depois de iniciar o banco e aplicar as migrations, habilite o teste real de integração:
 
@@ -185,7 +247,7 @@ npm.cmd run test:e2e
 npm run test:e2e
 ```
 
-Resultado esperado: `1 passed`. O Playwright inicia e encerra a API do laboratório; pare qualquer instância já aberta em `127.0.0.1:4180` antes de executar. O teste não lê `.env`, não conecta ao PostgreSQL e não envia dados para serviços externos. Relatórios ficam em `test-results/` e `playwright-report/`, ambos ignorados pelo Git.
+Resultado esperado: `2 passed`. O Playwright inicia e encerra a API do laboratório; pare qualquer instância já aberta em `127.0.0.1:4180` antes de executar. O teste não lê `.env`, não conecta ao PostgreSQL e não envia dados para serviços externos; a resposta meteorológica vem de um adaptador de teste determinístico. Relatórios ficam em `test-results/` e `playwright-report/`, ambos ignorados pelo Git.
 
 Se o executável do navegador não for encontrado, repita `playwright install chromium --only-shell`. Se o Linux informar bibliotecas do sistema ausentes, consulte `playwright install-deps chromium` e os requisitos da distribuição antes de instalar dependências do sistema.
 
