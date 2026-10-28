@@ -42,9 +42,11 @@ test('cria papel sem privilégios administrativos usando senha como parâmetro e
   assert.equal(pool.chamadas[0].sql.includes('pg_database'), true);
   assert.deepEqual(pool.chamadas[1].parametros, ['backend_app', 'senha-ficticia-segura']);
   assert.match(pool.chamadas[1].sql, /format\(/);
+  assert.match(pool.chamadas[1].sql, /\$1::text,\s*\$2::text/);
   assert.equal(pool.chamadas[1].sql.includes('senha-ficticia-segura'), false);
   assert.match(pool.chamadas[2].sql, /^CREATE ROLE/);
   assert.equal(pool.chamadas[3].sql.includes('current_database()'), true);
+  assert.match(pool.chamadas[3].sql, /current_database\(\),\s*\$1::text/);
   assert.match(pool.chamadas[4].sql, /^REVOKE CONNECT/);
   assert.match(pool.chamadas[5].sql, /^REVOKE ALL PRIVILEGES ON DATABASE/);
   assert.match(pool.chamadas[6].sql, /^GRANT CONNECT/);

@@ -26,7 +26,8 @@ test('papel da API executa somente leitura e inclusão no PostgreSQL local', {
   assert.equal(banco, 'backend_camadas', 'Use somente o banco descartável backend_camadas.');
 
   const admin = criarPoolMigracoes();
-  const app = criarPoolEstudos();
+  const appPool = criarPoolEstudos();
+  let app;
   const canonico = `privilegio-${randomUUID()}`;
 
   try {
@@ -83,6 +84,7 @@ test('papel da API executa somente leitura e inclusão no PostgreSQL local', {
       session_sequence_select: false
     });
 
+    app = await appPool.connect();
     await app.query('BEGIN');
     const estudo = await app.query(
       'INSERT INTO estudos (titulo, titulo_canonico) VALUES ($1, $2) RETURNING id, titulo',
@@ -106,8 +108,11 @@ test('papel da API executa somente leitura e inclusão no PostgreSQL local', {
     await assertPermissaoRecusada(app, 'SELECT id FROM migrations_aplicadas');
     await app.query('ROLLBACK');
   } finally {
-    await app.query('ROLLBACK').catch(() => {});
-    await app.end();
+    if (app) {
+      await app.query('ROLLBACK').catch(() => {});
+      app.release();
+    }
+    await appPool.end();
     await admin.end();
   }
 });

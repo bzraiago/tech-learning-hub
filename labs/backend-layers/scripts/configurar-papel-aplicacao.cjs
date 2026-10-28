@@ -57,11 +57,11 @@ async function configurarPapelAplicacao(opcoes = {}) {
         WHEN EXISTS (SELECT 1 FROM pg_roles WHERE rolname = $1)
           THEN format(
             'ALTER ROLE %I WITH LOGIN PASSWORD %L NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS NOINHERIT CONNECTION LIMIT 10',
-            $1, $2
+            $1::text, $2::text
           )
         ELSE format(
           'CREATE ROLE %I WITH LOGIN PASSWORD %L NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS NOINHERIT CONNECTION LIMIT 10',
-          $1, $2
+            $1::text, $2::text
         )
       END AS comando
     `, [papel, senha]);
@@ -70,8 +70,8 @@ async function configurarPapelAplicacao(opcoes = {}) {
     const databasePrivileges = await pool.query(`
       SELECT
         format('REVOKE CONNECT, TEMPORARY ON DATABASE %I FROM PUBLIC', current_database()) AS revogar_publico,
-        format('REVOKE ALL PRIVILEGES ON DATABASE %I FROM %I', current_database(), $1) AS revogar_aplicacao,
-        format('GRANT CONNECT ON DATABASE %I TO %I', current_database(), $1) AS conceder
+        format('REVOKE ALL PRIVILEGES ON DATABASE %I FROM %I', current_database(), $1::text) AS revogar_aplicacao,
+        format('GRANT CONNECT ON DATABASE %I TO %I', current_database(), $1::text) AS conceder
     `, [papel]);
     await pool.query(databasePrivileges.rows[0].revogar_publico);
     await pool.query(databasePrivileges.rows[0].revogar_aplicacao);
@@ -87,7 +87,7 @@ async function configurarPapelAplicacao(opcoes = {}) {
 
     for (const membership of memberships.rows) {
       const revoke = await pool.query(
-        'SELECT format(\'REVOKE %I FROM %I\', $1, $2) AS comando',
+        'SELECT format(\'REVOKE %I FROM %I\', $1::text, $2::text) AS comando',
         [membership.rolname, papel]
       );
       await pool.query(revoke.rows[0].comando);
