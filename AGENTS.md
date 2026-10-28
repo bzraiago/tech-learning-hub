@@ -282,7 +282,8 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
    - [x] Confirmar que uma conexão PostgreSQL recusada retorna `500` genérico sem detalhes internos e que `start:memory` sinaliza dados temporários.
    - [x] Executar migrations e teste de integração em PostgreSQL real descartável; criação, unicidade, transação e persistência após reinício foram verificadas. O caminho Compose do laboratório também foi validado com PostgreSQL 17.
    - [x] Ensinar fundamentos de Redis e validar localmente cache-aside e contador com TTL, usando chaves fictícias e sem persistência.
-   - [ ] Conectar Redis ao fluxo HTTP/API, testar falha/fallback e medir latência/custo antes e depois; obter aprovação antes de incluir cliente Redis externo.
+   - [x] Conectar Redis ao fluxo HTTP/API no laboratório isolado; `npm test` (76/76), integração Redis HTTP (2/2), cache-aside PostgreSQL/Redis (1/1) e E2E no navegador (3/3) passaram em 28/10/2026. O benchmark local foi executado e não mostrou ganho de latência consistente; preço e desempenho de produção permanecem desconhecidos.
+   - [~] Validar o adaptador opcional de sessão Clerk com uma sessão real usando `test:clerk-real`; o verificador tem cobertura unitária, mas a sessão deve ser fornecida somente no processo local e nunca copiada para o repositório ou chat.
 6. [ ] **CI, publicação e integração externa** como práticas guiadas e verificáveis (observar falha, corrigir, conferir URL final, voltar versão).
    - [x] Criar aulas sobre domínio, DNS, HTTPS/TLS e opções de hospedagem, com fontes oficiais, exemplos fictícios e práticas diagnósticas.
    - [x] Ensinar domínio personalizado e DNS com simulação detalhada: associação do projeto, A/AAAA/CNAME/TXT/NS, preservação de MX/TXT, verificação por camada e rollback, sem comprar ou validar domínio real.
