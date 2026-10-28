@@ -282,7 +282,9 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Criar evidências observáveis para passagem entre os níveis 0, 1, 2, 3 e 4.
   - [x] Exibir no curso entregas e critérios de verificação para cada nível, sem confundir acompanhamento com certificação.
   - [x] Disponibilizar a prova básica com registro de entrega, rubrica e explicação, sem liberar nível automaticamente.
-  - [ ] Integrar as demais provas práticas ao registro de evidências quando os projetos de conclusão e as atividades de aprofundamento estiverem disponíveis.
+  - [~] Integrar as demais provas práticas ao registro de evidências quando os projetos de conclusão e as atividades de aprofundamento estiverem disponíveis.
+    - [x] Associar os sete critérios atuais de prontidão aos quatro projetos de fechamento; exibir a entrega registrada como autoavaliação e manter a marcação de evidência externa separada.
+    - [ ] Integrar as provas dos níveis intermediário e avançado quando houver entregáveis correspondentes; registro de projeto não comprova artefatos, colaboração ou publicação externos.
 
 **Aceite:** o sistema distingue claramente leitura, prática, retenção e resolução autônoma; só `Resolvi sozinho`, com problema novo e explicação, conta como evidência de avanço.
 
@@ -737,6 +739,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 
 | 28/10/2026 | Fase 3 - conteudo conceitual de callbacks e closures | c382d51 | js-callbacks-closures agora distingue callback chamado imediatamente de callback chamado depois, define funcao de ordem superior, explica que closure conserva a ligacao viva da variavel e cria ambientes separados, inclui rastreamento visual e alerta que closure no navegador nao protege segredo. readerTrace e nomeada e focavel; Chromium a 375 px confirmou 20 celulas, navegacao por seta e rolagem contida. Exemplo executado e produziu 8, 1, 2, 1; node --check e validate-content passaram com 143 aulas, 597 exercicios e 454 questoes. Nao houve teste com aluno nem sessao Clerk real. |
 | 28/10/2026 | Fase 7.4 — precisão da explicação sobre verificação Clerk | `3c56501` | `delivery-api-abuse` e o README do laboratório explicam por que este exemplo usa `verifyToken()` para o Bearer extraído, que é uma API de nível mais baixo, e quando considerar `authenticateRequest()`; referências oficiais Clerk verificadas. Docker Compose isolado: migrations 001–004 aplicadas, integração HTTP Redis 2/2 e cache PostgreSQL/Redis 1/1; `npm test` 76/76, sintaxe e validador passaram (143 aulas, 597 exercícios, 454 questões, 24 projetos). Containers, rede, volume e `.env` temporários removidos; Supabase não foi alterado. A auditoria heurística listou 17 aulas para revisão de carga, sem concluir que precisem ser divididas. Sessão Clerk real, revisão visual e teste com aluno permanecem pendentes. |
+| 28/10/2026 | Fase 4 — associação entre prontidão e projetos de fechamento | `7d27e16` | Os sete itens do painel de prontidão agora apontam para quatro projetos de fechamento e mostram se a entrega foi registrada, se uma explicação antiga ainda falta ou se não há registro. A marcação de evidência externa segue manual, com avisos explícitos de que o dashboard não verifica Git, revisão, comandos ou deploy. Nenhum campo ou versão de estado foi alterado. Validador (143 aulas/597 exercícios/454 questões/24 projetos), `node --check` e harness de renderização; Chromium headless percorreu os 21 controles por Tab em viewport de 375 px. Não foi aberta uma sessão Clerk nem feita verificação visual da aplicação autenticada; integração completa para provas intermediárias/avançadas permanece pendente. |
 ## Decisões e bloqueios
 
 Registre aqui mudanças de direção e impedimentos que afetem a sequência.

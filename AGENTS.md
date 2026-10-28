@@ -300,6 +300,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
    - [x] Criar roteiro local de `pg_dump`/`pg_restore` para restaurar em uma base separada, sem alterar a origem; backups ficam ignorados pelo Git.
    - [~] Concluir as validações de recuperação: backup/restauração passou localmente via Docker Compose e no GitHub Actions; rollback real na Vercel aguarda acesso autenticado à conta.
 7. [ ] Atividades gerais de conclusão (prova básica disponível no curso; intermediária pendente) — ver seção 9.
+   - [x] Associar os sete critérios atuais de prontidão a quatro projetos de fechamento, exibindo o estado da entrega separadamente da evidência externa e preservando o caráter de autoavaliação.
 8. [x] Corrigir a inconsistência da porta do PostgreSQL (55432) entre laboratório Docker e projeto relacional.
 9. [ ] Dividir aulas com excesso de conceitos (a aula de funções em JavaScript já foi dividida; mapear as demais).
    - [x] Aprofundar js-callbacks-closures: diferenciar callback imediato e posterior, explicar a ligação da closure, mostrar execução de ambientes independentes e avisar que closure não protege segredos no navegador; Chromium a 375 px confirmou rolagem da tabela por teclado.
