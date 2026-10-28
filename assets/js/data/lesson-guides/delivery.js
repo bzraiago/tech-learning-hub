@@ -944,7 +944,7 @@ Object.assign(LESSON_GUIDES, {
   "delivery-ci": {
     "prerequisites": "Concluir setup-node, js-debug e delivery-environments; saber executar Node no terminal e ter praticado testes de funções em JavaScript.",
     "setup": "Na pasta da aula, salve o exemplo como regra.test.js no editor. No terminal aberto nessa pasta, execute node --test regra.test.js; a saída esperada resume 2 testes aprovados e 0 falhas. Não é preciso instalar pacote. Para simular regressão, troque apenas return valor.trim() por return valor, rode novamente e observe 1 falha; restaure a linha e repita o comando. O processo termina sozinho; se node não for reconhecido, revise setup-node. Esta execução é local, sem serviço de CI remoto.",
-    "why": "Publicar com confiança depende de repetir verificações e reconhecer rapidamente quando uma alteração quebrou algo. Uma rotina de integração contínua ajuda a aplicar a mesma regra a cada contribuição.",
+    "why": "Testes e integração contínua tornam verificações repetíveis. Compare camadas de teste, relacione gatilhos do repositório às verificações de CI e trate falhas sem dizer que uma execução local substitui a remota.",
     "sections": [
       {
         "title": "Camadas de verificação",
@@ -968,53 +968,6 @@ Object.assign(LESSON_GUIDES, {
           "Mesmo com testes passando, a produção pode ter configuração diferente, serviço indisponível ou dados inesperados. Observe sinais: taxa de erro, status HTTP, Console do navegador, relatos de usuários e registros do servidor que não vazem segredos. Uma mensagem genérica “não funciona” é difícil de investigar; capture horário aproximado, rota, ação, ambiente, resultado esperado e observado.",
           "Reproduzir começa pelo menor caso que demonstra o defeito. Se a falha aparece apenas quando lista está vazia, crie esse cenário local. Compare versões anteriores e atuais, faça uma hipótese e teste-a. Depois da correção, acrescente um teste para a condição que antes falhava. Isso transforma um incidente em aprendizagem durável do projeto.",
           "Pausa: escreva um relato de uma linha para POST /api/estudos com status 500 contendo ambiente, ação, esperado e observado."
-        ]
-      },
-      {
-        "title": "Registre JSON que ajude sem carregar dados pessoais",
-        "paragraphs": [
-          "O laboratório `labs/backend-layers/src/logger.cjs` emite uma linha JSON por evento com timestamp, nível e nome fixo do evento. A falha de rota pode incluir um caminho conhecido sem query; o startup registra só os modos locais de armazenamento, cache e rate limit.",
-          "O logger aceita poucos campos por allowlist, reconhece códigos de erro comuns e substitui os demais. Não guarda mensagem ou stack da exceção, corpo, título, IP, coordenada, URL completa, token, senha ou cabeçalho. Isso reduz exposição, mas também limita o diagnóstico: acrescente contexto técnico por categoria permitida, não copiando a entrada da pessoa.",
-          "Para verificar, rode `node --test src/logger.test.cjs src/server.test.cjs` em `labs/backend-layers`. Os testes incluem strings fictícias parecidas com token, email, IP e erro privado e conferem que a saída JSONL contém apenas campos autorizados. stdout e stderr são fluxos distintos; `docker compose logs` permite ler a saída local, sem torná-la automaticamente persistente.",
-          "Pausa: de um registro que contém token, endereço IP, URL com coordenadas e stack trace, quais campos são necessários para explicar uma falha HTTP e como reduzi-los?"
-        ],
-        "terms": [
-          { "term": "JSONL", "meaning": "Formato em que cada linha contém um objeto JSON independente, adequado a leitura e filtros por evento/campo." },
-          { "term": "Allowlist", "meaning": "Lista explícita dos campos e valores que podem sair no log; entradas fora dela são descartadas." },
-          { "term": "Minimização de log", "meaning": "Registrar só o contexto operacional necessário, reduzindo coleta e retenção de dados pessoais ou credenciais." }
-        ]
-      },
-      {
-        "title": "Separe liveness de readiness e teste o alerta",
-        "paragraphs": [
-          "No `labs/backend-layers`, `/health/live` responde se o processo está ativo; `/health/ready` verifica dependências antes de marcar a API pronta. No modo PostgreSQL e Redis, a readiness executa `SELECT 1` e `PING`; sem uma delas, retorna `503` com apenas `not_ready`. A rota não revela mensagem, host, credencial nem dado do banco.",
-          "`npm run monitor:api` consulta a readiness local a cada cinco segundos. O monitor espera duas falhas consecutivas para emitir `monitor.alert.opened`, evitando abrir um alerta por uma oscilação única; depois do alerta, uma sonda saudável registra `monitor.alert.resolved`. Os eventos aparecem no log JSONL e não enviam webhook.",
-          "Para ver a sequência sem serviços externos, inicie `BACKEND_STORAGE=memory npm run start:memory` (no PowerShell: `$env:BACKEND_STORAGE = 'memory'; npm.cmd run start:memory`) e `npm run monitor:api` em terminais separados. Pare o servidor, espere o alerta, reinicie e observe a recuperação. Os testes também usam um servidor HTTP local que alterna entre `200` e `503`, além da integração que verifica PostgreSQL e Redis reais. Isso prova a regra do alerta, não disponibilidade contínua, notificação de plantão ou cobertura de produção.",
-          "Pausa: por que uma liveness saudável não prova que a API consegue gravar no banco, e por que readiness não deve devolver detalhes da conexão?"
-        ],
-        "terms": [
-          { "term": "Liveness", "meaning": "Sonda que indica se o processo continua respondendo; não afirma que suas dependências estão prontas." },
-          { "term": "Readiness", "meaning": "Sonda de capacidade de atender tráfego, considerando dependências necessárias para a operação." },
-          { "term": "Falhas consecutivas", "meaning": "Limiar que reduz alertas provocados por uma falha isolada ou transitória." }
-        ]
-      },
-      {
-        "title": "Recuperação e rollback",
-        "paragraphs": [
-          "Rollback é voltar a uma versão que se sabe funcionar quando a versão nova causa problema grave. Ele precisa ser planejado: identifique a versão anterior, preserve artefato ou commit, saiba como restaurar e verifique o fluxo principal depois. Se houve mudança de dados incompatível, voltar só os arquivos pode não bastar; comunique a dependência. Em exercício local, copie a versão anterior e reproduza a volta sem apagar o histórico da falha.",
-          "Não confunda corrigir rapidamente com esconder o problema. Quando impacto é alto, restaurar primeiro pode reduzir dano; depois investigue com tempo. Registre causa, proteção adicionada e como o defeito foi detectado. Isso é parte da manutenção profissional de um projeto, mesmo em uma equipe pequena.",
-          "O roteiro `labs/backend-layers/BACKUP_RESTORE.md` restaura um dump PostgreSQL numa base separada; `PROVIDER_MIGRATION.md` amplia o ensaio para inventariar roles, extensões, identidade, Redis, arquivos e configuração. Um `pg_dump` comum contém uma base, não transfere todos os serviços do produto. Compare dados e comportamento no destino, preserve a origem e defina como tratar gravações depois do corte antes de autorizar retorno.",
-          "Para manter versões de aplicação compatíveis, use uma sequência expansiva e depois contrativa. Primeiro acrescente um campo opcional (`003_add_observacao_sessoes.sql`); a versão antiga, que declara as colunas que usa, continua lendo e gravando. Uma versão posterior pode começar a preencher o campo. Só planeje remover campos depois que nenhum deployment antigo depender deles, os dados tiverem destino decidido e uma migration separada tiver sido ensaiada. O [`ALTER TABLE` do PostgreSQL](https://www.postgresql.org/docs/17/sql-altertable.html) pode exigir locks; numa base real, verifique a operação e o tamanho antes da janela.",
-          "Para reverter o Preview `testes`, `labs/backend-layers/DEPLOY_VERCEL.md` orienta o [`git revert`](https://git-scm.com/docs/git-revert) seguido de um novo push; a [integração Git da Vercel](https://vercel.com/docs/git) cria um deployment associado ao commit. A reversão da aplicação deixa a migration expansiva aplicada; ela não apaga observações nem deve disparar uma migration destrutiva automaticamente.",
-          "Use `labs/backend-layers/RUNBOOK.md` para separar o deploy Vercel do login Clerk, da autorização Supabase e do PostgreSQL local. Uma tela de proteção Vercel aparece antes da aplicação; `Login indisponível` aponta ao fluxo Clerk; falha ao salvar precisa ser localizada na requisição Supabase. `/health/ready` verifica somente as dependências da API local. Registre branch, SHA, rota e status HTTP sem copiar tokens, cookies, progresso ou cabeçalhos.",
-          "Pausa: ordene registrar versão, restaurar versão estável, verificar o fluxo principal e investigar a causa. Indique quando uma migração de dados exige cuidado adicional."
-        ],
-        "terms": [
-          { "term": "Ponto de corte", "meaning": "Momento planejado em que o tráfego ou as gravações passam da origem para o destino." },
-          { "term": "Ensaio de restauração", "meaning": "Prova de que um backup pode ser restaurado num destino separado e verificado antes de depender dele." },
-          { "term": "Migration expansiva", "meaning": "Mudança aditiva que permite coexistência temporária entre código antigo e novo, como uma coluna opcional." },
-          { "term": "Migration contrativa", "meaning": "Etapa posterior que remove uma estrutura antiga após verificar que versões e dados não dependem mais dela." },
-          { "term": "Compatibilidade reversa", "meaning": "Capacidade do esquema novo de continuar atendendo a versão anterior da aplicação durante um rollback planejado." }
         ]
       },
       {
@@ -1047,26 +1000,6 @@ Object.assign(LESSON_GUIDES, {
       {
         "instruction": "Restaure o código e rode novamente.",
         "result": "Os dois testes voltam a passar."
-      },
-      {
-        "instruction": "Em `labs/backend-layers`, rode `node --test src/logger.test.cjs src/server.test.cjs` e leia uma linha de erro JSON.",
-        "result": "O registro contém timestamp, level, event, rota conhecida e código permitido; não contém mensagem/stack, IP, body, token ou query string."
-      },
-      {
-        "instruction": "Inicie `start:memory` e `monitor:api` em terminais separados; interrompa e reinicie a API depois do alerta.",
-        "result": "Duas sondas falhas abrem um evento `monitor.alert.opened`; uma sonda saudável posterior registra `monitor.alert.resolved`."
-      },
-      {
-        "instruction": "Leia `labs/backend-layers/BACKUP_RESTORE.md` e `PROVIDER_MIGRATION.md`; anote o que o dump copia, o que precisa ser criado/configurado à parte e qual evidência libera o corte.",
-        "result": "A análise separa uma base PostgreSQL de roles, identidade, Redis, arquivos e configuração; exige restaurar e comparar num destino isolado, manter a origem e definir condição de retorno."
-      },
-      {
-        "instruction": "Com PostgreSQL descartável e migrations aplicadas, use o comando por sistema descrito no README: no PowerShell defina `$env:RUN_MIGRATION_COMPATIBILITY = '1'` e rode `npm.cmd run test:migration-compatibility`; em macOS/Linux rode `RUN_MIGRATION_COMPATIBILITY=1 npm run test:migration-compatibility`. Compare o contrato do repositório antes e depois de `003`.",
-        "result": "A versão antiga opera antes e depois da coluna opcional; a nova escrita preserva os campos lidos pelo código antigo. O teste usa uma base temporária e não faz deploy."
-      },
-      {
-        "instruction": "Leia `labs/backend-layers/RUNBOOK.md`. Em um cenário simulado, classifique: Preview está Ready, a pessoa entra pelo Clerk, mas salvar progresso retorna HTTP 403; a API local responde readiness 200. Registre duas conferências seguras e a condição de recuperação, sem abrir painéis nem usar contas reais.",
-        "result": "A pessoa separa a implantação do Preview da autorização Supabase; compara SHA/rota/status e propõe que o responsável confira a integração Clerk–Supabase e RLS. A recuperação planejada usa duas contas fictícias para confirmar salvamento e isolamento; readiness local não comprova o serviço remoto."
       }
     ],
     "exercises": [
@@ -1079,7 +1012,10 @@ Object.assign(LESSON_GUIDES, {
         "solution": "test('recusa null', () => assert.throws(() => normalizarTitulo(null), TypeError));",
         "explanation": "Acrescente ao mesmo arquivo após os testes existentes.",
         "expected": "Três testes aprovados.",
-        "criteria": ["Teste cobre entrada null e suíte executa o total indicado.","Resultado de teste e código de saída ficam registrados."]
+        "criteria": [
+          "Teste cobre entrada null e suíte executa o total indicado.",
+          "Resultado de teste e código de saída ficam registrados."
+        ]
       },
       {
         "prompt": "Alterar: amplie a matriz do laboratório delivery-forms com POST válido, título vazio e servidor desligado. Aceite: para cada entrada, anote resposta HTTP ou falha de rede, estado da interface e se o título permanece; entrada servidor desligado → erro de rede, sem status HTTP.",
@@ -1090,7 +1026,10 @@ Object.assign(LESSON_GUIDES, {
         "solution": "Válido → 201 e registro; vazio → 400 e mensagem, sem registro; servidor parado → erro de rede mostrado pela interface, título preservado.",
         "explanation": "A matriz une contrato do servidor e estado do cliente.",
         "expected": "Três casos com resultado verificável.",
-        "criteria": ["Matriz cobre POST válido, vazio e rede indisponível.","Cada caso anota resposta, UI e preservação do campo."]
+        "criteria": [
+          "Matriz cobre POST válido, vazio e rede indisponível.",
+          "Cada caso anota resposta, UI e preservação do campo."
+        ]
       },
       {
         "prompt": "Construir: implemente uma função que remove títulos duplicados sem alterar a entrada e escreva teste independente para saída e entrada. Aceite: entrada ['HTML','HTML','CSS'] → saída ['HTML','CSS']; array original mantém três elementos.",
@@ -1101,7 +1040,10 @@ Object.assign(LESSON_GUIDES, {
         "solution": "function unicos(valores){return [...new Set(valores)];} test('remove duplicatas sem mutar',()=>{const entrada=['HTML','HTML','CSS'];assert.deepEqual(unicos(entrada),['HTML','CSS']);assert.deepEqual(entrada,['HTML','HTML','CSS']);});",
         "explanation": "Use node:test e assert/strict do exemplo; mutação da entrada seria defeito adicional.",
         "expected": "Teste passa e entrada mantém três elementos.",
-        "criteria": ["Função remove títulos duplicados sem alterar argumento original.","Testes conferem saída deduplicada e tamanho/estado da entrada."]
+        "criteria": [
+          "Função remove títulos duplicados sem alterar argumento original.",
+          "Testes conferem saída deduplicada e tamanho/estado da entrada."
+        ]
       },
       {
         "prompt": "Investigar erro: após uma nova versão, POST /api/estudos retorna 500. Registre evidências, proponha contenção, reproduza com entrada mínima e descreva teste de regressão e verificação final. Aceite: informe versão, rota, resultado observado, ação de recuperação e nova prova; entrada título HTML → resposta esperada 201 após a correção.",
@@ -1112,55 +1054,17 @@ Object.assign(LESSON_GUIDES, {
         "solution": "Registrar versão, horário, POST e 500; avaliar impacto; restaurar versão estável se necessário; reproduzir com entrada mínima; corrigir; adicionar regressão; rodar testes e verificar URL final.",
         "explanation": "O fluxo cobre diagnóstico e redução de impacto, não só alteração do código.",
         "expected": "Relato tem observação, contenção e prova posterior.",
-        "criteria": ["Relato contém versão, rota, entrada mínima e resposta observada.","Contenção, regressão e prova final são verificáveis após recuperação."]
-      },
-      {
-        "prompt": "Alterar: remova de um log de erro os campos `token`, `ip`, `body` e `stack`. Proponha um registro JSON mínimo com timestamp, level, event, rota conhecida e errorCode seguro; explique qual contexto ainda permite investigar.",
-        "hints": ["Use um evento fixo e rota sem query string.", "Código bruto desconhecido não precisa ser copiado para a saída."],
-        "solution": "`{\"timestamp\":\"2026-10-28T12:00:00.000Z\",\"level\":\"error\",\"event\":\"api.request.failed\",\"route\":\"POST /api/estudos\",\"errorCode\":\"ECONNREFUSED\"}`. Use versão/ambiente num fluxo de diagnóstico separado, sem incluir credenciais ou conteúdo do pedido.",
-        "explanation": "Um evento e uma categoria de rota permitem localizar a classe da falha; mensagem e payload podem vazar informação sem aumentar a evidência útil.",
-        "expected": "JSONL tem somente campos operacionais autorizados e omite segredo, IP, body, stack e query string.",
-        "criteria": ["Registro inclui timestamp, level, event, rota estável e código seguro.", "Token, IP, body, stack e query foram removidos.", "Diagnóstico usa categorias ou versão sem copiar entrada da pessoa."]
-      },
-      {
-        "prompt": "Construir: implemente uma sonda que recebe estados `true, false, false, false, true` com limiar de duas falhas. Indique o estado e os eventos emitidos em cada passo.",
-        "hints": ["Uma falha isolada ainda não abre o alerta.", "Falhas adicionais não devem duplicar o mesmo alerta; uma recuperação o resolve."],
-        "solution": "Estados: available, degraded, unavailable, unavailable, available. Emita `monitor.alert.opened` somente na segunda resposta falsa e `monitor.alert.resolved` na resposta true final; não repita eventos enquanto o estado não mudar.",
-        "explanation": "A máquina de estados torna a regra do alerta reproduzível e reduz ruído de uma sonda transitória.",
-        "expected": "Uma abertura após duas falhas consecutivas e uma resolução após recuperação, sem alertas duplicados.",
-        "criteria": ["Distingue falha isolada de limiar atingido.", "Mantém um único alerta enquanto indisponível.", "Resolve o alerta somente após sucesso."]
-      },
-      {
-        "prompt": "Mudança de requisito: o ensaio de migração leva 20 minutos entre exportação, restauração e validação, mas a equipe agora permite no máximo cinco minutos sem escrita. Atualize a decisão de corte e registre a evidência que falta antes de tentar cumprir essa janela.",
-        "hints": ["Não transforme um tempo medido de 20 minutos em uma promessa de cinco.", "Considere adiar o corte ou provar previamente outra estratégia de sincronização e retorno."],
-        "solution": "Não autorizar o corte com o procedimento atual. Registrar a janela incompatível, manter a origem ativa e avaliar uma janela maior ou uma estratégia incremental/replicada com suporte do destino. Ensaiar e medir exportação final, atraso de sincronização, validação e retorno antes de assumir compromisso; não introduzir dual write sem reconciliação testada.",
-        "explanation": "Uma nova restrição de indisponibilidade muda o método de migração; omitir validação para caber no prazo aumenta o risco de perda ou divergência de dados.",
-        "expected": "O plano é adiado ou substituído por uma estratégia comprovada; origem e destino ficam identificados, e existe critério verificável para prosseguir ou abortar.",
-        "criteria": ["Compara a janela nova ao tempo medido e não promete zero downtime sem prova.", "Preserva a origem e define validação final, condição de aborto e tratamento de escritas no destino.", "Qualquer estratégia incremental ou com dois sistemas é ensaiada e inclui reconciliação e retorno." ]
-      },
-      {
-        "prompt": "Mudança de requisito: a versão nova já gravou valores em `observacao`, mas um defeito exige voltar à aplicação anterior. Decida o que deve ser revertido agora e o que precisa continuar no banco; indique uma condição verificável para considerar uma migration contrativa mais tarde.",
-        "hints": ["Separe o commit/deployment da migration SQL.", "O repositório anterior nomeia as colunas que lê e escreve; confirme esse contrato no teste de compatibilidade."],
-        "solution": "Reverter o commit da aplicação no Preview com `git revert` e manter `003_add_observacao_sessoes.sql` aplicada. A aplicação anterior pode ler/escrever suas colunas, enquanto observações existentes permanecem no banco. Considere remover a coluna somente depois de não haver deployments que a leiam/escrevam, decidir como preservar ou descartar esses valores e testar uma migration contrativa em uma cópia.",
-        "explanation": "Um rollback do código não é uma restauração do esquema. Remover a coluna junto com o código pode apagar dados ou impedir que uma versão ainda ativa funcione.",
-        "expected": "A aplicação volta por commit revertido; o schema permanece expandido e o dado novo não é apagado automaticamente. A contração fica condicionada a uma verificação separada de versões, dados e plano de recuperação.",
-        "criteria": ["Distingue rollback de deployment de rollback de migration.", "Mantém a migration 003 e confere que o repositório antigo opera após ela.", "Define evidência e destino dos valores antes de qualquer remoção futura."]
-      },
-      {
-        "prompt": "Investigar erro: o Preview está Ready e o login Clerk funciona, mas a gravação de progresso retorna HTTP 403. Use o runbook para registrar branch/SHA, rota e status, identificar a camada provável e propor duas conferências seguras e um critério de recuperação. Não compartilhe dados da requisição.",
-        "hints": ["Ready confirma o deploy, não a autorização no banco remoto.", "A API PostgreSQL local do laboratório não está no caminho do progresso do site."],
-        "solution": "Confirmar URL, branch, SHA e Ready; registrar apenas método/rota/status da chamada `/rest/v1/learning_state`; pedir ao responsável que confira a integração de autenticação Clerk no Supabase e as políticas RLS. Não desativar RLS. Com contas fictícias, confirmar que cada pessoa salva/recarrega seu progresso e não acessa o da outra.",
-        "explanation": "Um 403 localiza a recusa na requisição observada, mas sozinho não identifica qual configuração ou política a causou. O Preview, Clerk, Supabase e laboratório local são camadas distintas.",
-        "expected": "O registro mantém a evidência mínima e redigida, aponta verificações que distinguem as camadas e define sucesso com persistência e isolamento de duas contas fictícias.",
-        "criteria": ["Registra branch/SHA, método/rota e status sem token, cookie ou corpo.", "Não confunde Ready ou readiness local com autorização remota.", "Inclui confirmação de salvamento e isolamento de contas no critério de recuperação."]
+        "criteria": [
+          "Relato contém versão, rota, entrada mínima e resposta observada.",
+          "Contenção, regressão e prova final são verificáveis após recuperação."
+        ]
       }
     ],
     "mistakes": [
-      "Confundir testes passando com garantia de ausência de defeitos.",
-      "Usar uma expectativa calculada pela própria função testada.",
-      "Ignorar o primeiro erro da CI e tentar publicar mesmo assim.",
-      "Fazer rollback sem considerar mudanças de dados.",
-      "Remover automaticamente uma coluna porque o código novo foi revertido."
+      "Confundir teste unitário, integração e navegador como se cobrissem o mesmo risco.",
+      "Usar expectativa calculada pela própria função testada.",
+      "Tratar execução local como prova de que a CI remota rodou.",
+      "Ignorar o primeiro erro e relaxar o teste para obter uma saída verde."
     ],
     "quiz": [
       {
@@ -1184,6 +1088,442 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "O caso de regressão protege contra retorno do defeito."
       },
       {
+        "question": "Executar `node --test` local comprova que o GitHub Actions executou a mesma verificação?",
+        "options": [
+          "Sim; todo teste local é uma execução remota.",
+          "Não; confira a execução da CI associada ao commit.",
+          "Sim, se a saída local for verde."
+        ],
+        "correctIndex": 1,
+        "explanation": "A execução local prova o comando no ambiente local; o status remoto exige conferir a CI do commit."
+      }
+    ],
+    "summary": [
+      "Combine testes unitários, de integração e navegação conforme os riscos da mudança.",
+      "CI repete verificações a partir de gatilhos do repositório; confira o resultado remoto do commit.",
+      "Uma falha pede evidência, reprodução mínima, contenção e teste de regressão.",
+      "Depois da entrega, confira o fluxo principal e registre resultado esperado e observado."
+    ],
+    "retry": {
+      "prompt": "Uma publicação altera a validação de minutos e o POST começa a aceitar -5. Defina um teste que falhe antes da correção, indique onde a CI deve executá-lo e descreva como conter a versão ruim enquanto investiga.",
+      "expected": "O teste envia -5 e espera recusa sem novo registro; a execução da CI mostra a falha antes da correção e passa depois; o plano de contenção verifica a versão recuperada na URL final.",
+      "hint": "Cubra a regra da API e o efeito no armazenamento, não apenas a mensagem da interface."
+    }
+  },
+  "delivery-observability": {
+    "prerequisites": "Concluir setup-node, delivery-http e delivery-ci. Para executar o monitor, instale as dependências de `labs/backend-layers`; Docker e serviços externos não são necessários no caminho em memória.",
+    "setup": "Objetivo: observar logs minimizados e a transição de um alerta local. Requisitos: Node.js e esta cópia do repositório. No editor, salve o exemplo como `registro.cjs` numa pasta de estudo; no terminal aberto nessa pasta, execute `node registro.cjs`. Resultado esperado: duas linhas JSON, sendo a segunda reduzida a rota `other` e código `UNKNOWN`; o script termina sozinho. Para o monitor, no Windows abra PowerShell na raiz, entre em `labs/backend-layers`, rode `npm.cmd ci` se faltarem dependências; em dois terminais nessa pasta use `$env:BACKEND_STORAGE = 'memory'; npm.cmd run start:memory` e `npm.cmd run monitor:api`. macOS: no Terminal, entre em `labs/backend-layers`, rode `npm ci` se necessário e use `BACKEND_STORAGE=memory npm run start:memory` e `npm run monitor:api` em dois terminais. Linux: use os mesmos comandos de macOS. Verificação: pare o servidor com Ctrl+C, aguarde duas sondas falhas e reinicie. Resultado esperado: JSONL registra `monitor.alert.opened` e, após recuperação, `monitor.alert.resolved`; o monitor termina com Ctrl+C. Problema comum: se Node/npm não for reconhecido, revise setup-node; no PowerShell use `npm.cmd`. Como parar e retomar: Ctrl+C encerra cada processo; repita nas duas janelas. Alternativa leve: leia `labs/backend-layers/RUNBOOK.md` e classifique o cenário sem iniciar servidor. Use localhost, dados fictícios e nenhuma conta real.",
+    "why": "Uma verificação verde antes da entrega não mostra o que ocorreu depois. Registre contexto operacional mínimo, separe processo ativo de dependências prontas e localize a camada provável de uma falha sem expor dados da pessoa usuária.",
+    "sections": [
+      {
+        "title": "Sinais após a entrega",
+        "paragraphs": [
+          "Mesmo com testes passando, a produção pode ter configuração diferente, serviço indisponível ou dados inesperados. Observe sinais: taxa de erro, status HTTP, Console do navegador, relatos de usuários e registros do servidor que não vazem segredos. Uma mensagem genérica “não funciona” é difícil de investigar; capture horário aproximado, rota, ação, ambiente, resultado esperado e observado.",
+          "Reproduzir começa pelo menor caso que demonstra o defeito. Se a falha aparece apenas quando lista está vazia, crie esse cenário local. Compare versões anteriores e atuais, faça uma hipótese e teste-a. Depois da correção, acrescente um teste para a condição que antes falhava. Isso transforma um incidente em aprendizagem durável do projeto.",
+          "Pausa: escreva um relato de uma linha para POST /api/estudos com status 500 contendo ambiente, ação, esperado e observado."
+        ]
+      },
+      {
+        "title": "Registre JSON que ajude sem carregar dados pessoais",
+        "paragraphs": [
+          "O laboratório `labs/backend-layers/src/logger.cjs` emite uma linha JSON por evento com timestamp, nível e nome fixo do evento. A falha de rota pode incluir um caminho conhecido sem query; o startup registra só os modos locais de armazenamento, cache e rate limit.",
+          "O logger aceita poucos campos por allowlist, reconhece códigos de erro comuns e substitui os demais. Não guarda mensagem ou stack da exceção, corpo, título, IP, coordenada, URL completa, token, senha ou cabeçalho. Isso reduz exposição, mas também limita o diagnóstico: acrescente contexto técnico por categoria permitida, não copiando a entrada da pessoa.",
+          "Para verificar, rode `node --test src/logger.test.cjs src/server.test.cjs` em `labs/backend-layers`. Os testes incluem strings fictícias parecidas com token, email, IP e erro privado e conferem que a saída JSONL contém apenas campos autorizados. stdout e stderr são fluxos distintos; `docker compose logs` permite ler a saída local, sem torná-la automaticamente persistente.",
+          "Pausa: de um registro que contém token, endereço IP, URL com coordenadas e stack trace, quais campos são necessários para explicar uma falha HTTP e como reduzi-los?"
+        ],
+        "terms": [
+          {
+            "term": "JSONL",
+            "meaning": "Formato em que cada linha contém um objeto JSON independente, adequado a leitura e filtros por evento/campo."
+          },
+          {
+            "term": "Allowlist",
+            "meaning": "Lista explícita dos campos e valores que podem sair no log; entradas fora dela são descartadas."
+          },
+          {
+            "term": "Minimização de log",
+            "meaning": "Registrar só o contexto operacional necessário, reduzindo coleta e retenção de dados pessoais ou credenciais."
+          }
+        ]
+      },
+      {
+        "title": "Separe liveness de readiness e teste o alerta",
+        "paragraphs": [
+          "No `labs/backend-layers`, `/health/live` responde se o processo está ativo; `/health/ready` verifica dependências antes de marcar a API pronta. No modo PostgreSQL e Redis, a readiness executa `SELECT 1` e `PING`; sem uma delas, retorna `503` com apenas `not_ready`. A rota não revela mensagem, host, credencial nem dado do banco.",
+          "`npm run monitor:api` consulta a readiness local a cada cinco segundos. O monitor espera duas falhas consecutivas para emitir `monitor.alert.opened`, evitando abrir um alerta por uma oscilação única; depois do alerta, uma sonda saudável registra `monitor.alert.resolved`. Os eventos aparecem no log JSONL e não enviam webhook.",
+          "Para ver a sequência sem serviços externos, inicie `BACKEND_STORAGE=memory npm run start:memory` (no PowerShell: `$env:BACKEND_STORAGE = 'memory'; npm.cmd run start:memory`) e `npm run monitor:api` em terminais separados. Pare o servidor, espere o alerta, reinicie e observe a recuperação. Os testes também usam um servidor HTTP local que alterna entre `200` e `503`, além da integração que verifica PostgreSQL e Redis reais. Isso prova a regra do alerta, não disponibilidade contínua, notificação de plantão ou cobertura de produção.",
+          "Pausa: por que uma liveness saudável não prova que a API consegue gravar no banco, e por que readiness não deve devolver detalhes da conexão?"
+        ],
+        "terms": [
+          {
+            "term": "Liveness",
+            "meaning": "Sonda que indica se o processo continua respondendo; não afirma que suas dependências estão prontas."
+          },
+          {
+            "term": "Readiness",
+            "meaning": "Sonda de capacidade de atender tráfego, considerando dependências necessárias para a operação."
+          },
+          {
+            "term": "Falhas consecutivas",
+            "meaning": "Limiar que reduz alertas provocados por uma falha isolada ou transitória."
+          }
+        ]
+      },
+      {
+        "title": "Separe a falha do Preview da autorização dos dados",
+        "paragraphs": [
+          "Um deployment `Ready` não prova que login, autorização e banco estão corretos. No cenário do RUNBOOK, o Preview abre, Clerk autentica e a gravação em Supabase recebe 403. A API PostgreSQL local não participa dessa chamada remota.",
+          "Registre branch, SHA, método, rota e status. Não copie token, cookie, corpo, cabeçalho ou progresso. Confira a integração Clerk–Supabase e a policy RLS; não desligue RLS para ocultar o erro.",
+          "Pausa: preveja qual camada um 403 em `/rest/v1/learning_state` torna necessário verificar e que teste seguro confirmaria recuperação."
+        ],
+        "terms": [
+          {
+            "term": "Triagem",
+            "meaning": "Separação inicial de camadas e hipóteses pelo sintoma, sem declarar a causa antes de verificá-la."
+          },
+          {
+            "term": "RLS",
+            "meaning": "Segurança por linha no banco; uma policy decide que registros uma identidade pode ler ou alterar."
+          }
+        ]
+      }
+    ],
+    "example": {
+      "language": "js",
+      "code": "const rotasPermitidas = new Set(['POST /api/estudos']);\nconst codigosPermitidos = new Set(['ECONNREFUSED']);\nfunction criarRegistro(rota, codigo) {\n  return {timestamp:'2026-10-28T12:00:00.000Z',level:'error',event:'api.request.failed',route:rotasPermitidas.has(rota)?rota:'other',errorCode:codigosPermitidos.has(codigo)?codigo:'UNKNOWN'};\n}\nconsole.log(JSON.stringify(criarRegistro('POST /api/estudos','ECONNREFUSED')));\nconsole.log(JSON.stringify(criarRegistro('POST /api/estudos?token=falso','erro privado')));",
+      "explanation": [
+        "A rota e o código vêm de valores permitidos, não do pedido inteiro.",
+        "O registro omite corpo, token, IP, URL com query e stack.",
+        "O laboratório testa o logger real; este exemplo mostra o formato esperado."
+      ],
+      "expected": "{\"timestamp\":\"2026-10-28T12:00:00.000Z\",\"level\":\"error\",\"event\":\"api.request.failed\",\"route\":\"POST /api/estudos\",\"errorCode\":\"ECONNREFUSED\"}\n{\"timestamp\":\"2026-10-28T12:00:00.000Z\",\"level\":\"error\",\"event\":\"api.request.failed\",\"route\":\"other\",\"errorCode\":\"UNKNOWN\"}"
+    },
+    "guided": [
+      {
+        "instruction": "Em `labs/backend-layers`, rode `node --test src/logger.test.cjs src/server.test.cjs` e leia uma linha de erro JSON.",
+        "result": "O registro contém timestamp, level, event, rota conhecida e código permitido; não contém mensagem/stack, IP, body, token ou query string."
+      },
+      {
+        "instruction": "Inicie `start:memory` e `monitor:api` em terminais separados; interrompa e reinicie a API depois do alerta.",
+        "result": "Duas sondas falhas abrem um evento `monitor.alert.opened`; uma sonda saudável posterior registra `monitor.alert.resolved`."
+      },
+      {
+        "instruction": "Leia `labs/backend-layers/RUNBOOK.md`. Em um cenário simulado, classifique: Preview está Ready, a pessoa entra pelo Clerk, mas salvar progresso retorna HTTP 403; a API local responde readiness 200. Registre duas conferências seguras e a condição de recuperação, sem abrir painéis nem usar contas reais.",
+        "result": "A pessoa separa a implantação do Preview da autorização Supabase; compara SHA/rota/status e propõe que o responsável confira a integração Clerk–Supabase e RLS. A recuperação planejada usa duas contas fictícias para confirmar salvamento e isolamento; readiness local não comprova o serviço remoto."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: a API está viva, mas Redis falha três sondas seguidas; o alerta exige duas falhas. Preveja liveness, readiness e em qual sonda abre. Aceite: liveness representa o processo, readiness indica a dependência e o alerta abre no limiar.",
+        "expected": "Liveness segue 200; readiness retorna 503; o alerta abre na segunda falha e não se repete na terceira.",
+        "solution": "Liveness 200, readiness 503; sem alerta na primeira, `monitor.alert.opened` na segunda e nenhum alerta duplicado na terceira.",
+        "explanation": "A previsão separa processo, dependências e limiar.",
+        "hints": [
+          "Conte falhas consecutivas separadamente de liveness.",
+          "O limiar não emite um evento por falha."
+        ],
+        "criteria": [
+          "Distingue processo de dependência.",
+          "Abre no limiar de duas falhas.",
+          "Não duplica o alerta."
+        ]
+      },
+      {
+        "prompt": "Alterar: remova de um log de erro os campos `token`, `ip`, `body` e `stack`. Proponha um registro JSON mínimo com timestamp, level, event, rota conhecida e errorCode seguro; explique qual contexto ainda permite investigar.",
+        "hints": [
+          "Use um evento fixo e rota sem query string.",
+          "Código bruto desconhecido não precisa ser copiado para a saída."
+        ],
+        "solution": "`{\"timestamp\":\"2026-10-28T12:00:00.000Z\",\"level\":\"error\",\"event\":\"api.request.failed\",\"route\":\"POST /api/estudos\",\"errorCode\":\"ECONNREFUSED\"}`. Use versão/ambiente num fluxo de diagnóstico separado, sem incluir credenciais ou conteúdo do pedido.",
+        "explanation": "Um evento e uma categoria de rota permitem localizar a classe da falha; mensagem e payload podem vazar informação sem aumentar a evidência útil.",
+        "expected": "JSONL tem somente campos operacionais autorizados e omite segredo, IP, body, stack e query string.",
+        "criteria": [
+          "Registro inclui timestamp, level, event, rota estável e código seguro.",
+          "Token, IP, body, stack e query foram removidos.",
+          "Diagnóstico usa categorias ou versão sem copiar entrada da pessoa."
+        ]
+      },
+      {
+        "prompt": "Construir: implemente uma sonda que recebe estados `true, false, false, false, true` com limiar de duas falhas. Indique o estado e os eventos emitidos em cada passo.",
+        "hints": [
+          "Uma falha isolada ainda não abre o alerta.",
+          "Falhas adicionais não devem duplicar o mesmo alerta; uma recuperação o resolve."
+        ],
+        "solution": "Estados: available, degraded, unavailable, unavailable, available. Emita `monitor.alert.opened` somente na segunda resposta falsa e `monitor.alert.resolved` na resposta true final; não repita eventos enquanto o estado não mudar.",
+        "explanation": "A máquina de estados torna a regra do alerta reproduzível e reduz ruído de uma sonda transitória.",
+        "expected": "Uma abertura após duas falhas consecutivas e uma resolução após recuperação, sem alertas duplicados.",
+        "criteria": [
+          "Distingue falha isolada de limiar atingido.",
+          "Mantém um único alerta enquanto indisponível.",
+          "Resolve o alerta somente após sucesso."
+        ]
+      },
+      {
+        "prompt": "Investigar erro: o Preview está Ready e o login Clerk funciona, mas a gravação de progresso retorna HTTP 403. Use o runbook para registrar branch/SHA, rota e status, identificar a camada provável e propor duas conferências seguras e um critério de recuperação. Não compartilhe dados da requisição.",
+        "hints": [
+          "Ready confirma o deploy, não a autorização no banco remoto.",
+          "A API PostgreSQL local do laboratório não está no caminho do progresso do site."
+        ],
+        "solution": "Confirmar URL, branch, SHA e Ready; registrar apenas método/rota/status da chamada `/rest/v1/learning_state`; pedir ao responsável que confira a integração de autenticação Clerk no Supabase e as políticas RLS. Não desativar RLS. Com contas fictícias, confirmar que cada pessoa salva/recarrega seu progresso e não acessa o da outra.",
+        "explanation": "Um 403 localiza a recusa na requisição observada, mas sozinho não identifica qual configuração ou política a causou. O Preview, Clerk, Supabase e laboratório local são camadas distintas.",
+        "expected": "O registro mantém a evidência mínima e redigida, aponta verificações que distinguem as camadas e define sucesso com persistência e isolamento de duas contas fictícias.",
+        "criteria": [
+          "Registra branch/SHA, método/rota e status sem token, cookie ou corpo.",
+          "Não confunde Ready ou readiness local com autorização remota.",
+          "Inclui confirmação de salvamento e isolamento de contas no critério de recuperação."
+        ]
+      }
+    ],
+    "mistakes": [
+      "Registrar corpo, token, IP ou stack para obter contexto.",
+      "Tratar liveness saudável como prova de que as dependências estão prontas.",
+      "Abrir alerta por falha única ou repetir evento em cada sonda.",
+      "Confundir Preview Ready ou readiness local com autorização Supabase remota."
+    ],
+    "quiz": [
+      {
+        "question": "O Preview está Ready, o login funciona e a gravação em Supabase retorna 403. Qual conclusão é segura?",
+        "options": [
+          "A readiness PostgreSQL local provou que a autorização remota está correta.",
+          "O deploy e o login passaram por partes do fluxo; a chamada Supabase precisa ser conferida com a integração Clerk e RLS, sem expor o token.",
+          "A proteção Vercel bloqueou a requisição depois do login."
+        ],
+        "correctIndex": 1,
+        "explanation": "Deploy, autenticação e autorização dos dados são verificações distintas; um status deve ser ligado à rota e à camada observadas."
+      },
+      {
+        "question": "Qual é a função da allowlist no logger?",
+        "options": [
+          "Copiar a exceção inteira.",
+          "Aceitar somente campos e valores previstos.",
+          "Ocultar todo evento de erro."
+        ],
+        "correctIndex": 1,
+        "explanation": "A allowlist limita a saída a campos deliberados."
+      },
+      {
+        "question": "O que `GET /health/live` prova por si só?",
+        "options": [
+          "Que o processo responde, não que todas as dependências estejam prontas.",
+          "Que a RLS remota autoriza a pessoa.",
+          "Que o deploy recebeu teste de navegador."
+        ],
+        "correctIndex": 0,
+        "explanation": "Liveness observa o processo; readiness considera as dependências necessárias."
+      },
+      {
+        "question": "Quando o monitor abre um alerta?",
+        "options": [
+          "Na primeira falha isolada.",
+          "Após duas falhas consecutivas.",
+          "Em cada resposta 200."
+        ],
+        "correctIndex": 1,
+        "explanation": "O limiar reduz ruído de uma oscilação única."
+      }
+    ],
+    "summary": [
+      "JSONL usa campos permitidos e omite payload, IP, credenciais e stack.",
+      "Liveness representa o processo; readiness verifica dependências necessárias.",
+      "O monitor abre alerta após duas falhas seguidas e registra resolução após sucesso.",
+      "Um 403 Supabase exige verificar Clerk e RLS remotos; localhost não comprova recuperação."
+    ],
+    "retry": {
+      "prompt": "Uma sonda alterna `false, true, false, false, true`. Simule limiar dois e registre eventos de mudança de estado e dados que devem ficar fora do log.",
+      "expected": "A falha isolada não abre alerta; a segunda falha consecutiva abre; o sucesso resolve; o log não recebe segredo, IP, query ou corpo.",
+      "hint": "Mantenha `alertaAberto` e reinicie a contagem consecutiva quando a sonda recuperar."
+    }
+  },
+  "delivery-recovery": {
+    "prerequisites": "Concluir setup-node, setup-docker, setup-postgresql, delivery-hosting-models e delivery-ci. O roteiro usa PostgreSQL Compose local; não use Supabase, banco remoto nem dados pessoais.",
+    "setup": "Objetivo: conferir backup/restauração numa base de destino e provar compatibilidade da migration 003. Requisitos: Docker iniciado, Node/npm e terminal em `labs/backend-layers`. Windows PowerShell: se `.env` não existir, copie o exemplo com `if (-not (Test-Path .env)) { Copy-Item .env.example .env }`; use só valores fictícios locais. Rode `npm.cmd ci` se necessário, `docker compose up -d --wait`, `npm.cmd run migrate`, `npm.cmd run test:backup-restore`; depois `$env:RUN_MIGRATION_COMPATIBILITY = '1'; npm.cmd run test:migration-compatibility; Remove-Item Env:RUN_MIGRATION_COMPATIBILITY`. macOS: se `.env` não existir, `cp .env.example .env`; rode `npm ci`, `docker compose up -d --wait`, `npm run migrate`, `npm run test:backup-restore` e `RUN_MIGRATION_COMPATIBILITY=1 npm run test:migration-compatibility`. Linux: use os mesmos comandos na pasta indicada. Verificação: `docker compose ps` mostra o banco healthy; o backup informa contagens locais e `origem preservada`; o teste de compatibilidade aprova um caso. Problema comum: porta 55433 ocupada; confira `.env` e use o mesmo valor na conexão e Compose. Como parar e retomar: `docker compose down` preserva volume; retome com `docker compose up -d --wait`. Não use `down -v` enquanto precisar dos dados. Alternativa leve: planeje o backup SQLite em db-recovery, sabendo que isso não comprova restauração PostgreSQL.",
+    "why": "Um backup só ajuda se puder ser restaurado e comparado em destino seguro. Uma nova versão também pode mudar código e schema. Esta aula pratica evidência de restauração e retorno compatível sem apagar dados nem confundir Preview e Production.",
+    "sections": [
+      {
+        "title": "Restaure em destino separado",
+        "paragraphs": [
+          "O roteiro `labs/backend-layers/BACKUP_RESTORE.md` restaura um dump PostgreSQL numa base separada; `PROVIDER_MIGRATION.md` amplia o ensaio para inventariar roles, extensões, identidade, Redis, arquivos e configuração. Um `pg_dump` comum contém uma base, não transfere todos os serviços do produto. Compare dados e comportamento no destino, preserve a origem e defina como tratar gravações depois do corte antes de autorizar retorno.",
+          "A prova local em `labs/backend-layers/BACKUP_RESTORE.md` cria um dump custom, restaura numa base separada e compara hashes. A origem continua disponível e é conferida outra vez. O script automatizado remove apenas o próprio destino temporário.",
+          "Pausa: preveja o que fica inalterado se um hash do destino diferir da origem."
+        ],
+        "terms": [
+          {
+            "term": "Dump",
+            "meaning": "Arquivo exportado de uma base PostgreSQL para inspeção ou restauração."
+          },
+          {
+            "term": "Restauração",
+            "meaning": "Criação de objetos e dados no destino a partir do backup; precisa de verificação separada."
+          },
+          {
+            "term": "Origem e destino",
+            "meaning": "Base de referência antes do corte e base isolada para comparação."
+          }
+        ]
+      },
+      {
+        "title": "Expanda o schema antes de contrair",
+        "paragraphs": [
+          "Para manter versões de aplicação compatíveis, use uma sequência expansiva e depois contrativa. Primeiro acrescente um campo opcional (`003_add_observacao_sessoes.sql`); a versão antiga, que declara as colunas que usa, continua lendo e gravando. Uma versão posterior pode começar a preencher o campo. Só planeje remover campos depois que nenhum deployment antigo depender deles, os dados tiverem destino decidido e uma migration separada tiver sido ensaiada. O [`ALTER TABLE` do PostgreSQL](https://www.postgresql.org/docs/17/sql-altertable.html) pode exigir locks; numa base real, verifique a operação e o tamanho antes da janela.",
+          "Uma migration aditiva permite que código antigo e novo coexistam por um período; ensaie a leitura e escrita de ambas as versões.",
+          "Pausa: explique por que a migration aditiva pode ficar aplicada após reverter o código."
+        ],
+        "terms": [
+          {
+            "term": "Migration expansiva",
+            "meaning": "Mudança aditiva que permite coexistência temporária entre versões."
+          },
+          {
+            "term": "Migration contrativa",
+            "meaning": "Etapa que remove estrutura antiga após verificar código, dados e retorno."
+          },
+          {
+            "term": "Compatibilidade reversa",
+            "meaning": "Schema novo que continua atendendo uma versão anterior durante a reversão."
+          }
+        ]
+      },
+      {
+        "title": "Reverta o deployment sem apagar dados",
+        "paragraphs": [
+          "Rollback é voltar a uma versão que se sabe funcionar quando a versão nova causa problema grave. Ele precisa ser planejado: identifique a versão anterior, preserve artefato ou commit, saiba como restaurar e verifique o fluxo principal depois. Se houve mudança de dados incompatível, voltar só os arquivos pode não bastar; comunique a dependência. Em exercício local, copie a versão anterior e reproduza a volta sem apagar o histórico da falha.",
+          "Não confunda corrigir rapidamente com esconder o problema. Quando impacto é alto, restaurar primeiro pode reduzir dano; depois investigue com tempo. Registre causa, proteção adicionada e como o defeito foi detectado. Isso é parte da manutenção profissional de um projeto, mesmo em uma equipe pequena.",
+          "Para reverter o Preview `testes`, `labs/backend-layers/DEPLOY_VERCEL.md` orienta o [`git revert`](https://git-scm.com/docs/git-revert) seguido de um novo push; a [integração Git da Vercel](https://vercel.com/docs/git) cria um deployment associado ao commit. A reversão da aplicação deixa a migration expansiva aplicada; ela não apaga observações nem deve disparar uma migration destrutiva automaticamente.",
+          "Pausa: se uma coluna opcional já recebeu dados, diga o que reverte e o que permanece."
+        ],
+        "terms": [
+          {
+            "term": "Rollback de aplicação",
+            "meaning": "Retorno do código ou tráfego a uma versão estável; não reverte o banco automaticamente."
+          },
+          {
+            "term": "Reversão por commit",
+            "meaning": "Novo commit que desfaz uma mudança sem apagar o histórico compartilhado."
+          }
+        ]
+      },
+      {
+        "title": "Defina o corte com evidência",
+        "paragraphs": [
+          "`PROVIDER_MIGRATION.md` inventaria roles, extensões, identidade, Redis, arquivos e configuração. O dump não prova que esses outros componentes estejam prontos.",
+          "Antes do corte, defina gravações, validação, responsável e critério de aborto. Depois do corte, decida como tratar novas gravações antes de qualquer retorno à origem.",
+          "Pausa: o ensaio levou vinte minutos, mas a janela permitida passou a cinco. Que decisão evita prometer um tempo ainda não comprovado?"
+        ],
+        "terms": [
+          {
+            "term": "Ponto de corte",
+            "meaning": "Momento em que tráfego ou gravações deixam a origem e passam ao destino."
+          },
+          {
+            "term": "Janela de manutenção",
+            "meaning": "Período autorizado para uma operação que pode suspender ou limitar gravações."
+          },
+          {
+            "term": "Critério de aborto",
+            "meaning": "Condição definida previamente que interrompe a mudança e preserva a origem."
+          }
+        ]
+      }
+    ],
+    "example": {
+      "language": "text",
+      "code": "Terminal em labs/backend-layers\n\n# Windows PowerShell\nnpm.cmd run test:backup-restore\n\n# macOS ou Linux\nnpm run test:backup-restore",
+      "explanation": [
+        "O script cria um dump e restaura numa base com nome exclusivo.",
+        "Hashes das tabelas são comparados; a origem é conferida novamente.",
+        "A base temporária é removida pelo próprio script."
+      ],
+      "expected": "A saída informa as contagens observadas e `origem preservada`; estudos e sessões coincidem."
+    },
+    "guided": [
+      {
+        "instruction": "Leia `labs/backend-layers/BACKUP_RESTORE.md` e `PROVIDER_MIGRATION.md`; anote o que o dump copia, o que precisa ser criado/configurado à parte e qual evidência libera o corte.",
+        "result": "A análise separa uma base PostgreSQL de roles, identidade, Redis, arquivos e configuração; exige restaurar e comparar num destino isolado, manter a origem e definir condição de retorno."
+      },
+      {
+        "instruction": "Com PostgreSQL descartável e migrations aplicadas, use o comando por sistema descrito no README: no PowerShell defina `$env:RUN_MIGRATION_COMPATIBILITY = '1'` e rode `npm.cmd run test:migration-compatibility`; em macOS/Linux rode `RUN_MIGRATION_COMPATIBILITY=1 npm run test:migration-compatibility`. Compare o contrato do repositório antes e depois de `003`.",
+        "result": "A versão antiga opera antes e depois da coluna opcional; a nova escrita preserva os campos lidos pelo código antigo. O teste usa uma base temporária e não faz deploy."
+      },
+      {
+        "instruction": "Na pasta `labs/backend-layers`, execute `npm.cmd run test:backup-restore` no Windows ou `npm run test:backup-restore` em macOS/Linux depois de preparar a base local.",
+        "result": "A saída registra contagens e `origem preservada`; o destino de teste é removido pelo script."
+      },
+      {
+        "instruction": "Com PostgreSQL Compose pronto, defina `RUN_MIGRATION_COMPATIBILITY=1` conforme o README e rode `test:migration-compatibility`.",
+        "result": "Um teste confirma que o repositório antigo continua lendo e gravando após a migration 003."
+      }
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: um dump de `backend_camadas` será restaurado numa base nova. Que evidência deve coincidir e o que fica intocado na origem? Aceite: compare estudos e sessões, confira a origem e não restaure por cima dela.",
+        "expected": "Contagens e hashes coincidem entre origem e destino; a segunda conferência confirma que a origem não mudou.",
+        "solution": "Compare hashes de estudos e sessões na origem e no destino separado; depois confirme novamente a origem.",
+        "explanation": "Arquivo presente ou índice válido não prova sozinho que os dados foram restaurados.",
+        "hints": [
+          "Compare os dados, não só o arquivo.",
+          "Use nome de destino diferente."
+        ],
+        "criteria": [
+          "Identifica origem e destino.",
+          "Compara as duas tabelas.",
+          "Confirma origem preservada."
+        ]
+      },
+      {
+        "prompt": "Alterar: o ensaio de migração leva 20 minutos entre exportação, restauração e validação, mas a equipe agora permite no máximo cinco minutos sem escrita. Atualize a decisão de corte e registre a evidência que falta antes de tentar cumprir essa janela.",
+        "hints": [
+          "Não transforme um tempo medido de 20 minutos em uma promessa de cinco.",
+          "Considere adiar o corte ou provar previamente outra estratégia de sincronização e retorno."
+        ],
+        "solution": "Não autorizar o corte com o procedimento atual. Registrar a janela incompatível, manter a origem ativa e avaliar uma janela maior ou uma estratégia incremental/replicada com suporte do destino. Ensaiar e medir exportação final, atraso de sincronização, validação e retorno antes de assumir compromisso; não introduzir dual write sem reconciliação testada.",
+        "explanation": "Uma nova restrição de indisponibilidade muda o método de migração; omitir validação para caber no prazo aumenta o risco de perda ou divergência de dados.",
+        "expected": "O plano é adiado ou substituído por uma estratégia comprovada; origem e destino ficam identificados, e existe critério verificável para prosseguir ou abortar.",
+        "criteria": [
+          "Compara a janela nova ao tempo medido e não promete zero downtime sem prova.",
+          "Preserva a origem e define validação final, condição de aborto e tratamento de escritas no destino.",
+          "Qualquer estratégia incremental ou com dois sistemas é ensaiada e inclui reconciliação e retorno."
+        ]
+      },
+      {
+        "prompt": "Construir: escreva uma matriz de liberação para um corte com origem A e destino B. Inclua restauração, contagens/hash, gravações durante o corte, verificação funcional, critério de aborto e responsável.",
+        "expected": "Matriz identifica bases, evidência de dados e comportamento, plano de escritas, responsável e condição de aborto/retorno; a origem é preservada.",
+        "solution": "Restaure em B; compare hashes; meça a janela e o tratamento das escritas; teste leitura e escrita; aborte diante de divergência, erro ou janela excedida; mantenha A e identifique quem autoriza.",
+        "explanation": "A matriz evita tratar backup como migração completa de identidade, arquivos e cache.",
+        "hints": [
+          "Pense no que muda enquanto B é validado.",
+          "Defina antes qual diferença impede o corte."
+        ],
+        "criteria": [
+          "Identifica A, B e responsável.",
+          "Inclui evidência de dados e comportamento.",
+          "Define escrita, aborto e preservação da origem."
+        ]
+      },
+      {
+        "prompt": "Investigar erro: a aplicação nova já gravou valores em `observacao`, mas um defeito exige voltar à versão anterior. Decida o que reverter, o que manter no banco e que evidência pedir antes de uma migration contrativa.",
+        "hints": [
+          "Separe o commit/deployment da migration SQL.",
+          "O repositório anterior nomeia as colunas que lê e escreve; confirme esse contrato no teste de compatibilidade."
+        ],
+        "solution": "Reverter o commit da aplicação no Preview com `git revert` e manter `003_add_observacao_sessoes.sql` aplicada. A aplicação anterior pode ler/escrever suas colunas, enquanto observações existentes permanecem no banco. Considere remover a coluna somente depois de não haver deployments que a leiam/escrevam, decidir como preservar ou descartar esses valores e testar uma migration contrativa em uma cópia.",
+        "explanation": "Um rollback do código não é uma restauração do esquema. Remover a coluna junto com o código pode apagar dados ou impedir que uma versão ainda ativa funcione.",
+        "expected": "A aplicação volta por commit revertido; o schema permanece expandido e o dado novo não é apagado automaticamente. A contração fica condicionada a uma verificação separada de versões, dados e plano de recuperação.",
+        "criteria": [
+          "Distingue rollback de deployment de rollback de migration.",
+          "Mantém a migration 003 e confere que o repositório antigo opera após ela.",
+          "Define evidência e destino dos valores antes de qualquer remoção futura."
+        ]
+      }
+    ],
+    "mistakes": [
+      "Confundir arquivo criado com restauração verificada.",
+      "Restaurar por cima da origem durante o ensaio.",
+      "Reverter código e apagar automaticamente uma migration aditiva ou seus dados.",
+      "Prometer janela menor do que a medição demonstrou.",
+      "Achar que pg_dump migra identidade, Redis, arquivos e configuração."
+    ],
+    "quiz": [
+      {
         "question": "O que é rollback?",
         "options": [
           "Voltar à última versão conhecida que funciona.",
@@ -1195,33 +1535,47 @@ Object.assign(LESSON_GUIDES, {
       },
       {
         "question": "O que um `pg_dump` comum de uma base não migra automaticamente?",
-        "options": ["As linhas das tabelas da base exportada.", "Roles globais do cluster e configurações dos outros serviços, como identidade e arquivos.", "O schema e os objetos que estiverem incluídos no dump."],
+        "options": [
+          "As linhas das tabelas da base exportada.",
+          "Roles globais do cluster e configurações dos outros serviços, como identidade e arquivos.",
+          "O schema e os objetos que estiverem incluídos no dump."
+        ],
         "correctIndex": 1,
         "explanation": "Um dump cobre uma base PostgreSQL; roles/tablespaces são globais, e identidade, cache, arquivos e configuração exigem plano próprio."
       },
       {
         "question": "Depois de reverter a aplicação para a versão anterior, o que fazer com uma coluna opcional já aplicada?",
-        "options": ["Removê-la imediatamente para que o schema volte a coincidir com o código.", "Manter a migration expansiva enquanto a versão antiga for compatível; planejar uma contração separada após avaliar deployments e dados.", "Apagar a tabela e recriá-la com as colunas antigas."],
+        "options": [
+          "Removê-la imediatamente para que o schema volte a coincidir com o código.",
+          "Manter a migration expansiva enquanto a versão antiga for compatível; planejar uma contração separada após avaliar deployments e dados.",
+          "Apagar a tabela e recriá-la com as colunas antigas."
+        ],
         "correctIndex": 1,
         "explanation": "Código e esquema têm ciclos distintos; uma migration aditiva pode continuar aplicada, preservando compatibilidade e dados até uma contração segura."
       },
       {
-        "question": "O Preview está Ready, o login funciona e a gravação em Supabase retorna 403. Qual conclusão é segura?",
-        "options": ["A readiness PostgreSQL local provou que a autorização remota está correta.", "O deploy e o login passaram por partes do fluxo; a chamada Supabase precisa ser conferida com a integração Clerk e RLS, sem expor o token.", "A proteção Vercel bloqueou a requisição depois do login."],
+        "question": "O ensaio levou vinte minutos, mas a janela permitida é cinco. O que é seguro fazer?",
+        "options": [
+          "Pular a comparação de dados.",
+          "Adiar ou provar outra estratégia que caiba na janela, incluindo validação e retorno.",
+          "Apagar a origem para reduzir custo."
+        ],
         "correctIndex": 1,
-        "explanation": "Deploy, autenticação e autorização dos dados são verificações distintas; um status deve ser ligado à rota e à camada observadas."
+        "explanation": "Uma restrição de tempo não torna seguro um procedimento ainda não medido."
       }
     ],
     "summary": [
-      "Combine testes de regra, integração e navegação conforme o risco.",
-      "CI repete verificações e ajuda a impedir entrega com falha conhecida.",
-      "Observe, reproduza, contenha, corrija e acrescente regressão.",
-      "Use logs JSON estruturados com campos permitidos e sem payload, IP, credenciais ou stack.",
-      "Separe liveness de readiness e teste alerta local com um limiar explícito.",
-      "Restaure backups em destino separado e valide comportamento; `pg_dump` não migra identidade, Redis, arquivos ou configuração por conta própria.",
-      "Prefira expandir o esquema antes de mudar a aplicação; um rollback de código pode deixar a migration aplicada até a contração ser segura.",
-      "No incidente, registre SHA, rota e status; separe Preview, Clerk, autorização Supabase e dependências locais antes de escolher a recuperação."
-    ]
+      "Restaure backup em destino separado, compare conteúdo e preserve a origem.",
+      "pg_dump cobre uma base, não identidade, Redis, arquivos e configurações de outros serviços.",
+      "Migration expansiva permite coexistência; contração é outra etapa ensaiada.",
+      "Rollback de código não apaga a migration aditiva nem dados do banco.",
+      "Adie o corte se tempo e plano de retorno não forem comprovados."
+    ],
+    "retry": {
+      "prompt": "Durante a restauração, o hash de `sessoes_estudo` difere, mas `estudos` coincide. Registre a decisão imediata e como obter nova evidência sem modificar a origem.",
+      "expected": "Bloqueie o corte; preserve a origem; investigue a divergência no destino e ensaie novo dump/restore antes de decidir.",
+      "hint": "Uma tabela correta não compensa a divergência da outra nem autoriza promover o destino."
+    }
   },
   "delivery-threat-model": {
     "prerequisites": "Concluir `delivery-environments`, `delivery-oauth-google` e `delivery-clerk-supabase`. Esta aula modela o fluxo do Tech Learning Hub com Preview Vercel, Clerk e Supabase; não precisa abrir os painéis nem possuir domínio ou credenciais.",

@@ -55,7 +55,7 @@ function validEvidenceDate(value) {
 }
 
 function sanitizeState(candidate) {
-  const clean = { version: 1, completed: {}, learningEvidence: {}, activeTrack: 'preparacao', lastLesson: null, notes: {}, quizAttempts: {}, projects: {}, htmlCssRevision: 2, javascriptRevision: 3, pythonRevision: 2, databaseRevision: 3, aiRevision: 2, readiness: {} };
+  const clean = { version: 1, completed: {}, learningEvidence: {}, activeTrack: 'preparacao', lastLesson: null, notes: {}, quizAttempts: {}, projects: {}, htmlCssRevision: 2, javascriptRevision: 3, pythonRevision: 2, databaseRevision: 3, aiRevision: 2, deliveryRevision: 1, readiness: {} };
   if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return clean;
   if (candidate.completed && typeof candidate.completed === 'object') {
     for (const id of lessonIndex.keys()) {
@@ -102,6 +102,23 @@ function sanitizeState(candidate) {
       clean.quizAttempts[lesson.id] = { answers, checked, checkedAt: checked ? validEvidenceDate(attempt.checkedAt) : null, reviewStartedAt: validEvidenceDate(attempt.reviewStartedAt) };
     }
   }
+  const deliveryExerciseMigrations = [
+    ['delivery-ci:4', 'delivery-observability:1'],
+    ['delivery-ci:5', 'delivery-observability:2'],
+    ['delivery-ci:6', 'delivery-recovery:1'],
+    ['delivery-ci:7', 'delivery-recovery:3'],
+    ['delivery-ci:8', 'delivery-observability:3']
+  ];
+  for (const [oldKey, newKey] of deliveryExerciseMigrations) {
+    if (typeof candidate.notes?.[oldKey] === 'string' && typeof clean.notes[newKey] !== 'string') {
+      clean.notes[newKey] = candidate.notes[oldKey].slice(0, 10000);
+    }
+  }
+  if (candidate.completed?.['delivery-ci'] === true) {
+    // A antiga aula cobria os três blocos; preserve a marca de acompanhamento nas divisões.
+    clean.completed['delivery-observability'] = true;
+    clean.completed['delivery-recovery'] = true;
+  }
   for (const project of PROJECTS) {
     const entry = candidate.projects?.[project.id];
     if (!entry || typeof entry !== 'object') continue;
@@ -126,6 +143,13 @@ function sanitizeState(candidate) {
     if (Object.keys(candidate.quizAttempts || {}).some(id => lessonIndex.get(id)?.track.id === 'database')) startupNotice='Banco de Dados foi revisado. As respostas dessa trilha foram reiniciadas; conclusões e rascunhos foram preservados.';
   }
   if(candidate.aiRevision!==2){for(const lesson of tracks.find(t=>t.id==='ai').modules.flatMap(m=>m.lessons))delete clean.quizAttempts[lesson.id];}
+  if (candidate.deliveryRevision !== 1) {
+    delete clean.quizAttempts['delivery-ci'];
+    if (candidate.quizAttempts?.['delivery-ci']) {
+      const deliveryNotice = 'A aula de testes, CI e falhas de entrega foi dividida. O quiz original foi reiniciado; conclusões e rascunhos de exercícios foram preservados.';
+      startupNotice = startupNotice ? `${startupNotice} ${deliveryNotice}` : deliveryNotice;
+    }
+  }
   return clean;
 }
 

@@ -242,7 +242,9 @@ Toda implementação só pode ser considerada pronta quando:
     - [x] `ai-skills`: criar um exemplo de `SKILL.md` com escopo e autorização explícitos, testar o validador local e distinguir instruções de execução real.
     - [x] `ai-workflows`: intercalar previsões na máquina de estados, praticar cancelamento e eventos atrasados e delimitar o tratamento textual de timeout.
     - [x] `ai-capstone`: ligar o exemplo ao projeto completo, intercalar previsões e separar teste de contrato de avaliação factual.
-- [x] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes; observar com alunos as 15 aulas que mantiveram cinco seções.
+- [~] Dividir ou reorganizar as aulas identificadas sem renomear ids existentes; a revisão do código não substitui observação com alunos e o piloto continua pendente.
+  - [x] `delivery-ci`: separar testes/CI, observabilidade/incidentes e backup/migrations/recuperação; preservar `delivery-ci`, mapear rascunhos de exercícios antigos e manter as conclusões acompanhadas da aula original.
+  - [ ] Observar as aulas reestruturadas com um aluno iniciante antes de afirmar que a carga cognitiva foi validada.
 - [x] Adicionar demonstrações visuais de laços com rastreamento de `for` e `while` em `js-flow`.
 - [x] Adicionar diagramas de referências e cópias rasas em `js-arrays` e `js-es6`.
 - [x] Adicionar visualização de consultas e `JOIN` em `db-joins`, da condição `ON` ao resultado e à contagem.

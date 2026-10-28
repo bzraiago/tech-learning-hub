@@ -5155,38 +5155,111 @@
             ]
           },
           {
-            "id": "delivery-ci",
-            "title": "Testes de entrega, observação e recuperação",
-            "minutes": 130,
-            "concept": "Transforme um roteiro manual em verificações repetíveis, leia falhas após uma entrega e tenha uma forma concreta de voltar à última versão estável.",
-            "objectives": [
-              "Usar testes unitários, integração local e um roteiro de navegação para cobrir riscos distintos.",
-              "Identificar o gatilho e os testes de uma rotina de integração contínua e interpretar evidências de sucesso ou falha.",
-              "Registrar sintomas, reproduzir, corrigir, verificar e preparar rollback."
-            ],
-            "exercise": "Rode os testes com node --test; provoque uma regressão, localize a falha e descreva como impedir a publicação.",
-            "code": "// Salve como regra.test.js e rode: node --test regra.test.js\nconst test = require('node:test');\nconst assert = require('node:assert/strict');\nfunction normalizarTitulo(valor) {\n  if (typeof valor !== 'string' || !valor.trim()) throw new TypeError('Título obrigatório');\n  return valor.trim();\n}\ntest('remove espaços externos', () => assert.equal(normalizarTitulo('  HTML  '), 'HTML'));\ntest('recusa título vazio', () => assert.throws(() => normalizarTitulo('  '), TypeError));\n",
-            "docs": [
-              {
-                "kind": "doc",
-                "title": "Node.js · Test runner",
-                "url": "https://nodejs.org/api/test.html",
-                "language": "EN"
-              },
-              {
-                "kind": "doc",
-                "title": "GitHub Docs · Entenda o GitHub Actions",
-                "url": "https://docs.github.com/en/actions/get-started/understand-github-actions",
-                "language": "EN"
-              },
-              {
-                "kind": "doc",
-                "title": "W3C WAI · Testes básicos de acessibilidade",
-                "url": "https://www.w3.org/WAI/test-evaluate/preliminary/",
-                "language": "EN"
-              }
-            ]
-          },
+              "id": "delivery-ci",
+              "title": "Testes, CI e falhas de entrega",
+              "minutes": 75,
+              "concept": "Escolha camadas de teste conforme o risco, relacione eventos do repositório às verificações de CI e trate regressões com evidência e teste independente.",
+              "objectives": [
+                "Distinguir testes unitários, de integração e roteiro de navegador pelos riscos observados.",
+                "Descrever quando CI executa verificações e conferir a execução remota do commit.",
+                "Registrar defeito reproduzível, acrescentar regressão e comunicar evidência de entrega."
+              ],
+              "exercise": "Rode os testes com node --test; provoque uma regressão, localize a falha e descreva como impedir a publicação.",
+              "code": "// Salve como regra.test.js e rode: node --test regra.test.js\nconst test = require('node:test');\nconst assert = require('node:assert/strict');\nfunction normalizarTitulo(valor) {\n  if (typeof valor !== 'string' || !valor.trim()) throw new TypeError('Título obrigatório');\n  return valor.trim();\n}\ntest('remove espaços externos', () => assert.equal(normalizarTitulo('  HTML  '), 'HTML'));\ntest('recusa título vazio', () => assert.throws(() => normalizarTitulo('  '), TypeError));\n",
+              "docs": [
+                {
+                  "kind": "doc",
+                  "title": "Node.js · Test runner",
+                  "url": "https://nodejs.org/api/test.html",
+                  "language": "EN"
+                },
+                {
+                  "kind": "doc",
+                  "title": "GitHub Docs · Entenda o GitHub Actions",
+                  "url": "https://docs.github.com/en/actions/get-started/understand-github-actions",
+                  "language": "EN"
+                },
+                {
+                  "kind": "doc",
+                  "title": "W3C WAI · Testes básicos de acessibilidade",
+                  "url": "https://www.w3.org/WAI/test-evaluate/preliminary/",
+                  "language": "EN"
+                }
+              ]
+            },
+            {
+              "id": "delivery-observability",
+              "title": "Observabilidade e resposta a incidentes",
+              "minutes": 95,
+              "concept": "Registre eventos minimizados, interprete liveness/readiness e alertas e faça triagem entre Preview, Clerk, Supabase e dependências locais sem expor dados.",
+              "objectives": [
+                "Construir registro JSON com campos permitidos, sem payload ou credenciais.",
+                "Diferenciar liveness/readiness e interpretar abertura e resolução de alerta local.",
+                "Classificar um 403 na integração remota e indicar verificações redigidas que distinguem as camadas."
+              ],
+              "exercise": "Execute o monitor local, observe alerta e recuperação e classifique um 403 simulado usando o runbook, sem requisições remotas.",
+              "code": "const rotasPermitidas = new Set(['POST /api/estudos']);\nconst codigosPermitidos = new Set(['ECONNREFUSED']);\nfunction criarRegistro(rota, codigo) {\n  return {timestamp:'2026-10-28T12:00:00.000Z',level:'error',event:'api.request.failed',route:rotasPermitidas.has(rota)?rota:'other',errorCode:codigosPermitidos.has(codigo)?codigo:'UNKNOWN'};\n}\nconsole.log(JSON.stringify(criarRegistro('POST /api/estudos','ECONNREFUSED')));\nconsole.log(JSON.stringify(criarRegistro('POST /api/estudos?token=falso','erro privado')));",
+              "docs": [
+                {
+                  "kind": "doc",
+                  "title": "OWASP · Logging Cheat Sheet",
+                  "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html",
+                  "language": "EN"
+                },
+                {
+                  "kind": "doc",
+                  "title": "NIST · SP 800-61 Rev. 3 Incident Response",
+                  "url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final",
+                  "language": "EN"
+                },
+                {
+                  "kind": "doc",
+                  "title": "Vercel · Deployments e ambientes",
+                  "url": "https://vercel.com/docs/deployments",
+                  "language": "EN"
+                }
+              ]
+            },
+            {
+              "id": "delivery-recovery",
+              "title": "Backup, migrations e recuperação",
+              "minutes": 120,
+              "concept": "Restaure PostgreSQL numa base separada, comprove compatibilidade e escolha rollback/corte com origem preservada e critérios verificáveis.",
+              "objectives": [
+                "Diferenciar backup, restauração e prova de integridade no destino.",
+                "Planejar migration expansiva e condições de contração posterior.",
+                "Reverter aplicação sem apagar dados ou schema compatível.",
+                "Definir liberação, aborto e retorno antes de um corte de fornecedor."
+              ],
+              "exercise": "Restaure dump numa base separada, confira origem/destino e planeje reversão sem remover migration expansiva.",
+              "code": "Terminal em labs/backend-layers\n\n# Windows PowerShell\nnpm.cmd run test:backup-restore\n\n# macOS ou Linux\nnpm run test:backup-restore",
+              "docs": [
+                {
+                  "kind": "doc",
+                  "title": "PostgreSQL 17 · pg_dump",
+                  "url": "https://www.postgresql.org/docs/17/app-pgdump.html",
+                  "language": "EN"
+                },
+                {
+                  "kind": "doc",
+                  "title": "PostgreSQL 17 · pg_restore",
+                  "url": "https://www.postgresql.org/docs/17/app-pgrestore.html",
+                  "language": "EN"
+                },
+                {
+                  "kind": "doc",
+                  "title": "Git · git revert",
+                  "url": "https://git-scm.com/docs/git-revert",
+                  "language": "EN"
+                },
+                {
+                  "kind": "doc",
+                  "title": "Vercel · Integração Git",
+                  "url": "https://vercel.com/docs/git",
+                  "language": "EN"
+                }
+              ]
+            },
           {
             "id": "delivery-threat-model",
             "title": "Modelagem de ameaças: ativos, limites e controles",

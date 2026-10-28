@@ -139,7 +139,7 @@ Os scripts são clássicos e compartilham o mesmo escopo global, carregados na o
 
 Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workflow`, `quality`, `delivery`.
 
-> Os números atuais (9 trilhas, 28 módulos, 143 aulas, 597 exercícios, 454 questões, 24 projetos) foram conferidos no código em 28/10/2026. **Confira no código antes de citá-los** e atualize `contexto/ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
+> Os números atuais (9 trilhas, 28 módulos, 145 aulas, 600 exercícios, 459 questões, 24 projetos) foram conferidos no código em 28/10/2026. **Confira no código antes de citá-los** e atualize `contexto/ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
 
 ### 5.2 Persistência e compatibilidade (cuidado máximo)
 - O curso exige login Clerk antes de mostrar o conteúdo. O progresso persistente fica somente em `public.learning_state` no Supabase, protegido por RLS e vinculado ao ID Clerk. `state` permanece em memória durante a sessão. Ao trocar de conta, a interface aguarda a leitura da nova conta antes de aceitar edição.
@@ -148,7 +148,7 @@ Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workf
   - **Nunca renomeie ou remova ids** de aulas, módulos, trilhas, projetos ou checks sem necessidade. Se for inevitável, escreva migração em `sanitizeState()` mapeando ids antigos para novos.
   - Ao adicionar campos ao estado, defina o valor padrão em `sanitizeState()`.
   - Se mudar o formato de modo incompatível, incremente `version` e documente a migração.
-  - Mantenha os campos de revisão (`htmlCssRevision`, `javascriptRevision`, `pythonRevision`, `databaseRevision`, `aiRevision`) coerentes quando reescrever conteúdo de uma trilha.
+  - Mantenha os campos de revisão (`htmlCssRevision`, `javascriptRevision`, `pythonRevision`, `databaseRevision`, `aiRevision`, `deliveryRevision`) coerentes quando reescrever conteúdo de uma trilha.
 - Falhas de leitura impedem editar o progresso da conta até nova tentativa. Falhas de escrita mantêm mudanças em memória, mostram o erro e tentam novamente; antes de fechar a página, o usuário deve ver a confirmação de salvamento.
 - O desafio de mudança de requisito usa a estrutura existente `notes`, na chave `${lessonId}:requirement-change`, com limite de 2.000 caracteres. Preserve essa chave no `sanitizeState()`; ela não altera a versão do estado.
 
@@ -261,7 +261,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 1. [x] **Etapa 0** de computador, arquivos, editor e terminal, disponível antes do primeiro exercício que dependa deles.
 2. [x] **Mapa de pré-requisitos** e instruções de instalação por sistema (Python, Git, Node.js + npm, Docker/WSL, PostgreSQL, MariaDB, Firebird, MongoDB/`mongosh`), seguindo o padrão 6.2.
 3. [x] **Resultado esperado visível** separado da solução em todos os exercícios; checkpoints distintos para *li / pratiquei / revisão / resolvi sozinho*.
-   - [x] Os 597 exercícios exibem resultado esperado e critérios específicos; o validador exige critérios nas aulas revisadas.
+   - [x] Os 600 exercícios exibem resultado esperado e critérios específicos; o validador exige critérios nas aulas revisadas.
    - [x] As aulas `prep-tools`, `prep-files`, `prep-workspace`, `prep-cycle`, `prep-errors`, as quatro instalações iniciais, `setup-docker`, `setup-docker-alternative`, `setup-postgresql`, as preparações opcionais de MariaDB, Firebird e MongoDB, `db-mariadb`, `db-firebird`, `db-mongo-crud`, `db-mongo-pipelines`, `db-nosql-models`, `db-performance`, `db-security`, `db-recovery`, `db-project`, `db-modeling`, `db-normalization`, `db-ddl-constraints`, `db-ddl-crud`, `db-select`, `db-aggregation`, `db-joins`, `db-subqueries-ctes`, `db-transactions`, `db-concurrency-boundaries`, `db-docker-basics`, `db-docker-compose`, `db-docker-operations`, `db-postgres` e `db-sqlite` iniciam os critérios específicos.
    - [x] As 13 aulas HTML/CSS contêm critérios nos 52 exercícios; 14 resultados foram revisados para que previsão, investigação e comparação não mostrem a conclusão antes da tentativa.
    - [x] As 14 aulas JavaScript contêm critérios nos 56 exercícios; 22 resultados foram revisados para preservar a previsão, investigação e diagnóstico antes da conclusão.
@@ -302,8 +302,10 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 7. [ ] Atividades gerais de conclusão (prova básica disponível no curso; intermediária pendente) — ver seção 9.
    - [x] Associar os sete critérios atuais de prontidão a quatro projetos de fechamento, exibindo o estado da entrega separadamente da evidência externa e preservando o caráter de autoavaliação.
 8. [x] Corrigir a inconsistência da porta do PostgreSQL (55432) entre laboratório Docker e projeto relacional.
-9. [ ] Dividir aulas com excesso de conceitos (a aula de funções em JavaScript já foi dividida; mapear as demais).
+9. [~] Dividir aulas com excesso de conceitos (a aula de funções em JavaScript já foi dividida; mapear e revisar as demais).
    - [x] Aprofundar js-callbacks-closures: diferenciar callback imediato e posterior, explicar a ligação da closure, mostrar execução de ambientes independentes e avisar que closure não protege segredos no navegador; Chromium a 375 px confirmou rolagem da tabela por teclado.
+   - [x] Dividir `delivery-ci` em testes/CI, observabilidade/incidentes e backup/migrations/recuperação; manter o ID antigo, migrar rascunhos e preservar as marcações de acompanhamento da aula concluída.
+   - [ ] Fazer piloto das três aulas com aluno e registrar dúvidas observadas; a análise estrutural não comprova a carga real para uma pessoa iniciante.
 10. [x] Demonstrações visuais de execução (laços, referências, `JOIN`, requisições HTTP), registradas em `js-flow`, `js-arrays`, `js-es6`, `db-joins` e `delivery-http`.
 11. [x] Revisão acumulativa e recuperação de dificuldades: quiz errado aponta para conceitos da aula, oferece segunda tentativa diferente e a primeira aula de cada módulo posterior recupera conteúdo anterior com rascunho persistente.
 12. [x] Persistir progresso e anotações automaticamente por conta no Supabase, sem depender de `localStorage`.
