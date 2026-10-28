@@ -422,8 +422,13 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Criar threat model simples: ativos, entradas, fronteiras de confiança, ameaças e controles.
   - [x] Criar `delivery-threat-model` para delimitar escopo, mapear ativos/atores/fluxos, usar STRIDE como perguntas, priorizar risco e associar cada ameaça a controle e evidência.
   - [x] Aplicar o modelo conceitualmente ao fluxo Clerk–Vercel–Supabase com dados fictícios; separar hipótese não verificada, controle implementado, teste executado e risco residual.
-- [ ] Ensinar OWASP Top 10 por meio de falhas reproduzíveis e correções verificadas, sem conteúdo ofensivo fora do laboratório.
-- [ ] Cobrir autenticação versus autorização, IDOR/BOLA, XSS, CSRF, SQL injection, abuso de API, rate limiting e gestão de dependências.
+- [~] Ensinar OWASP Top 10 por meio de falhas reproduzíveis e correções verificadas, sem conteúdo ofensivo fora do laboratório.
+  - [x] Apresentar as dez categorias OWASP Top 10 2025 e seus limites como referência de conscientização, não certificação.
+  - [x] Criar `labs/security-basics` local com reprodução e correção de A01/BOLA, leitura e escrita cruzadas, casos positivos/negativos e dados fictícios; os seis testes passam localmente.
+  - [ ] Criar laboratórios específicos e testes para as demais categorias prioritárias; não considerar a lista de nomes como cobertura.
+- [~] Cobrir autenticação versus autorização, IDOR/BOLA, XSS, CSRF, SQL injection, abuso de API, rate limiting e gestão de dependências.
+  - [x] Diferenciar autenticação/autorização e reproduzir BOLA/IDOR em laboratório local isolado.
+  - [ ] Criar práticas verificáveis de XSS, CSRF, SQL injection, abuso de API, rate limiting e gestão de dependências.
 - [ ] Implementar cabeçalhos de segurança, validação no servidor, mensagens de erro seguras e princípio do menor privilégio.
 - [ ] Ensinar rotação e revogação de segredo, auditoria de acesso e resposta inicial a incidente.
 - [ ] Introduzir LGPD com papéis, finalidade, base legal, minimização, retenção, direitos do titular e resposta a incidente.
@@ -662,6 +667,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 27/10/2026 | Fase 7.2 — OAuth/OIDC com Google e Clerk | Conceitos concluídos | `delivery-oauth-google` explica o fluxo mediado pelo Clerk, callback versus retorno ao Preview, consentimento, escopos mínimos, `state`/`nonce`, diagnóstico de `redirect_uri_mismatch` e separação de autenticação, autorização e RLS. O usuário já havia confirmado que o login Google funcionou. Conceitos apoiados em documentação oficial; domínio próprio e validação de produção não são requisitos. Contagens na etapa: 122 aulas, 490 exercícios e 366 questões. Validação de conteúdo passou; não foram feitos testes de domínio ou produção. |
 | 27/10/2026 | Fase 7.2 — integração Clerk–Supabase e RLS | Conceitos concluídos | `delivery-clerk-supabase` usa os arquivos reais `cloud.js` e `learning-state.sql` para explicar token de sessão, claim `sub`, roles, grants, `USING`, `WITH CHECK`, chaves e matriz de isolamento para duas contas. Validador de conteúdo passou. Nenhuma policy ou dado remoto foi alterado; a prova de isolamento por duas contas segue pendente. Sem teste de domínio/Production. Contagens na etapa: 123 aulas, 494 exercícios e 370 questões. |
 | 27/10/2026 | Fase 7.3 — modelagem de ameaças | Conceitos concluídos | `delivery-threat-model` delimita escopo, ativos, atores, entradas e fronteiras; usa STRIDE, classifica ameaças, escolhe controle/evidência e registra hipóteses e risco residual. Inclui referências oficiais OWASP Top 10 2025 e Threat Modeling. A atividade é conceitual, usa exemplos fictícios e não executa ataque nem testa domínio. Validador de conteúdo passou; revisão visual manual pendente. Contagens: 124 aulas, 498 exercícios e 374 questões. |
+| 27/10/2026 | Fase 7.3 — OWASP Top 10 e BOLA/IDOR | Prática local concluída; cobertura OWASP parcial | `delivery-owasp-top10` apresenta as dez categorias OWASP 2025 como conscientização e explica autenticação versus autorização. `labs/security-basics` reproduz A01/BOLA em servidor loopback com dados fictícios, corrige a checagem no servidor e cobre leitura/escrita próprias e cruzadas; `node --test labs/security-basics/server.test.cjs` passou (6/6). Sem deploy, domínio próprio ou chamadas remotas. Laboratórios das demais categorias e revisão visual/teclado permanecem pendentes. Contagens: 125 aulas, 502 exercícios e 378 questões. |
 
 ## Decisões e bloqueios
 

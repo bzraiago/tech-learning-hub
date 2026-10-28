@@ -5222,6 +5222,46 @@
             ]
           },
           {
+            "id": "delivery-owasp-top10",
+            "title": "OWASP Top 10 2025: acesso indevido a objetos",
+            "minutes": 110,
+            "concept": "Use o OWASP Top 10 como referência de conscientização e reproduza localmente uma falha A01/API1 de autorização por objeto, comparando-a com uma checagem de propriedade no servidor.",
+            "objectives": [
+              "Listar as categorias do OWASP Top 10 2025 e explicar por que a lista não certifica uma aplicação.",
+              "Distinguir autenticação de autorização e reconhecer BOLA/IDOR como falha de controle de acesso a um objeto.",
+              "Executar o laboratório local com contas e progresso fictícios, observar a rota vulnerável e a corrigida.",
+              "Propor testes positivos e negativos que confirmem acesso próprio e bloqueiem acesso cruzado."
+            ],
+            "exercise": "Siga `labs/security-basics/README.md`, compare a resposta das rotas vulnerável e corrigida e explique qual verificação falta em cada requisição.",
+            "code": "OWASP Top 10 2025 — categorias de conscientização\nA01 Broken Access Control             A06 Insecure Design\nA02 Security Misconfiguration          A07 Authentication Failures\nA03 Software Supply Chain Failures     A08 Software or Data Integrity Failures\nA04 Cryptographic Failures              A09 Security Logging & Alerting Failures\nA05 Injection                           A10 Mishandling of Exceptional Conditions\n\nExperimento local (somente IDs e tokens fictícios):\nGET /demo/vulnerable/progress/aluno-b  → token A; resposta 200 com marcador B\nGET /demo/fixed/progress/aluno-b      → token A; resposta 404 sem dados de B\n\nA01: a sessão está autenticada, mas a autorização do objeto não foi verificada.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "OWASP · Top 10 2025",
+                "url": "https://top10.owasp.org/2025/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "OWASP · A01:2025 Broken Access Control",
+                "url": "https://top10.owasp.org/2025/A01_2025-Broken_Access_Control/index.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "OWASP API Security · API1:2023 Broken Object Level Authorization",
+                "url": "https://api-security.owasp.org/editions/2023/en/0xa1-broken-object-level-authorization/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "OWASP · Authorization Cheat Sheet",
+                "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html",
+                "language": "EN"
+              }
+            ]
+          },
+          {
             "id": "delivery-requirements",
             "title": "Requisitos novos, colaboração e portfólio",
             "minutes": 140,

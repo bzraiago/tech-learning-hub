@@ -1244,6 +1244,143 @@ Object.assign(LESSON_GUIDES, {
       "OWASP Top 10 2025 é referência de conscientização; atualize o modelo conforme mudam dados e requisitos."
     ]
   },
+  "delivery-owasp-top10": {
+    "prerequisites": "Concluir `delivery-clerk-supabase` e `delivery-threat-model`; revisar autenticação, autorização, requisições HTTP e testes. A lista OWASP é conceitual; o laboratório executável é local e usa apenas contas/dados fictícios. Não exige domínio, deploy nem configuração remota.",
+    "setup": "Abra `labs/security-basics/README.md`. No terminal, a partir da pasta do repositório, execute `cd labs/security-basics` e depois `node --test server.test.cjs`. A saída esperada termina com `tests 6`, `pass 6` e `fail 0`. O teste sobe um servidor apenas em `127.0.0.1:4178`, verifica as rotas vulnerável e corrigida e encerra. Para repetir, execute o mesmo comando. Não publique o laboratório nem use tokens ou dados reais. Se Node não for reconhecido, retome `setup-node`; alternativa leve: analise os requests e respostas esperados nesta aula sem iniciar servidor.",
+    "why": "Uma pessoa pode estar autenticada e ainda assim pedir um objeto que pertence a outra conta. A autorização precisa ser aplicada no servidor em cada operação. O laboratório torna a diferença observável e conecta um risco comum a uma correção e a testes de regressão.",
+    "example": {
+      "language": "text",
+      "code": "CATÁLOGO OWASP TOP 10 2025 (conscientização):\nA01 Broken Access Control\nA02 Security Misconfiguration\nA03 Software Supply Chain Failures\nA04 Cryptographic Failures\nA05 Injection\nA06 Insecure Design\nA07 Authentication Failures\nA08 Software or Data Integrity Failures\nA09 Security Logging & Alerting Failures\nA10 Mishandling of Exceptional Conditions\n\nNo laboratório local, token demo-token-a:\nGET /demo/vulnerable/progress/aluno-b  → 200, marcador fictício de B\nGET /demo/fixed/progress/aluno-b      → 404, sem dados de B\nGET /demo/fixed/progress/aluno-a      → 200, marcador fictício de A",
+      "expected": "A rota vulnerável retorna o marcador de B para a sessão A porque confia no ID do caminho. A rota corrigida bloqueia a leitura cruzada, mas permite à sessão A ler seu próprio registro. As dez categorias são um vocabulário de conscientização, não uma certificação.",
+      "explanation": [
+        "Autenticação responde quem fez a chamada; autorização decide qual ação essa identidade pode executar sobre aquele objeto.",
+        "BOLA (Broken Object Level Authorization), também relacionada a IDOR, ocorre quando uma API identifica um objeto pelo ID sem conferir se a pessoa pode agir sobre ele.",
+        "O cliente controla URL, corpo e interface. O servidor deve obter a identidade da sessão validada e aplicar uma regra de acesso por objeto em cada leitura e escrita.",
+        "A checagem simples de dono neste laboratório é didática. Sistemas com equipes, compartilhamento ou papéis precisam de uma política de permissões explícita."
+      ]
+    },
+    "sections": [
+      {
+        "title": "O que o OWASP Top 10 mede e não mede",
+        "paragraphs": [
+          "O OWASP Top 10 2025 agrupa riscos de segurança de aplicações web para conscientização e conversa entre equipes. As categorias atuais são: A01 Broken Access Control; A02 Security Misconfiguration; A03 Software Supply Chain Failures; A04 Cryptographic Failures; A05 Injection; A06 Insecure Design; A07 Authentication Failures; A08 Software or Data Integrity Failures; A09 Security Logging & Alerting Failures; A10 Mishandling of Exceptional Conditions. Os nomes são mantidos em inglês para corresponder à fonte oficial; traduza e explique o significado ao aplicá-los.",
+          "A lista ajuda a lembrar famílias de problemas, mas não é um inventário de todos os riscos, uma certificação nem prova de que um sistema está seguro. Um projeto pode não ter evidência suficiente para avaliar uma categoria. Registre o escopo, a versão da referência e o que foi realmente verificado.",
+          "Esta aula pratica A01 e autorização por objeto com um servidor local isolado. As outras categorias exigem cenários e correções específicos; apenas nomeá-las não comprova que você saiba preveni-las. O roadmap mantém essas práticas separadas para evitar uma demonstração superficial."
+        ],
+        "terms": [
+          { "term": "OWASP Top 10", "meaning": "Referência de conscientização que organiza categorias importantes de risco em aplicações web; não é certificação ou garantia de cobertura." },
+          { "term": "A01 Broken Access Control", "meaning": "Falha em aplicar corretamente limites de acesso a ações e recursos." },
+          { "term": "Risco", "meaning": "Possibilidade contextual de uma ameaça explorar uma fraqueza e causar impacto." }
+        ]
+      },
+      {
+        "title": "Autenticação não basta: autorize cada objeto",
+        "paragraphs": [
+          "Considere uma API com `GET /progress/aluno-a`. O servidor verifica que o pedido tem uma sessão válida. Isso autentica a chamada, mas não responde se a identidade autenticada pode ler `aluno-a`. Se o servidor usa diretamente o identificador controlado pelo cliente, uma pessoa pode trocar o ID e consultar outro objeto.",
+          "A falha é chamada BOLA (Broken Object Level Authorization) no OWASP API Security Top 10; IDOR (Insecure Direct Object Reference) é um termo comum para uma referência direta cujo acesso não foi devidamente autorizado. O identificador não é, por si, uma vulnerabilidade: a falha é a ausência de autorização no objeto para a ação solicitada.",
+          "A correção precisa estar no servidor e cobrir cada operação relevante: ler, alterar, excluir, exportar ou executar uma ação. Uma interface que esconde botões e um filtro na consulta podem melhorar a experiência, mas não protegem um endpoint contra pedidos alterados manualmente. Aplique negação por padrão e teste também a própria conta, para evitar bloquear tudo por engano.",
+          "No projeto principal, Supabase RLS aplica autorização por linha usando o `sub` validado do Clerk e `user_id` da linha. O laboratório local usa uma comparação de dono simplificada para tornar o conceito visível; não substitui a policy do banco nem demonstra que a instância remota esteja correta."
+        ],
+        "terms": [
+          { "term": "Autenticação", "meaning": "Verificação da identidade ou sessão que apresenta a requisição." },
+          { "term": "Autorização", "meaning": "Decisão sobre quais ações uma identidade pode executar em um recurso." },
+          { "term": "BOLA", "meaning": "Falha de autorização em nível de objeto de uma API: a pessoa consegue acessar um registro que não deveria." },
+          { "term": "IDOR", "meaning": "Referência direta a um objeto usada sem verificar a permissão correspondente." },
+          { "term": "Negação por padrão", "meaning": "Acesso é recusado até que uma regra explícita permita a ação." }
+        ]
+      },
+      {
+        "title": "Reproduzir e comparar no laboratório local",
+        "paragraphs": [
+          "O laboratório em `labs/security-basics` não contém dependências externas, credenciais reais ou persistência. O servidor vincula somente `127.0.0.1:4178`, usa duas sessões e dois registros inteiramente fictícios e expõe pares de rotas para leitura e atualização. Nunca publique esse exemplo: a rota vulnerável existe para estudo controlado.",
+          "Execute `node --test server.test.cjs` e leia os seis casos. Eles comprovam que a falha é reproduzida na rota intencionalmente vulnerável e que a rota corrigida permite o registro próprio, recusa o de outra pessoa, ignora propriedade forjada no corpo e rejeita chamadas sem sessão ou com corpo inválido. `404` para registro alheio evita revelar se o objeto de outra pessoa existe.",
+          "Se quiser observar manualmente, inicie `node server.cjs` em um terminal e faça requests apenas para `http://127.0.0.1:4178`, seguindo o README; pare com Ctrl+C. Não use o hostname Preview para acessar as rotas vulneráveis. O teste automatizado já executa localmente e não depende de domínio, login Vercel ou deployment.",
+          "O teste comprova somente o comportamento deste exemplo local. Não é evidência de auditoria, de RLS remota, de configuração da Vercel, de resistência a todas as categorias OWASP ou de segurança do site inteiro."
+        ],
+        "terms": [
+          { "term": "Regressão", "meaning": "Retorno de um defeito já corrigido; um teste preserva a expectativa para mudanças futuras." },
+          { "term": "Marcador fictício", "meaning": "Valor inventado usado para distinguir dados de demonstração, sem representar informação pessoal real." },
+          { "term": "Loopback", "meaning": "Endereço local da própria máquina; `127.0.0.1` não publica o servidor na rede externa." }
+        ]
+      },
+      {
+        "title": "Transformar a correção em evidência",
+        "paragraphs": [
+          "Para leitura, teste dois resultados positivos (A lê A e B lê B) e dois negativos (A não lê B e B não lê A). Para escrita, confirme que cada pessoa altera somente o próprio registro e que enviar outro `ownerId` no corpo não transfere a propriedade. Uma checagem só de sucesso pode deixar a falha cruzada invisível.",
+          "Revise a origem da identidade: a sessão precisa ser validada pelo servidor. Nunca trate um `userId` fornecido pelo cliente como prova de identidade. Em produção, consulte a política de autorização no ponto de acesso aos dados; para Supabase, revise grants, RLS, claims e credencial usada. Não tente comprovar isso modificando dados remotos sem uma tarefa e ambiente autorizados.",
+          "Ao documentar, registre a versão do código, o comando, as identidades fictícias, o pedido, o status e o resultado. Não registre tokens. Diferencie claramente ‘teste local passou’ de ‘controle remoto verificado’. Para incidentes reais, interrompa a exposição, preserve evidências sem dados sensíveis e siga o processo responsável de resposta."
+        ],
+        "terms": [
+          { "term": "Teste positivo", "meaning": "Confirma que uma operação permitida continua funcionando." },
+          { "term": "Teste negativo", "meaning": "Confirma que uma operação proibida é recusada e não produz alteração." },
+          { "term": "Privilégio mínimo", "meaning": "Conceder somente as operações e recursos necessários à tarefa." }
+        ]
+      }
+    ],
+    "diagramTitle": "Identidade, objeto solicitado e decisão de acesso",
+    "diagram": "Pessoa A → navegador (não confiável) → API local\n                               │\n                     valida sessão demo-token-a\n                               │ identidade = aluno-a\n                               ▼\n              solicita objeto /progress/aluno-b\n                               │\n          ┌────────────────────┴────────────────────┐\n          │ rota vulnerável                        │ rota corrigida\n          │ usa o ID da URL sem comparar dono       │ compara identidade com dono\n          ▼                                         ▼\n     200: dados B                            404: acesso recusado",
+    "guided": [
+      { "instruction": "Antes de rodar o laboratório, preveja o status de A lendo A e A tentando ler B em cada rota. Explique qual informação a rota vulnerável usa para escolher o objeto.", "result": "Ambas as rotas permitem A→A; a vulnerável também permite A→B, enquanto a corrigida recusa A→B. A rota vulnerável seleciona pelo ID fornecido na URL sem comparar com a identidade autenticada." },
+      { "instruction": "Execute `node --test server.test.cjs` e encontre no resultado o caso que reproduz leitura cruzada e os casos que protegem leitura/escrita na rota corrigida.", "result": "Os seis testes passam; os nomes dos casos identificam falha reproduzida, acesso próprio, acesso cruzado, adulteração do corpo, autenticação e validação de entrada." },
+      { "instruction": "Escreva uma matriz com ator A/B, objeto A/B e operações ler/atualizar. Marque permitir ou recusar e defina o resultado esperado para cada combinação.", "result": "A e B podem ler/atualizar o próprio objeto; as quatro combinações cruzadas são recusadas. Cada decisão tem um resultado verificável e nenhum dado de B é retornado a A." }
+    ],
+    "mistakes": [
+      "Tratar uma sessão válida como permissão para ler qualquer ID.",
+      "Confiar em `ownerId`, `userId` ou papel enviado no corpo ou query string.",
+      "Proteger a tela, mas deixar a rota de API sem checagem de autorização.",
+      "Testar somente que o usuário consegue acessar o próprio registro, sem testar acesso cruzado.",
+      "Corrigir leitura e esquecer atualização, exclusão, exportação ou outra operação sobre o objeto.",
+      "Usar um status que revela dados do registro alheio sem necessidade, como diferença entre ‘existe’ e ‘não autorizado’. ",
+      "Interpretar seis testes locais como auditoria completa, prova de RLS remota ou validação de domínio."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: a sessão demo-token-a chama `/demo/vulnerable/progress/aluno-b`. Antes de executar, indique se a autenticação passa, se a autorização foi comprovada e que resposta o teste espera observar.",
+        "expected": "A sessão é reconhecida, mas a rota não comprova autorização sobre B; o laboratório espera `200` e um marcador fictício de B, reproduzindo a falha.",
+        "criteria": ["Distingue sessão válida de permissão ao objeto.", "Prevê a resposta `200` na rota vulnerável.", "Identifica o ID de URL como entrada controlada pelo cliente."],
+        "solution": "A rota vulnerável autentica demo-token-a, mas escolhe a linha usando aluno-b sem validar a relação com aluno-a; portanto o resultado didático é `200` com marcador B.",
+        "explanation": "A previsão separa a validação de identidade da autorização que falta para o objeto.",
+        "hints": ["Qual identidade o token demo representa?", "Quem escolheu o ID da rota e onde deveria ocorrer a comparação?"]
+      },
+      {
+        "prompt": "Alterar: observe o request de atualização no laboratório. Envie no JSON um `ownerId` correspondente a B enquanto usa a sessão A. Preveja o resultado da rota corrigida e explique qual valor deve definir a identidade.",
+        "expected": "A rota corrigida ignora a propriedade enviada pelo cliente e usa a identidade derivada da sessão validada; o pedido cruzado é recusado e o registro B permanece inalterado.",
+        "criteria": ["Não confia no campo de propriedade enviado pelo cliente.", "Especifica recusa sem alteração de B.", "Identifica a sessão validada no servidor como origem da identidade."],
+        "solution": "A API obtém aluno-a da sessão e compara com o dono do recurso. O ownerId do corpo não tem autoridade; A→B recebe recusa e a asserção do teste confirma que B não mudou.",
+        "explanation": "Uma correção segura controla a origem da identidade e protege tanto a decisão de acesso quanto o efeito da operação.",
+        "hints": ["O cliente consegue editar o corpo HTTP?", "Que estado precisa continuar igual após uma tentativa proibida?"]
+      },
+      {
+        "prompt": "Construir: amplie a matriz de autorização com operações `ler`, `atualizar` e `exportar`, para as identidades A/B e objetos A/B. Indique resultado esperado e um teste que confirme a negação cruzada para cada operação.",
+        "expected": "A matriz permite operações próprias e recusa operações cruzadas; cada teste verifica status de recusa e ausência de conteúdo/alteração/exportação alheia. A proposta não assume que uma checagem de leitura cobre outras ações.",
+        "criteria": ["Cobre as três operações e as duas identidades.", "Inclui casos positivos e negativos por operação.", "Confirma ausência de efeito ou dado no caso recusado."],
+        "solution": "Para cada ação, A→A e B→B são permitidos; A→B e B→A são recusados. O teste de exportação deve confirmar que a resposta não inclui linhas alheias; atualização confirma estado intacto após recusa; leitura confirma ausência do objeto.",
+        "explanation": "A autorização é por ação e objeto; uma rota protegida não protege automaticamente outra rota.",
+        "hints": ["Repita a matriz para cada verbo/ação, não só para SELECT.", "O que deve permanecer inalterado depois de um pedido bloqueado?"]
+      },
+      {
+        "prompt": "Investigar erro: após uma refatoração, o teste ‘A não consegue ler B’ falha. Escreva a sequência local de investigação para localizar se a identidade, o ID solicitado ou a checagem de dono mudou; não publique nem execute pedidos contra Preview ou Supabase.",
+        "expected": "Reproduz o teste local, compara sessão resolvida e ID do objeto, inspeciona a condição de autorização e a resposta sem imprimir tokens, verifica se o caminho corrigido ainda é usado e confirma que nenhum dado foi alterado; corrige a menor causa e repete os seis testes.",
+        "criteria": ["Reproduz somente no laboratório local.", "Inspeciona identidade, objeto e regra separadamente.", "Não imprime credenciais nem usa serviços publicados.", "Repete os casos positivos e negativos depois da correção."],
+        "solution": "Execute `node --test server.test.cjs`, anote o caso que falhou e examine em `server.cjs` a resolução da sessão, o `ownerId` da URL e a comparação no handler corrigido. Confirme que a rota é `/demo/fixed`, que a propriedade vem do registro/sessão no servidor e que o teste verifica estado inalterado. Corrija o menor defeito e rode novamente o comando completo.",
+        "explanation": "Uma falha de autorização precisa ser rastreada pelos valores e pela decisão que atravessam a fronteira, não mascarada com uma mudança no cliente.",
+        "hints": ["O teste falha na autenticação, na autorização ou na asserção de efeito?", "Compare a origem da identidade antes e depois da refatoração."]
+      }
+    ],
+    "quiz": [
+      { "question": "O que a autenticação de uma sessão válida garante, por si só?", "options": ["Que a identidade foi reconhecida; não que pode acessar todo objeto.", "Acesso a qualquer registro da API.", "Que o navegador não pode alterar o ID da URL."], "correctIndex": 0, "explanation": "Autorização precisa decidir separadamente a ação sobre cada recurso." },
+      { "question": "Qual cenário melhor descreve BOLA/IDOR?", "options": ["A pessoa troca um ID e o servidor retorna objeto alheio sem verificar permissão.", "Uma página tem um link quebrado.", "O servidor rejeita uma sessão expirada."], "correctIndex": 0, "explanation": "A falha está na ausência de autorização em nível de objeto, não na existência de um identificador." },
+      { "question": "Onde deve ocorrer a decisão final de autorização para uma API?", "options": ["No servidor ou camada confiável de dados, em cada ação relevante.", "Somente ao esconder um botão no navegador.", "No campo `ownerId` enviado pelo cliente."], "correctIndex": 0, "explanation": "O navegador e os valores que ele envia são controláveis pelo usuário." },
+      { "question": "O que os seis testes locais do laboratório comprovam?", "options": ["Comportamento coberto no exemplo local, não a segurança total ou a configuração remota.", "Que todas as dez categorias OWASP foram corrigidas.", "Que o domínio Vercel está validado."], "correctIndex": 0, "explanation": "A evidência é limitada ao código e aos cenários que o teste executa." }
+    ],
+    "summary": [
+      "OWASP Top 10 2025 é referência de conscientização; não é certificação nem prova de segurança.",
+      "Autenticação identifica a sessão; autorização decide cada ação sobre cada objeto.",
+      "BOLA/IDOR acontece quando uma API aceita referência a objeto sem conferir acesso.",
+      "O servidor deriva identidade de sessão validada, ignora propriedade forjada pelo cliente e aplica negação por padrão.",
+      "O laboratório local reproduz A01/BOLA com dados fictícios; os testes não validam Preview, domínio ou Supabase remoto."
+    ]
+  },
   "delivery-requirements": {
     "prerequisites": "Concluir setup-node, delivery-forms e delivery-ci; ter a lista de estudos do laboratório e saber alterar funções e testes. O exemplo usa apenas Node.",
     "setup": "Na pasta da aula, salve o exemplo como requisito.js no editor. No terminal aberto nessa pasta, execute node requisito.js; a saída esperada é false e true em linhas separadas. O processo termina sozinho; para retomar, execute o mesmo comando. Se node não for reconhecido, revise setup-node. Use a lista de estudos da aula delivery-forms para planejar a integração, mas este arquivo não altera server.js. Escreva critérios antes de editar o projeto.",
@@ -2231,6 +2368,11 @@ Object.assign(LESSON_GUIDES, {
       prompt: "Uma nova exportação permite baixar anotações de estudo como JSON. Atualize o modelo com a nova superfície de saída, identifique ameaças a confidencialidade/integridade e defina uma evidência por controle, mantendo dados fictícios.",
       expected: "O fluxo inclui a saída/download e quem a pode iniciar; ameaças incluem exportar dados alheios ou vazar conteúdo; controles exigem autorização por dono, escape/formatos seguros e evidência negativa/positiva em ambiente autorizado.",
       hint: "Siga o dado até a nova saída e pergunte quem recebe o arquivo e quais registros entram nele."
+    },
+    "delivery-owasp-top10": {
+      prompt: "Uma pessoa A autentica normalmente, mas a rota usa o ID da URL para carregar o progresso de B. Explique a diferença entre autenticação e autorização, descreva a correção no servidor e proponha um teste positivo e um negativo para leitura e atualização, somente com os dados fictícios do laboratório local.",
+      expected: "A sessão válida identifica A, mas não autoriza acesso a B; a API deve derivar a identidade da sessão validada e conferir o dono do objeto em cada ação. Testes permitem A→A e recusam A→B, confirmando que nenhuma resposta ou alteração de B ocorre.",
+      hint: "O cliente controla o ID solicitado. Qual identidade confiável o servidor deve comparar com o proprietário do registro?"
     },
     "delivery-ci": {
       prompt: "Uma publicação altera a validação de minutos e o POST começa a aceitar -5. Defina um teste que falhe antes da correção, indique onde a CI deve executá-lo e descreva como conter a versão ruim enquanto investiga.",
