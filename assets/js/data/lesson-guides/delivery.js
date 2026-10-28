@@ -2084,25 +2084,25 @@ Object.assign(LESSON_GUIDES, {
   },
   "delivery-redis-cache-aside": {
     "prerequisites": "Concluir `delivery-redis-foundations` e `db-postgres`; saber ler dados de uma fonte persistente e distinguir cópia de registro autoritativo.",
-    "setup": "Com Redis iniciado pela aula anterior, abra `labs/redis-fundamentals` no terminal e execute `node check-cache-aside.cjs`. A saída esperada termina em `Cache-aside Redis: PASS`; o script comprova miss, hit, valor antigo sem invalidação, invalidação e TTL. A fonte é uma Map local, não PostgreSQL. O script apaga a chave aleatória que cria. Se Compose standalone, o programa tenta `docker-compose`; se Redis não responder, confira `docker compose ps`/`docker-compose ps` e o README. Não abre domínio, Preview nem banco remoto.",
-    "why": "Cache-aside pode reduzir consultas repetidas, mas cria uma cópia que pode ficar velha ou indisponível. O desenho precisa limitar staleness, invalidar após escrita e preservar a fonte persistente.",
+    "setup": "No `labs/redis-fundamentals`, execute `node check-cache-aside.cjs` para observar miss/hit e valor obsoleto numa Map simulada. Depois, em `labs/backend-layers`, instale dependências, prepare `.env`, inicie PostgreSQL e Redis com Compose, aplique `npm.cmd run migrate` e execute `$env:RUN_CACHE_INTEGRATION = '1'; npm.cmd run test:cache; Remove-Item Env:RUN_CACHE_INTEGRATION` no PowerShell. Em macOS/Linux, execute `RUN_CACHE_INTEGRATION=1 npm run test:cache`. A integração usa PostgreSQL e Redis reais: confirma miss, hit, TTL, invalidação após POST e fallback para PostgreSQL quando o cliente Redis desconecta; remove a linha e keys que cria. Nenhum dado pessoal, Preview, domínio ou carga é usado.",
+    "why": "Cache-aside pode reduzir consultas repetidas, mas cria uma cópia que pode ficar velha ou indisponível. O laboratório verifica essa estratégia na API local e no PostgreSQL autoritativo, com TTL, invalidação após escrita e fallback no caminho GET.",
     "example": {
       "language": "text",
-      "code": "LEITURA\nGET cache:v1:studies:<id-opaco> → hit? devolver cópia\n                      └── miss → consultar PostgreSQL\n                                  SET cache:v1:studies:<id-opaco> JSON EX 30\n                                  devolver dado da fonte\n\nESCRITA\nPostgreSQL COMMIT → DEL cache:v1:studies:<id-opaco>\n\nA key tem versão/escopo, TTL limita envelhecimento e Redis não vira fonte.",
-      "expected": "Uma falta consulta PostgreSQL e preenche uma cópia versionada com TTL; uma escrita bem-sucedida invalida a cópia depois do commit.",
+      "code": "GET /api/estudos\nGET cache:v1:backend-layers:studies:list → hit? devolver lista\n                                      └── miss → SELECT no PostgreSQL\n                                                  SET EX 30 → devolver fonte\n\nPOST /api/estudos\nPostgreSQL confirma estudo → DEL cache:v1:backend-layers:studies:list\n\nGET com falha Redis → consulta PostgreSQL e não tenta preencher cache.",
+      "expected": "A primeira leitura consulta PostgreSQL e preenche Redis; a segunda usa o cache. POST bem-sucedido invalida a lista para a próxima leitura; Redis indisponível em GET permite recorrer ao banco.",
       "explanation": [
         "Cache-aside: aplicação consulta cache, busca fonte principal em miss e grava cópia temporária para próxima leitura.",
         "Namespace e versão como `cache:v1:...` ajudam a separar tipo/formato; identificador opaco evita colocar email, token ou dado pessoal em chave/log.",
         "TTL dá limite superior planejado para vida da cópia; `DEL` após commit reduz staleness imediatamente. Se invalidar antes do commit, leitura concorrente pode repor valor antigo.",
         "Uma expiração de chave popular pode disparar muitas leituras simultâneas ao banco (cache stampede). Cache lock, jitter, refresh antecipado ou coalescing ajudam, mas aumentam complexidade.",
-        "O script do laboratório usa fonte em memória. É evidência do comportamento Redis e de cache-aside simulado, não integração com PostgreSQL nem medida de desempenho real."
+        "`labs/redis-fundamentals/check-cache-aside.cjs` usa uma Map para isolar miss/hit/staleness. `labs/backend-layers` também testa API, PostgreSQL e Redis reais. Essa prova funcional não é benchmark, teste de múltiplas instâncias nem garantia de consistência de produção."
       ]
     },
     "sections": [
       {
         "title": "Percorra miss, fonte e hit",
         "paragraphs": [
-          "No primeiro GET, a chave não existe: cache miss. A API lê a fonte persistente, serializa um resultado que pode ser compartilhado com aquele escopo e grava no Redis com TTL. Na próxima chamada, cache hit pode evitar uma consulta ao banco. Se a fonte retorna registro inexistente, decida se armazena uma resposta vazia por pouco tempo; cuidado para não esconder uma criação recente.",
+          "No primeiro GET de `/api/estudos`, a chave da lista não existe: cache miss. A API lê PostgreSQL, serializa os títulos fictícios que são compartilháveis neste laboratório e grava Redis com TTL. A próxima chamada pode ser hit e evitar uma consulta. O teste integrado conta chamadas à fonte para diferenciar os caminhos; em dados por conta, a key precisaria de escopo e autorização antes de devolver qualquer valor.",
           "Chave deve identificar a entidade, versão de formato e escopo de acesso. Para dados por usuário, inclua um ID interno apropriado e mantenha autorização antes de devolver valor; a chave não é controle de acesso. Um cache compartilhado sem escopo por tenant pode servir dados de uma conta para outra.",
           "Evite guardar segredo de sessão, bearer token, anotação privada ou resposta pessoal sem política justificada. Se o valor contém dados do aluno, o risco e retenção mudam; use minimização, TTL adequado e isolamento por conta. Não coloque token em nome de key nem em log.",
           "Pausa: trace uma leitura em que o primeiro pedido é miss e o seguinte hit. Em que ponto o banco é consultado e qual camada autoriza o usuário?"
@@ -2117,8 +2117,8 @@ Object.assign(LESSON_GUIDES, {
         "title": "Limite idade com TTL e invalidação após escrita",
         "paragraphs": [
           "TTL como 30 segundos é apenas um valor fictício. Escolha uma duração conforme frescor aceitável e custo de recarga; não copie um número sem conhecer o requisito. Expiração limita a janela planejada para dado antigo, mas relógio, failover, processo e cópias locais podem ter efeitos diferentes.",
-          "Caminho de escrita típico: validar e autorizar; gravar no PostgreSQL; confirmar commit; então invalidar key Redis. Se o commit falhar, não deve apagar ou confirmar uma atualização inexistente. Se invalidação falhar depois do commit, TTL reduz a duração de dado antigo; registre falha e escolha outra forma de consistência se o requisito não tolera essa janela.",
-          "Uma corrida ainda é possível: leitura consulta banco antigo; escrita faz commit e DEL; leitura antiga termina depois e grava valor antigo no cache. Estratégias como versão de cache, compare-and-set, lock ou invalidação por versão podem evitar situações específicas, mas trazem custo. Explique a consistência oferecida antes de adotar cache.",
+          "No laboratório, um POST só invalida a lista depois que o serviço confirma a criação no PostgreSQL. Se o banco recusa o pedido, não há invalidação; se `DEL` falha após commit, a API mantém o `201` porque o dado já foi escrito e a cópia expira pelo TTL. O teste unitário cobre essa janela de valor antigo.",
+          "Uma corrida ainda é possível: leitura consulta banco antigo; escrita faz commit e `DEL`; leitura antiga termina depois e grava valor antigo no cache. O teste reduz misses simultâneos no mesmo processo, mas não sincroniza várias instâncias. TTL e refetch limitam idade planejada; versão distribuída, compare-and-set ou lock têm mais custo. Explique o limite antes de adotar cache.",
           "Pausa: compare escrita SQL que falhou versus escrita confirmada seguida de falha no DEL. Qual versão deve ser devolvida e que compensação existe?"
         ],
         "terms": [
@@ -2130,9 +2130,9 @@ Object.assign(LESSON_GUIDES, {
       {
         "title": "Responda a falta e indisponibilidade sem cascata",
         "paragraphs": [
-          "O laboratório usa TTL e chave versionada. `check-cache-aside.cjs` faz a primeira leitura em uma Map fictícia, retorna cópia no segundo acesso, simula atualização da fonte sem invalidar para mostrar valor velho e em seguida invalida para recarregar. A saída `PASS` confirma esse roteiro pequeno, não um SLO de aplicação.",
-          "Redis fora do ar não deve causar retry infinito. Configure timeout, limite de conexões e um fallback controlado ao PostgreSQL apenas para leitura que tolera isso. Cache bypass amplia consultas; limite concorrência, monitore a fonte e decida se serve cópia velha explicitamente. Para escrita de progresso, a confirmação vem do banco durável; não confirme com base apenas em cache.",
-          "Planeje cache hit ratio, miss, falhas Redis, tempo de GET, latência e consultas ao banco. Antes/depois precisa usar mesma versão de dados, aquecimento e perfil; compare p50/p95 e memória. Nesta etapa o teste confirma lógica simples no container, mas não mede ganho de throughput ou custo.",
+          "O teste real `npm run test:cache` inicia um servidor HTTP com repositório PostgreSQL e key Redis aleatória. Ele mede miss/hit contando consultas ao banco, confere TTL, cria um estudo por POST, verifica `DEL`, lê a lista atualizada e depois desconecta o cliente Redis para observar fallback ao PostgreSQL. O teste também remove os dados que criou.",
+          "Redis fora do ar não causa retry ilimitado: GET usa timeout e recorre à fonte; misses concorrentes deste processo compartilham uma leitura. Isso não coordena várias instâncias e fallback amplo ainda pode pressionar PostgreSQL. Gravações continuam exigindo Redis para rate limit. Não há stale-if-error: o laboratório escolhe a fonte atual e falha se o banco também estiver indisponível.",
+          "Planeje cache hit ratio, miss, falhas Redis, tempo de GET, latência e consultas ao banco. Antes/depois precisa usar mesma versão de dados, aquecimento e perfil; compare p50/p95 e memória. O teste funcional atual não mede ganho de throughput ou custo.",
           "Pausa: se Redis cai e todos os clientes dão miss ao PostgreSQL, que limite evita transformar fallback em pico de carga?"
         ],
         "terms": [
@@ -2143,11 +2143,11 @@ Object.assign(LESSON_GUIDES, {
       }
     ],
     "diagramTitle": "Cache-aside no caminho de leitura e escrita",
-    "diagram": "LEITURA: API → GET Redis → hit ─────────→ responder cópia permitida\n                    └── miss → Postgres → SET Redis com TTL → responder fonte\n\nESCRITA: API → autorizar → Postgres COMMIT → invalidar chave Redis\n                                                ↓\n                                      próximo pedido recarrega",
+    "diagram": "LEITURA: GET /api/estudos → Redis list:v1 → hit ─→ responder cópia\n                                    └── miss → PostgreSQL → SET EX 30 → responder fonte\n              Redis falha → PostgreSQL (GET)\n\nESCRITA: POST validado → PostgreSQL confirma → DEL da lista Redis\n                                      Redis falha após commit → sucesso persistido; TTL limita staleness",
     "guided": [
-      { "instruction": "Execute `node check-cache-aside.cjs` e anote qual chamada foi miss, qual foi hit e quantas vezes a fonte fictícia foi lida.", "result": "A fonte Map é lida na primeira chamada e novamente após invalidar; a segunda leitura antes da mudança usa Redis." },
-      { "instruction": "No `compose.yaml`, localize versão `v1`, porta loopback e o TTL 30 do script; descreva o que cada um limita.", "result": "Versão separa espaço de keys; 127.0.0.1 limita alcance de rede; EX 30 dá expiração curta à cópia de demonstração." },
-      { "instruction": "Desenhe ordem de escrita com commit Postgres e DEL Redis; indique comportamento se o commit falhar ou DEL falhar.", "result": "Só invalida depois de commit confirmado; se o banco falha, mantém estado anterior; se DEL falha depois, assume staleness limitada por TTL ou registra incidente." }
+      { "instruction": "Execute `node check-cache-aside.cjs` e `npm run test:cache`; anote que evidência cada um fornece sobre a fonte.", "result": "O primeiro usa uma Map fictícia para mostrar stale e DEL; o segundo conta consultas à fonte PostgreSQL no fluxo HTTP real e prova hit, invalidação e fallback." },
+      { "instruction": "Inspecione `servico-estudos-cache-aside.cjs` e `.env.example`; localize key versionada, TTL 30 e porta loopback.", "result": "`cache:v1:backend-layers:studies:list` separa formato/escopo, `CACHE_TTL_SECONDS` define vida padrão, e Redis publica só em 127.0.0.1 sem volume." },
+      { "instruction": "Desenhe a ordem de POST, commit PostgreSQL e DEL Redis; inclua a janela concorrente e a falha de DEL.", "result": "A API invalida só após sucesso do serviço; se DEL falha, mantém 201 e a cópia pode envelhecer até TTL. Uma leitura concorrente ou outra instância ainda pode preencher valor antigo." }
     ],
     "mistakes": [
       "Chamar cache-aside de fonte de verdade ou confirmar gravação antes do banco.",
@@ -2155,7 +2155,7 @@ Object.assign(LESSON_GUIDES, {
       "Invalidar antes do commit e permitir repopular valor antigo.",
       "Esquecer escopo de tenant/usuário e misturar respostas de contas diferentes.",
       "Fazer fallback ilimitado ao banco durante falha do cache.",
-      "Supor que o script local usa PostgreSQL ou prova ganho de desempenho real."
+      "Supor que o script local usa PostgreSQL ou que a integração HTTP prova ganho de desempenho real."
     ],
     "exercises": [
       {
@@ -2175,11 +2175,11 @@ Object.assign(LESSON_GUIDES, {
         "hints": ["Que informação não deveria aparecer em logs de chave?", "Que prefixo permite migrar formato?", "Quando o banco confirmou a escrita?"]
       },
       {
-        "prompt": "Construir: execute o teste de cache e crie uma tabela de estado com cache vazio, hit, fonte alterada sem invalidar e `DEL` após commit; inclua fonte consultada, valor esperado e TTL.",
-        "expected": "A tabela mostra miss/fonte HTML, hit/HTML sem nova leitura, dado velho HTML após mudança da Map para CSS e miss/CSS após DEL com TTL de 30 segundos; declara que fonte é simulada.",
-        "criteria": ["Registra estados e fonte observados.", "Mostra o valor velho sem invalidar.", "Mostra valor atualizado após DEL.", "Declara que fonte Map não é PostgreSQL."],
-        "solution": "Estado 1 key ausente: consulta Map (HTML), SET EX 30. Estado 2 GET retorna HTML, Map sem leitura adicional. Estado 3 Map recebe CSS, key ainda devolve HTML. Estado 4 DEL remove cópia; leitura volta à Map e devolve CSS. Esse script não abre conexão SQL.",
-        "explanation": "A tabela separa o estado autoritativo fictício do cache temporário e prova o efeito da invalidação.",
+        "prompt": "Construir: execute `node check-cache-aside.cjs` e `npm run test:cache`; compare as tabelas de miss, hit, staleness, invalidação e fallback. Identifique qual usa fonte simulada e qual usa PostgreSQL.",
+        "expected": "O script Map mostra HTML antigo após alterar fonte sem DEL e CSS após invalidar. O teste de API mostra miss que consulta PostgreSQL, hit sem consulta, POST com invalidação e nova leitura contendo estudo criado; com Redis desconectado, GET volta ao PostgreSQL.",
+        "criteria": ["Separa fonte Map de PostgreSQL real.", "Registra que hit evita consulta.", "Mostra POST, invalidação e leitura atualizada.", "Identifica fallback, TTL e limites de concorrência."],
+        "solution": "Map: primeira leitura consulta HTML; a seguinte é hit; uma mudança para CSS sem DEL continua mostrando HTML; DEL faz a leitura seguinte retornar CSS. API: cache miss busca lista persistida, hit não incrementa contador de consultas; POST cria linha no PostgreSQL e apaga a key; GET recarrega lista incluindo novo item. Após desconectar cliente Redis, GET volta à fonte e não tenta preencher cache.",
+        "explanation": "As duas provas se complementam: script pequeno isola algoritmo; integração verifica contratos HTTP, PostgreSQL e Redis local.",
         "hints": ["Use contador `sourceReads` do script.", "Qual chave é removida?", "O que está explicitamente simulado?"]
       },
       {
@@ -2202,7 +2202,7 @@ Object.assign(LESSON_GUIDES, {
       "Use key versionada, escopo correto e dados minimizados.",
       "Após commit no PostgreSQL, invalide; falhas de cache e DB têm tratamentos diferentes.",
       "O fallback deve ser limitado para evitar cascata; medir antes/depois com perfil controlado.",
-      "A prática usa Map fictícia e não mede API nem toca banco remoto."
+      "O script didático usa Map; a integração local prova API/PostgreSQL/Redis, mas não mede desempenho nem coordena instâncias."
     ]
   },
   "delivery-redis-rate-limit": {

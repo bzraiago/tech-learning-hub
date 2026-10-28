@@ -91,6 +91,13 @@ jobs:
           RUN_PG_INTEGRATION: '1'
         run: npm run test:db
 
+      - name: Test cache-aside with PostgreSQL and Redis
+        working-directory: labs/backend-layers
+        env:
+          RUN_CACHE_INTEGRATION: '1'
+          REDIS_URL: redis://127.0.0.1:6379
+        run: npm run test:cache
+
       - name: Install headless Chromium and system dependencies
         working-directory: labs/backend-layers
         run: npx playwright install --with-deps chromium --only-shell

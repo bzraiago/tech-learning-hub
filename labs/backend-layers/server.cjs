@@ -10,6 +10,7 @@ const { criarClienteOpenMeteo } = require('./src/cliente-open-meteo.cjs');
 const { criarRotaPrevisao } = require('./src/rota-previsao.cjs');
 const { criarLimitadorRedis } = require('./src/rate-limiter-redis.cjs');
 const { criarLimitadorEmMemoria } = require('./src/rate-limiter-memory.cjs');
+const { criarServicoEstudosComCache } = require('./src/servico-estudos-cache-aside.cjs');
 const { createClient } = require('redis');
 
 const pagina = path.join(__dirname, 'index.html');
@@ -174,6 +175,7 @@ if (require.main === module) {
     const servicoPrevisao = criarClienteOpenMeteo();
     let clienteRedis;
     let limitador;
+    let servicoDaApi = servico;
 
     if (usarMemoria) {
       limitador = criarLimitadorEmMemoria();
@@ -192,6 +194,9 @@ if (require.main === module) {
         const codigo = erro && (erro.code || erro.name);
         console.error(`Falha na conexão Redis: ${codigo || 'erro desconhecido'}`);
       });
+      servicoDaApi = criarServicoEstudosComCache(servico, clienteRedis, {
+        ttlSegundos: Number(process.env.CACHE_TTL_SECONDS || 30)
+      });
       limitador = criarLimitadorRedis(clienteRedis, {
         limite: Number(process.env.RATE_LIMIT_MAX_REQUESTS || 3),
         janelaSegundos: Number(process.env.RATE_LIMIT_WINDOW_SECONDS || 60)
@@ -204,11 +209,12 @@ if (require.main === module) {
       }
     }
 
-    const servidor = criarServidor(servico, servicoPrevisao, limitador);
+    const servidor = criarServidor(servicoDaApi, servicoPrevisao, limitador);
     servidor.listen(4180, '127.0.0.1', () => {
       const modoLimite = usarMemoria ? 'memória local (temporário)' : 'Redis';
+      const modoCache = usarMemoria ? 'desativado' : 'Redis (cache-aside)';
       console.log(
-        `Abra http://127.0.0.1:4180 · armazenamento: ${usarMemoria ? 'memória (temporário)' : 'PostgreSQL'} · rate limit: ${modoLimite}`
+        `Abra http://127.0.0.1:4180 · armazenamento: ${usarMemoria ? 'memória (temporário)' : 'PostgreSQL'} · cache: ${modoCache} · rate limit: ${modoLimite}`
       );
     });
 
