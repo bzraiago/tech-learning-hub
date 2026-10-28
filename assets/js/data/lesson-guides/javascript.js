@@ -535,35 +535,208 @@ Object.assign(LESSON_GUIDES, {
 "js-callbacks-closures": {
     "prerequisites": "Concluir Funções: parâmetros, retorno e contratos (js-functions) e Escopo, dependências e funções puras (js-scope-pure).",
     "setup": "Use a mesma pasta javascript-estudos e um arquivo .html aberto no navegador. Mantenha o Console visível para comparar chamadas. Não é necessário instalar biblioteca ou servidor. Digite cada exemplo e preveja a saída antes de atualizar a página.",
-    "why": "JavaScript permite guardar e passar funções como qualquer outro valor. Esse recurso aparece em eventos e métodos de arrays. Closures explicam como uma função interna continua acessando o ambiente onde nasceu, permitindo estado privado sem criar uma variável global.",
+    "why": "JavaScript permite guardar e passar funções como qualquer outro valor. Callbacks aparecem em métodos de arrays e em eventos, mas o nome não quer dizer que a execução é sempre assíncrona: quem recebe a função decide quando chamá-la. Closures explicam como uma função interna continua acessando o ambiente onde nasceu, permitindo estado associado a uma instância sem criar uma variável global.",
     "sections": [
-      { "title": "Funções como valores e callbacks", "paragraphs": ["Uma função pode ser atribuída a uma variável ou recebida como argumento. A função entregue a outra operação para ser chamada depois é um callback. Em aplicar(3, dobro), dobro é passado sem parênteses; aplicar decide quando executá-lo.", "Escrever aplicar(3, dobro()) executaria dobro imediatamente e passaria seu retorno. Compare referência e chamada antes de usar callbacks em arrays ou eventos."], "terms": [{"term": "Callback", "meaning": "Função passada como valor para outra operação, que decide quando chamá-la; em aplicar(3, dobro), dobro é o callback."}] },
-      { "title": "Closure conserva acesso", "paragraphs": ["Uma função interna forma uma closure ao conservar acesso às variáveis do ambiente em que foi criada. criarContador declara valor e devolve uma função que incrementa esse valor. Mesmo após a função externa terminar, a interna continua usando aquele ambiente.", "A variável preservada não é global. Cada nova chamada a criarContador cria outro ambiente; por isso dois contadores podem avançar de modo independente."] },
-      { "title": "Estado deliberado", "paragraphs": ["Diferente de uma função pura, uma closure com estado pode retornar valores diferentes em chamadas sem argumentos. Isso é adequado quando memória faz parte do contrato, mas deve ser explicado e testado.", "Use closure quando o estado pertence a uma instância e precisa ficar protegido. Para um cálculo simples, parâmetros e retorno continuam sendo a opção mais direta."] }
+      {
+        "title": "Funções como valores e callbacks",
+        "paragraphs": [
+          "Uma função pode ser guardada numa variável ou recebida por outra função. A função passada é um callback: quem a recebe decide quando chamá-la. `aplicar` chama o callback imediatamente durante a própria execução; um evento pode chamá-lo mais tarde. Callback, por si só, não significa operação assíncrona.",
+          "Em `aplicar(3, dobro)`, `dobro` é a referência à função e ainda não roda. Já `dobro(3)` roda agora e produz o número 6. Por isso `aplicar(3, dobro())` entrega um número onde `aplicar` espera uma função. A diferença está nos parênteses: referência para passar; parênteses para chamar."
+        ],
+        "terms": [
+          {
+            "term": "Callback",
+            "meaning": "Função passada como valor para outra operação, que decide quando chamá-la; ela pode ser chamada agora ou mais tarde."
+          },
+          {
+            "term": "Função de ordem superior",
+            "meaning": "Função que recebe outra função ou devolve uma função. `aplicar` recebe `dobro`; `criarContador` devolve uma função interna."
+          }
+        ]
+      },
+      {
+        "title": "Closure conserva acesso",
+        "paragraphs": [
+          "Uma closure é a função interna junto com o acesso ao ambiente léxico em que nasceu. `criarContador` declara `valor` e devolve uma função que o incrementa. Quando `criarContador` termina, `contar` continua ligado àquela variável; ela não vira global nem desaparece enquanto a função devolvida ainda puder ser chamada.",
+          "A closure acompanha a variável, não uma fotografia do valor inicial: depois de `contar()` ela vê o valor atualizado na chamada seguinte. Cada execução de `criarContador()` cria uma ligação separada. A tabela acompanha duas delas e mostra por que `contar` e `outro` não compartilham o contador."
+        ],
+        "trace": {
+          "title": "Acompanhe o valor preservado em cada chamada",
+          "columns": [
+            "Ação",
+            "Ambiente usado",
+            "Valor antes → depois",
+            "Resultado"
+          ],
+          "rows": [
+            [
+              "criarContador() → contar",
+              "Contador A",
+              "— → 0",
+              "função interna devolvida"
+            ],
+            [
+              "contar()",
+              "Contador A",
+              "0 → 1",
+              "1"
+            ],
+            [
+              "contar()",
+              "Contador A",
+              "1 → 2",
+              "2"
+            ],
+            [
+              "criarContador() → outro",
+              "Contador B",
+              "— → 0",
+              "outra função interna"
+            ],
+            [
+              "outro()",
+              "Contador B; A continua em 2",
+              "0 → 1",
+              "1"
+            ]
+          ]
+        }
+      },
+      {
+        "title": "Estado deliberado",
+        "paragraphs": [
+          "Diferente de uma função pura, uma closure com estado pode retornar valores diferentes em chamadas sem argumentos. Isso é útil quando a memória pertence a uma instância, como um contador, mas a mudança precisa fazer parte do contrato e dos testes.",
+          "Uma closure reduz acessos acidentais ao estado, mas não é uma barreira de segurança. Não coloque senha ou chave secreta numa closure do navegador: o código e a memória continuam sob controle de quem usa a página. Para um cálculo simples, parâmetros e retorno são mais diretos."
+        ]
+      }
     ],
     "example": {
       "language": "html",
-      "code": "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\">\n\u003cbody>\n  \u003cpre id=\"saida\">\u003c/pre>\n  \u003cscript>\n\"use strict\";\nfunction aplicar(valor, operacao) { return operacao(valor); }\nfunction dobro(numero) { return numero * 2; }\nfunction criarContador() {\n  let valor = 0;\n  return function () { valor += 1; return valor; };\n}\nconst contar = criarContador();\nconst outro = criarContador();\nconst linhas = [aplicar(4, dobro), contar(), contar(), outro()];\ndocument.getElementById(\"saida\").textContent = linhas.join(\"\\n\");\n  \u003c/script>\n\u003c/body>\n\u003c/html>",
-      "explanation": ["aplicar recebe a referência dobro e a chama com valor.", "contar conserva seu próprio valor entre chamadas.", "outro nasceu de uma nova execução e começa em 1."],
+      "code": "<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<body>\n  <pre id=\"saida\"></pre>\n  <script>\n\"use strict\";\nfunction aplicar(valor, operacao) { return operacao(valor); }\nfunction dobro(numero) { return numero * 2; }\nfunction criarContador() {\n  let valor = 0;\n  return function () { valor += 1; return valor; };\n}\nconst contar = criarContador();\nconst outro = criarContador();\nconst linhas = [aplicar(4, dobro), contar(), contar(), outro()];\ndocument.getElementById(\"saida\").textContent = linhas.join(\"\\n\");\n  </script>\n</body>\n</html>",
+      "explanation": [
+        "Em aplicar(4, dobro), a referência dobro é passada sem executar; aplicar chama essa função com 4 e recebe 8.",
+        "criarContador cria o ambiente A com valor igual a 0 e devolve a função interna que o utiliza.",
+        "A primeira chamada a contar muda o mesmo valor de 0 para 1; a segunda o muda de 1 para 2.",
+        "outro foi criado numa nova execução, então usa o ambiente B, separado do A, e sua primeira chamada retorna 1."
+      ],
       "expected": "A página mostra, em linhas separadas: 8, 1, 2 e 1."
     },
     "guided": [
-      { "instruction": "Troque dobro por function triplo(numero) { return numero * 3; }.", "result": "A primeira linha passa a mostrar 12; aplicar não precisa ser alterada." },
-      { "instruction": "Acrescente outro() ao final da lista.", "result": "A nova linha mostra 2; o estado de outro permanece independente de contar." }
+      {
+        "instruction": "Troque dobro por function triplo(numero) { return numero * 3; }.",
+        "result": "A primeira linha passa a mostrar 12; aplicar não precisa ser alterada."
+      },
+      {
+        "instruction": "Acrescente outro() ao final da lista.",
+        "result": "A nova linha mostra 2; o estado de outro permanece independente de contar."
+      },
+      {
+        "instruction": "Antes de executar, copie a tabela de ambientes para o rascunho e preveja o valor de cada contador antes e depois das chamadas.",
+        "result": "contar reutiliza o ambiente A (0 → 1 → 2); outro usa o ambiente B (0 → 1). A tabela torna visível que a closure acompanha uma variável de cada instância."
+      }
     ],
     "exercises": [
-      { "prompt": "Prever: qual é a diferença entre executar aplicar(5, dobro) e tentar aplicar(5, dobro(5))? Responda antes de rodar.", "hints": ["Na segunda forma, observe o que é passado como segundo argumento."], "solution": "aplicar(5, dobro) retorna 10. Em aplicar(5, dobro(5)), dobro(5) vira 10 antes da chamada; aplicar tenta executar o número 10 como função e lança TypeError.", "explanation": "Callbacks são passados por referência, sem parênteses.", "expected": "A observação compara a função passada como callback com o resultado de uma chamada antecipada.", "criteria": ["Previsão anotada antes das chamadas.","Compara callback passado com valor produzido por chamada antecipada."] },
-      { "prompt": "Alterar: adapte aplicar para receber dois valores e um callback, permitindo aplicar(3, 4, somar).", "hints": ["Chame operacao com dois argumentos."], "solution": "function aplicar(a, b, operacao) { return operacao(a, b); }\nfunction somar(a, b) { return a + b; }\nconsole.log(aplicar(3, 4, somar));", "explanation": "A função de ordem superior controla a chamada sem conhecer a regra específica.", "expected": "7 no Console.", "criteria": ["aplicar recebe dois valores e função callback.","Resultado é obtido sem executar callback antes da função externa."] },
-      { "prompt": "Construir: crie criarMarcador(inicial), que devolve uma função capaz de somar uma quantidade ao valor preservado. Crie dois marcadores e demonstre que seus estados são independentes.", "hints": ["Declare valor na função externa.", "A função interna recebe quantidade, altera valor e o retorna."], "solution": "function criarMarcador(inicial) {\n  let valor = inicial;\n  return function (quantidade) { valor += quantidade; return valor; };\n}\nconst a = criarMarcador(10);\nconst b = criarMarcador(0);\nconsole.log(a(5), a(2), b(3));", "explanation": "Cada chamada da função externa cria um ambiente separado conservado pela função interna.", "expected": "15, 17 e 3 no Console.", "criteria": ["Função interna preserva valor entre chamadas.","Duas instâncias mantêm estado independente em chamadas intercaladas."] },
-      { "prompt": "Investigar erro: const contar = criarContador; console.log(contar()) devolve uma função em vez de 1. Explique e corrija.", "hints": ["criarContador é a fábrica; ela precisa ser chamada para produzir o contador."], "solution": "const contar = criarContador();\nconsole.log(contar());", "explanation": "Sem os primeiros parênteses, contar referencia a função externa. A chamada correta cria e guarda a função interna.", "expected": "1 no Console.", "criteria": ["Correção chama a função devolvida pela fábrica.","Console mostra número, não referência à função."] }
+      {
+        "prompt": "Prever: qual é a diferença entre executar aplicar(5, dobro) e tentar aplicar(5, dobro(5))? Responda antes de rodar.",
+        "hints": [
+          "Na segunda forma, observe o que é passado como segundo argumento."
+        ],
+        "solution": "aplicar(5, dobro) retorna 10. Em aplicar(5, dobro(5)), dobro(5) vira 10 antes da chamada; aplicar tenta executar o número 10 como função e lança TypeError.",
+        "explanation": "Callbacks são passados por referência, sem parênteses.",
+        "expected": "A observação compara a função passada como callback com o resultado de uma chamada antecipada.",
+        "criteria": [
+          "Previsão anotada antes das chamadas.",
+          "Compara callback passado com valor produzido por chamada antecipada."
+        ]
+      },
+      {
+        "prompt": "Alterar: adapte aplicar para receber dois valores e um callback, permitindo aplicar(3, 4, somar).",
+        "hints": [
+          "Chame operacao com dois argumentos."
+        ],
+        "solution": "function aplicar(a, b, operacao) { return operacao(a, b); }\nfunction somar(a, b) { return a + b; }\nconsole.log(aplicar(3, 4, somar));",
+        "explanation": "A função de ordem superior controla a chamada sem conhecer a regra específica.",
+        "expected": "7 no Console.",
+        "criteria": [
+          "aplicar recebe dois valores e função callback.",
+          "Resultado é obtido sem executar callback antes da função externa."
+        ]
+      },
+      {
+        "prompt": "Construir: crie criarMarcador(inicial), que devolve uma função capaz de somar uma quantidade ao valor preservado. Crie dois marcadores e demonstre que seus estados são independentes.",
+        "hints": [
+          "Declare valor na função externa.",
+          "A função interna recebe quantidade, altera valor e o retorna."
+        ],
+        "solution": "function criarMarcador(inicial) {\n  let valor = inicial;\n  return function (quantidade) { valor += quantidade; return valor; };\n}\nconst a = criarMarcador(10);\nconst b = criarMarcador(0);\nconsole.log(a(5), a(2), b(3));",
+        "explanation": "Cada chamada da função externa cria um ambiente separado conservado pela função interna.",
+        "expected": "15, 17 e 3 no Console.",
+        "criteria": [
+          "Função interna preserva valor entre chamadas.",
+          "Duas instâncias mantêm estado independente em chamadas intercaladas."
+        ]
+      },
+      {
+        "prompt": "Investigar erro: const contar = criarContador; console.log(contar()) devolve uma função em vez de 1. Explique e corrija.",
+        "hints": [
+          "criarContador é a fábrica; ela precisa ser chamada para produzir o contador."
+        ],
+        "solution": "const contar = criarContador();\nconsole.log(contar());",
+        "explanation": "Sem os primeiros parênteses, contar referencia a função externa. A chamada correta cria e guarda a função interna.",
+        "expected": "1 no Console.",
+        "criteria": [
+          "Correção chama a função devolvida pela fábrica.",
+          "Console mostra número, não referência à função."
+        ]
+      }
     ],
-    "mistakes": ["Executar o callback ao passá-lo, usando parênteses quando era necessária a referência.", "Confundir a função externa, que cria o ambiente, com a função interna que o utiliza.", "Usar estado oculto quando parâmetros e retorno deixariam o cálculo mais simples."],
+    "mistakes": [
+      "Executar o callback ao passá-lo, usando parênteses quando era necessária a referência.",
+      "Confundir a função externa, que cria o ambiente, com a função interna que o utiliza.",
+      "Usar estado oculto quando parâmetros e retorno deixariam o cálculo mais simples."
+    ],
     "quiz": [
-      { "question": "Em aplicar(3, dobro), o que dobro representa?", "options": ["Uma referência à função", "O retorno já calculado", "Uma string"], "correctIndex": 0, "explanation": "Sem parênteses, a própria função é passada como valor." },
-      { "question": "Por que contar() ainda acessa valor depois que criarContador terminou?", "options": ["Porque valor é global", "Porque a closure conserva acesso ao ambiente de criação", "Porque const copia todas as variáveis"], "correctIndex": 1, "explanation": "A função interna mantém a ligação com o escopo em que foi criada." },
-      { "question": "Duas chamadas separadas a criarContador() compartilham obrigatoriamente o mesmo estado?", "options": ["Sim", "Não, cada chamada cria seu próprio ambiente", "Somente no Console"], "correctIndex": 1, "explanation": "Cada execução da função externa cria um novo ambiente léxico." }
+      {
+        "question": "Em aplicar(3, dobro), o que dobro representa?",
+        "options": [
+          "Uma referência à função",
+          "O retorno já calculado",
+          "Uma string"
+        ],
+        "correctIndex": 0,
+        "explanation": "Sem parênteses, a própria função é passada como valor."
+      },
+      {
+        "question": "Por que contar() ainda acessa valor depois que criarContador terminou?",
+        "options": [
+          "Porque valor é global",
+          "Porque a closure conserva acesso ao ambiente de criação",
+          "Porque const copia todas as variáveis"
+        ],
+        "correctIndex": 1,
+        "explanation": "A função interna mantém a ligação com o escopo em que foi criada."
+      },
+      {
+        "question": "Duas chamadas separadas a criarContador() compartilham obrigatoriamente o mesmo estado?",
+        "options": [
+          "Sim",
+          "Não, cada chamada cria seu próprio ambiente",
+          "Somente no Console"
+        ],
+        "correctIndex": 1,
+        "explanation": "Cada execução da função externa cria um novo ambiente léxico."
+      }
     ],
-    "summary": ["Passe callbacks como referências e deixe quem recebe decidir quando chamá-los.", "Uma closure conserva acesso ao ambiente de criação.", "Instâncias criadas por chamadas diferentes mantêm estados independentes."]
+    "summary": [
+      "Callback é uma referência de função; quem recebe decide se chama agora ou depois.",
+      "Uma closure conserva acesso à ligação da variável; execuções criadoras distintas formam ambientes separados.",
+      "Closure organiza estado, mas não protege segredos no navegador."
+    ],
+    "retry": {
+      "prompt": "Crie criarSaldo(inicial), que devolve uma função para acrescentar um valor e retornar o saldo atual. Crie duas instâncias e preveja o resultado de acrescentar 5 à primeira e 2 à segunda.",
+      "expected": "Cada função preserva seu próprio saldo; atualizar uma instância não altera a outra; criarSaldo retorna uma função que só é executada quando chamada.",
+      "hint": "Declare o saldo dentro da função criadora e retorne uma função que o use."
+    }
   },
 "js-arrays": {
     "prerequisites": "Concluir Funções: parâmetros, retorno e contratos (js-functions), Escopo, dependências e funções puras (js-scope-pure) e Callbacks e closures (js-callbacks-closures). Arrow functions não são necessárias nesta aula.",

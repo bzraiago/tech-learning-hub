@@ -79,7 +79,7 @@ function readerCode(code, label) {
 }
 
 function readerTrace(trace) {
-  return `<figure class="my-5 overflow-x-auto rounded-xl border border-white/10 bg-[#0b101b]"><figcaption class="px-4 py-3 text-sm font-semibold text-violet-200">${escapeHTML(trace.title)}</figcaption><table class="w-full min-w-[34rem] border-collapse text-left text-sm text-slate-200"><thead><tr>${trace.columns.map(column => `<th scope="col" class="border-y border-white/10 px-4 py-2 font-semibold">${escapeHTML(column)}</th>`).join('')}</tr></thead><tbody>${trace.rows.map(row => `<tr>${row.map(cell => `<td class="border-b border-white/10 px-4 py-2 font-mono">${escapeHTML(String(cell))}</td>`).join('')}</tr>`).join('')}</tbody></table></figure>`;
+  return `<figure tabindex="0" role="region" aria-label="Tabela com rolagem horizontal. Use as setas do teclado para percorrer as colunas." class="my-5 overflow-x-auto rounded-xl border border-white/10 bg-[#0b101b]"><figcaption class="px-4 py-3 text-sm font-semibold text-violet-200">${escapeHTML(trace.title)}</figcaption><table class="w-full min-w-[34rem] border-collapse text-left text-sm text-slate-200"><thead><tr>${trace.columns.map(column => `<th scope="col" class="border-y border-white/10 px-4 py-2 font-semibold">${escapeHTML(column)}</th>`).join('')}</tr></thead><tbody>${trace.rows.map(row => `<tr>${row.map(cell => `<td class="border-b border-white/10 px-4 py-2 font-mono">${escapeHTML(String(cell))}</td>`).join('')}</tr>`).join('')}</tbody></table></figure>`;
 }
 
 function readerTerms(terms) {

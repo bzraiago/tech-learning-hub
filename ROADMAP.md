@@ -249,6 +249,8 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Adicionar sequência visual de uma requisição HTTP em `delivery-http`, com método, rota, decisão do servidor, status, cabeçalho e corpo.
 - [x] Criar glossário contextual nas seções que introduzem runtime, schema, callback, endpoint, mock e inferência.
 
+- [x] Aprofundar a aula js-callbacks-closures para estudo sem fonte externa: esclarecer que callback pode ser chamado agora ou depois, definir função de ordem superior, explicar a ligação viva da closure e separar encapsulamento de segurança.
+  - [x] Adicionar uma tabela de rastreamento de duas closures e uma prática de previsão; Chromium a 375 px confirmou foco, nome acessível, navegação por setas e rolagem horizontal sem alargar a página.
 **Aceite:** cada aula alterada permite prever antes de executar, observar o resultado esperado, praticar com ajuda decrescente e resolver uma tarefa nova.
 
 ## Fase 4 — Avaliação de domínio e recuperação

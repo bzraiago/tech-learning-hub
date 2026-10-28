@@ -301,6 +301,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 7. [ ] Atividades gerais de conclusão (prova básica disponível no curso; intermediária pendente) — ver seção 9.
 8. [x] Corrigir a inconsistência da porta do PostgreSQL (55432) entre laboratório Docker e projeto relacional.
 9. [ ] Dividir aulas com excesso de conceitos (a aula de funções em JavaScript já foi dividida; mapear as demais).
+   - [x] Aprofundar js-callbacks-closures: diferenciar callback imediato e posterior, explicar a ligação da closure, mostrar execução de ambientes independentes e avisar que closure não protege segredos no navegador; Chromium a 375 px confirmou rolagem da tabela por teclado.
 10. [ ] Demonstrações visuais de execução (laços, referências, `JOIN`, requisições HTTP).
 11. [ ] Revisão acumulativa e recuperação de dificuldades (indicar aula a revisar e segunda tentativa diferente).
 12. [x] Persistir progresso e anotações automaticamente por conta no Supabase, sem depender de `localStorage`.
