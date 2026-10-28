@@ -1,0 +1,8 @@
+{
+  "course": "Tech Learning Hub",
+  "module": "integridade demonstrativa",
+  "records": [
+    { "id": "item-ficticio-01", "title": "Dados de estudo inventados", "minutes": 15 },
+    { "id": "item-ficticio-02", "title": "Nenhuma conta ou pessoa real", "minutes": 20 }
+  ]
+}

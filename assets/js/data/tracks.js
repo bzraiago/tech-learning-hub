@@ -5233,6 +5233,7 @@
               "Propor testes positivos e negativos que confirmem acesso próprio e bloqueiem acesso cruzado.",
               "Relacionar A05 Injection à aula `db-security`, que usa parâmetros SQLite e testa entrada de aparência SQL como dado literal.",
               "Relacionar A03 Software Supply Chain Failures à aula `delivery-supply-chain` sem reduzir a categoria a dependências com CVE.",
+              "Relacionar A08 Software or Data Integrity Failures à aula `delivery-software-integrity` sem confundir digest, assinatura e confiança no publicador.",
               "Continuar A04 Cryptographic Failures em `delivery-cryptography`, distinguindo hash, senha, Base64, criptografia e gestão de chave."
             ],
             "exercise": "Siga `labs/security-basics/README.md`, compare a resposta das rotas vulnerável e corrigida e explique qual verificação falta em cada requisição.",
@@ -5450,6 +5451,26 @@
                 "url": "https://docs.npmjs.com/cli/using-npm/scripts/",
                 "language": "EN"
               }
+            ]
+          },
+          {
+            "id": "delivery-software-integrity",
+            "title": "Integridade de software e dados: hash, assinatura e atualização",
+            "minutes": 120,
+            "concept": "Aprenda a diferença entre hash e assinatura, associe a chave pública confiável ao emissor e verifique um manifesto e um artefato fictícios; separe integridade, versão atual, conteúdo seguro e autorização.",
+            "objectives": [
+              "Explicar A08 e como seu foco em artefato/dado se relaciona com A03 e a cadeia de suprimentos.",
+              "Calcular e interpretar SHA-256, explicar o que uma assinatura Ed25519 verifica e identificar por que a chave pública precisa ser conhecida antes do download.",
+              "Executar o laboratório e interpretar a aceitação/recusa de bytes, manifesto e assinatura alterados.",
+              "Planejar verificação de versão, proteção contra replay/downgrade, validação de esquema e recuperação sem tratar assinatura como prova de segurança."
+            ],
+            "exercise": "Leia `labs/security-integrity/README.md`, execute `node labs/security-integrity/integrity.cjs` e os sete testes. Preveja cada resultado antes de conferir; se não tiver computador, use o exemplo e as respostas da aula sem afirmar que executou a suíte.",
+            "code": "Aprovação de release fictícia:\nbytes do artefato → SHA-256 → digest no manifesto\nchave privada do publicador autorizado → assinatura do manifesto\n\nConsumidor:\nverifica assinatura com chave pública previamente confiável\ncompara SHA-256 calculado aos bytes recebidos\nconfere versão/frescor, esquema, revisão e política de uso\n\nTeste local: alteração do conteúdo e assinatura por outra chave\nresultam em recusa; nenhum pacote é executado ou instalado.",
+            "docs": [
+              { "kind": "doc", "title": "OWASP Top 10 2025 · A08 Software or Data Integrity Failures", "url": "https://top10.owasp.org/2025/A08_2025-Software_or_Data_Integrity_Failures/", "language": "EN" },
+              { "kind": "doc", "title": "Node.js · Crypto API", "url": "https://nodejs.org/api/crypto.html", "language": "EN" },
+              { "kind": "doc", "title": "npm · Verificação de assinaturas e proveniência", "url": "https://docs.npmjs.com/cli/commands/npm-audit/", "language": "EN" },
+              { "kind": "doc", "title": "npm · Proveniência de pacotes", "url": "https://docs.npmjs.com/generating-provenance-statements/", "language": "EN" }
             ]
           },
           {

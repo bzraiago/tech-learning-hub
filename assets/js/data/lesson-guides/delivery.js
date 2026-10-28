@@ -1503,7 +1503,9 @@ Object.assign(LESSON_GUIDES, {
       "BOLA/IDOR acontece quando uma API aceita referência a objeto sem conferir acesso.",
       "O servidor deriva identidade de sessão validada, ignora propriedade forjada pelo cliente e aplica negação por padrão.",
       "O laboratório local reproduz A01/BOLA com dados fictícios; os testes não validam Preview, domínio ou Supabase remoto.",
-      "A04 Cryptographic Failures segue em `delivery-cryptography`, com conceitos e laboratório próprios para hash, cifra, senha e chaves."
+      "A02 Security Misconfiguration segue em `delivery-security-misconfiguration`, com conceitos de CSP e cabeçalhos e teste local limitado ao HTTP.",
+      "A04 Cryptographic Failures segue em `delivery-cryptography`, com conceitos e laboratório próprios para hash, cifra, senha e chaves.",
+      "A08 Software or Data Integrity Failures segue em `delivery-software-integrity`, que diferencia hash, assinatura, chave confiável e validação de dados."
     ]
   },
   "delivery-cryptography": {
@@ -2603,7 +2605,176 @@ Object.assign(LESSON_GUIDES, {
       "Inventarie dependências diretas, transitivas, ferramentas, CI e origem; minimize o que não é necessário.",
       "Manifesto, lockfile, npm ci e npm audit têm funções complementares e limites diferentes.",
       "Revise atualizações em passos pequenos com advisory, compatibilidade, testes, CI e rollback.",
+      "A08 `delivery-software-integrity` detalha assinatura e verificação de artefatos; isso complementa, mas não substitui, a avaliação da cadeia A03.",
       "A inspeção desta aula é estática; não afirma estado atual de vulnerabilidades nem execução de auditoria."
+    ]
+  },
+  "delivery-software-integrity": {
+    "prerequisites": "Concluir `delivery-owasp-top10`, `delivery-supply-chain`, `delivery-cryptography` e `setup-node`. A aula retoma hash e chaves desde o princípio; não exige matemática avançada, instalação de pacotes nem experiência com assinatura de releases.",
+    "setup": "Abra `labs/security-integrity/README.md`. No terminal, a partir da raiz do repositório, execute `node labs/security-integrity/integrity.cjs` e depois `node --test labs/security-integrity/integrity.test.cjs`. A saída esperada mostra uma verificação válida, conteúdo alterado recusado e assinatura de chave desconhecida recusada; os testes terminam com 7 aprovados e 0 falhas. Não há `npm install`, rede, serviço, conta ou arquivo de chave para limpar. Se `node` não for reconhecido, retome `setup-node`; se não puder executar comandos, use a saída e a demonstração conceitual abaixo sem declarar os testes executados.",
+    "why": "Um programa pode baixar uma atualização ou usar um conjunto de dados acreditando que veio de uma fonte conhecida, mas o caminho pode ter sido alterado. A08 trata dessa fronteira mais baixa entre bytes preparados e bytes aceitos. A03 aborda a cadeia mais ampla de componentes, publicadores, ferramentas, CI e distribuição. Esta aula ensina desde o começo como hash e assinatura se relacionam, por que a chave pública precisa ser confiável antes da conferência e quais perguntas ainda ficam abertas mesmo com assinatura válida. Os links oficiais são aprofundamento opcional; exemplo, definições, execução, limites e respostas estão explicados no curso.",
+    "example": {
+      "language": "text",
+      "code": "ARTEFATO FICTÍCIO: study-material.json\n\nManifesto assinado:\n  formato: tech-learning-hub-demo-release-v1\n  versão: 1.0.0\n  nome: study-material.json\n  SHA-256: <resumo calculado dos bytes>\n\nChave privada autorizada → assina a representação fixa do manifesto\nChave pública previamente confiável → verifica a assinatura\nBytes do arquivo → SHA-256 calculado novamente e comparado ao resumo assinado\n\nSaída observada ao executar o laboratório:\nAssinatura e conteúdo íntegros: OK\nConteúdo alterado após a assinatura: RECUSADO (artifact-mismatch)\nAssinatura de outra chave, contra a chave esperada: RECUSADA (signature-mismatch)\n\nNenhuma chave é salva nem exibida; o JSON não é executado.",
+      "expected": "A assinatura válida liga o manifesto à chave pública escolhida como confiável; o digest recomputado coincide com os bytes originais. Ao alterar os bytes, o manifesto continua assinado, mas o digest diverge. Outra chave não consegue produzir uma assinatura aceita pela chave pública esperada.",
+      "explanation": [
+        "O hash é um resumo dos bytes. A comparação revela divergência somente se o resumo esperado veio de uma fonte confiável ou foi protegido por uma assinatura confiável.",
+        "A assinatura é verificada com a chave pública associada a quem pode assinar. A equipe precisa conhecer essa associação antes de receber o pacote que será verificado.",
+        "Uma assinatura válida não avalia se o código ou dado é benigno, se o signatário agiu corretamente ou se aquela versão é a mais recente.",
+        "O exemplo gera as chaves dentro do mesmo processo para mostrar os cálculos. Ele não autentica um fornecedor nem representa uma configuração de produção."
+      ]
+    },
+    "guided": [
+      {
+        "instruction": "Antes de executar, compare hash e assinatura: se um arquivo e seu resumo forem trocados juntos por uma fonte desconhecida, o que ainda falta para confiar?",
+        "result": "O hash pode corresponder ao arquivo trocado, pois ambos vieram da mesma fonte. Falta uma referência ou assinatura verificada contra uma chave pública que a equipe já reconhece como confiável."
+      },
+      {
+        "instruction": "Execute o laboratório e anote a ordem: o que se verifica antes de comparar SHA-256? O que acontece quando se altera apenas o arquivo?",
+        "result": "O código confere a assinatura do manifesto usando a chave esperada e, depois, recalcula o digest dos bytes. A assinatura do manifesto ainda pode conferir, mas os bytes alterados produzem outro resumo e são recusados."
+      },
+      {
+        "instruction": "Leia `integrity.test.cjs` e associe um teste a cada caso: alteração do artefato, alteração do manifesto e assinatura de outra chave.",
+        "result": "Bytes diferentes falham na comparação do digest; versão alterada muda o manifesto assinado; assinatura de outra chave não verifica contra a chave pública confiável passada ao verificador."
+      },
+      {
+        "instruction": "Escreva um fluxo seguro de atualização que também lide com uma versão antiga, uma chave revogada e validação dos dados depois da assinatura.",
+        "result": "O fluxo identifica emissor e versão esperada, verifica assinatura e digest contra chave aprovada, rejeita versão antiga/revogada pela política, valida tamanho e esquema, testa antes de aplicar e mantém rollback e resposta de rotação/revogação."
+      }
+    ],
+    "sections": [
+      {
+        "title": "O que integridade protege e como A08 se separa de A03",
+        "paragraphs": [
+          "Integridade significa conseguir detectar alteração, troca, truncamento ou inclusão de conteúdo que não corresponde ao que deveria ser usado. O artefato pode ser um pacote de software, uma atualização, um arquivo de configuração ou dados críticos. Confidencialidade pergunta quem pode ler; integridade pergunta se os bytes correspondem à versão aprovada; disponibilidade pergunta se o serviço está acessível.",
+          "No OWASP Top 10 2025, A08 Software or Data Integrity Failures concentra-se em confiar em código, infraestrutura ou dados sem verificar origem e integridade na fronteira em que serão usados. Exemplos incluem atualização sem assinatura e dado serializado que pode ser alterado. A03 Software Supply Chain Failures olha a cadeia mais ampla: dependências, fornecedores, ferramentas, repositórios, CI, publicação e atualização. Os riscos se relacionam, mas uma verificação de bytes não substitui a avaliação de quem construiu e distribuiu o pacote.",
+          "Imagine receber um arquivo e a frase `SHA-256: abc...` junto dele. Se ambos forem trocados pelo mesmo canal não confiável, o novo resumo pode combinar com o novo arquivo. Para saber se a referência é confiável, a equipe precisa de uma comparação obtida por canal independente ou de uma assinatura verificada contra uma chave pública conhecida anteriormente."
+        ],
+        "terms": [
+          { "term": "Integridade", "meaning": "Capacidade de detectar se informação ou código mudou em relação ao que foi aprovado para aquele uso." },
+          { "term": "Artefato", "meaning": "Arquivo resultante que será distribuído ou usado, como pacote, binário, configuração ou conjunto de dados." },
+          { "term": "A08 e A03", "meaning": "A08 foca a verificação de confiança e integridade do artefato/dado; A03 examina a cadeia maior que produz e distribui esses itens." },
+          { "term": "Fronteira de confiança", "meaning": "Ponto em que conteúdo vindo de um local ou ator precisa ser verificado antes de ser tratado como confiável." },
+          { "term": "Serialização", "meaning": "Representar dados numa sequência de bytes ou texto para transmitir ou guardar; a forma e as regras de leitura variam por formato." }
+        ]
+      },
+      {
+        "title": "Entenda hash, digest e assinatura",
+        "paragraphs": [
+          "Um hash criptográfico recebe bytes e calcula um resumo curto chamado digest. O exemplo usa SHA-256: a mesma sequência de bytes produz o mesmo resumo; o algoritmo foi projetado para dificultar que conteúdos diferentes produzam o mesmo resumo, embora colisões sejam teoricamente possíveis. Um digest não é uma cifra e não permite recuperar o arquivo. Ele também não identifica quem criou o conteúdo. Se uma fonte puder trocar arquivo e resumo juntos, a comparação por si só não estabelece confiança.",
+          "Uma assinatura digital associa uma mensagem a uma chave privada. O emissor assina o manifesto, e quem recebe usa a chave pública correspondente para verificar. A chave privada precisa permanecer sob controle do signatário; a chave pública pode ser distribuída. Assinatura válida significa que a mensagem verificada foi assinada por quem controla a chave privada correspondente, sob a confiança atribuída àquela chave. Ela não significa que o conteúdo está livre de erros ou é seguro.",
+          "No laboratório, a assinatura cobre um manifesto com versão, nome e SHA-256 do artefato. A aplicação serializa esses campos numa ordem fixa antes de assinar/verificar; assim, emissor e verificador calculam os mesmos bytes da mensagem mesmo sem discutir formatação visual. Primeiro verifica-se a assinatura do manifesto com a chave escolhida como confiável; depois recalcula-se o hash do arquivo e compara-se ao resumo que o manifesto assinado protege."
+        ],
+        "terms": [
+          { "term": "Hash criptográfico", "meaning": "Função que transforma uma entrada em um resumo de tamanho definido; SHA-256 é o algoritmo de hash usado neste exemplo." },
+          { "term": "Digest ou resumo", "meaning": "Saída hexadecimal do hash que representa aqueles bytes para comparação; não é a entrada nem uma assinatura." },
+          { "term": "Assinatura digital", "meaning": "Valor calculado com uma chave privada e conferido com a chave pública correspondente para detectar alteração e verificar qual chave assinou a mensagem." },
+          { "term": "Chave privada/pública", "meaning": "Par matemático usado no exemplo: a privada assina e deve ficar protegida; a pública verifica e pode ser distribuída." },
+          { "term": "Manifesto", "meaning": "Arquivo/estrutura que descreve a versão e os artefatos esperados; aqui contém o digest assinado do arquivo fictício." },
+          { "term": "Serialização fixa", "meaning": "Construção previsível dos campos e sua ordem antes da assinatura, para que os bytes conferidos sejam os mesmos." }
+        ]
+      },
+      {
+        "title": "Decida em quem confiar e proteja contra replay",
+        "paragraphs": [
+          "A verificação só é útil quando a chave pública esperada foi associada ao publicador por uma configuração anterior e protegida. Se pacote, manifesto, assinatura e chave pública desconhecida chegam no mesmo download, alguém pode substituir todos e assinar com sua própria chave. A demonstração gera chaves temporárias no processo para permitir reproduzir os cálculos, mas deixa explícito que isso não autentica fornecedor nenhum.",
+          "Uma assinatura válida não responde se aquela é a versão mais recente. Uma atualização antiga ainda pode ter assinatura correta; isso é replay ou downgrade se a política aceitar voltar a uma versão menos recente. O consumidor precisa comparar versão/canal esperados, manter regra contra regressão, conferir validade/revogação da chave conforme o sistema, limitar quem pode assinar e preservar revisão, proveniência do build e recuperação. Cada mecanismo tem alcance próprio e pode falhar se a conta, pipeline ou chave que assina for comprometida.",
+          "Para dados serializados recebidos de uma pessoa usuária, uma assinatura de origem não substitui autenticação da sessão, autorização da ação, limite de tamanho e validação do esquema. JSON descreve dados e `JSON.parse` não executa o texto como programa, mas os campos ainda podem ser inesperados ou malformados. Formatos de serialização que reconstroem objetos com comportamento precisam ser tratados com controles específicos e não devem processar entradas não confiáveis cegamente."
+        ],
+        "terms": [
+          { "term": "Âncora de confiança", "meaning": "Chave, certificado ou configuração que o consumidor já reconhece como confiável antes de conferir o item recebido." },
+          { "term": "Autenticidade", "meaning": "Evidência de que uma mensagem veio do detentor da chave associada à identidade esperada; a associação precisa ser verificada por outro processo." },
+          { "term": "Proveniência", "meaning": "Informação verificável que liga um artefato à origem e ao processo de construção/publicação, sem certificar que o conteúdo é seguro." },
+          { "term": "Replay/downgrade", "meaning": "Reapresentar uma versão antiga ainda válida para induzir o sistema a voltar a um estado menos recente ou permitido." },
+          { "term": "Esquema e autorização", "meaning": "O esquema valida campos e tipos esperados; autorização decide qual pessoa pode executar qual ação sobre os dados." }
+        ]
+      },
+      {
+        "title": "Use o laboratório e limite a conclusão",
+        "paragraphs": [
+          "`labs/security-integrity` lê um único fixture JSON fictício e verifica um manifesto assinado com Ed25519. O teste válido confere assinatura e digest; outros alteram bytes, versão, assinatura ou chave. Os testes usam conteúdo pequeno em memória, não instalam software e não executam o JSON. Os nomes de erro distinguem manifesto inválido, assinatura diferente, chave imprópria e digest que não corresponde.",
+          "A verificação do manifesto ocorre antes do digest do arquivo. Isso impede que a demonstração trate um manifesto não autenticado como referência. O resultado positivo atesta apenas: o verificador recebeu aquela chave pública, a assinatura correspondeu aos bytes da representação validada e o fixture coincidiu com o SHA-256 assinado. Não atesta a origem externa da chave, a correção de quem assinou, a segurança do conteúdo, a CI ou a distribuição real.",
+          "Antes de usar um artefato numa aplicação, valide também versão e formato, tamanho, origem, revisão e critérios de aceitação. Para software, mantenha a execução separada da verificação: o laboratório não instala, importa nem executa o pacote. Para dados, valide esquema e permissões depois de conferir a integridade. Registre o que foi verificado, com qual chave/versão, em que ambiente, o resultado e as lacunas."
+        ],
+        "terms": [
+          { "term": "Ed25519", "meaning": "Algoritmo de assinatura de chave pública usado pelos módulos nativos do Node neste exemplo didático." },
+          { "term": "Verificação em camadas", "meaning": "Conferir assinatura, resumo do conteúdo, versão, formato, origem e política de uso como decisões distintas." },
+          { "term": "Escopo de teste", "meaning": "Cenários que a suíte executou e observou; aprovação não comprova propriedades externas não testadas." }
+        ]
+      }
+    ],
+    "mistakes": [
+      "Confundir hash com criptografia ou assinatura digital.",
+      "Confiar no hash recebido do mesmo canal que pode substituir o arquivo.",
+      "Aceitar a chave pública que veio junto ao artefato sem validar sua origem.",
+      "Interpretar assinatura válida como prova de que o código é benigno ou o emissor é infalível.",
+      "Esquecer que uma versão antiga pode continuar assinada e ser reapresentada.",
+      "Usar assinatura como substituta de autenticação, autorização, validação de esquema ou teste.",
+      "Confundir o exemplo com uma verificação real de npm, CI, fornecedor ou Preview."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: um servidor desconhecido envia `arquivo.json` e `arquivo.json.sha256`; os bytes e o resumo combinam. O que você pode concluir e qual evidência falta para aceitar o arquivo?",
+        "expected": "Os bytes combinam com aquele resumo, mas não há prova da origem nem de que o resumo era aprovado. É preciso uma referência independente confiável ou manifesto assinado contra uma chave pública previamente reconhecida.",
+        "criteria": ["Descreve somente a igualdade observada.", "Não confunde hash com identidade do publicador.", "Indica de onde viria uma referência/chave confiável."],
+        "solution": "Conclua apenas que a função SHA-256 calculada sobre os bytes produziu o valor fornecido. Como ambos vieram do mesmo canal, um terceiro poderia trocar os dois. Obtenha o digest por canal autorizado independente ou verifique manifesto assinado contra chave pública cuja associação ao publicador foi estabelecida anteriormente.",
+        "explanation": "Um hash serve para comparar conteúdo; confiança na referência é uma decisão separada.",
+        "hints": ["Quem poderia trocar os dois arquivos?", "O hash informa quem preparou o conteúdo?"]
+      },
+      {
+        "prompt": "Alterar: o laboratório tem assinatura válida para o manifesto. Mude mentalmente só os bytes do fixture e depois só a versão do manifesto. Preveja qual etapa rejeita cada caso.",
+        "expected": "Com bytes alterados, assinatura do manifesto passa, mas o digest não coincide. Com a versão do manifesto alterada, a assinatura não confere antes da comparação de conteúdo.",
+        "criteria": ["Separa campos assinados de bytes referenciados.", "Nomeia a etapa e motivo da recusa nos dois casos.", "Preserva a ordem assinatura e depois digest."],
+        "solution": "Os bytes originais continuam cobertos pelo SHA-256 armazenado no manifesto. Modificar apenas o arquivo leva a `artifact-mismatch`. A versão é parte do manifesto assinado; alterá-la muda a mensagem e leva a `signature-mismatch`, antes da comparação do arquivo.",
+        "explanation": "A assinatura protege o manifesto; o digest dentro dele liga esse manifesto aos bytes do artefato.",
+        "hints": ["Quais campos entram no manifesto serializado?", "O programa compara o digest antes ou depois da assinatura?"]
+      },
+      {
+        "prompt": "Construir: desenhe uma sequência para distribuir uma atualização contendo emissor esperado, versão, artefato, manifesto, assinatura, chave pública confiável, testes e rollback.",
+        "expected": "A sequência escolhe chave previamente aprovada, verifica assinatura e digest, rejeita versão fora da política, valida formato, testa antes de aplicar e mantém resposta de rotação/revogação/rollback.",
+        "criteria": ["Identifica como a chave pública passa a ser confiável.", "Verifica assinatura e conteúdo antes do uso.", "Inclui frescor, validação, testes e recuperação."],
+        "solution": "Antes do download, identifique publicador, chave confiável, canal e versão mínima. Receba artefato/manifesto/assinatura; valide o formato, confira assinatura com a chave aprovada, compare o digest dos bytes, recuse versão antiga ou revogada, valide esquema e teste em ambiente isolado. Só então planeje aplicação gradual, registro e rollback para uma versão permitida.",
+        "explanation": "A checagem criptográfica é uma etapa de uma decisão de atualização, não a decisão inteira.",
+        "hints": ["A chave pública vem do mesmo arquivo baixado?", "Uma assinatura antiga deixa de ser válida automaticamente?"]
+      },
+      {
+        "prompt": "Investigar erro: uma versão anterior tem assinatura válida, mas a aplicação passou a usar esquema de dados incompatível depois da atualização. Monte a triagem sem desligar a verificação criptográfica.",
+        "expected": "Verifica versão/canal e compatibilidade, distingue assinatura de frescor, confere migração e esquema, interrompe downgrade se a política proibir, preserva dados e executa plano compatível de rollback/forward fix.",
+        "criteria": ["Não ignora assinatura para contornar incompatibilidade.", "Distingue autenticidade/integridade de versão e compatibilidade.", "Inclui preservação de estado e decisão de rollback."],
+        "solution": "Registre versão atual/recebida, chave e resultado criptográfico; compare política de versão mínima e esquema de entrada/saída. Não conclua que assinatura válida torna o downgrade apropriado. Faça backup ou preserve estado, reproduza em fixture, escolha uma versão compatível aprovada ou correção forward e teste recuperação antes de alterar produção.",
+        "explanation": "Uma release pode ser autêntica e íntegra e ainda assim incompatível com o estado atual.",
+        "hints": ["A assinatura diz se esta é a versão mais nova?", "Qual mudança de esquema pode tornar o retorno incompatível?"]
+      },
+      {
+        "prompt": "Mudança inesperada: alguém com acesso de assinatura publica um artefato malicioso com manifesto e assinatura válidos. Proponha contenção, investigação e recuperação sem afirmar que a assinatura está quebrada.",
+        "expected": "Interrompe promoção/distribuição, identifica escopo de chave/artefatos/builds, revoga ou rota chaves conforme plano, localiza versão confiável anterior, revisa controle de acesso/revisão/proveniência, testa reparo e comunica consumidores sem reutilizar material comprometido.",
+        "criteria": ["Reconhece que bytes podem estar assinados e ainda ser nocivos.", "Trata acesso do signatário e pipeline como parte da confiança.", "Inclui escopo, revogação, recuperação e validação."],
+        "solution": "Suspenda o canal de promoção, preserve hashes/versões e delimite artefatos distribuídos. Acione o responsável para revogar/rotacionar a chave e invalidar builds afetados; procure a última versão aprovada por fonte separada. Audite permissões, workflow, revisão e proveniência, crie release corrigida em ambiente controlado, teste a atualização/rollback e informe quem precisa substituir a versão.",
+        "explanation": "A assinatura comprova controle da chave no momento da assinatura; não prova que esse controle foi usado corretamente.",
+        "hints": ["Quem pode assinar e quem pode aprovar o workflow?", "Quais dispositivos ou consumidores já receberam o artefato?"]
+      },
+      {
+        "prompt": "Transferir: uma API recebe JSON editável de uma conta autenticada. Explique por que um hash enviado pelo navegador não autoriza a alteração e liste verificações separadas para aceitar os campos.",
+        "expected": "Hash fornecido pelo mesmo cliente não autentica intenção; a API autentica a sessão, autoriza ação/objeto, limita tamanho e valida esquema/regras. Se houver assinatura, verifica chave/origem e replay conforme o protocolo, sem substituir a autorização.",
+        "criteria": ["Não confia em hash controlado pelo cliente.", "Diferencia sessão, autorização e integridade.", "Inclui limite/schema e proteção contra repetição quando relevante."],
+        "solution": "O cliente pode mudar JSON e recalcular o hash, então a comparação não prova quem enviou nem se pode alterar aquele objeto. O servidor valida a sessão, confere propriedade e permissão para aquela ação, limita tamanho/campos e valida tipos/regras. Uma assinatura confiável só se aplica se a origem autorizada controla a chave; também é necessário tratar expiração/replay e manter a decisão de acesso no servidor.",
+        "explanation": "Integridade criptográfica e autorização respondem perguntas distintas e ambas podem ser necessárias.",
+        "hints": ["Quem escolhe o JSON e o hash recebido?", "Qual componente decide quem pode alterar o registro?"]
+      }
+    ],
+    "quiz": [
+      { "question": "O que um digest SHA-256 demonstra quando foi calculado localmente?", "options": ["Que os bytes produziram aquele resumo; a origem ainda precisa de referência confiável.", "Quem publicou o arquivo e que ele é benigno.", "Que o arquivo está cifrado e ninguém pode lê-lo."], "correctIndex": 0, "explanation": "Hash resume bytes; não cifra, identifica autor nem avalia intenção." },
+      { "question": "Por que conferir assinatura contra uma chave pública conhecida previamente?", "options": ["Para associar a assinatura à chave esperada, em vez de aceitar uma chave trocada junto do arquivo.", "Para tornar o arquivo secreto.", "Para provar que a versão é sempre a mais recente."], "correctIndex": 0, "explanation": "A chave usada na conferência precisa estar ligada ao publicador por um processo de confiança separado." },
+      { "question": "O que uma assinatura válida não comprova?", "options": ["Que a chave correspondente assinou a mensagem verificada.", "Que o conteúdo é benigno, atualizado e compatível com a aplicação.", "Que a mensagem verificada não foi alterada depois da assinatura."], "correctIndex": 1, "explanation": "Uma assinatura válida não substitui revisão do conteúdo, frescor, compatibilidade nem política de uso." },
+      { "question": "O que os sete testes do laboratório comprovam?", "options": ["O comportamento do verificador nos casos locais listados; não uma distribuição/npm/CI real.", "Que as chaves do exemplo identificam um fornecedor externo.", "Que a aplicação principal verifica todas as atualizações."], "correctIndex": 0, "explanation": "O laboratório usa fixture e chaves efêmeras, sem registry, pacote externo, CI ou produção." }
+    ],
+    "summary": [
+      "Hash detecta divergência em bytes comparados com referência confiável; sozinho não identifica o publicador.",
+      "Assinatura liga um manifesto a uma chave privada; verificação depende de uma chave pública confiável obtida separadamente.",
+      "A assinatura válida não declara conteúdo benigno, versão atual, compatibilidade nem autorização para uso.",
+      "Verifique assinatura e digest antes de usar o artefato; confira versão/frescor, formato e regras depois.",
+      "A08 foca a confiança de artefatos/dados; A03 cobre cadeia mais ampla de componentes e processos.",
+      "O laboratório usa dados fictícios e chaves efêmeras; não instala pacote nem prova processo externo."
     ]
   },
   "delivery-secret-lifecycle": {
@@ -5451,6 +5622,11 @@ Object.assign(LESSON_GUIDES, {
       prompt: "Uma dependência direta parece saudável, mas o lockfile mostra muitos pacotes transitivos. Faça triagem de necessidade, origem, integridade registrada, manutenção/licença, avisos conhecidos, CI e plano de atualização sem instalar nem auditar automaticamente.",
       expected: "A triagem separa campos observados no manifesto/lockfile de consultas atuais pendentes, verifica origem e licença, avalia a árvore transitiva, confere escopo de CI e exige responsável/testes/rollback; não chama lockfile ou scanner de garantia de segurança.",
       hint: "Marque cada afirmação como observada no repositório ou pendente de verificação atual."
+    },
+    "delivery-software-integrity": {
+      prompt: "Segunda tentativa: você recebeu um manifesto com assinatura válida para a chave pública esperada, mas o digest do arquivo não coincide. Explique quais bytes foram autenticados, o que deve ser recusado e como retomar a investigação sem instalar o artefato.",
+      expected: "A assinatura autentica o manifesto sob a chave confiável, mas o arquivo recebido diverge do digest assinado; ele não é usado. A pessoa preserva versão/resumo/ambiente, compara origem e transporte, solicita cópia aprovada e mantém a investigação sem trocar a chave de confiança no mesmo canal.",
+      hint: "A assinatura válida protege o manifesto; qual campo do manifesto faz a ligação com os bytes do arquivo?"
     },
     "delivery-secret-lifecycle": {
       prompt: "Uma variável de servidor chamada `SUPABASE_SECRET_KEY` foi atualizada em Preview, mas a equipe não sabe se CI, Development e uma automação ainda usam a chave antiga. Monte uma verificação de transferência que inventarie consumers e ambientes, confirme a chave nova e prove revogação, sem consultar nem imprimir valores.",
