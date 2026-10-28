@@ -28,6 +28,13 @@ function responderJson(res, status, dados, cabecalhos = {}) {
   res.end(JSON.stringify(dados));
 }
 
+function aplicarCabecalhosSeguros(res) {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+}
+
 function obterIdentidadePorIpObservado(req) {
   const endereco = req.socket.remoteAddress;
   if (typeof endereco !== 'string' || !endereco.trim()) {
@@ -186,6 +193,7 @@ function criarServidor(servico, servicoPrevisao, limitador, { verificarProntidao
   }
   const rotaPrevisao = criarRotaPrevisao(servicoPrevisao);
   return http.createServer((req, res) => {
+    aplicarCabecalhosSeguros(res);
     responder(req, res, servico, rotaPrevisao, limitador, verificarProntidao).catch((erro) => {
       logger.error('api.request.failed', erro, { route: obterRotaSeguraParaLog(req) });
       if (!res.headersSent) {

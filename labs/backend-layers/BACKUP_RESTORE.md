@@ -29,17 +29,17 @@ Confira também a conexão e as migrations:
 
 ```powershell
 # Windows PowerShell
-npm.cmd run db:check
 npm.cmd run migrate
+npm.cmd run db:check
 ```
 
 ```sh
 # macOS ou Linux
-npm run db:check
 npm run migrate
+npm run db:check
 ```
 
-Resultado esperado: `Conexão OK` e as migrations `001`, `002` e `003` aparecem como aplicadas ou já aplicadas. Em uma base recém-criada, `estudos` contém `HTML` e `JavaScript`, `sessoes_estudo` começa vazia e a coluna opcional `observacao` aceita `NULL`.
+Resultado esperado: as migrations `001` a `004` aparecem como aplicadas ou já aplicadas e `db:check` mostra o usuário da API `backend_app`. Em uma base recém-criada, `estudos` contém `HTML` e `JavaScript`, `sessoes_estudo` começa vazia e a coluna opcional `observacao` aceita `NULL`.
 
 ## 2. Criar e conferir o backup
 

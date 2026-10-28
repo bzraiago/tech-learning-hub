@@ -5264,6 +5264,46 @@
             ]
           },
           {
+            "id": "delivery-server-hardening",
+            "title": "Proteções HTTP e validação no servidor",
+            "minutes": 100,
+            "concept": "Compare cabeçalhos de defesa em camadas, validação no servidor e erros genéricos no laboratório local e na configuração Vercel; identifique controles ausentes e limites das evidências.",
+            "objectives": [
+              "Explicar o propósito e o limite de X-Content-Type-Options, X-Frame-Options, Referrer-Policy e Permissions-Policy.",
+              "Verificar que os cabeçalhos estão presentes em respostas HTML, JSON, erro e health check locais e na configuração global Vercel.",
+              "Relacionar validação de corpo, Content-Type, domínio e limite de tamanho aos status de recusa e à ausência de gravação.",
+              "Distinguir mensagem segura ao cliente de diagnóstico minimizado no servidor e justificar por que CSP exige inventário e teste de compatibilidade.",
+              "Separar testes locais e CI de uma inspeção manual do Preview autenticado."
+            ],
+            "exercise": "Inspecione `vercel.json` e `labs/backend-layers/server.cjs`, rode os testes unitários e monte uma matriz de respostas e cabeçalhos. Não altere proteção de Preview nem teste um domínio externo.",
+            "code": "Resposta local esperada:\nGET /                         → 200 + quatro cabeçalhos\nGET /api/estudos              → 200 + quatro cabeçalhos\nGET /health/live              → 200 + quatro cabeçalhos\nGET /nao-existe                → 404 + quatro cabeçalhos\nPOST inválido                  → 400/413/415 + erro genérico\n\nvercel.json aplica os quatro cabeçalhos globalmente.\nContent-Security-Policy: pendente de inventário de inline styles,\nCDNs, Clerk e teste de compatibilidade no Preview.",
+            "docs": [
+              { "kind": "doc", "title": "Vercel · vercel.json: headers", "url": "https://vercel.com/docs/project-configuration/vercel-json#headers", "language": "EN" },
+              { "kind": "doc", "title": "OWASP · HTTP Security Response Headers Cheat Sheet", "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html", "language": "EN" },
+              { "kind": "doc", "title": "OWASP · Content Security Policy Cheat Sheet", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html", "language": "EN" }
+            ]
+          },
+          {
+            "id": "delivery-db-privileges",
+            "title": "Privilégios mínimos para a aplicação",
+            "minutes": 110,
+            "concept": "Separe a role administrativa usada em migrations da role runtime backend_app e prove por grants e testes quais operações de leitura e gravação estão permitidas ou recusadas.",
+            "objectives": [
+              "Explicar por que o processo da API não deve se conectar como superusuário ou proprietário do schema.",
+              "Ler grants de schema, tabelas e sequences e relacioná-los a SELECT, INSERT e geração de IDs.",
+              "Executar verificações de privilégios em PostgreSQL descartável e confirmar que UPDATE, DELETE, TRUNCATE e DDL são negados.",
+              "Manter credenciais fictícias separadas e fora do Git e preservar volumes e dados existentes durante setup e testes.",
+              "Explicar que privilégio mínimo por role não fornece isolamento de linhas por usuário e não substitui autorização ou RLS."
+            ],
+            "exercise": "Siga `labs/backend-layers/README.md`, confira as migrations 001–004 e compare a role administrativa com `backend_app`. Use apenas a base descartável do Compose ou os serviços CI; não conecte ao Supabase.",
+            "code": "Runtime backend_app:\n  CONNECT: backend_camadas\n  schema public: USAGE\n  estudos, sessoes_estudo: SELECT, INSERT\n  sequences de identidade: USAGE\n  UPDATE, DELETE, TRUNCATE, CREATE: negados\n\nAdministração/migrations: PGUSER + PGPASSWORD\nAPI/runtime:             PGAPPUSER + PGAPPPASSWORD\n\nIsso limita operações disponíveis à aplicação; não identifica\nqual aluno é dono de cada linha e não implementa isolamento RLS.",
+            "docs": [
+              { "kind": "doc", "title": "PostgreSQL 17 · Role Attributes", "url": "https://www.postgresql.org/docs/17/role-attributes.html", "language": "EN" },
+              { "kind": "doc", "title": "PostgreSQL 17 · GRANT", "url": "https://www.postgresql.org/docs/17/sql-grant.html", "language": "EN" },
+              { "kind": "doc", "title": "PostgreSQL 17 · ALTER DEFAULT PRIVILEGES", "url": "https://www.postgresql.org/docs/17/sql-alterdefaultprivileges.html", "language": "EN" }
+            ]
+          },
+          {
             "id": "delivery-xss-output",
             "title": "XSS: texto seguro no DOM",
             "minutes": 95,

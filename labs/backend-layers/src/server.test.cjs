@@ -10,6 +10,40 @@ function criarServidorComLimitadorMemoria(servico, previsao, options) {
   return criarServidor(servico, previsao, criarLimitadorEmMemoria(), options);
 }
 
+test('aplica cabeçalhos de segurança em respostas HTML, JSON, erro e rota ausente', async (contexto) => {
+  const servidor = criarServidorComLimitadorMemoria({
+    async listar() { return []; }
+  });
+  await new Promise((resolve) => servidor.listen(0, '127.0.0.1', resolve));
+  contexto.after(() => new Promise((resolve, reject) => {
+    servidor.close((erro) => erro ? reject(erro) : resolve());
+  }));
+
+  const baseUrl = `http://127.0.0.1:${servidor.address().port}`;
+  const caminhos = ['/', '/api/estudos', '/health/live', '/health/ready', '/nao-existe'];
+  for (const caminho of caminhos) {
+    const resposta = await fetch(`${baseUrl}${caminho}`);
+    assert.equal(resposta.headers.get('x-content-type-options'), 'nosniff', caminho);
+    assert.equal(resposta.headers.get('x-frame-options'), 'DENY', caminho);
+    assert.equal(resposta.headers.get('referrer-policy'), 'strict-origin-when-cross-origin', caminho);
+    assert.equal(resposta.headers.get('permissions-policy'), 'camera=(), microphone=(), geolocation=()', caminho);
+  }
+
+  const servidorComFalha = criarServidorComLimitadorMemoria({
+    async listar() { throw new Error('erro interno fictício'); }
+  });
+  await new Promise((resolve) => servidorComFalha.listen(0, '127.0.0.1', resolve));
+  contexto.after(() => new Promise((resolve, reject) => {
+    servidorComFalha.close((erro) => erro ? reject(erro) : resolve());
+  }));
+  const falha = await fetch(`http://127.0.0.1:${servidorComFalha.address().port}/api/estudos`);
+  assert.equal(falha.status, 500);
+  assert.equal(falha.headers.get('x-content-type-options'), 'nosniff');
+  assert.equal(falha.headers.get('x-frame-options'), 'DENY');
+  assert.equal(falha.headers.get('referrer-policy'), 'strict-origin-when-cross-origin');
+  assert.equal(falha.headers.get('permissions-policy'), 'camera=(), microphone=(), geolocation=()');
+});
+
 test('health live e ready não expõem detalhes e ready verifica dependências', async (contexto) => {
   let verificacoes = 0;
   const servidor = criarServidorComLimitadorMemoria({}, undefined, {

@@ -37,7 +37,7 @@ Saída esperada: npm termina sem erro e instala as dependências do laboratório
 
 ### 2. Criar a configuração local
 
-Ainda em `labs/backend-layers`, copie o exemplo e abra `.env` no editor para substituir o texto de `PGPASSWORD` por uma senha local fictícia. Mantenha `REDIS_URL` apontando para `127.0.0.1:56380`; não coloque credenciais reais na URL. O arquivo `.env` é ignorado pelo Git; não o envie nem cole seus valores em mensagens.
+Ainda em `labs/backend-layers`, copie o exemplo e abra `.env` no editor para substituir `PGPASSWORD` e `PGAPPPASSWORD` por senhas locais fictícias distintas. `PGUSER`/`PGPASSWORD` são usados somente pela administração/migrations; a API usa `PGAPPUSER=backend_app`/`PGAPPPASSWORD`. Mantenha `REDIS_URL` apontando para `127.0.0.1:56380`; não coloque credenciais reais na URL. O arquivo `.env` é ignorado pelo Git; não o envie nem cole seus valores em mensagens. Se o volume PostgreSQL já existe, preserve a credencial administrativa que o inicializou e apenas acrescente as variáveis da API; não apague o volume.
 
 ```powershell
 # Windows PowerShell
@@ -48,12 +48,12 @@ notepad .env
 ```sh
 # macOS ou Linux
 cp .env.example .env
-# Abra .env no editor e troque o valor de PGPASSWORD.
+# Abra .env no editor e troque os valores de PGPASSWORD e PGAPPPASSWORD.
 ```
 
-O exemplo usa PostgreSQL em `127.0.0.1:55433` (usuário `aluno`, banco `backend_camadas`) e Redis em `127.0.0.1:56380`. A porta PostgreSQL dedicada evita conflitar com a instância principal de aulas, que usa `55432`; Redis não tem volume persistente. O cache de leitura usa TTL padrão de 30 segundos (`CACHE_TTL_SECONDS`).
+O exemplo usa PostgreSQL em `127.0.0.1:55433` (administrador local `aluno`, API `backend_app`, banco `backend_camadas`) e Redis em `127.0.0.1:56380`. A porta PostgreSQL dedicada evita conflitar com a instância principal de aulas, que usa `55432`; Redis não tem volume persistente. O cache de leitura usa TTL padrão de 30 segundos (`CACHE_TTL_SECONDS`).
 
-### 3. Iniciar e conferir o banco
+### 3. Iniciar o banco e configurar o acesso
 
 No mesmo terminal e pasta, valide a configuração sem imprimir os valores resolvidos e inicie o serviço:
 
@@ -65,19 +65,7 @@ docker compose ps
 
 Saída esperada: serviços `db` e `redis` em estado `healthy`; as portas locais são `127.0.0.1:55433->5432/tcp` e `127.0.0.1:56380->6379/tcp`. Na primeira execução, o Docker pode baixar PostgreSQL 17 e Redis 8.8.4.
 
-Agora confira a conexão Node → banco:
-
-```powershell
-# Windows PowerShell
-npm.cmd run db:check
-```
-
-```sh
-# macOS ou Linux
-npm run db:check
-```
-
-Saída esperada: `Conexão OK: banco=backend_camadas; usuário=aluno; consulta=1`.
+O comando `npm run migrate` executa primeiro `setup:app-role`, que cria ou ajusta `backend_app`; depois, conecta como `PGUSER` para aplicar o schema. Não use essas credenciais administrativas no servidor HTTP.
 
 ### 4. Aplicar a migration
 
@@ -93,7 +81,21 @@ npm.cmd run migrate
 npm run migrate
 ```
 
-Saída esperada na primeira execução: `Migration aplicada` para `001_create_estudos.sql`, `002_create_sessoes_estudo.sql` e `003_add_observacao_sessoes.sql`. Execute o comando outra vez: os três arquivos devem aparecer como já aplicados, sem repetir alterações. O aplicador percorre migrations numeradas em ordem, registra cada nome em `migrations_aplicadas` e usa uma transação por arquivo.
+Saída esperada na primeira execução: `Migration aplicada` para as migrations `001` a `004`. Execute o comando outra vez: os quatro arquivos devem aparecer como já aplicados, sem repetir alterações. O aplicador percorre migrations numeradas em ordem, registra cada nome em `migrations_aplicadas` e usa uma transação por arquivo.
+
+Confira que a conexão usada pelo runtime é a role restrita:
+
+```powershell
+# Windows PowerShell
+npm.cmd run db:check
+```
+
+```sh
+# macOS ou Linux
+npm run db:check
+```
+
+Saída esperada: `Conexão OK: banco=backend_camadas; usuário=backend_app; consulta=1`.
 
 Confira os registros iniciais sem instalar um cliente PostgreSQL no computador:
 
@@ -361,11 +363,11 @@ Com a API em execução, abra `http://127.0.0.1:4180/demo/`. Essa página usa o 
 
 ## CI real no GitHub Actions
 
-O workflow `.github/workflows/ci.yml`, na raiz do repositório, executa a validação do curso, os testes unitários, as integrações de rate limit com Redis real e cache-aside com PostgreSQL/Redis reais, migrations e o fluxo Chromium em serviços descartáveis. Ele roda em pushes de qualquer branch, em pull requests direcionados a `main` e por acionamento manual. As credenciais, títulos e dados de rate limit são fictícios e usados somente nos containers efêmeros do CI.
+O workflow `.github/workflows/ci.yml`, na raiz do repositório, executa a validação do curso, valida `vercel.json`, roda testes unitários e de privilégios, integra rate limit com Redis real e cache-aside com PostgreSQL/Redis reais, aplica migrations e percorre o fluxo Chromium em serviços descartáveis. Ele roda em pushes de qualquer branch, em pull requests direcionados a `main` e por acionamento manual. As credenciais, títulos e dados de rate limit são fictícios e usados somente nos containers efêmeros do CI.
 
 Depois que uma alteração chegar ao GitHub, abra a aba **Actions**, selecione a execução mais recente de **CI** e confira cada etapa. Se algo falhar, registre o primeiro passo vermelho, leia a mensagem completa, reproduza o comando correspondente no ambiente local e faça uma correção pequena. Uma execução verde confirma somente os cenários que o workflow rodou; ela não comprova que todos os comportamentos possíveis estão corretos.
 
-Para conferir localmente os mesmos passos, execute `node scripts/validate-content.js` na raiz do repositório. Em `labs/backend-layers`, rode `npm ci`, `npm test`, inicie PostgreSQL e Redis com `docker compose up -d --wait`, execute `RUN_REDIS_INTEGRATION=1 npm run test:redis`, `npm run db:check`, `npm run migrate`, `RUN_PG_INTEGRATION=1 npm run test:db`, `RUN_CACHE_INTEGRATION=1 npm run test:cache` e `npm run test:e2e`. Use a base descartável deste Compose; não conecte ao Supabase do curso. No Windows PowerShell, defina cada variável antes do comando (`$env:RUN_REDIS_INTEGRATION = '1'`, `$env:RUN_PG_INTEGRATION = '1'`, `$env:RUN_CACHE_INTEGRATION = '1'`) e remova-a depois; use `npm.cmd` se `npm.ps1` estiver bloqueado.
+Para conferir localmente os mesmos passos, execute `node scripts/validate-content.js` e `node scripts/validate-vercel-security.cjs` na raiz do repositório. Em `labs/backend-layers`, rode `npm ci`, `npm test`, inicie PostgreSQL e Redis com `docker compose up -d --wait`, aplique `npm run migrate`, confirme `npm run db:check`, então execute `RUN_REDIS_INTEGRATION=1 npm run test:redis`, `RUN_PG_INTEGRATION=1 npm run test:db`, `RUN_LEAST_PRIVILEGE_INTEGRATION=1 npm run test:least-privilege`, `RUN_MIGRATION_COMPATIBILITY=1 npm run test:migration-compatibility`, `RUN_CACHE_INTEGRATION=1 npm run test:cache` e `npm run test:e2e`. Use a base descartável deste Compose; não conecte ao Supabase do curso. No Windows PowerShell, defina cada variável antes do comando e remova-a depois; use `npm.cmd` se `npm.ps1` estiver bloqueado. Para executar a integração de menor privilégio no PowerShell: `$env:RUN_LEAST_PRIVILEGE_INTEGRATION='1'; npm.cmd run test:least-privilege; Remove-Item Env:RUN_LEAST_PRIVILEGE_INTEGRATION`.
 
 ## Como parar e retomar
 
@@ -387,7 +389,7 @@ Para conferir localmente os mesmos passos, execute `node scripts/validate-conten
 | API responde `503` ao gravar | Confira se `redis` está `healthy` em `docker compose ps`, se `REDIS_URL` aponta para a porta publicada e se `docker compose exec -T redis redis-cli PING` responde `PONG`. Gravações falham fechadas enquanto o limitador estiver indisponível; `GET` pula o cache e consulta PostgreSQL. |
 | `GET /api/estudos` continua em `500` durante falha Redis | O cache recorre ao PostgreSQL; confira também `docker compose ps`, `npm run db:check` e se as migrations foram aplicadas. Se o banco falhar, não há cópia antiga servida como stale-if-error. |
 | `password authentication failed` depois de trocar a senha | O volume já guarda a senha inicial do cluster. Reponha no `.env` a senha usada na primeira criação ou recupere o ambiente com o procedimento de `db-docker-operations`; não apague o volume para esconder o erro. |
-| `relation "estudos" does not exist` | Confirme o banco com `npm run db:check` e aplique `npm run migrate`. |
+| `relation "estudos" does not exist` | A conexão pode estar ativa antes do schema existir. Aplique `npm run migrate` e depois confira `npm run db:check`. |
 | migration já aplicada | É o comportamento esperado ao repetir o comando. Para praticar a migration desde o início, use outro banco local descartável; não apague o volume que contém seus dados. |
 | Título válido recebeu `409` | A comparação ignora espaços nas pontas e diferença entre maiúsculas/minúsculas; confira a lista pelo `GET`. |
 | API retorna `500` | Leia o código de erro no terminal e confira conexão/migration; a resposta HTTP omite detalhes do banco. Nunca compartilhe `.env`. |
@@ -396,7 +398,7 @@ Para conferir localmente os mesmos passos, execute `node scripts/validate-conten
 
 Para continuar estudando validação, regras e HTTP em um computador sem Docker/banco, no Windows execute `$env:BACKEND_STORAGE = 'memory'; npm.cmd run start:memory`; depois de parar com `Ctrl+C`, limpe a variável com `Remove-Item Env:BACKEND_STORAGE`. Em macOS/Linux execute `BACKEND_STORAGE=memory npm run start:memory`. A saída identifica armazenamento e rate limit como memória temporária e cache como desativado. Nesse modo os dados e contadores somem ao reiniciar o servidor e não são compartilhados; marque as integrações PostgreSQL/Redis/cache-aside como pendentes e volte a este roteiro quando Docker estiver disponível.
 
-Se Docker não estiver disponível mas o computador já tiver PostgreSQL local, conclua `setup-postgresql`, crie uma base descartável `backend_camadas` e ajuste em `.env` `PGHOST`, `PGPORT`, `PGUSER`, `PGDATABASE` e `PGPASSWORD` para essa instalação antes de executar `npm run db:check` e `npm run migrate`.
+Se Docker não estiver disponível mas o computador já tiver PostgreSQL local, conclua `setup-postgresql`, crie uma base descartável `backend_camadas` e ajuste em `.env` `PGHOST`, `PGPORT`, `PGUSER`, `PGDATABASE`, `PGPASSWORD`, `PGAPPUSER` e `PGAPPPASSWORD` para essa instalação antes de executar `npm run setup:app-role`, `npm run migrate` e `npm run db:check`.
 
 ## Como as camadas se conectam
 
@@ -407,8 +409,13 @@ Se Docker não estiver disponível mas o computador já tiver PostgreSQL local, 
 | Validação | Confere o formato do pedido e limpa o título | `src/validar-estudo.cjs` |
 | Regra de negócio | Compara títulos sem considerar espaços externos e caixa | `src/regra-titulo.cjs` e `src/servico-estudos.cjs` |
 | Repositório | Executa `SELECT`/`INSERT` com parâmetros e converte o resultado | `src/repositorio-estudos-postgres.cjs` |
-| Pool | Reutiliza até cinco conexões e lê as variáveis `PG*` | `src/configuracao-banco.cjs` |
-| Esquema | Cria estudos, sessões e suas restrições; a 003 adiciona `observacao` opcional às sessões | `migrations/001_create_estudos.sql` a `migrations/003_add_observacao_sessoes.sql` |
+| Pool da aplicação | Reutiliza até cinco conexões e usa `PGAPPUSER`/`PGAPPPASSWORD` | `src/configuracao-banco.cjs` |
+| Pool administrativo | Executa migrations e ferramentas locais de manutenção por `PGUSER`/`PGPASSWORD` | `src/configuracao-banco.cjs` |
+| Esquema e permissões | Cria estudos e sessões; a 003 amplia o esquema; a 004 concede à API somente leitura/inclusão nas tabelas de negócio | `migrations/001_create_estudos.sql` a `migrations/004_privilegios_minimos.sql` |
+
+O papel `backend_app` não é superuser, não cria bancos ou papéis, não ignora RLS e não herda permissões de outros papéis. Ele acessa as duas tabelas de negócio somente para `SELECT` e `INSERT`, com `USAGE` nas sequências de identidade; a tabela `migrations_aplicadas` e o esquema ficam fora do alcance de escrita. Migrations, backup e limpeza de dados fictícios usam o usuário administrativo. Como esta API não autentica pessoas, o privilégio mínimo não separa linhas por usuário; isso requer autenticação/autorização e, no Supabase, RLS.
+
+O Vercel recebe `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` e `Permissions-Policy` que desativa câmera, microfone e geolocalização. O servidor Node local repete os cabeçalhos em todas as respostas e valida limites do corpo, Content-Type, JSON e domínio antes da gravação; erros internos são genéricos para o cliente. CSP ainda não está ativada porque a página tem estilos inline e dependências CDN; ela precisa de inventário e verificação de compatibilidade próprios. Os testes locais confirmam arquivos e respostas do servidor local; o Preview publicado requer verificação autenticada separada.
 | Aplicador | Executa migrations numeradas em ordem e registra cada arquivo uma vez | `scripts/aplicar-migration.cjs` |
 
 O índice único é a última barreira contra duplicidade quando pedidos simultâneos passam pela consulta de busca. O serviço transforma somente essa violação conhecida em `409`; falhas de conexão continuam como erro de servidor. `migrations_aplicadas` registra qual arquivo foi aplicado, e a migration roda na mesma transação da marcação.
@@ -436,7 +443,7 @@ Para observar o rollback no PostgreSQL sem guardar dados de teste, execute `npm.
 
 A migration `003_add_observacao_sessoes.sql` é expansiva: acrescenta `observacao TEXT` aceitando `NULL`. O código anterior nomeia explicitamente as colunas de sessão em `INSERT` e `SELECT`; a coluna opcional não exige alteração imediata desse código. A coluna não deve ser removida só porque a aplicação voltou a uma versão anterior.
 
-O teste automatizado só prossegue com um host de loopback (`127.0.0.1`, `::1` ou `localhost`) e `PGDATABASE=backend_camadas`. Ele cria uma base PostgreSQL temporária, aplica primeiro `001` e `002`, usa o repositório anterior, aplica `003` e repete operações com o mesmo contrato antigo. Em seguida grava uma observação fictícia pela forma de escrita nova, confirma que uma consulta antiga ainda lê os demais campos e executa outra gravação com o repositório anterior. O valor da observação deve continuar preservado. O script remove somente a base que criou e exige que o usuário PostgreSQL possa criar e remover uma base de teste. Rode apenas no Compose descartável do laboratório, nunca no Supabase ou numa base com dados reais.
+O teste automatizado só prossegue com um host de loopback (`127.0.0.1`, `::1` ou `localhost`) e `PGDATABASE=backend_camadas`. Ele cria uma base PostgreSQL temporária, aplica as migrations `001`, `002` e `004`, usa o repositório da versão anterior, aplica `003` e repete operações com o mesmo contrato antigo. Em seguida grava uma observação fictícia pela forma nova, confirma que a consulta antiga ainda lê os demais campos e que o papel da API conserva somente os privilégios previstos. O script remove somente a base que criou e exige que a conta administrativa PostgreSQL possa criar e remover uma base de teste. Rode apenas no Compose descartável do laboratório, nunca no Supabase ou numa base com dados reais.
 
 Com PostgreSQL saudável, terminal em `labs/backend-layers` e `.env` local configurado:
 
@@ -460,7 +467,7 @@ Uma mudança que não for mais necessária passa por uma etapa separada de contr
 
 ### Objetivo e pré-requisitos
 
-Ao final, você consegue ampliar uma tabela sem alterar arquivos de migration que já foram aplicados. Conclua os passos anteriores até aplicar as migrations `001`, `002` e `003`. Use somente a base descartável `backend_camadas`; não conecte esta prática ao Supabase nem a uma base com dados importantes.
+Ao final, você consegue ampliar uma tabela sem alterar arquivos de migration que já foram aplicados. Conclua os passos anteriores até aplicar as migrations `001` a `004`. Use somente a base descartável `backend_camadas`; não conecte esta prática ao Supabase nem a uma base com dados importantes.
 
 ### Preveja e confira o resultado esperado
 
@@ -470,11 +477,11 @@ Depois da execução, a consulta ao catálogo do PostgreSQL deve mostrar uma lin
 
 ### Faça a mudança
 
-1. No editor, dentro da pasta `labs/backend-layers`, crie `migrations/004_add_revisada_em_estudos.sql`. Não edite, renomeie nem apague os arquivos `001`, `002` ou `003`.
+1. No editor, dentro da pasta `labs/backend-layers`, crie `migrations/005_add_revisada_em_estudos.sql`. Não edite, renomeie nem apague os arquivos `001` a `004`.
 2. Nesse arquivo, escreva uma instrução `ALTER TABLE` que adicione a `estudos` a coluna `revisada_em`, do tipo `TIMESTAMPTZ` e que aceite `NULL`. Não é necessário adicionar um valor padrão.
 3. Salve o arquivo. No terminal aberto em `labs/backend-layers`, execute `npm.cmd run migrate` no Windows ou `npm run migrate` em macOS/Linux.
 
-Saída esperada na primeira execução: `Migration já aplicada` para `001`, `002` e `003`, e `Migration aplicada: 004_add_revisada_em_estudos.sql`. Execute o comando uma segunda vez: os quatro nomes devem aparecer como já aplicados.
+Saída esperada na primeira execução: `Migration já aplicada` para `001` a `004`, e `Migration aplicada: 005_add_revisada_em_estudos.sql`. Execute o comando uma segunda vez: os cinco nomes devem aparecer como já aplicados.
 
 ### Verifique no PostgreSQL
 
@@ -487,15 +494,15 @@ docker compose exec -T db psql -U aluno -d backend_camadas -c "SELECT id FROM mi
 
 Se estiver usando uma instalação local de PostgreSQL, execute as mesmas consultas com `psql -h 127.0.0.1 -p 55433 -U aluno -d backend_camadas -c "..."`, substituindo host, porta e usuário pelos valores configurados no `.env`.
 
-Critérios de aceite: a primeira consulta mostra `revisada_em | YES`; a segunda lista exatamente as migrations `001`, `002`, `003` e `004`; a segunda execução de `npm run migrate` não reaplica nenhuma delas; os três arquivos anteriores continuam iguais. Confira também `SELECT id, revisada_em FROM estudos ORDER BY id;` e explique por que os valores anteriores são `NULL`.
+Critérios de aceite: a primeira consulta mostra `revisada_em | YES`; a segunda lista exatamente as migrations `001` a `005`; a segunda execução de `npm run migrate` não reaplica nenhuma delas; os quatro arquivos anteriores continuam iguais. Confira também `SELECT id, revisada_em FROM estudos ORDER BY id;` e explique por que os valores anteriores são `NULL`.
 
 ### Erros comuns e retomada
 
 - `relation "sessoes_estudo" does not exist`: confira o banco com `npm.cmd run db:check` e aplique primeiro as migrations iniciais.
-- `column "revisada_em" already exists`: confira se `004_add_revisada_em_estudos.sql` consta em `migrations_aplicadas`; não remova o registro nem altere uma migration já aplicada para esconder o erro.
+- `column "revisada_em" already exists`: confira se `005_add_revisada_em_estudos.sql` consta em `migrations_aplicadas`; não remova o registro nem altere uma migration já aplicada para esconder o erro.
 - A migration aparece como já aplicada: este é o resultado correto ao repetir o comando. Para refazer a atividade do zero, use outra base descartável e aplique as migrations nela.
 
-Para parar, use `Ctrl+C` na API e `docker compose down` no terminal. Para retomar, inicie o banco, confira `npm.cmd run db:check` e execute `npm.cmd run migrate`; o aplicador continua da próxima migration pendente. Não use `docker compose down -v` para reiniciar esta prática.
+Para parar, use `Ctrl+C` na API e `docker compose down` no terminal. Para retomar, inicie o banco, execute `npm.cmd run migrate` e confira `npm.cmd run db:check`; o aplicador continua da próxima migration pendente. Não use `docker compose down -v` para reiniciar esta prática.
 
 ## Prática
 

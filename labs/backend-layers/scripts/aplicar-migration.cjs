@@ -2,12 +2,12 @@
 
 const fs = require('node:fs/promises');
 const path = require('node:path');
-const { criarPoolEstudos } = require('../src/configuracao-banco.cjs');
+const { criarPoolMigracoes } = require('../src/configuracao-banco.cjs');
 
 const pastaPadrao = path.join(__dirname, '..', 'migrations');
 
 async function aplicarMigrations({
-  pool = criarPoolEstudos(),
+  pool = criarPoolMigracoes(),
   pastaMigrations = pastaPadrao,
   registrar = console.log
 } = {}) {

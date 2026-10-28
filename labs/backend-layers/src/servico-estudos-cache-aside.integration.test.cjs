@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const { randomUUID } = require('node:crypto');
 const { createClient } = require('redis');
 const { criarServidor } = require('../server.cjs');
-const { criarPoolEstudos } = require('./configuracao-banco.cjs');
+const { criarPoolEstudos, criarPoolMigracoes } = require('./configuracao-banco.cjs');
 const { criarRepositorioEstudosPostgres } = require('./repositorio-estudos-postgres.cjs');
 const { criarLimitadorRedis } = require('./rate-limiter-redis.cjs');
 const { criarServicoEstudos } = require('./servico-estudos.cjs');
@@ -24,6 +24,7 @@ test('cache-aside usa PostgreSQL, invalida após escrita e recorre à fonte se R
   const escopoLimite = `cache-integration:${idExecucao}`;
   const chaveContador = `rate:v1:${escopoLimite}:127.0.0.1`;
   const pool = criarPoolEstudos();
+  const poolLimpeza = criarPoolMigracoes();
   const clienteRedis = createClient({
     url: urlRedis,
     disableOfflineQueue: true,
@@ -152,7 +153,7 @@ test('cache-aside usa PostgreSQL, invalida após escrita e recorre à fonte se R
       await new Promise((resolve) => servidor.close(resolve));
     }
     if (idEstudo !== undefined) {
-      await pool.query('DELETE FROM estudos WHERE id = $1', [idEstudo]).catch(() => {});
+      await poolLimpeza.query('DELETE FROM estudos WHERE id = $1', [idEstudo]).catch(() => {});
     }
     if (!clienteRedisDestruido && clienteRedis.isReady) {
       await clienteRedis.del(chavesTeste).catch(() => {});
@@ -160,5 +161,6 @@ test('cache-aside usa PostgreSQL, invalida após escrita e recorre à fonte se R
     if (clienteRedis.isOpen) clienteRedis.destroy();
     if (clienteRedisDestruido) await limparChavesRedis().catch(() => {});
     await pool.end();
+    await poolLimpeza.end();
   }
 });

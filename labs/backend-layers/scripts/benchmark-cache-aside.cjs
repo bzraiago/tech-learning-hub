@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const { randomUUID } = require('node:crypto');
 const { performance } = require('node:perf_hooks');
 const { createClient } = require('redis');
-const { criarPoolEstudos } = require('../src/configuracao-banco.cjs');
+const { criarPoolMigracoes } = require('../src/configuracao-banco.cjs');
 const { criarServicoEstudosComCache } = require('../src/servico-estudos-cache-aside.cjs');
 const { criarServidor } = require('../server.cjs');
 
@@ -75,7 +75,7 @@ async function executar() {
   const ttlSegundos = lerInteiro('CACHE_TTL_SECONDS', 30, 1, 86400);
   const idExecucao = randomUUID();
   const chave = `cache:v1:backend-layers:benchmark:${idExecucao}`;
-  const pool = criarPoolEstudos();
+  const pool = criarPoolMigracoes();
   const redis = createClient({ url: process.env.REDIS_URL || 'redis://127.0.0.1:56380' });
   const operacoesRedis = { get: 0, getHits: 0, setEx: 0, del: 0 };
   const redisInstrumentado = {

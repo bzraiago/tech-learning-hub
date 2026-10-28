@@ -435,7 +435,10 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Criar `delivery-supply-chain` com inspeção local do manifesto, lockfile e workflow reais; a atividade separa observações de verificações atuais pendentes e não instala nem altera pacotes.
   - [x] Criar `labs/security-csrf` com sessão/token fictícios, rota vulnerável e rota protegida; testes locais confirmam respostas e ausência de escrita em pedidos recusados (7/7).
   - [~] Integrar e testar rate limiting HTTP distribuído por IP observado com Redis real em `labs/backend-layers`; limite por conta autenticada segue pendente porque este laboratório não tem autenticação.
-- [ ] Implementar cabeçalhos de segurança, validação no servidor, mensagens de erro seguras e princípio do menor privilégio.
+- [~] Implementar cabeçalhos de segurança, validação no servidor, mensagens de erro seguras e princípio do menor privilégio.
+  - [x] Configurar quatro cabeçalhos globais em `vercel.json` e nas respostas locais; cobrir HTML, JSON, health check, 404 e 500. Validador Vercel, suíte unitária 62/62 e E2E local 3/3 passaram. CSP segue pendente de inventário e teste de compatibilidade; inspeção manual do Preview no Brave não foi executada.
+  - [~] Separar admin/migrations de `backend_app`, limitar grants a SELECT/INSERT e sequences necessárias e adicionar teste PostgreSQL para operações permitidas/negadas. Testes unitários do setup passaram; integração PostgreSQL 17 aguarda a execução CI após o push, pois o daemon Docker retorna acesso negado localmente.
+  - [x] Criar `delivery-server-hardening` e `delivery-db-privileges` com cinco exercícios cada, quiz, roteiro de setup/alternativa sem Docker, limites de evidência e distinção entre grants de tabela, autorização por linha e RLS. Validador registra 134 aulas, 547 exercícios e 418 questões.
 - [ ] Ensinar rotação e revogação de segredo, auditoria de acesso e resposta inicial a incidente.
 - [ ] Introduzir LGPD com papéis, finalidade, base legal, minimização, retenção, direitos do titular e resposta a incidente.
 - [ ] Criar inventário de dados e fluxo de tratamento usando somente dados fictícios.

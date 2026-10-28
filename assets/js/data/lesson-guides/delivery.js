@@ -1505,6 +1505,197 @@ Object.assign(LESSON_GUIDES, {
       "O laboratório local reproduz A01/BOLA com dados fictícios; os testes não validam Preview, domínio ou Supabase remoto."
     ]
   },
+  "delivery-server-hardening": {
+    "prerequisites": "Concluir `delivery-http`, `delivery-owasp-top10` e `setup-node`; saber ler status, headers, JSON, validação de entrada e testes Node. A prática usa somente o servidor local do laboratório e a configuração versionada; não exige conta, domínio ou deploy.",
+    "setup": "Abra `labs/backend-layers/README.md` e `labs/backend-layers` no editor. Para testes sem banco, execute `npm ci` e `npm test` nessa pasta (`npm.cmd` no PowerShell se necessário). O resultado esperado da suíte é processo concluído com zero falhas. Para conferir a configuração estática, volte à raiz do repositório e execute `node scripts/validate-vercel-security.cjs`; a mensagem informa quatro cabeçalhos globais. Não é necessário iniciar Docker para esta atividade. Encerre o comando ao terminar; para retomar, repita-o. Se dependências ainda não estiverem instaladas e a rede não estiver disponível, leia os testes e registre execução pendente; não instale ferramentas de sistema. O teste do Preview no Brave está separado e só deve ser marcado depois de uma inspeção manual autorizada.",
+    "why": "Uma resposta HTTP inclui mais que o corpo: cabeçalhos podem reduzir interpretação indevida, enquadramento e exposição de origem. A aplicação também precisa rejeitar pedidos inválidos no servidor e evitar devolver detalhes internos. Esses controles reduzem classes de risco, mas cada um tem escopo limitado; evidência local não prova a configuração de toda rota publicada.",
+    "example": {
+      "language": "text",
+      "code": "Resposta observada no teste local\nHTTP 200 / 404\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: camera=(), microphone=(), geolocation=()\n\nA validação de POST confere tipo de conteúdo, JSON, domínio e tamanho.\nErro interno ao cliente: mensagem genérica, sem stack ou SQL.\n\nCSP não está configurada: index.html tem CSS inline e usa recursos CDN/Clerk.",
+      "expected": "Os quatro cabeçalhos estão presentes em respostas locais de sucesso, erro e health check. Pedidos inválidos retornam status coerente e JSON genérico. CSP aparece como lacuna registrada, pois uma política imposta sem inventário pode bloquear estilos e dependências legítimas.",
+      "explanation": [
+        "X-Content-Type-Options com nosniff reduz interpretação de conteúdo como outro MIME type. X-Frame-Options DENY impede enquadramento por iframe em navegadores que aplicam o cabeçalho; confirme compatibilidade com o produto antes de generalizar.",
+        "Referrer-Policy limita quanto da URL de origem segue em navegações. Permissions-Policy desativa câmera, microfone e geolocalização neste projeto, que não precisa dessas APIs.",
+        "Cabeçalhos devem ser observados em cada tipo de resposta relevante. Um middleware pode esquecer um caminho de erro; os testes verificam HTML, JSON, health check, 404 e 500 no servidor local.",
+        "A validação do servidor verifica Content-Type, sintaxe JSON, estrutura e tamanho antes de persistir. Cliente pode contornar validação da interface, por isso o servidor mantém a regra e os testes verificam também que pedido recusado não grava.",
+        "A mensagem entregue ao usuário não deve revelar stack, SQL, caminhos ou segredo. Diagnóstico operacional usa evento/código permitido e minimizado, sem copiar dados pessoais ou credenciais.",
+        "CSP pode reduzir fontes de conteúdo permitidas, mas não substitui sinks seguros. Esta página contém estilo inline e usa CDNs e Clerk; antes de impor uma política é preciso inventariar recursos, construir a configuração e verificar o fluxo no Preview sem desativar proteção ou abrir a política amplamente."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Cabeçalhos são parte da resposta",
+        "paragraphs": [
+          "Abra `vercel.json` e localize a regra global `/(.*)`. A regra declara os quatro cabeçalhos para páginas, arquivos e funções Vercel. O servidor Node local aplica os mesmos valores às respostas dele. São duas configurações relacionadas: a local pode ser testada na máquina; a regra Vercel só comprova o que está versionado até que CI/deploy e uma resposta Preview sejam observados.",
+          "Leia cada valor pelo risco que reduz e pelo que não resolve. `nosniff` não valida JSON; `DENY` não autoriza registros; Referrer-Policy não apaga logs já enviados; Permissions-Policy não controla permissões de banco. Um cabeçalho presente é evidência de configuração observada, não certificado de segurança.",
+          "Antes de testar, preveja: se uma rota retorna 404, ela também deve receber os cabeçalhos? No laboratório, o middleware aplica os valores antes do roteamento, então a resposta de caminho inexistente mantém os mesmos quatro cabeçalhos."
+        ],
+        "terms": [
+          { "term": "Cabeçalho de resposta", "meaning": "Metadado HTTP enviado pelo servidor junto ao status e corpo; pode orientar comportamento do navegador." },
+          { "term": "Defesa em profundidade", "meaning": "Controles complementares que reduzem riscos diferentes, sem que um substitua os demais." },
+          { "term": "CSP", "meaning": "Content Security Policy, política de fontes e capacidades de conteúdo avaliada pelo navegador; requer inventário e teste de compatibilidade." }
+        ]
+      },
+      {
+        "title": "Valide no limite confiável e responda com segurança",
+        "paragraphs": [
+          "O navegador pode melhorar a experiência, mas não é uma fronteira confiável: scripts podem ser alterados e pedidos podem ser montados fora da interface. O backend-layers lê bytes com limite, valida tipo de conteúdo, analisa JSON e verifica campos/domínio antes de chamar o serviço. O status distingue corpo grande (413), tipo não suportado (415), JSON/entrada inválida (400) e erro inesperado (500).",
+          "Uma recusa precisa acontecer antes da gravação. Leia `server.test.cjs` e acompanhe o contador/estado ou mock de repositório: status correto sem conferir efeito pode esconder uma alteração parcial. Uma exceção interna é registrada com o logger minimizado e chega ao cliente como erro genérico; não reproduza o teste escrevendo token, senha ou dado de aluno no log.",
+          "CSP é um controle adicional, mas política arbitrária pode quebrar o site ou levar à tentação de permitir tudo. O `index.html` atual inclui bloco de estilo inline e recursos externos de Tailwind, fontes Google e Clerk. Registre essa dependência, teste primeiro uma política em modo de observação quando houver caminho apropriado, revise console e rede no Preview, e só então escolha um enforcement estreito. Nesta entrega CSP permanece pendente."
+        ],
+        "diagramTitle": "Limite de validação e resposta",
+        "diagram": "Pedido não confiável\n        │\n        ├─ tamanho / Content-Type / JSON / domínio\n        │       └─ recusa → status esperado + erro genérico + sem gravação\n        │\n        └─ entrada válida → regra de domínio → armazenamento\n                                │\n                                └─ exceção → log minimizado + 500 genérico\n\nCabeçalhos acompanham ambos os caminhos no servidor local.",
+        "terms": [
+          { "term": "Validação no servidor", "meaning": "Verificação repetida na API antes de confiar em dados controlados pelo cliente ou alterar estado." },
+          { "term": "Erro genérico", "meaning": "Resposta que informa falha sem expor detalhes internos que ajudem a revelar dados ou estrutura." },
+          { "term": "Risco residual", "meaning": "Risco que permanece depois dos controles implementados e precisa ser registrado ou tratado." }
+        ]
+      },
+      {
+        "title": "Monte uma evidência com limites claros",
+        "paragraphs": [
+          "Execute a suíte unitária e o validador de `vercel.json`. Relacione cada asserção à propriedade: presença de header, status, corpo sem detalhe ou ausência de gravação. Se um caso falha, registre primeiro o nome do teste, o valor esperado, o observado e o caminho executado; altere um comportamento por vez e repita a suíte completa.",
+          "A CI executa validação estática e testes. O deploy Preview é outra evidência: para afirmar que headers chegaram ao visitante, inspecione uma resposta autorizada e anote URL, caminho, status e cabeçalhos sem registrar tokens. Nesta sessão, o acesso ao Brave não está disponível; a conferência de Preview permanece pendente e não deve ser substituída por um teste em Chrome.",
+          "A propriedade desta aula é a resposta HTTP e a validação de entradas. Autorização por objeto, grants de banco, RLS e revisão de dependências são controles diferentes e devem continuar cobertos em suas aulas próprias."
+        ],
+        "terms": [
+          { "term": "Evidência", "meaning": "Observação reproduzível ligada a um critério específico; deve registrar ambiente e limite da conclusão." },
+          { "term": "Configuração estática", "meaning": "Regra presente em arquivo versionado, ainda não equivalente a observar o comportamento publicado." }
+        ]
+      }
+    ],
+    "guided": [
+      { "instruction": "Abra `vercel.json` e liste os quatro pares nome/valor; sem executar, preveja se a regra global inclui uma rota inexistente.", "result": "Os valores são nosniff, DENY, strict-origin-when-cross-origin e as três permissões desativadas. A regra `/(.*)` inclui caminho inexistente, mas a resposta publicada precisa ser observada para confirmar deploy." },
+      { "instruction": "No terminal em `labs/backend-layers`, execute `npm test` e localize o caso que examina cabeçalhos. Registre quais status e caminhos estão cobertos.", "result": "A suíte verifica respostas locais de HTML, API, health/live, 404 e erro 500; o cabeçalho esperado é conferido em cada uma." },
+      { "instruction": "Leia a validação de POST e escreva a sequência antes de uma gravação: Content-Type, parse, domínio/tamanho, serviço e status.", "result": "Entrada inválida é recusada antes do serviço/repositório; 400, 413 ou 415 distingue a causa e a resposta não inclui detalhe interno." },
+      { "instruction": "Abra `index.html` e identifique inline styles e dependências externas antes de sugerir CSP. Marque qual evidência faltaria depois de configurar uma política.", "result": "Há estilo inline e recursos CDN/Clerk; é preciso inventariar fontes e observar console/rede no Preview, por isso esta mudança não inventa uma CSP enforcement." }
+    ],
+    "mistakes": [
+      "Tratar cabeçalhos comuns como garantia de que a aplicação inteira é segura.",
+      "Validar somente no formulário do navegador e aceitar qualquer JSON enviado diretamente à API.",
+      "Devolver stack, SQL, caminhos ou credenciais na mensagem de erro ao cliente.",
+      "Verificar apenas status e esquecer que um pedido recusado pode ter alterado o banco.",
+      "Impor CSP permissiva ou incompleta sem inventário de inline styles, CDN e login.",
+      "Chamar arquivo `vercel.json` de prova de que o cabeçalho já chegou ao Preview.",
+      "Copiar token ou dados pessoais ao registrar uma evidência de teste."
+    ],
+    "exercises": [
+      { "prompt": "Prever: `GET /rota-que-nao-existe` retorna 404. Antes de executar, preveja quais cabeçalhos de segurança a resposta local terá e explique por que a regra do middleware alcança esse caminho.", "expected": "A resposta local 404 terá os quatro cabeçalhos porque são definidos antes do roteamento; isso não confirma por si só o deploy Vercel.", "criteria": ["Lista os quatro cabeçalhos corretos.", "Relaciona a aplicação dos headers à ordem antes do roteamento.", "Distingue servidor local de resposta do Preview."], "solution": "Leia `aplicarCabecalhosSeguros(res)` e confirme que a função é chamada no início do handler. A asserção local para 404 verifica os quatro valores.", "explanation": "Testar erro de rota encontra caminhos que às vezes escapam ao middleware de sucesso.", "hints": ["Em que ponto do handler o middleware é chamado?", "A configuração versionada já foi observada no host publicado?"] },
+      { "prompt": "Alterar: proponha uma mudança local para que também `Content-Security-Policy-Report-Only` seja configurado. Antes de editar o projeto, liste recursos que precisam ser inventariados e um teste de compatibilidade que evite quebrar login ou estilos.", "expected": "A proposta começa com inventário de scripts, estilos inline, Tailwind/CDNs, Google Fonts e Clerk; testa política de observação e console/rede em Preview com login e fluxo visual antes de enforcement. Não adiciona CSP permissiva sem evidência.", "criteria": ["Inclui inline styles e serviços externos presentes.", "Usa observação/relato e teste funcional antes de impor bloqueio.", "Prevê conferência de login, CSS e recursos no Preview.", "Não inclui wildcard amplo como correção automática."], "solution": "Escreva primeiro o inventário de origem e os fluxos necessários. Configure report-only em cópia/ambiente de Preview autorizado, recolha violações sem conteúdo sensível, ajuste fontes específicas e repita os fluxos; só considere enforcement estreito após evidência.", "explanation": "Uma política CSP pode alterar carregamento legítimo e precisa ser construída com conhecimento da página real.", "hints": ["Quais dependências são chamadas pelo HTML?", "Como descobrir bloqueios sem quebrar o usuário?", "Qual fluxo de autenticação precisa continuar funcional?"] },
+      { "prompt": "Construir: monte uma matriz com HTML, JSON 200, health 200, rota 404, entrada 413 e erro 500. Para cada linha registre status, quatro headers e se o corpo pode conter detalhe interno.", "expected": "Todos os caminhos locais cobertos têm os quatro headers; status segue o contrato; 500 não revela stack/SQL e erros de entrada também não ecoam segredo ou conteúdo bruto.", "criteria": ["Inclui seis cenários solicitados.", "Confere os quatro headers em todos os caminhos.", "Separa status de corpo e observa ausência de detalhe interno.", "Inclui teste de não gravação para pedido recusado quando aplicável."], "solution": "Use a matriz da aula e compare com `server.test.cjs` e `scripts/validate-vercel-security.cjs`; acrescente uma asserção apenas se encontrar lacuna e rode `npm test` de novo.", "explanation": "A matriz liga critérios concretos a respostas diferentes em vez de inferir proteção pelo caso feliz.", "hints": ["Qual status representa corpo grande?", "Como você saberá que 500 não vazou exceção?", "O que comprova que não houve escrita?"] },
+      { "prompt": "Investigar erro: o teste de `/health/live` falha porque `Referrer-Policy` está ausente, enquanto API e HTML passam. Registre a evidência mínima, indique dois pontos de código/configuração para comparar e escolha uma correção pequena antes de repetir os testes.", "expected": "A análise registra teste e header esperado/observado; compara a função comum do servidor com a configuração Vercel e confirma se health usa o mesmo handler. Corrige ponto comum sem remover o teste, repete suíte e validador.", "criteria": ["Anota esperado e observado sem copiar dados privados.", "Compara caminho local e configuração global publicada.", "Não reduz cobertura removendo ou enfraquecendo a asserção.", "Roda a suíte completa depois da correção."], "solution": "Reproduza `npm test`, abra o caso `/health/live`, confira se `aplicarCabecalhosSeguros` ocorre antes de despachar a rota e compare o nome exato no `vercel.json`. Faça a menor correção e rode `npm test` e `node scripts/validate-vercel-security.cjs`.", "explanation": "Quando duas rotas divergem, rastrear caminho e ponto de aplicação costuma localizar uma exceção de middleware.", "hints": ["O teste falha só no status de health ou em todas as propriedades?", "A API e health passam pelo mesmo handler?", "O nome do header é comparado sem distinção de caixa?"] },
+      { "prompt": "Mudança inesperada: o produto agora incorpora uma página de suporte externa, mas ainda não sabe qual origem nem qual frame precisa permitir. Defina o que deve ser preservado, o que precisa ser descoberto e como manter a política segura sem quebrar a tela.", "expected": "O requisito não justifica remover X-Frame-Options globalmente ou permitir qualquer origem; primeiro identifica fluxo e origem exatos, avalia compatibilidade de frame, propõe exceção escopada e testa página, login, mobile e headers sem alterar rotas não relacionadas.", "criteria": ["Preserva controles em respostas não afetadas.", "Pede evidência da origem e necessidade do frame.", "Propõe escopo mínimo e teste funcional acessível.", "Registra CSP/headers como risco residual se ainda não validado."], "solution": "Mapeie a tela e a origem do conteúdo externo, confirme a exigência funcional, escolha diretiva e escopo compatíveis com a plataforma e valide numa cópia Preview. Mantenha DENY global enquanto a necessidade não estiver comprovada; se houver exceção real, configure somente a rota necessária e documente os testes.", "explanation": "Mudança de produto pode alterar o modelo de ameaças; ajustar política global sem evidência cria exposição lateral.", "hints": ["Qual página realmente precisa ser incorporada?", "É a página do curso que precisa entrar em frame ou um frame externo dentro dela?", "Que outras rotas seriam afetadas por uma exceção global?"] }
+    ],
+    "quiz": [
+      { "question": "O que `X-Content-Type-Options: nosniff` faz neste contexto?", "options": ["Reduz a interpretação de resposta como outro tipo MIME pelo navegador.", "Valida todos os campos do JSON.", "Impede acesso a registros de outra conta."], "correctIndex": 0, "explanation": "A validação do conteúdo continua sendo responsabilidade do contrato e do servidor." },
+      { "question": "Por que validar também no backend?", "options": ["O cliente pode contornar a interface e enviar pedidos próprios.", "O navegador não consegue enviar JSON.", "O status HTTP não tem significado."], "correctIndex": 0, "explanation": "O servidor é a fronteira confiável para validar entrada antes de alterar estado." },
+      { "question": "Qual evidência demonstra que uma recusa não gravou dados?", "options": ["Teste verifica resposta e estado/contador do repositório antes e depois.", "A interface escondeu o botão.", "O log mostra somente a mensagem genérica."], "correctIndex": 0, "explanation": "Status isolado não prova ausência de efeito colateral." },
+      { "question": "Qual é a conclusão correta sobre CSP nesta entrega?", "options": ["Está pendente de inventário e teste de compatibilidade por causa de estilos inline e dependências externas.", "Uma política permissiva qualquer já comprova segurança.", "CSP corrige automaticamente todo XSS."], "correctIndex": 0, "explanation": "CSP é defesa em profundidade e deve corresponder a recursos e fluxos observados." }
+    ],
+    "summary": [
+      "Cabeçalhos reduzem riscos específicos e devem ser testados em sucesso, erro e health check.",
+      "Validação da API ocorre no servidor antes da gravação; recusa precisa deixar estado intacto.",
+      "Erro ao cliente é genérico e o diagnóstico fica minimizado sem dados sensíveis.",
+      "CSP permanece pendente até inventário dos recursos e verificação funcional do Preview.",
+      "Teste local e regra Vercel versionada não equivalem a inspeção manual do Preview."
+    ]
+  },
+  "delivery-db-privileges": {
+    "prerequisites": "Concluir `db-postgres`, `delivery-http`, `delivery-owasp-top10` e `setup-node`; conhecer tabelas, migrations e variáveis de ambiente. A prática usa exclusivamente PostgreSQL descartável local ou serviço efêmero CI, com dados e senhas fictícios; não usa Supabase.",
+    "setup": "Leia `labs/backend-layers/README.md`, `.env.example`, `migrations/001_create_estudos.sql` a `004_privilegios_minimos.sql` e `src/configuracao-banco.cjs`. Se Docker estiver disponível, em `labs/backend-layers` copie `.env.example` para `.env`, configure senhas fictícias separadas com ao menos 12 caracteres, preserve as credenciais já usadas pelo volume existente, execute `docker compose up -d --wait db`, `npm run migrate` e `npm run db:check`. Depois defina `RUN_LEAST_PRIVILEGE_INTEGRATION=1` no PowerShell com `$env:RUN_LEAST_PRIVILEGE_INTEGRATION='1'; npm run test:least-privilege; Remove-Item Env:RUN_LEAST_PRIVILEGE_INTEGRATION`; em macOS/Linux use `RUN_LEAST_PRIVILEGE_INTEGRATION=1 npm run test:least-privilege`. Resultado esperado: integração conclui sem falhas. Para encerrar use `docker compose down`, sem `-v`; para retomar, suba o mesmo serviço e verifique `db:check`. Se Docker não estiver disponível, estude as migrations e rode os testes unitários; marque verificação de PostgreSQL real como pendente. Nunca reutilize senha real nem imprima `.env`.",
+    "why": "A conta que executa uma API recebe todas as permissões disponíveis à conexão. Se ela for comprometida e também puder criar roles, alterar schema ou apagar tabelas, o impacto aumenta. Uma role de aplicação limitada reduz ações possíveis; migrations usam uma credencial administrativa separada e não devem ser executadas por cada pedido HTTP.",
+    "example": {
+      "language": "text",
+      "code": "PGUSER / PGPASSWORD          → role admin, somente setup/migrations\nPGAPPUSER / PGAPPPASSWORD    → backend_app, usada pelo runtime\n\nbackend_app:\n  CONNECT backend_camadas    permitido\n  USAGE schema public        permitido\n  SELECT / INSERT nas tabelas de negócio permitido\n  USAGE nas sequences identity permitido\n  UPDATE / DELETE / TRUNCATE negado\n  CREATE schema/tabela       negado\n  SUPERUSER / CREATEDB       negado\n\nA role limita operações, mas não restringe uma linha ao dono-aluno.",
+      "expected": "A API usa credenciais de runtime `backend_app`; scripts de migrations usam credenciais admin. A integração demonstra SELECT/INSERT permitidos e operações administrativas e destrutivas recusadas, sem concluir isolamento por conta.",
+      "explanation": [
+        "PostgreSQL autentica roles e autoriza operações com atributos, grants e herança. Superuser ignora muitas checagens e não deve ser a identidade normal da API.",
+        "A migration 004 concede USAGE no schema e SELECT/INSERT nas duas tabelas; geração de identity depende de privilégio de sequence separado. Permissão de tabela não concede automaticamente uso da sequence.",
+        "O setup garante que `backend_app` não seja superuser, não crie banco/role, não contorne RLS, não herde outros papéis e não receba membership privilegiado. O runner de migration mantém a credencial administrativa.",
+        "O teste de integração tenta as operações permitidas e confirma que UPDATE, DELETE, TRUNCATE e CREATE falham. Ele usa transação e dados descartáveis para não deixar registros de teste.",
+        "Essa role pertence ao exemplo backend-layers e não é a arquitetura de progresso autenticado do curso. Privilégios globais de tabela não associam usuário a uma linha; o app ainda precisaria autorizar cada objeto, e isolamento de conta exige projeto separado de identidade/policies como Supabase RLS."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Separe a identidade administrativa da identidade de runtime",
+        "paragraphs": [
+          "Leia `configuracao-banco.cjs`: o pool de estudos usa `PGAPPUSER` e `PGAPPPASSWORD`, enquanto o pool de migrations usa `PGUSER` e `PGPASSWORD`. O servidor HTTP não precisa de poder para criar roles ou alterar estrutura. O processo de instalação/migration é uma tarefa administrativa explícita.",
+          "O `.env.example` contém marcadores locais. Copie para `.env`, substitua pelos valores fictícios desta base e confirme que `.env` é ignorado pelo Git. Um volume PostgreSQL existente persiste usuário e senha iniciais: se já foi inicializado, alinhe `.env` com as credenciais que criaram esse volume; não apague o volume para contornar divergência.",
+          "Neste Compose descartável, `aluno` é a conta de bootstrap que cria a role e aplica migrations; ela tem autoridade administrativa porque o ambiente é local e fictício. Isso não recomenda superusuário em produção: um ambiente real deve usar uma identidade de migration separada com somente os privilégios de DDL/gestão necessários, enquanto a API continua em uma role sem ownership e com grants de runtime limitados.",
+          "Prever antes de rodar: quando a conexão runtime tentar criar uma tabela de teste, ela deve receber erro de privilégio. A integração cria e remove estruturas temporárias administrativas fora da conexão da aplicação."
+        ],
+        "terms": [
+          { "term": "Role", "meaning": "Identidade/agrupamento PostgreSQL a que podem ser atribuídos atributos e privilégios." },
+          { "term": "Privilégio mínimo", "meaning": "Conceder somente as operações necessárias à tarefa e à identidade específica." },
+          { "term": "Migration", "meaning": "Mudança versionada de estrutura/dados do banco, aplicada por processo administrativo controlado." }
+        ]
+      },
+      {
+        "title": "Leia grants por objeto e teste a operação real",
+        "paragraphs": [
+          "A migration 004 remove grants amplos de PUBLIC no schema e objetos atuais e concede ao runtime somente leitura e inserção nas tabelas de estudo. `USAGE` no schema permite resolver os nomes; `USAGE` nas sequences permite gerar IDs de identidade. Esses são objetos diferentes e precisam de privilégios próprios.",
+          "O setup da role também revoga CONNECT/TEMPORARY de PUBLIC no banco descartável e concede CONNECT à role da aplicação. Faça esse setup somente na base local nomeada pelo exercício. A migration SQL trata grants do schema e objetos, não muda roles de um banco remoto.",
+          "Para aprender, compare permissão declarada com operação: SELECT e INSERT são aceitos; UPDATE, DELETE, TRUNCATE e CREATE falham. Um catálogo dizendo que grant existe ajuda, mas uma tentativa controlada confirma o caminho usado pelo cliente real. Não use comando destrutivo em dados do usuário.",
+          "Migrations futuras que criem novas tabelas precisam incluir grants correspondentes ou política de default privileges explícita. Não suponha que permissões das tabelas atuais se propagam automaticamente a objetos criados depois."
+        ],
+        "diagramTitle": "Duas conexões, duas responsabilidades",
+        "diagram": "npm run migrate\n      │ PGUSER / PGPASSWORD\n      └── role admin → cria role e aplica migrations\n\nservidor Node.js\n      │ PGAPPUSER / PGAPPPASSWORD\n      └── backend_app → SELECT / INSERT + sequences permitidas\n                         UPDATE / DELETE / DDL recusados\n\nA autorização por pessoa/linha exige controles separados.",
+        "terms": [
+          { "term": "USAGE no schema", "meaning": "Permite resolver e acessar objetos do schema quando também há grant no objeto." },
+          { "term": "Sequence", "meaning": "Objeto PostgreSQL que fornece próximos valores; uso pode exigir grant separado da tabela." },
+          { "term": "Default privileges", "meaning": "Regras de grants aplicadas a objetos futuros criados por uma role específica." }
+        ]
+      },
+      {
+        "title": "Limite a conclusão e preserve o ambiente",
+        "paragraphs": [
+          "A base Compose desta aula é descartável, local e usa credenciais fictícias. `npm run migrate` configura a role e aplica migrations; `npm run db:check` prova a conexão da aplicação. A suíte de privilégio opt-in verifica a separação e reverte seus dados de teste.",
+          "Se Docker não iniciar, consulte o README e execute a parte unitária; não marque o teste real como aprovado. CI executa PostgreSQL 17 efêmero e pode fornecer evidência de integração quando a execução remota passar. Evite substituir o teste faltante por inspeção de código.",
+          "Privilégio de tabela não sabe que uma linha pertence à identidade A. Como não há autenticação neste laboratório, esta etapa não cria RLS nem política por usuário. No app de progresso, RLS e validação de sessão são outra fronteira, com testes próprios. Pare serviços com `docker compose down`; nunca use `docker compose down -v` para remover dados sem intenção explícita."
+        ],
+        "terms": [
+          { "term": "Autorização por linha", "meaning": "Decisão que limita registros visíveis ou alteráveis de acordo com identidade e política; não é concedida por SELECT/INSERT de tabela." },
+          { "term": "Risco residual", "meaning": "O papel ainda pode inserir dados permitidos e não implementa isolamento por aluno; testes de integração também cobrem apenas operações exercitadas." }
+        ]
+      }
+    ],
+    "guided": [
+      { "instruction": "Compare `.env.example` com `configuracao-banco.cjs`. Identifique qual variável entra no pool usado pela API e qual entra no aplicador de migration.", "result": "Pool runtime usa PGAPPUSER/PGAPPPASSWORD; migration usa PGUSER/PGPASSWORD. São dois contextos e segredos fictícios separados." },
+      { "instruction": "Leia `004_privilegios_minimos.sql` e circule os grants de schema, tabela e sequence. Preveja o que acontece ao criar uma linha com ID automático.", "result": "backend_app precisa de USAGE no schema, INSERT na tabela e USAGE na sequence identity; SELECT é concedido para listar." },
+      { "instruction": "Leia `least-privilege.integration.test.cjs` e liste uma operação permitida, quatro negadas e como o teste limpa o dado de inserção.", "result": "SELECT/INSERT são permitidas; UPDATE/DELETE/TRUNCATE/CREATE são negadas; INSERT usa transação revertida e objetos de teste são controlados pelo admin." },
+      { "instruction": "Se Docker estiver disponível, execute `npm run migrate`, `npm run db:check` e o teste opt-in. Se não, registre cada etapa como não executada e leia os asserts unitários de configuração.", "result": "A execução real precisa terminar sem falhas contra PostgreSQL descartável. Sem serviço acessível, a integração permanece pendente; não se infere sucesso dos testes unitários." }
+    ],
+    "mistakes": [
+      "Executar API como dono da base ou superusuário porque simplifica migrations.",
+      "Usar a mesma senha para role admin e role de aplicação.",
+      "Conceder UPDATE/DELETE por conveniência sem requisito ou teste que explique a necessidade.",
+      "Esquecer USAGE da sequence e concluir que INSERT na tabela sempre basta para IDs identity.",
+      "Confundir grants em tabelas com autorização por usuário ou com RLS.",
+      "Apagar volume Compose para corrigir login de banco existente sem conferir credenciais iniciais.",
+      "Tratar teste unitário ou YAML do CI como evidência de que integração local foi executada."
+    ],
+    "exercises": [
+      { "prompt": "Prever: `backend_app` tenta conectar e listar estudos, inserir um estudo, atualizar o título e apagar uma sessão. Para cada operação, preveja permissão e o grant que explica o resultado.", "expected": "CONNECT, SELECT e INSERT são permitidos; UPDATE e DELETE são negados. CONNECT vem do setup local, SELECT/INSERT de 004 e as operações de alteração/remoção não são concedidas.", "criteria": ["Classifica corretamente as cinco operações.", "Relaciona o resultado a grants/role apropriados.", "Distingue acesso à tabela e privilégio CONNECT."], "solution": "Consulte setup de role, migration 004 e testes. A role recebe CONNECT/USAGE, SELECT/INSERT e USAGE nas sequences; UPDATE e DELETE não aparecem nos grants concedidos.", "explanation": "Prever operação ajuda a detectar uma autorização ampla antes de executá-la.", "hints": ["CONNECT é no banco ou na tabela?", "Qual migration concede SELECT e INSERT?", "A ausência de grant permite UPDATE?"] },
+      { "prompt": "Alterar: um requisito aprovado agora permite corrigir o título de estudo, mas ainda proíbe apagar. Especifique a menor mudança de migration e os testes positivos e negativos que preservam o restante do contrato.", "expected": "A proposta concede UPDATE somente na tabela/coluna necessária conforme estratégia PostgreSQL escolhida, mantém DELETE/TRUNCATE/DDL negados e testa atualizar permitido, leitura posterior e tentativa de delete recusada sem estado removido.", "criteria": ["Limita concessão ao objeto e ação necessários.", "Preserva negação de DELETE/TRUNCATE/DDL.", "Inclui teste de efeito positivo e negativo.", "Explica como migration futura mantém privilégio idempotente e revisável."], "solution": "Revise a migration versionada para conceder UPDATE no objeto estritamente necessário, avalie privilégio por coluna se a regra só afeta título e adicione teste com transação revertida. Não conceda ALL e não altere role administrativa.", "explanation": "Requisito legítimo pode ampliar autoridade, mas a mudança deve ser pequena e protegida contra regressão.", "hints": ["A tabela toda precisa ser atualizável ou somente um campo?", "Qual efeito negativo continua obrigatório?", "Como evitar que dados do laboratório persistam?"] },
+      { "prompt": "Construir: desenhe uma tabela de permissão para `estudos`, `sessoes_estudo`, sequences, schema, migrations e role administrativa. Inclua SELECT, INSERT, UPDATE, DELETE, TRUNCATE e CREATE e indique a identidade que executa cada uma.", "expected": "backend_app recebe somente privilégios de runtime documentados em tabelas/sequences/schema; migrations e criação de roles ficam com admin; ações não necessárias permanecem negadas.", "criteria": ["Separa duas identidades e contextos.", "Inclui grants por schema, tabela, sequence e migration.", "Marca permissões desnecessárias como negadas.", "Distingue operação de banco de autorização por linha."], "solution": "Use a migration 004 para os objetos de negócio e configurar-papel-aplicacao para role/CONNECT. Registre que ledger de migrations continua admin-only e que novas tabelas exigem política de grant própria.", "explanation": "Uma matriz torna explícito quem pode executar cada tipo de mudança.", "hints": ["Quem precisa ler o ledger de migrations?", "Como o INSERT gera ID identity?", "Qual operação a API não precisa para seu contrato atual?"] },
+      { "prompt": "Investigar erro: depois de uma migration, a API pode ler estudos mas INSERT falha com erro de privilégio na sequence. Registre os fatos, localize o grant ausente e proponha correção que não transforme backend_app em owner.", "expected": "A investigação separa privilege de tabela do privilege de sequence, confere nome/identidade correta e adiciona USAGE específico via migration revisada; repete teste de insert e mantém negações administrativas.", "criteria": ["Distingue grant de tabela e sequence.", "Confirma objeto e role usados pela API.", "Não concede ownership, ALL ou superuser.", "Repete teste positivo e testes negativos."], "solution": "Registre mensagem sem senha, confirme que a conexão usa backend_app e examine `has_sequence_privilege`/migration. Conceda USAGE na sequence identity correta, reaplique a migration em base descartável e rode a integração inteira.", "explanation": "Uma operação SQL pode depender de permissões em mais de um objeto PostgreSQL.", "hints": ["INSERT da tabela chegou a ser autorizado?", "O erro nomeia tabela ou sequence?", "Qual role abre o pool runtime?"] },
+      { "prompt": "Mudança inesperada: um aluno precisa ver e alterar somente seus próprios registros. Explique por que o grant global SELECT/INSERT não satisfaz o requisito e desenhe as decisões e evidências adicionais necessárias antes de adotar RLS ou autorização na API.", "expected": "A resposta observa que backend_app tem acesso a todas as linhas concedidas; é preciso escolher identidade autenticada confiável, relacioná-la a owner_id no servidor/policy, limitar operações por ação e testar A→A/B→B permitido e A→B/B→A negado, incluindo ausência de escrita cruzada. Esta entrega não altera o Supabase.", "criteria": ["Identifica que grants atuais não filtram linhas por aluno.", "Propõe identidade autenticada confiável e regra por objeto/linha.", "Inclui casos positivos e negativos com duas identidades fictícias.", "Não sugere confiar em ID/owner enviado pelo cliente.", "Mantém a alteração remota fora do escopo desta prática."], "solution": "Use sessão validada para derivar identidade, defina policy/checagem por linha e testes cruzados de leitura e escrita em ambiente isolado. Avalie RLS no projeto de identidade apropriado; não faça mudança no painel remoto como parte desta aula.", "explanation": "Privilégio mínimo por tabela limita tipo de operação, enquanto autorização por linha limita quais registros a identidade pode alcançar.", "hints": ["SELECT concede leitura de quais linhas?", "Quem controla o user_id no request?", "Que teste prova que B permaneceu intacto?"] }
+    ],
+    "quiz": [
+      { "question": "Por que separar credencial de migrations e credencial runtime?", "options": ["O processo HTTP não precisa de poderes de criação/alteração de schema.", "Migrations não usam banco.", "A role runtime deve ser superuser."], "correctIndex": 0, "explanation": "Separar tarefas reduz a autoridade disponível a cada processo." },
+      { "question": "Por que a API precisa de USAGE na sequence identity?", "options": ["A inserção pode solicitar o próximo ID ao objeto sequence.", "Para permitir DELETE em qualquer linha.", "Para abrir a conexão TCP."], "correctIndex": 0, "explanation": "Table grants e sequence grants são objetos distintos." },
+      { "question": "O que SELECT em `estudos` garante?", "options": ["Leitura permitida segundo o grant da tabela, sem filtrar automaticamente linhas por usuário.", "Só leitura das linhas cujo owner coincide com a sessão.", "Que RLS está habilitada."], "correctIndex": 0, "explanation": "Autorização por linha é controle separado do privilégio de tabela." },
+      { "question": "Qual prática preserva o ambiente PostgreSQL Compose existente?", "options": ["Usar credenciais coerentes com o volume e parar com `docker compose down` sem `-v`.", "Apagar o volume após cada erro de senha.", "Conectar o teste ao banco Supabase."], "correctIndex": 0, "explanation": "O volume mantém o estado inicial do banco; `down -v` apaga os dados persistidos." }
+    ],
+    "summary": [
+      "A role runtime `backend_app` é separada da role administrativa usada por migrations.",
+      "Schema, tabelas, sequences e conexão são objetos/escopos diferentes para grants.",
+      "A integração testa operações permitidas e recusadas em PostgreSQL descartável.",
+      "SELECT/INSERT no nível de tabela não isolam registros por usuário nem implementam RLS.",
+      "Sem Docker acessível, integração real permanece pendente; não remova volumes para corrigir credenciais."
+    ]
+  },
   "delivery-xss-output": {
     "prerequisites": "Concluir `delivery-owasp-top10`; conhecer strings, eventos, DOM e `textContent` de `js-dom`/`js-events`. A atividade demonstra uma falha DOM XSS somente em cópia local fora do repositório. Não exige servidor, conta, domínio ou deploy.",
     "setup": "Leia `labs/security-xss/README.md`. Faça uma cópia de `labs/security-xss/demo.html.example` para fora do repositório e renomeie a cópia para `demo-local.html`. No Windows, no PowerShell aberto na pasta do repositório, execute `Copy-Item labs/security-xss/demo.html.example \"$env:TEMP\\demo-local.html\"`; no macOS/Linux execute `cp labs/security-xss/demo.html.example /tmp/demo-local.html`. Abra a cópia no navegador e use Tab/Enter. O resultado esperado é: botão vulnerável altera o aviso local; botão corrigido mostra a marcação literalmente e não altera o aviso. Feche a aba para parar; para retomar, abra a cópia. Se ela não abrir, confira a extensão `.html`; como alternativa, compare os dois sinks no código sem executar. O arquivo `.html.example` fica inerte no Preview e nenhuma validação de domínio é necessária.",
@@ -3514,6 +3705,16 @@ Object.assign(LESSON_GUIDES, {
       prompt: "Uma pessoa A autentica normalmente, mas a rota usa o ID da URL para carregar o progresso de B. Explique a diferença entre autenticação e autorização, descreva a correção no servidor e proponha um teste positivo e um negativo para leitura e atualização, somente com os dados fictícios do laboratório local.",
       expected: "A sessão válida identifica A, mas não autoriza acesso a B; a API deve derivar a identidade da sessão validada e conferir o dono do objeto em cada ação. Testes permitem A→A e recusam A→B, confirmando que nenhuma resposta ou alteração de B ocorre.",
       hint: "O cliente controla o ID solicitado. Qual identidade confiável o servidor deve comparar com o proprietário do registro?"
+    },
+    "delivery-server-hardening": {
+      prompt: "Uma rota de erro 500 perdeu um dos cabeçalhos, enquanto os caminhos de sucesso ainda o exibem. Planeje como reproduzir a resposta local, comparar ordem do middleware, configurar Vercel e teste e separar a causa local da evidência de Preview; registre também o que CSP ainda exigiria.",
+      expected: "O plano reproduz o 500 com teste local, registra header esperado/observado, compara aplicação comum antes do despacho e regra global Vercel, acrescenta regressão sem reduzir cobertura e executa validador/suíte. Inspeção publicada é separada; CSP exige inventário e teste funcional das origens inline/CDN/Clerk.",
+      hint: "Uma exceção pode contornar cabeçalhos definidos somente no caminho de sucesso; compare a ordem em ambos os fluxos."
+    },
+    "delivery-db-privileges": {
+      prompt: "O runtime consegue selecionar e inserir, mas um requisito novo pede que cada pessoa altere apenas as próprias linhas. Explique por que o grant atual não basta e planeje uma prova com A/B, operação por ação, identidade confiável e ausência de efeito cruzado, sem modificar o projeto remoto.",
+      expected: "O grant de tabela autoriza linhas sem filtro por dono; o plano precisa derivar identidade de sessão validada e aplicar autorização por objeto/RLS com leituras e escritas A→A/B→B permitidas e cruzadas negadas, verificando que B não mudou.",
+      hint: "Privilégio de tabela controla o tipo de operação, não quem é dono de cada linha."
     },
     "delivery-xss-output": {
       prompt: "Uma anotação simples é mostrada em cinco telas. Uma revisão encontrou `innerHTML` na busca, mas não sabe como os outros caminhos renderizam o valor. Defina como rastrear fonte e sinks e critérios de teste que mostrem texto literal após criação, leitura, busca e recarga, usando apenas o exemplo local e um marcador sem efeito externo.",

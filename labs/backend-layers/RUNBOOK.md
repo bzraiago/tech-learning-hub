@@ -49,16 +49,16 @@ Para o Preview, confira no painel que `CLERK_PUBLISHABLE_KEY`, `SUPABASE_URL` e 
 
 Primeiro identifique qual serviço falhou. O progresso do site usa Supabase remoto; as rotas `/api/estudos` e `/health/*` abaixo pertencem ao laboratório local. Elas não comprovam a saúde do Supabase.
 
-No PowerShell, em `labs/backend-layers`, confira o estado dos serviços e a conexão. O `.env` deve existir, conter somente credenciais fictícias locais e apontar a `backend_camadas`:
+No PowerShell, em `labs/backend-layers`, confira o estado dos serviços e a conexão. O `.env` deve existir, conter credenciais fictícias distintas para administração e API e apontar a `backend_camadas`. O processo HTTP usa `backend_app`; `PGUSER`/`PGPASSWORD` são reservados às migrations, backup e manutenção local:
 
 ```powershell
 docker compose ps
 docker compose up -d --wait db redis
-npm.cmd run db:check
 npm.cmd run migrate
+npm.cmd run db:check
 ```
 
-Saída esperada: `db` e `redis` ficam saudáveis, `db:check` retorna `Conexão OK` e as migrations aparecem como aplicadas ou já aplicadas. No macOS/Linux, use os mesmos comandos com `npm` no lugar de `npm.cmd`.
+Saída esperada: `db` e `redis` ficam saudáveis, migrations `001` a `004` aparecem como aplicadas ou já aplicadas, e `db:check` retorna `Conexão OK` com o usuário `backend_app`. No macOS/Linux, use os mesmos comandos com `npm` no lugar de `npm.cmd`.
 
 Com a API ativa em `127.0.0.1:4180`, verifique as sondas sem imprimir configuração:
 

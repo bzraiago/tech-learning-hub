@@ -18,7 +18,7 @@ jobs:
         image: postgres:17
         env:
           POSTGRES_USER: aluno
-          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_PASSWORD: ci-only-admin-password
           POSTGRES_DB: backend_camadas
         ports:
           - 55433:5432
@@ -50,6 +50,9 @@ jobs:
       - name: Validate course content
         run: node scripts/validate-content.js
 
+      - name: Validate Vercel security headers
+        run: node scripts/validate-vercel-security.cjs
+
       - name: Install lab dependencies
         working-directory: labs/backend-layers
         run: npm ci
@@ -74,22 +77,30 @@ jobs:
           PGPORT=55433
           PGUSER=aluno
           PGDATABASE=backend_camadas
-          PGPASSWORD=ci-only-password
+          PGPASSWORD=ci-only-admin-password
+          PGAPPUSER=backend_app
+          PGAPPPASSWORD=ci-only-app-password
           EOF
-
-      - name: Check database connection
-        working-directory: labs/backend-layers
-        run: npm run db:check
 
       - name: Apply database migrations
         working-directory: labs/backend-layers
         run: npm run migrate
+
+      - name: Check database connection as the application role
+        working-directory: labs/backend-layers
+        run: npm run db:check
 
       - name: Run PostgreSQL integration test
         working-directory: labs/backend-layers
         env:
           RUN_PG_INTEGRATION: '1'
         run: npm run test:db
+
+      - name: Verify least-privilege application role
+        working-directory: labs/backend-layers
+        env:
+          RUN_LEAST_PRIVILEGE_INTEGRATION: '1'
+        run: npm run test:least-privilege
 
       - name: Test compatibility with the previous application version
         working-directory: labs/backend-layers
@@ -140,7 +151,9 @@ jobs:
           PGPORT=55433
           PGUSER=aluno
           PGDATABASE=backend_camadas
-          PGPASSWORD=ci-only-password
+          PGPASSWORD=ci-only-admin-password
+          PGAPPUSER=backend_app
+          PGAPPPASSWORD=ci-only-app-password
           EOF
 
       - name: Start PostgreSQL with the lab Compose file

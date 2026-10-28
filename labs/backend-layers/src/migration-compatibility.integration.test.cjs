@@ -7,16 +7,18 @@ const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 const { Pool } = require('pg');
+const { criarPoolEstudos, criarPoolMigracoes } = require('./configuracao-banco.cjs');
 const { aplicarMigrations } = require('../scripts/aplicar-migration.cjs');
 const { criarRepositorioEstudosPostgres } = require('./repositorio-estudos-postgres.cjs');
 
 const pastaMigrations = path.resolve(__dirname, '..', 'migrations');
 const migrationsBase = [
   '001_create_estudos.sql',
-  '002_create_sessoes_estudo.sql'
+  '002_create_sessoes_estudo.sql',
+  '004_privilegios_minimos.sql'
 ];
 
-function criarPool(database) {
+function criarPoolAdmin(database) {
   const porta = Number(process.env.PGPORT || 55433);
   return new Pool({
     host: process.env.PGHOST || '127.0.0.1',
@@ -30,7 +32,7 @@ function criarPool(database) {
 
 async function aplicarMigrationsNaBase(database, pasta) {
   return aplicarMigrations({
-    pool: criarPool(database),
+    pool: criarPoolMigracoes(database),
     pastaMigrations: pasta,
     registrar: () => {}
   });
@@ -53,8 +55,9 @@ test('migration expansiva preserva leitura e escrita da aplicação anterior', {
 
   const database = `compat_${randomUUID().replaceAll('-', '')}`;
   const pastaBase = await fs.mkdtemp(path.join(os.tmpdir(), 'hub-migration-base-'));
-  const poolAdmin = criarPool('postgres');
+  const poolAdmin = criarPoolAdmin('postgres');
   let poolAplicacao;
+  let poolConsultaAdmin;
   let databaseCreated = false;
 
   try {
@@ -66,7 +69,7 @@ test('migration expansiva preserva leitura e escrita da aplicação anterior', {
     }
     await aplicarMigrationsNaBase(database, pastaBase);
 
-    poolAplicacao = criarPool(database);
+    poolAplicacao = criarPoolEstudos(database);
     const versaoAnterior = criarRepositorioEstudosPostgres(poolAplicacao);
     const antes = await versaoAnterior.criarComSessao(
       'Compatibilidade antes da migration',
@@ -83,7 +86,7 @@ test('migration expansiva preserva leitura e escrita da aplicação anterior', {
     poolAplicacao = undefined;
     await aplicarMigrationsNaBase(database, pastaMigrations);
 
-    poolAplicacao = criarPool(database);
+    poolAplicacao = criarPoolEstudos(database);
     const versaoAnteriorAposMigration = criarRepositorioEstudosPostgres(poolAplicacao);
     const coluna = await poolAplicacao.query(
       "SELECT is_nullable FROM information_schema.columns WHERE table_name = 'sessoes_estudo' AND column_name = 'observacao'"
@@ -127,13 +130,15 @@ test('migration expansiva preserva leitura e escrita da aplicação anterior', {
     assert.equal(gravacaoAntigaAposDadosNovos.sessao.minutos, 20);
     assert.equal(observacaoPreservada.rows[0].observacao, 'registro fictício da versão nova');
 
-    const ledger = await poolAplicacao.query(
+    poolConsultaAdmin = criarPoolMigracoes(database);
+    const ledger = await poolConsultaAdmin.query(
       'SELECT id FROM migrations_aplicadas ORDER BY id'
     );
     assert.deepEqual(ledger.rows.map((linha) => linha.id), [
       '001_create_estudos.sql',
       '002_create_sessoes_estudo.sql',
-      '003_add_observacao_sessoes.sql'
+      '003_add_observacao_sessoes.sql',
+      '004_privilegios_minimos.sql'
     ]);
 
     console.log('Compatibilidade confirmada: versão anterior operou antes e depois da migration expansiva.');
@@ -142,12 +147,16 @@ test('migration expansiva preserva leitura e escrita da aplicação anterior', {
       await poolAplicacao?.end();
     } finally {
       try {
-        if (databaseCreated) {
-          await poolAdmin.query(`DROP DATABASE IF EXISTS "${database}"`);
-        }
+        await poolConsultaAdmin?.end();
       } finally {
-        await poolAdmin.end();
-        await fs.rm(pastaBase, { recursive: true, force: true });
+        try {
+          if (databaseCreated) {
+            await poolAdmin.query(`DROP DATABASE IF EXISTS "${database}"`);
+          }
+        } finally {
+          await poolAdmin.end();
+          await fs.rm(pastaBase, { recursive: true, force: true });
+        }
       }
     }
   }

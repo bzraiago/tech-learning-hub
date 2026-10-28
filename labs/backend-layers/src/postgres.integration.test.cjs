@@ -3,7 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { randomUUID } = require('node:crypto');
-const { criarPoolEstudos } = require('./configuracao-banco.cjs');
+const { criarPoolEstudos, criarPoolMigracoes } = require('./configuracao-banco.cjs');
 const { criarRepositorioEstudosPostgres } = require('./repositorio-estudos-postgres.cjs');
 
 test('PostgreSQL mantém dados após reconectar e reverte operações parciais', {
@@ -15,6 +15,7 @@ test('PostgreSQL mantém dados após reconectar e reverte operações parciais',
   const tituloRollbackCanonico = `rollback-${randomUUID()}`;
   const primeiroPool = criarPoolEstudos();
   const segundoPool = criarPoolEstudos();
+  const poolLimpeza = criarPoolMigracoes();
   let primeiroPoolEncerrado = false;
 
   try {
@@ -56,7 +57,6 @@ test('PostgreSQL mantém dados após reconectar e reverte operações parciais',
       (erro) => erro.code === '23505' && erro.constraint === 'estudos_titulo_canonico_unico'
     );
   } finally {
-    const poolLimpeza = segundoPool;
     const titulos = [tituloCanonico, tituloSessaoCanonico, tituloRollbackCanonico];
     await poolLimpeza.query(
       'DELETE FROM sessoes_estudo WHERE estudo_id IN (SELECT id FROM estudos WHERE titulo_canonico = ANY($1::text[]))',
@@ -68,5 +68,6 @@ test('PostgreSQL mantém dados após reconectar e reverte operações parciais',
     ).catch(() => {});
     if (!primeiroPoolEncerrado) await primeiroPool.end();
     await segundoPool.end();
+    await poolLimpeza.end();
   }
 });
