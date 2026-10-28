@@ -461,7 +461,10 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Ensinar limites, custos, quotas e risco de dependência de fornecedor (vendor lock-in).
   - [x] Atualizar `delivery-hosting-models` com estimativa por componente/unidade/janela, cenários esperado/crescimento/pico, quotas, excedentes, efeito dos limites e custo de saída; fontes oficiais da Vercel, Supabase e Clerk são consultadas sem fixar preços que mudam.
   - [x] Acrescentar prática de comparação com data da consulta, mecanismo de alerta/teto ou ausência, definição de métricas de usuários, dependências proprietárias e ensaio reversível de exportação/restauração. Validação didática, auditoria de carga e `npm test` passaram.
-- [ ] Documentar exportação e backup dos dados, restauração e plano mínimo de migração de fornecedor.
+- [x] Documentar exportação e backup dos dados, restauração e plano mínimo de migração de fornecedor.
+  - [x] Manter `BACKUP_RESTORE.md` como procedimento PostgreSQL e criar `PROVIDER_MIGRATION.md` para inventariar roles, extensões, identidade, Redis, arquivos, configuração, corte, retorno e validação numa cópia isolada.
+  - [x] Ligar a prática ao README e à aula `delivery-ci`; explicitar que o dump local não migra Clerk, RLS gerenciado, Redis, arquivos nem segredos.
+  - [x] Reexecutar restauração em PostgreSQL 17 descartável com dados fictícios: `estudos=2`, `sessoes=1`, hashes iguais e origem preservada; `src/postgres.integration.test.cjs` passou 1/1 contra a base restaurada. Não houve migração remota, de Clerk ou Supabase.
 - [ ] Criar rollback da aplicação e migração de banco compatível com a versão anterior quando necessário.
 - [ ] Produzir runbook de deploy, falha de autenticação, falha de banco, incidente e recuperação.
 

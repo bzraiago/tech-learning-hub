@@ -1003,7 +1003,12 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "Rollback é voltar a uma versão que se sabe funcionar quando a versão nova causa problema grave. Ele precisa ser planejado: identifique a versão anterior, preserve artefato ou commit, saiba como restaurar e verifique o fluxo principal depois. Se houve mudança de dados incompatível, voltar só os arquivos pode não bastar; comunique a dependência. Em exercício local, copie a versão anterior e reproduza a volta sem apagar o histórico da falha.",
           "Não confunda corrigir rapidamente com esconder o problema. Quando impacto é alto, restaurar primeiro pode reduzir dano; depois investigue com tempo. Registre causa, proteção adicionada e como o defeito foi detectado. Isso é parte da manutenção profissional de um projeto, mesmo em uma equipe pequena.",
+          "O roteiro `labs/backend-layers/BACKUP_RESTORE.md` restaura um dump PostgreSQL numa base separada; `PROVIDER_MIGRATION.md` amplia o ensaio para inventariar roles, extensões, identidade, Redis, arquivos e configuração. Um `pg_dump` comum contém uma base, não transfere todos os serviços do produto. Compare dados e comportamento no destino, preserve a origem e defina como tratar gravações depois do corte antes de autorizar retorno.",
           "Pausa: ordene registrar versão, restaurar versão estável, verificar o fluxo principal e investigar a causa. Indique quando uma migração de dados exige cuidado adicional."
+        ],
+        "terms": [
+          { "term": "Ponto de corte", "meaning": "Momento planejado em que o tráfego ou as gravações passam da origem para o destino." },
+          { "term": "Ensaio de restauração", "meaning": "Prova de que um backup pode ser restaurado num destino separado e verificado antes de depender dele." }
         ]
       },
       {
@@ -1044,6 +1049,10 @@ Object.assign(LESSON_GUIDES, {
       {
         "instruction": "Inicie `start:memory` e `monitor:api` em terminais separados; interrompa e reinicie a API depois do alerta.",
         "result": "Duas sondas falhas abrem um evento `monitor.alert.opened`; uma sonda saudável posterior registra `monitor.alert.resolved`."
+      },
+      {
+        "instruction": "Leia `labs/backend-layers/BACKUP_RESTORE.md` e `PROVIDER_MIGRATION.md`; anote o que o dump copia, o que precisa ser criado/configurado à parte e qual evidência libera o corte.",
+        "result": "A análise separa uma base PostgreSQL de roles, identidade, Redis, arquivos e configuração; exige restaurar e comparar num destino isolado, manter a origem e definir condição de retorno."
       }
     ],
     "exercises": [
@@ -1106,6 +1115,14 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "A máquina de estados torna a regra do alerta reproduzível e reduz ruído de uma sonda transitória.",
         "expected": "Uma abertura após duas falhas consecutivas e uma resolução após recuperação, sem alertas duplicados.",
         "criteria": ["Distingue falha isolada de limiar atingido.", "Mantém um único alerta enquanto indisponível.", "Resolve o alerta somente após sucesso."]
+      },
+      {
+        "prompt": "Mudança de requisito: o ensaio de migração leva 20 minutos entre exportação, restauração e validação, mas a equipe agora permite no máximo cinco minutos sem escrita. Atualize a decisão de corte e registre a evidência que falta antes de tentar cumprir essa janela.",
+        "hints": ["Não transforme um tempo medido de 20 minutos em uma promessa de cinco.", "Considere adiar o corte ou provar previamente outra estratégia de sincronização e retorno."],
+        "solution": "Não autorizar o corte com o procedimento atual. Registrar a janela incompatível, manter a origem ativa e avaliar uma janela maior ou uma estratégia incremental/replicada com suporte do destino. Ensaiar e medir exportação final, atraso de sincronização, validação e retorno antes de assumir compromisso; não introduzir dual write sem reconciliação testada.",
+        "explanation": "Uma nova restrição de indisponibilidade muda o método de migração; omitir validação para caber no prazo aumenta o risco de perda ou divergência de dados.",
+        "expected": "O plano é adiado ou substituído por uma estratégia comprovada; origem e destino ficam identificados, e existe critério verificável para prosseguir ou abortar.",
+        "criteria": ["Compara a janela nova ao tempo medido e não promete zero downtime sem prova.", "Preserva a origem e define validação final, condição de aborto e tratamento de escritas no destino.", "Qualquer estratégia incremental ou com dois sistemas é ensaiada e inclui reconciliação e retorno." ]
       }
     ],
     "mistakes": [
@@ -1144,6 +1161,12 @@ Object.assign(LESSON_GUIDES, {
         ],
         "correctIndex": 0,
         "explanation": "A versão estável reduz impacto enquanto a causa é investigada."
+      },
+      {
+        "question": "O que um `pg_dump` comum de uma base não migra automaticamente?",
+        "options": ["As linhas das tabelas da base exportada.", "Roles globais do cluster e configurações dos outros serviços, como identidade e arquivos.", "O schema e os objetos que estiverem incluídos no dump."],
+        "correctIndex": 1,
+        "explanation": "Um dump cobre uma base PostgreSQL; roles/tablespaces são globais, e identidade, cache, arquivos e configuração exigem plano próprio."
       }
     ],
     "summary": [
@@ -1151,7 +1174,8 @@ Object.assign(LESSON_GUIDES, {
       "CI repete verificações e ajuda a impedir entrega com falha conhecida.",
       "Observe, reproduza, contenha, corrija e acrescente regressão.",
       "Use logs JSON estruturados com campos permitidos e sem payload, IP, credenciais ou stack.",
-      "Separe liveness de readiness e teste alerta local com um limiar explícito."
+      "Separe liveness de readiness e teste alerta local com um limiar explícito.",
+      "Restaure backups em destino separado e valide comportamento; `pg_dump` não migra identidade, Redis, arquivos ou configuração por conta própria."
     ]
   },
   "delivery-threat-model": {

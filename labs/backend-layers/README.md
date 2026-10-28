@@ -103,6 +103,8 @@ Resultado esperado: as linhas `HTML` e `JavaScript`. Para verificar a configura�
 
 Para praticar backup lógico e restauração numa base separada, siga o [roteiro de backup e restauração](BACKUP_RESTORE.md). Use apenas os dados fictícios do laboratório; os arquivos locais de backup ficam fora do Git.
 
+Para planejar uma mudança de fornecedor sem confundir o dump PostgreSQL com a exportação de identidade, cache, arquivos e configuração, siga o [plano mínimo de migração](PROVIDER_MIGRATION.md). O roteiro separa inventário, ensaio em destino isolado, validação, corte e retorno; não conecte a prática ao Supabase real nem use contas reais.
+
 ## Executar a API e observar a persistência
 
 1. No terminal em `labs/backend-layers`, execute `npm.cmd start` no Windows ou `npm start` em macOS/Linux. A primeira linha é um registro JSON `api.started`, com endereço local e modos de armazenamento, cache e rate limit.
