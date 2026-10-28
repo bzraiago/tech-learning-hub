@@ -1,7 +1,10 @@
 'use strict';
 
 // Eventos da interface e inicialização da aplicação.
-function closeDialog() { if (dialog.open) dialog.close(); }
+function closeDialog(savePosition = true) {
+  if (dialog.open && savePosition && dialogContext?.type === 'lesson') saveReadingPosition();
+  if (dialog.open) dialog.close();
+}
 
 $('#close-dialog').addEventListener('click', closeDialog);
 dialog.addEventListener('close', () => {
@@ -12,6 +15,9 @@ dialog.addEventListener('close', () => {
   const original = dialogReturnFocus;
   const restored = original?.isConnected ? original : original?.dataset.focus ? document.querySelector(`[data-focus="${original.dataset.focus}"]`) : null;
   (restored || $('#resume')).focus({ preventScroll: true });
+});
+dialog.addEventListener('cancel', () => {
+  if (dialogContext?.type === 'lesson') saveReadingPosition();
 });
 // O Escape e o bloqueio de foco são nativos do elemento dialog.
 let pointerStartedOutside = false;
@@ -112,9 +118,26 @@ $('#lesson-sections').addEventListener('keydown', (event) => {
   renderLessonSection(READER_SECTIONS[index][0], true);
 });
 
+$('#dialog-body').addEventListener('scroll', scheduleReadingPositionSave, { passive: true });
+
 document.addEventListener('click', (event) => {
+  const readingLink = event.target.closest('a[data-reading-target]');
+  if (readingLink && dialogContext?.type === 'lesson') {
+    event.preventDefault();
+    const target = document.getElementById(readingLink.dataset.readingTarget);
+    if (!target) return;
+    const body = $('#dialog-body');
+    const top = target.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop;
+    body.scrollTo({ top, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+    (target.matches('h1,h2,h3,h4') ? target : target.querySelector('h1,h2,h3,h4'))?.focus({ preventScroll: true });
+    return;
+  }
   const button = event.target.closest('button');
   if (!button) return;
+  if (button.dataset.readingSetting) {
+    updateReadingPreference(button.dataset.readingSetting);
+    return;
+  }
   if (button.hasAttribute('data-retry')) {
     $('#retry-note')?.focus();
     return;

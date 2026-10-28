@@ -40,6 +40,67 @@ const READER_SECTIONS = [
 ];
 let activeLessonSection = 'learn';
 let notesSaveTimer;
+let readingPositionTimer;
+
+function saveReadingPosition() {
+  clearTimeout(readingPositionTimer);
+  readingPositionTimer = null;
+  if (dialogContext?.type !== 'lesson' || !lessonIndex.has(dialogContext.id)) return;
+  const top = Math.max(0, Math.min(2_000_000, Math.round($('#dialog-body').scrollTop / 40) * 40));
+  const previous = state.readingPositions[dialogContext.id];
+  if (previous?.section === activeLessonSection && previous.top === top) return;
+  state.readingPositions[dialogContext.id] = { section: activeLessonSection, top };
+  saveState();
+}
+
+function scheduleReadingPositionSave() {
+  if (dialogContext?.type !== 'lesson') return;
+  clearTimeout(readingPositionTimer);
+  readingPositionTimer = setTimeout(saveReadingPosition, 450);
+}
+
+function readingControlsMarkup() {
+  const { fontScale, lineHeight, width } = state.readingPreferences;
+  return `<section class="reader-tools" aria-label="Ajustes de leitura"><span class="reader-tools-title">Leitura</span><div class="reader-tool-group" role="group" aria-label="Tamanho do texto"><button type="button" data-reading-setting="font-down" aria-label="Diminuir tamanho do texto" ${fontScale <= 90 ? 'disabled' : ''}>A−</button><output id="reading-scale" aria-live="polite">${fontScale}%</output><button type="button" data-reading-setting="font-up" aria-label="Aumentar tamanho do texto" ${fontScale >= 130 ? 'disabled' : ''}>A+</button></div><button type="button" class="reader-tool-toggle" data-reading-setting="line" aria-label="Alterar espaçamento entre linhas">Entre linhas: ${lineHeight}</button><button type="button" class="reader-tool-toggle" data-reading-setting="width" aria-pressed="${width === 'wide'}">${width === 'wide' ? 'Largura ampla' : 'Largura padrão'}</button><span class="sr-only" id="reading-position-status" role="status" aria-live="polite">A posição de leitura é salva automaticamente nesta conta.</span></section>`;
+}
+
+function applyReadingPreferences() {
+  const article = $('#lesson-reading-panel');
+  if (!article) return;
+  const preferences = state.readingPreferences;
+  article.style.setProperty('--reader-font-scale', String(preferences.fontScale / 100));
+  article.style.setProperty('--reader-line-height', String(preferences.lineHeight));
+  article.classList.toggle('reader-wide', preferences.width === 'wide');
+  const scale = $('#reading-scale');
+  if (scale) scale.value = `${preferences.fontScale}%`;
+  const fontDown = $('[data-reading-setting="font-down"]');
+  const fontUp = $('[data-reading-setting="font-up"]');
+  if (fontDown) fontDown.disabled = preferences.fontScale <= 90;
+  if (fontUp) fontUp.disabled = preferences.fontScale >= 130;
+  const lineButton = $('[data-reading-setting="line"]');
+  if (lineButton) {
+    lineButton.textContent = `Entre linhas: ${preferences.lineHeight}`;
+    lineButton.setAttribute('aria-label', `Espaçamento entre linhas: ${preferences.lineHeight}. Ativar para alterar.`);
+  }
+  const widthButton = $('[data-reading-setting="width"]');
+  if (widthButton) {
+    widthButton.setAttribute('aria-pressed', String(preferences.width === 'wide'));
+    widthButton.textContent = preferences.width === 'wide' ? 'Largura ampla' : 'Largura padrão';
+  }
+}
+
+function updateReadingPreference(setting) {
+  const preferences = state.readingPreferences;
+  if (setting === 'font-down') preferences.fontScale = Math.max(90, preferences.fontScale - 10);
+  if (setting === 'font-up') preferences.fontScale = Math.min(130, preferences.fontScale + 10);
+  if (setting === 'line') {
+    const lineHeights = [1.6, 1.8, 2];
+    preferences.lineHeight = lineHeights[(lineHeights.indexOf(preferences.lineHeight) + 1) % lineHeights.length];
+  }
+  if (setting === 'width') preferences.width = preferences.width === 'wide' ? 'standard' : 'wide';
+  applyReadingPreferences();
+  saveState();
+}
 
 function prose(value) {
   return escapeHTML(value).replace(/`([^`]+)`/g, '<code class="rounded bg-white/5 px-1 text-violet-200">$1</code>');
@@ -183,15 +244,18 @@ function updateLearningEvidence(action) {
   $(target)?.focus();
 }
 
-function renderLessonSection(section = activeLessonSection, moveFocus = false) {
+function renderLessonSection(section = activeLessonSection, moveFocus = false, restoreSavedPosition = false) {
   if (dialogContext?.type !== 'lesson' || !READER_SECTIONS.some(([key]) => key === section)) return;
+  if (!restoreSavedPosition) saveReadingPosition();
   const { lesson, module, track } = lessonIndex.get(dialogContext.id);
   const guide = lesson.guide;
   activeLessonSection = section;
   $('#lesson-sections').innerHTML = READER_SECTIONS.map(([key, label]) => `<button id="reader-tab-${key}" role="tab" aria-selected="${key === section}" aria-controls="lesson-reading-panel" tabindex="${key === section ? 0 : -1}" data-lesson-section="${key}" class="reader-section shrink-0 rounded-lg border border-transparent px-3 py-2.5 text-xs font-semibold text-slate-400 transition hover:bg-white/5 hover:text-white">${label}</button>`).join('');
   let content = '';
   if (section === 'learn') {
-    content = `<div class="mb-6 flex flex-wrap items-center gap-2"><span class="rounded-full bg-violet-400/10 px-3 py-1 text-xs text-violet-200">${module.level}</span><span class="text-xs text-slate-400">~${duration(lesson.minutes)} de estudo e prática</span></div><div class="mt-6 border-l-2 border-violet-400/60 pl-4"><h3 class="font-display text-xl font-semibold text-violet-200">Ao terminar esta aula</h3><ul class="mt-2 list-disc space-y-2 pl-4 text-sm leading-relaxed text-slate-300">${lesson.objectives.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul></div><h3 class="font-display text-2xl font-semibold">Antes do primeiro passo</h3><div class="mt-4 rounded-xl border border-white/10 bg-white/[.025] p-4"><h4 class="text-sm font-semibold text-violet-200">O que você precisa saber</h4>${readerParagraph(guide.prerequisites)}<h4 class="mt-5 text-sm font-semibold text-violet-200">Prepare seu ambiente</h4>${readerParagraph(guide.setup)}</div><h3 class="mt-8 font-display text-xl font-semibold">Onde isso entra na prática?</h3>${readerParagraph(guide.why)}${guide.sections.map((part, i) => `<section class="mt-9"><h3 class="font-display text-xl font-semibold leading-snug"><span class="mr-2 text-violet-300">${String(i + 1).padStart(2, '0')}.</span>${escapeHTML(part.title)}</h3>${part.paragraphs.map(readerParagraph).join('')}${part.trace ? readerTrace(part.trace) : ''}${part.diagram ? readerCode(part.diagram, part.diagramTitle || 'Mapa de referências') : ''}${part.terms?.length ? readerTerms(part.terms) : ''}</section>`).join('')}<p class="mt-8 rounded-xl bg-violet-400/10 p-4 text-sm leading-relaxed text-violet-100">Quando conseguir explicar essas ideias com suas palavras, continue para o exemplo. Você verá como cada parte aparece no código ou no fluxo de trabalho.</p>`;
+    const lessonSummary = guide.summary.map(item => `<li>${prose(item)}</li>`).join('');
+    const tableOfContents = `<details class="reader-toc" open><summary>Sumário desta aula</summary><nav aria-label="Sumário desta aula"><ol>${guide.sections.map((part, i) => `<li><a href="#lesson-part-${i}" data-reading-target="lesson-part-${i}">${escapeHTML(part.title)}</a></li>`).join('')}<li><a href="#lesson-summary" data-reading-target="lesson-summary">Resumo da aula</a></li></ol></nav></details>`;
+    content = `${tableOfContents}<div class="mb-6 flex flex-wrap items-center gap-2"><span class="rounded-full bg-violet-400/10 px-3 py-1 text-xs text-violet-200">${module.level}</span><span class="text-xs text-slate-400">~${duration(lesson.minutes)} de estudo e prática</span></div><div class="mt-6 border-l-2 border-violet-400/60 pl-4"><h3 class="font-display text-xl font-semibold text-violet-200">Ao terminar esta aula</h3><ul class="mt-2 list-disc space-y-2 pl-4 text-sm leading-relaxed text-slate-300">${lesson.objectives.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul></div><h3 class="font-display text-2xl font-semibold">Antes do primeiro passo</h3><div class="mt-4 rounded-xl border border-white/10 bg-white/[.025] p-4"><h4 class="text-sm font-semibold text-violet-200">O que você precisa saber</h4>${readerParagraph(guide.prerequisites)}<h4 class="mt-5 text-sm font-semibold text-violet-200">Prepare seu ambiente</h4>${readerParagraph(guide.setup)}</div><h3 class="mt-8 font-display text-xl font-semibold">Onde isso entra na prática?</h3>${readerParagraph(guide.why)}${guide.sections.map((part, i) => `<section id="lesson-part-${i}" class="reader-content-section mt-9"><h3 tabindex="-1" class="font-display text-xl font-semibold leading-snug"><span class="mr-2 text-violet-300">${String(i + 1).padStart(2, '0')}.</span>${escapeHTML(part.title)}</h3>${part.paragraphs.map(readerParagraph).join('')}${part.trace ? readerTrace(part.trace) : ''}${part.diagram ? readerCode(part.diagram, part.diagramTitle || 'Mapa de referências') : ''}${part.terms?.length ? readerTerms(part.terms) : ''}</section>`).join('')}<section id="lesson-summary" class="reader-summary mt-9 rounded-xl border border-emerald-300/20 bg-emerald-300/[.04] p-4"><h3 tabindex="-1" class="font-display text-xl font-semibold text-emerald-200">Resumo da aula</h3><ul class="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-slate-300">${lessonSummary}</ul></section><p class="mt-8 rounded-xl bg-violet-400/10 p-4 text-sm leading-relaxed text-violet-100">Quando conseguir explicar essas ideias com suas palavras, continue para o exemplo. Você verá como cada parte aparece no código ou no fluxo de trabalho.</p>`;
   } else if (section === 'example') {
     content = `<h3 class="font-display text-2xl font-semibold">Um exemplo, parte por parte</h3><p class="mt-3 text-sm leading-relaxed text-slate-400">Leia a explicação e execute no ambiente indicado. O código exibido aqui é material de estudo; ele não é executado dentro do dashboard.</p>${readerParagraph(guide.setup)}${readerCode(guide.example.code, guide.example.language)}<h3 class="mt-7 font-display text-xl font-semibold">Por que cada parte está aqui?</h3><ol class="mt-4 space-y-4">${guide.example.explanation.map((step, i) => `<li class="flex gap-3"><span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-violet-400/15 text-xs font-bold text-violet-200">${i + 1}</span><p class="text-[15px] text-slate-300">${prose(step)}</p></li>`).join('')}</ol><div class="mt-6 rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-4"><h3 class="text-sm font-semibold text-emerald-200">O que você deve observar</h3>${readerParagraph(guide.example.expected)}</div><h3 class="mt-8 font-display text-xl font-semibold">Agora, faça uma mudança de cada vez</h3><ol class="mt-4 space-y-4">${guide.guided.map((step, i) => `<li class="rounded-xl border border-white/10 p-4"><h4 class="mb-2 text-xs font-semibold uppercase tracking-wide text-violet-300">Passo ${i + 1}</h4>${readerParagraph(step.instruction)}<p class="mt-3 text-sm text-emerald-200"><strong>Observe:</strong> ${prose(step.result)}</p></li>`).join('')}</ol>`;
   } else if (section === 'practice') {
@@ -202,8 +266,10 @@ function renderLessonSection(section = activeLessonSection, moveFocus = false) {
   } else {
     content = `<h3 class="font-display text-2xl font-semibold">Aprofunde quando precisar</h3><p class="mt-3 text-[15px] leading-relaxed text-slate-400">A explicação, a prática e a revisão estão dentro desta aula. As referências abaixo servem para consultar detalhes e explorar aplicações adicionais. Algumas aulas em vídeo usam versões anteriores; confira a documentação para o seu ambiente.</p>${track.id === 'html' ? htmlReferenceGuide() : track.id === 'ai' ? '<div class="mt-5 rounded-xl border border-sky-300/20 p-4"><h4 class="font-semibold">Como aprofundar Engenharia de IA</h4><p class="mt-3 text-sm leading-7">Consulte primeiro o contrato da API, a versão do SDK e a especificação do protocolo usado. Exemplos locais simulam somente as partes explicitadas; conexão real, qualidade de modelo e segurança exigem avaliações próprias. As aulas fornecem a base para as atividades. Documentação, livros e cursos abertos complementam; contas, inferência e infraestrutura podem ter custos separados.</p></div>' : track.id === 'database' ? '<div class="mt-5 rounded-xl border border-sky-300/20 p-4"><h4 class="font-semibold">Como consultar bancos e Docker</h4><p class="mt-3 text-sm leading-7">Identifique primeiro o motor, a versão e o cliente. Consulte a referência de comandos SQL, tipos, funções e transações desse motor. No MongoDB, procure operadores de consulta e estágios de agregação. No Docker, diferencie comandos de terminal e opções do arquivo Compose. Compare sintaxe, resultado e limites; não trate dialetos como intercambiáveis. As fontes aprofundam as aulas, e cada prática informa onde executar.</p></div>' : track.id === 'python' ? '<div class="mt-5 rounded-xl border border-sky-300/20 p-4"><h4 class="font-semibold">Como consultar Python</h4><p class="mt-3 text-sm leading-7">No índice oficial, pesquise primeiro a estrutura da linguagem no Tutorial e depois o nome exato da função, método, exceção ou módulo na Referência da Biblioteca. Confira assinatura, tipos aceitos, valor retornado e exceções. Teste uma mudança pequena no terminal. As fontes ampliam o estudo; os exercícios e projetos são explicados aqui.</p></div>' : track.id === 'javascript' ? '<div class="mt-5 rounded-xl border border-sky-300/20 p-4"><h4 class="font-semibold">Como consultar JavaScript</h4><p class="mt-3 text-sm leading-7">Procure métodos pelo tipo: Array para map, filter e reduce; String para trim e includes; Object para chaves e valores. Operadores e estruturas de controle ficam na referência da linguagem. document, eventos, fetch e localStorage pertencem às APIs do navegador. Confira parâmetros, valor retornado, mutação da entrada e erros possíveis. Adapte um exemplo pequeno antes de integrar ao projeto. As consultas são opcionais: as atividades são explicadas nas aulas.</p></div>' : ''}${resourceCards([...(lesson.docs || []), ...module.resources])}`;
   }
-  $('#dialog-body').innerHTML = `<article id="lesson-reading-panel" role="tabpanel" aria-labelledby="reader-tab-${section}" tabindex="0" class="reader-prose">${content}</article>`;
-  $('#dialog-body').scrollTop = 0;
+  $('#dialog-body').innerHTML = `<article id="lesson-reading-panel" role="tabpanel" aria-labelledby="reader-tab-${section}" tabindex="0" class="reader-prose">${readingControlsMarkup()}${content}</article>`;
+  applyReadingPreferences();
+  const savedPosition = state.readingPositions[lesson.id];
+  $('#dialog-body').scrollTop = savedPosition?.section === section ? savedPosition.top : 0;
   renderLessonFooter();
   if (moveFocus) $(`#reader-tab-${section}`).focus({ preventScroll: true });
 }
@@ -211,6 +277,7 @@ function renderLessonSection(section = activeLessonSection, moveFocus = false) {
 function openLesson(id) {
   const entry = lessonIndex.get(id);
   if (!entry) return;
+  if (dialogContext?.type === 'lesson') saveReadingPosition();
   const { track, module, lesson } = entry;
   state.lastLesson = id;
   state.activeTrack = track.id;
@@ -219,9 +286,9 @@ function openLesson(id) {
   const origin = dialogReturnFocus;
   render();
   dialogContext = { type: 'lesson', id };
-  activeLessonSection = 'learn';
+  activeLessonSection = state.readingPositions[id]?.section || 'learn';
   showDialog(lesson.title, `${track.title} / Módulo ${module.number}`, '', '');
-  renderLessonSection();
+  renderLessonSection(activeLessonSection, false, true);
   dialogReturnFocus = origin;
 }
 

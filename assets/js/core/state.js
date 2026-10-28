@@ -55,7 +55,7 @@ function validEvidenceDate(value) {
 }
 
 function sanitizeState(candidate) {
-  const clean = { version: 1, completed: {}, learningEvidence: {}, activeTrack: 'preparacao', lastLesson: null, notes: {}, quizAttempts: {}, projects: {}, htmlCssRevision: 2, javascriptRevision: 3, pythonRevision: 2, databaseRevision: 3, aiRevision: 2, deliveryRevision: 1, readiness: {} };
+  const clean = { version: 1, completed: {}, learningEvidence: {}, activeTrack: 'preparacao', lastLesson: null, notes: {}, quizAttempts: {}, projects: {}, htmlCssRevision: 2, javascriptRevision: 3, pythonRevision: 2, databaseRevision: 3, aiRevision: 2, deliveryRevision: 1, readiness: {}, readingPositions: {}, readingPreferences: { fontScale: 100, lineHeight: 1.8, width: 'standard' } };
   if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return clean;
   if (candidate.completed && typeof candidate.completed === 'object') {
     for (const id of lessonIndex.keys()) {
@@ -77,6 +77,18 @@ function sanitizeState(candidate) {
   for(const item of READINESS_EVIDENCE)clean.readiness[item.id]=candidate.readiness?.[item.id]===true;
   if (tracks.some((track) => track.id === candidate.activeTrack)) clean.activeTrack = candidate.activeTrack;
   if (lessonIndex.has(candidate.lastLesson)) clean.lastLesson = candidate.lastLesson;
+  for (const id of lessonIndex.keys()) {
+    const position = candidate.readingPositions?.[id];
+    if (!position || typeof position !== 'object' || !['learn', 'example', 'practice', 'review', 'resources'].includes(position.section)) continue;
+    const top = Number.isFinite(position.top) ? Math.max(0, Math.min(2_000_000, Math.round(position.top))) : 0;
+    clean.readingPositions[id] = { section: position.section, top };
+  }
+  const preferences = candidate.readingPreferences;
+  if (preferences && typeof preferences === 'object') {
+    if ([90, 100, 110, 120, 130].includes(preferences.fontScale)) clean.readingPreferences.fontScale = preferences.fontScale;
+    if ([1.6, 1.8, 2].includes(preferences.lineHeight)) clean.readingPreferences.lineHeight = preferences.lineHeight;
+    if (['standard', 'wide'].includes(preferences.width)) clean.readingPreferences.width = preferences.width;
+  }
   for (const { track, module, lesson } of lessonIndex.values()) {
     if (!lesson.guide) continue;
     if (lesson.guide.retry) {

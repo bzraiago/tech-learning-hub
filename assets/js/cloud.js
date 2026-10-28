@@ -70,7 +70,7 @@ async function cloudLoad(userId, generation) {
       throw new Error('O progresso remoto tem formato desconhecido.');
     }
     state = sanitizeState(candidate || null);
-    if (dialog.open) closeDialog();
+    if (dialog.open) closeDialog(false);
     render();
     cloudReady = true;
     cloudLock(false);
@@ -97,7 +97,7 @@ function cloudSwitch(userId) {
   cloudSavedRevision = 0;
   startupNotice = '';
   state = sanitizeState(null);
-  if (dialog.open) closeDialog();
+  if (dialog.open) closeDialog(false);
   render();
   cloudPanel.hidden = false;
   if (pending) notify('A conta mudou antes de confirmar o salvamento. As alterações pendentes podem não ter sido enviadas.');

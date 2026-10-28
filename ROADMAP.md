@@ -537,10 +537,11 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Implementar exportação de progresso e anotações.
 - [ ] Implementar importação validada, com confirmação antes de substituir dados.
 - [ ] Documentar versão e compatibilidade do formato exportado.
-- [ ] Criar modo de leitura prolongada.
-- [ ] Adicionar sumário navegável por teclado.
-- [ ] Salvar e restaurar posição de leitura.
-- [ ] Adicionar ajustes de leitura sem prejudicar contraste e responsividade.
+- [x] Criar modo de leitura prolongada com resumo por aula.
+- [x] Adicionar sumário navegável por teclado.
+- [x] Salvar e restaurar posição por aula e etapa de leitura na conta Supabase.
+- [x] Adicionar escala do texto, espaçamento entre linhas e largura de leitura, mantendo os controles responsivos.
+- [~] Conferir navegação só por teclado e largura de 375 px; confirmar retomada da posição e preferências após recarga com Clerk/Supabase.
 - [ ] Garantir funcionamento quando o armazenamento local estiver bloqueado.
 - [ ] Testar perda, corrupção e recuperação do estado.
 
@@ -743,6 +744,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 28/10/2026 | Fase 7.4 — precisão da explicação sobre verificação Clerk | `3c56501` | `delivery-api-abuse` e o README do laboratório explicam por que este exemplo usa `verifyToken()` para o Bearer extraído, que é uma API de nível mais baixo, e quando considerar `authenticateRequest()`; referências oficiais Clerk verificadas. Docker Compose isolado: migrations 001–004 aplicadas, integração HTTP Redis 2/2 e cache PostgreSQL/Redis 1/1; `npm test` 76/76, sintaxe e validador passaram (143 aulas, 597 exercícios, 454 questões, 24 projetos). Containers, rede, volume e `.env` temporários removidos; Supabase não foi alterado. A auditoria heurística listou 17 aulas para revisão de carga, sem concluir que precisem ser divididas. Sessão Clerk real, revisão visual e teste com aluno permanecem pendentes. |
 | 28/10/2026 | Fase 4 — associação entre prontidão e projetos de fechamento | `7d27e16` | Os sete itens do painel de prontidão agora apontam para quatro projetos de fechamento e mostram se a entrega foi registrada, se uma explicação antiga ainda falta ou se não há registro. A marcação de evidência externa segue manual, com avisos explícitos de que o dashboard não verifica Git, revisão, comandos ou deploy. Nenhum campo ou versão de estado foi alterado. Validador (143 aulas/597 exercícios/454 questões/24 projetos), `node --check` e harness de renderização; Chromium headless percorreu os 21 controles por Tab em viewport de 375 px. Não foi aberta uma sessão Clerk nem feita verificação visual da aplicação autenticada; integração completa para provas intermediárias/avançadas permanece pendente. |
 | 28/10/2026 | Fase 3 — separar testes/CI, observabilidade e recuperação | `eddbc4e` | `delivery-ci` mantém o ID antigo e fica com quatro seções de testes/CI; `delivery-observability` e `delivery-recovery` recebem logs, sondas, incidentes, backup, migrations e rollback. Migração sintética preservou conclusão, cinco rascunhos realocados, retry e nota de requisito; reiniciou só o quiz alterado e preservou os quizzes das outras aulas. Docker isolado aplicou migrations 001–004; backup/restore confirmou `estudos=2`, `sessoes=0` e origem preservada; compatibilidade 003 passou 1/1. Validador: 145 aulas, 600 exercícios, 459 questões e 24 projetos; sintaxe e `git diff --check` passaram. A auditoria heurística deixa 16 candidatas; revisão com aluno, revisão visual e sessão Clerk real não foram executadas. O projeto Docker temporário e `.env` foram removidos; os contêineres Supabase locais permaneceram ativos. |
+| 28/10/2026 | Fase 9 — modo de leitura prolongada | Commit pendente | A leitura ganhou sumário com âncoras focáveis, resumo da aula, posição por aula/etapa sincronizada no estado da conta e preferências de texto, espaçamento e largura. `sanitizeState()` aplica defaults e limites compatíveis com progresso existente; na troca de conta, a posição anterior não é associada ao novo usuário. `node --check` nos quatro scripts, validador (145/600/459/24) e `git diff --check` passaram. Conferência manual de teclado, 375 px e sessão autenticada Clerk/Supabase pendente. |
 ## Decisões e bloqueios
 
 Registre aqui mudanças de direção e impedimentos que afetem a sequência.
