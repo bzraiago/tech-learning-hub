@@ -593,6 +593,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 27/10/2026 | Fase 7 — fluxo automatizado no navegador | `66636e5` | `labs/backend-layers/e2e` executa Chromium headless contra a interface e API reais do laboratório em memória; 1 fluxo passou. O teste não comprova persistência PostgreSQL. |
 | 27/10/2026 | Fase 7 — CI real | `66636e5` | Run [40605904963](https://github.com/bzraiago/tech-learning-hub/actions/runs/40605904963) passou no GitHub Actions: validação, 17 testes unitários, migrations, integração PostgreSQL 17 e Playwright. |
 | 27/10/2026 | Fase 7 — recuperação de falha na CI | `92fb73d` | Na branch temporária, o run [40606364491](https://github.com/bzraiago/tech-learning-hub/actions/runs/40606364491) identificou a asserção incorreta; após restaurar `valido: true`, o run [40606768881](https://github.com/bzraiago/tech-learning-hub/actions/runs/40606768881) passou em todas as etapas. `main` não foi alterada durante a prática e o branch foi removido. |
+| 27/10/2026 | Fase 7 — serviço externo real | `9c6dab5` | Open-Meteo foi integrado ao laboratório com validação do contrato, atribuição visível e falhas simuladas. Smoke público sem chave passou; validador, 29 testes unitários e 2 fluxos locais Playwright passaram; run [40607589139](https://github.com/bzraiago/tech-learning-hub/actions/runs/40607589139) passou no GitHub Actions. |
 
 ## Decisões e bloqueios
 
