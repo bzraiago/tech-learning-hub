@@ -331,8 +331,9 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] `labs/backend-layers` consulta o Open-Meteo, valida e normaliza temperatura/umidade; smoke real passou sem credenciais e a interface atribui a fonte.
 - [x] Simular falhas de rede, autenticação e resposta inválida sem expor credenciais.
   - [x] Testes controlados cobrem erro de rede, timeout, `401` simulado e contrato JSON inválido; API retorna mensagens públicas sem detalhes internos. O serviço escolhido não exige autenticação.
-- [ ] Publicar uma aplicação de demonstração.
+- [x] Publicar a página e a função da demonstração em `main`; o deploy Vercel do commit [`43decdc`](https://github.com/bzraiago/tech-learning-hub/commit/43decdce0350ebd35645a1b3c9fa31ad55a5e99b) foi concluído.
 - [ ] Conferir a URL final e o comportamento publicado.
+  - [ ] O alias de branch `tech-learning-hub-git-main-bzraiago.vercel.app` mostra “Login – Vercel” sem sessão Vercel; localizar o domínio de produção público ou decidir como configurar a proteção antes de marcar este aceite.
 - [ ] Ensinar rollback para uma versão anterior.
 - [ ] Executar e comprovar backup e restauração.
 - [ ] Criar prática real ou revisão independente de colaboração.
@@ -594,6 +595,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 27/10/2026 | Fase 7 — CI real | `66636e5` | Run [40605904963](https://github.com/bzraiago/tech-learning-hub/actions/runs/40605904963) passou no GitHub Actions: validação, 17 testes unitários, migrations, integração PostgreSQL 17 e Playwright. |
 | 27/10/2026 | Fase 7 — recuperação de falha na CI | `92fb73d` | Na branch temporária, o run [40606364491](https://github.com/bzraiago/tech-learning-hub/actions/runs/40606364491) identificou a asserção incorreta; após restaurar `valido: true`, o run [40606768881](https://github.com/bzraiago/tech-learning-hub/actions/runs/40606768881) passou em todas as etapas. `main` não foi alterada durante a prática e o branch foi removido. |
 | 27/10/2026 | Fase 7 — serviço externo real | `9c6dab5` | Open-Meteo foi integrado ao laboratório com validação do contrato, atribuição visível e falhas simuladas. Smoke público sem chave passou; validador, 29 testes unitários e 2 fluxos locais Playwright passaram; run [40607589139](https://github.com/bzraiago/tech-learning-hub/actions/runs/40607589139) passou no GitHub Actions. |
+| 27/10/2026 | Fase 7 — demonstração Vercel | `43decdc` | Página independente e função Node.js foram publicadas; o check de deploy concluiu. Os aliases conhecidos exigem sessão Vercel e exibem a tela de login, portanto a URL pública final e o fluxo remoto ainda precisam de confirmação. A CI [40608266317](https://github.com/bzraiago/tech-learning-hub/actions/runs/40608266317) passou. |
 
 ## Decisões e bloqueios
 
@@ -603,3 +605,4 @@ Registre aqui mudanças de direção e impedimentos que afetem a sequência.
 |---|---|---|---|---|
 | 27/10/2026 | Decisão de ambiente | O daemon Docker não está acessível nesta sessão; a validação PostgreSQL foi feita numa instância 18 descartável, vinculada somente a `127.0.0.1:55433`, e encerrada após os testes. | O caminho PostgreSQL real ficou verificável sem tocar no Supabase nem no banco permanente; o fluxo específico de Docker Compose não foi executado. | Seguir para a Fase 7; quando Docker estiver disponível, conferir também o caminho Compose do laboratório. |
 | 27/10/2026 | Prática CI | Foi introduzida e corrigida uma expectativa de teste incorreta em branch temporária; `main` permaneceu intacta e verde. | A prática demonstrou localizar a primeira etapa vermelha, comparar esperado/observado, restaurar a asserção e esperar a CI confirmar os testes seguintes. | Integrar e documentar um serviço externo real no laboratório backend. |
+| 27/10/2026 | Acesso à demonstração | A Vercel concluiu o deploy do commit `43decdc`, mas o alias `git-main` mostra “Login – Vercel” a clientes sem sessão. | A proteção dos previews pode ser independente da sessão Clerk da aplicação; não a alterei nem considerei a URL verificada como pública. | O dono informa o domínio de produção correto ou decide se deseja mudar a proteção de acesso dos previews. |

@@ -69,6 +69,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [x] Numa branch temporária, observar a falha controlada no run [40606364491](https://github.com/bzraiago/tech-learning-hub/actions/runs/40606364491), corrigir a expectativa e confirmar o run verde [40606768881](https://github.com/bzraiago/tech-learning-hub/actions/runs/40606768881); `main` permaneceu intacta.
 - [x] `labs/backend-layers`: `npm run smoke:open-meteo` consulta serviço real sem chave e confere campos; testes automatizados simulam rede, timeout, `401` e JSON inválido sem enviar credenciais.
 - [x] Interface do laboratório identifica e vincula Open-Meteo como fonte dos dados meteorológicos.
+- [ ] Demonstração Vercel: verificar página e JSON público sem sessão Vercel; o alias conhecido `git-main` ainda apresenta “Login – Vercel”.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.

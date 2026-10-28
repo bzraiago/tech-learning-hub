@@ -4,7 +4,7 @@
 
 Publicar a página independente em `labs/backend-layers/demo/` e a função Node.js em `api/labs/open-meteo.mjs`. A função chama Open-Meteo sem chave. Esta demonstração não usa Clerk, Supabase nem PostgreSQL; não informe dados pessoais e não confunda a página com o curso principal. A rota pública limita a consulta a um ponto geográfico de referência e permite cache compartilhado por cinco minutos para reduzir chamadas ao provedor.
 
-O repositório já tem uma função Vercel em `api/public-config.mjs`. A demonstração acrescenta uma rota no mesmo projeto, sem mudar a raiz ou os domínios atuais. A Vercel encontra funções Node.js na pasta `api/`; arquivos estáticos da raiz e subpastas são servidos no mesmo projeto. Consulte a [documentação do runtime Node.js da Vercel](https://vercel.com/docs/functions/runtimes/node-js).
+O repositório já tem uma função Vercel em `api/public-config.mjs`. A demonstração acrescenta uma rota no mesmo projeto, sem mudar a raiz ou os domínios atuais. A Vercel encontra funções Node.js na pasta `api/`; arquivos estáticos da raiz e subpastas são servidos no mesmo projeto. Consulte a [documentação do runtime Node.js da Vercel](https://vercel.com/docs/functions/runtimes/node-js) e as notas sobre [deploys conectados ao Git](https://vercel.com/docs/builds).
 
 ## Conferir o projeto antes do deploy
 
@@ -15,11 +15,13 @@ O repositório já tem uma função Vercel em `api/public-config.mjs`. A demonst
 
 ## Publicação
 
-Com a integração Git ativa, cada push para a branch principal inicia um deploy conforme a configuração do projeto. Depois que o commit chegar ao GitHub, abra **Deployments** no painel e espere a implantação correspondente à branch `main` terminar com estado **Ready**. Se o projeto não estiver conectado ao Git, use a raiz do repositório e o fluxo oficial de deploy da CLI após autenticar sua conta; não rode `vercel --prod` em outra pasta ou projeto.
+Com a integração Git ativa, cada push para a branch principal inicia um deploy conforme a configuração do projeto. Depois que o commit chegar ao GitHub, abra **Deployments** no painel e espere a implantação correspondente à branch `main` terminar com estado **Ready**. Se o projeto não estiver conectado ao Git, use a raiz do repositório e o [fluxo oficial da CLI](https://vercel.com/docs/projects/deploy-from-cli) após autenticar sua conta; não rode `vercel --prod` em outra pasta ou projeto.
 
 ## Verificação após publicar
 
 Substitua `<dominio-do-projeto>` pelo domínio principal do projeto Vercel:
+
+O alias de preview pode estar protegido por autenticação Vercel. Uma resposta `200 text/html` não basta: confirme o título da demonstração e que a chamada à API retorna JSON. Faça a conferência em uma janela sem sessão Vercel para separar proteção do deploy e login Clerk.
 
 1. Abra `https://<dominio-do-projeto>/labs/backend-layers/demo/`. Resultado esperado: página “Do navegador até um serviço real”, formulário acessível por teclado e atribuição visível ao Open-Meteo.
 2. Clique em **Consultar previsão**. Resultado esperado: temperatura, umidade e horário, usando dados variáveis do serviço.
