@@ -129,6 +129,7 @@ Arquivos principais:
 | `assets/js/core/state.js` | Índices, `READINESS_EVIDENCE`, estado, sanitização e persistência |
 | `assets/js/ui/render.js` | Renderização da navegação, progresso, módulos e aulas |
 | `assets/js/ui/dialogs.js` | Leitores, diálogos, recursos e validação de projetos |
+| `assets/js/transfer.js` | Exportação JSON e importação validada do estado da conta |
 | `assets/js/app.js` | Eventos e inicialização da aplicação |
 | `assets/js/auth.js` | Login opcional com Clerk e aviso de mudança de sessão para a sincronização |
 | `assets/js/cloud.js` | Carregamento por conta Clerk e salvamento automático no Supabase |
@@ -309,7 +310,9 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 10. [x] Demonstrações visuais de execução (laços, referências, `JOIN`, requisições HTTP), registradas em `js-flow`, `js-arrays`, `js-es6`, `db-joins` e `delivery-http`.
 11. [x] Revisão acumulativa e recuperação de dificuldades: quiz errado aponta para conceitos da aula, oferece segunda tentativa diferente e a primeira aula de cada módulo posterior recupera conteúdo anterior com rascunho persistente.
 12. [x] Persistir progresso e anotações automaticamente por conta no Supabase, sem depender de `localStorage`.
-13. [~] Modo de leitura prolongada implementado; Playwright headless cobriu teclado, 375/1280 px, retomada após recarga e isolamento entre contas fictícias via mocks. Conferência com Clerk/Supabase reais no Preview ainda pendente.
+   - [x] Exportar e importar progresso/rascunhos com envelope JSON versionado, sanitização, confirmação de substituição e gravação apenas após autenticação/sincronização da conta.
+   - [x] Documentar o formato `tech-learning-hub-progress` versão 1 e os limites da cópia.
+13. [~] Modo de leitura prolongada implementado; E2E headless cobre teclado, 375/1280 px, retomada após recarga, exportação/importação e isolamento entre contas fictícias via mocks. Conferência com Clerk/Supabase reais no Preview ainda pendente.
 14. [x] Glossário contextual no ponto de uso, renderizado por `readerTerms()` nas seções que apresentam termos novos.
 15. [ ] Laboratório de leitura de projeto alheio (achar ponto de entrada e corrigir um defeito).
 16. [ ] Ponte da IA simulada para IA conectada a um modelo real, com avaliações distintas.

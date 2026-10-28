@@ -30,6 +30,11 @@ function cloudLock(locked) {
   document.querySelector('main').inert = locked;
   document.querySelector('aside').inert = locked;
   document.querySelector('main').setAttribute('aria-busy', String(locked));
+  document.querySelectorAll('#progress-export, #progress-import-trigger, #progress-import-file').forEach(control => { control.disabled = locked; });
+}
+
+function cloudCanTransfer() {
+  return cloudReady && !cloudWriting && !cloudRetryTimer && cloudRevision === cloudSavedRevision;
 }
 
 async function cloudRequest(userId, method, query = '', body = null) {
