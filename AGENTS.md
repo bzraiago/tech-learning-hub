@@ -139,7 +139,7 @@ Os scripts são clássicos e compartilham o mesmo escopo global, carregados na o
 
 Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workflow`, `quality`, `delivery`.
 
-> Os números atuais (9 trilhas, 28 módulos, 119 aulas, 478 exercícios, 355 questões, 24 projetos) foram conferidos no código em 27/10/2026. **Confira no código antes de citá-los** e atualize `contexto/ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
+> Os números atuais (9 trilhas, 28 módulos, 121 aulas, 486 exercícios, 361 questões, 24 projetos) foram conferidos no código em 27/10/2026. **Confira no código antes de citá-los** e atualize `contexto/ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
 
 ### 5.2 Persistência e compatibilidade (cuidado máximo)
 - O curso exige login Clerk antes de mostrar o conteúdo. O progresso persistente fica somente em `public.learning_state` no Supabase, protegido por RLS e vinculado ao ID Clerk. `state` permanece em memória durante a sessão. Ao trocar de conta, a interface aguarda a leitura da nova conta antes de aceitar edição.
@@ -261,7 +261,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 1. [x] **Etapa 0** de computador, arquivos, editor e terminal, disponível antes do primeiro exercício que dependa deles.
 2. [x] **Mapa de pré-requisitos** e instruções de instalação por sistema (Python, Git, Node.js + npm, Docker/WSL, PostgreSQL, MariaDB, Firebird, MongoDB/`mongosh`), seguindo o padrão 6.2.
 3. [x] **Resultado esperado visível** separado da solução em todos os exercícios; checkpoints distintos para *li / pratiquei / revisão / resolvi sozinho*.
-   - [x] Os 478 exercícios exibem resultado esperado e critérios específicos; o validador exige critérios nas aulas revisadas.
+   - [x] Os 486 exercícios exibem resultado esperado e critérios específicos; o validador exige critérios nas aulas revisadas.
    - [x] As aulas `prep-tools`, `prep-files`, `prep-workspace`, `prep-cycle`, `prep-errors`, as quatro instalações iniciais, `setup-docker`, `setup-docker-alternative`, `setup-postgresql`, as preparações opcionais de MariaDB, Firebird e MongoDB, `db-mariadb`, `db-firebird`, `db-mongo-crud`, `db-mongo-pipelines`, `db-nosql-models`, `db-performance`, `db-security`, `db-recovery`, `db-project`, `db-modeling`, `db-normalization`, `db-ddl-constraints`, `db-ddl-crud`, `db-select`, `db-aggregation`, `db-joins`, `db-subqueries-ctes`, `db-transactions`, `db-concurrency-boundaries`, `db-docker-basics`, `db-docker-compose`, `db-docker-operations`, `db-postgres` e `db-sqlite` iniciam os critérios específicos.
    - [x] As 13 aulas HTML/CSS contêm critérios nos 52 exercícios; 14 resultados foram revisados para que previsão, investigação e comparação não mostrem a conclusão antes da tentativa.
    - [x] As 14 aulas JavaScript contêm critérios nos 56 exercícios; 22 resultados foram revisados para preservar a previsão, investigação e diagnóstico antes da conclusão.
@@ -269,7 +269,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
    - [x] As 18 aulas de IA contêm critérios nos 73 exercícios; 17 resultados foram revisados para preservar previsões, métricas e validações antes da conclusão.
    - [x] As seis aulas Git contêm critérios nos 24 exercícios; o resultado da busca no histórico não antecipa mais a linha literal.
    - [x] As seis aulas de Qualidade contêm critérios nos 24 exercícios; o resultado de diagnóstico evita antecipar qual valor demonstra coerção.
-   - [x] As 11 aulas de Entrega contêm critérios nos 45 exercícios; previsões, validação, DNS/HTTPS, publicação estática, chamadas reais opcionais e limites do deploy ficam verificáveis.
+   - [x] As 13 aulas de Entrega contêm critérios nos 53 exercícios; previsões, resolução DNS, HTTPS, Preview e plano conceitual de domínio personalizado ficam verificáveis.
 4. [x] **Projetos de fechamento** para as trilhas Git, Qualidade e Integração (entregas de laboratório; publicação real permanece nas fases posteriores).
 5. [ ] **Sequência de backend com persistência**: interface → API → validação → regra de negócio → banco → resposta → testes → publicação.
    - [x] Laboratório `labs/backend-validation` demonstra validação no servidor com Node.js nativo, pedidos diretos inválidos e ausência de escrita após rejeição.
@@ -283,14 +283,14 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
    - [x] Executar migrations e teste de integração em PostgreSQL real descartável; criação, unicidade, transação e persistência após reinício foram verificadas. O caminho Compose do laboratório também foi validado com PostgreSQL 17.
 6. [ ] **CI, publicação e integração externa** como práticas guiadas e verificáveis (observar falha, corrigir, conferir URL final, voltar versão).
    - [x] Criar aulas sobre domínio, DNS, HTTPS/TLS e opções de hospedagem, com fontes oficiais, exemplos fictícios e práticas diagnósticas.
-   - [ ] Verificar a publicação anônima na Vercel e executar o laboratório de domínio; o acesso autenticado à conta e um domínio de laboratório continuam necessários.
+   - [x] Ensinar domínio personalizado e DNS com simulação detalhada: associação do projeto, A/AAAA/CNAME/TXT/NS, preservação de MX/TXT, verificação por camada e rollback, sem comprar ou validar domínio real.
    - [x] Criar `labs/bug-investigation` com teste de regressão que falha antes e passa depois da correção; a execução red/green foi verificada em ambiente temporário.
    - [x] Automatizar um fluxo do navegador em Chromium headless, isolado ao laboratório de backend e sem depender de banco.
    - [x] Criar workflow real de GitHub Actions com validação, testes, PostgreSQL efêmero e Playwright; execução `40605904963` passou em `main`.
    - [x] Observar uma falha de asserção na branch temporária (`40606364491`), corrigi-la (`92fb73d`) e confirmar execução verde (`40606768881`); `main` permaneceu intacta.
    - [x] Integrar Open-Meteo no laboratório com contrato documentado, smoke real sem credenciais e testes simulados de rede, timeout, autenticação e resposta inválida.
    - [x] Publicar a página e a função da demonstração na Vercel (`43decdc`; deploy concluído).
-   - [ ] Conferir a URL pública final; o dono autorizou previews públicos, mas o ajuste e a validação anônima aguardam acesso autenticado à conta Vercel.
+   - [ ] Conferir a URL e o caminho do Preview da branch `testes` quando houver sessão Vercel autorizada; tela de login é registrada como proteção, sem exigir acesso anônimo nem desativá-la.
    - [x] Documentar o Instant Rollback da Vercel, seus limites por plano, o efeito na atribuição automática de domínios e a separação em relação aos dados do banco.
    - [x] Criar roteiro local de `pg_dump`/`pg_restore` para restaurar em uma base separada, sem alterar a origem; backups ficam ignorados pelo Git.
    - [~] Concluir as validações de recuperação: backup/restauração passou localmente via Docker Compose e no GitHub Actions; rollback real na Vercel aguarda acesso autenticado à conta.
@@ -368,5 +368,6 @@ Extensão de IA (opcional): responder perguntas sobre um pequeno conjunto de mat
 - 2026-10-26 — A página passou a exigir autenticação Clerk e carregamento do progresso antes de liberar o conteúdo.
 - 2026-10-26 — Troca de conta passa a carregar automaticamente o progresso remoto da nova conta, preservando cache local por usuário e exigindo escolha em caso de divergência.
 - 2026-10-26 — A cópia remota passa a ser exibida mesmo com cache divergente; a versão local anterior permanece recuperável no navegador, sem baixar arquivo automaticamente.
+- 2026-10-27 — O uso do projeto será somente por Preview, sem domínio próprio; ensinar domínio e DNS em detalhe com exemplos reservados, sem exigir configuração ou validação de domínio real.
 - 2026-10-27 — Autorizado tornar os previews da Vercel públicos para testar a demonstração anonimamente; ajuste pendente de conexão autenticada à conta.
 - 2026-10-27 — Aprovado `@playwright/test` somente em `labs/backend-layers` para automação de um fluxo de interface; o modo memória mantém o E2E separado da persistência PostgreSQL.

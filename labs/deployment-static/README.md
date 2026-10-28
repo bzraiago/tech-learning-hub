@@ -1,108 +1,79 @@
-# Laboratório: primeira publicação estática na Vercel
+# Laboratório: publicação estática em Preview
 
 ## Objetivo
 
-Publicar uma página HTML/CSS a partir de uma pasta do repositório, sem framework, pacote ou etapa de build. Ao final, você terá evidências de que a URL abre, os arquivos são servidos e o acesso termina em HTTPS.
+Entender como uma página HTML/CSS chega ao deployment Preview da branch `testes`, localizar os arquivos pela URL e distinguir erro de caminho, resposta DNS e proteção de acesso.
 
-Este laboratório usa `labs/deployment-static` como raiz de um **novo projeto Vercel separado**. Ele não altera a configuração do Tech Learning Hub já publicado. Não há compra de domínio: a URL padrão `vercel.app` é suficiente para esta prática.
+Este exercício usa a integração Vercel já existente no repositório. Não crie outro projeto, não altere configurações, não publique em Production e não precisa comprar ou configurar domínio. A URL `vercel.app` do Preview é suficiente. A checagem remota dos arquivos é opcional quando a política de acesso permitir; uma tela de login Vercel também pode ser registrada como evidência de proteção.
 
 ## Requisitos
 
-- A pasta deste laboratório está em uma branch enviada ao GitHub.
-- Você tem acesso ao painel Vercel e pode criar um projeto.
-- O navegador permite abrir a página local e a URL pública.
-- Nenhuma instalação de Node.js, dependência ou credencial é necessária.
+- A branch `testes` e seu deployment Preview já existem no projeto conectado à Vercel.
+- Você consegue abrir a pasta do repositório no editor e a URL Preview fornecida pelo deployment ou pelo status do commit.
+- Nenhuma instalação, chave, variável de ambiente ou serviço de banco é necessária.
 
-Se o projeto ainda não estiver no GitHub, conclua primeiro a preparação Git da trilha. Não coloque chaves, tokens nem dados pessoais neste laboratório.
+Se não encontrar uma URL de Preview, conclua as etapas conceituais com o marcador `https://<deployment>.vercel.app/`. Não invente hostname nem crie um projeto novo para substituir a URL.
 
-## Etapa 1 — Conferir os arquivos localmente
+## Etapa 1 — Conferir os arquivos no repositório
 
-1. No Explorador de Arquivos, abra a pasta `labs/deployment-static`.
-2. Abra `index.html` no navegador. No VS Code, você também pode abrir o arquivo e usar “Abrir com navegador” ou instalar um servidor local apenas se a aula pedir.
-3. Confira os cartões, os passos de verificação e o rodapé. Use Tab para alcançar o link “Pular para o conteúdo”.
+1. No Explorador de Arquivos, abra `labs/deployment-static`.
+2. Abra `index.html` no navegador. Confira os cartões e o link “Pular para o conteúdo”.
+3. No editor, localize a referência `styles.css` e confirme que o arquivo está ao lado de `index.html`.
+4. Use Tab, Shift+Tab e Enter para navegar pelos controles.
 
-**Resultado esperado:** aparece a página “Seu primeiro deploy sem build”, com três cartões e uma lista de verificações. A largura da página se adapta ao celular.
+**Resultado esperado:** aparece a página “Seu primeiro deploy sem build”, com três cartões e uma lista de verificações; a largura se adapta ao celular.
 
-## Etapa 2 — Criar projeto separado na Vercel
+## Etapa 2 — Localizar o Preview existente
 
-1. No painel da Vercel, selecione **Add New → Project**.
-2. Importe o repositório GitHub que contém este laboratório. Se solicitado, conecte o provedor Git pela interface oficial.
-3. Dê ao projeto um nome disponível. O nome e o domínio `vercel.app` dependem da disponibilidade da conta.
-4. Em **Root Directory**, selecione `labs/deployment-static`.
-5. Em **Framework Preset**, selecione **Other**.
-6. Como a pasta só tem arquivos estáticos, não configure comando de instalação. Deixe o Build Command vazio (se houver a opção de override, deixe-a habilitada e vazia). Não existe pasta `public`; use a raiz do projeto como diretório servido (`.`) se o painel pedir esse valor.
-7. Não adicione variável de ambiente nem domínio personalizado. Revise o nome do repositório e a pasta raiz; então clique em **Deploy**.
-8. Espere o deploy ficar pronto e abra a URL de produção atribuída ao novo projeto. Não mude Root Directory, domínio ou proteção do projeto principal do curso.
+1. Use a URL indicada no deployment Preview da branch `testes`. Ela pode aparecer no status de implantação do commit ou na lista de deployments do projeto.
+2. Confirme, quando a informação estiver disponível, que o deployment corresponde à branch `testes` e ao commit esperado.
+3. Acrescente o caminho `/labs/deployment-static/` ao fim do hostname do Preview. A forma é `https://<deployment>.vercel.app/labs/deployment-static/`.
+4. Abra a URL. Não altere a raiz do projeto, a proteção de acesso, os domínios nem o ambiente Production.
 
-O painel da Vercel muda com o tempo. Se os rótulos forem diferentes, consulte “Configuring a Build” nas fontes desta aula. Para esta página, o princípio é manter a raiz em `labs/deployment-static` e não executar um build.
+Não use o endereço raiz do site como se ele apontasse automaticamente para esta pasta. Os arquivos do laboratório ficam sob o caminho `/labs/deployment-static/` porque o projeto Vercel serve o repositório inteiro.
 
-## Etapa 3 — Conferir a URL, HTTP e HTTPS
+## Etapa 3 — Observar os arquivos e a política de acesso
 
-1. Abra `https://<dominio-do-seu-projeto>.vercel.app/` em uma janela sem sessão Vercel. Use o domínio real exibido no painel no lugar do texto entre sinais de menor/maior.
-2. Na aba **Rede/Network** das ferramentas do navegador, atualize a página. Abra os pedidos para `/` e `/styles.css`.
-3. Confirme que a página carrega e que os pedidos finais retornam status de sucesso (normalmente `200`). Registre a URL e os status observados, sem copiar cookies ou cabeçalhos de autenticação.
-4. Visite a variante `http://` da mesma URL. Observe a cadeia de redirecionamento e anote se o endereço final usa `https://`. Não digite dados de conta na URL HTTP.
-5. Teste em largura aproximada de 375 px e navegue usando somente Tab, Shift+Tab, Enter e Espaço.
+Se a página abrir:
 
-Se preferir o terminal, substitua `<dominio-do-seu-projeto>` pelo hostname real. No Windows PowerShell, digite:
+1. Abra as ferramentas do navegador e selecione **Rede/Network**.
+2. Atualize a página e localize a requisição `/labs/deployment-static/` e a requisição `/labs/deployment-static/styles.css`.
+3. Registre os status e o comportamento de HTTPS que realmente observou. Os resultados pertencem àquele deployment e podem mudar em outro commit.
+4. Confira o layout em largura aproximada de 375 px e teste teclado.
 
-```powershell
-curl.exe -I -L -w "URL final: %{url_effective}`n" "http://<dominio-do-seu-projeto>.vercel.app/"
-```
+Se aparecer uma tela de login Vercel, registre que o Preview está protegido e pare a conferência remota. Isso não demonstra falha DNS nem que os arquivos estão ausentes; a política de acesso intercepta a navegação antes de observá-los. Não tente remover essa proteção para concluir a aula.
 
-No macOS ou Linux, digite:
+## Diagnosticar sem fazer alterações
 
-```sh
-curl -I -L -w 'URL final: %{url_effective}\n' 'http://<dominio-do-seu-projeto>.vercel.app/'
-```
+| Observação | O que verificar conceitualmente |
+|---|---|
+| A URL do Preview não é encontrada | Confira hostname e deployment selecionado; a resolução DNS do hostname é uma camada anterior ao caminho HTTP. |
+| `/labs/deployment-static/` retorna 404 | Compare o caminho pedido com a pasta e o commit do deployment. Um 404 de arquivo não prova falha DNS. |
+| HTML abre, mas CSS retorna 404 | Confira a referência relativa `styles.css`, o caminho efetivamente pedido e se o arquivo existe no mesmo diretório do HTML. |
+| Aparece login Vercel | Registre proteção de acesso. DNS pode resolver normalmente mesmo sem acesso ao conteúdo. |
+| Arquivos aparecem, mas a página não funciona como esperado | Compare conteúdo e commit servido; uma resposta HTTP de sucesso não comprova o comportamento completo da aplicação. |
 
-**Resultado esperado:** a saída mostra a cadeia de respostas (pode haver um redirecionamento) e uma URL final iniciada por `https://`. Faça também uma consulta direta à URL HTTPS e confirme status final de sucesso. Cabeçalhos e versões HTTP podem variar; registre a saída real em vez de exigir um único texto literal.
+Não altere registros DNS. O curso usa apenas Preview. Se no futuro uma pessoa optar por domínio personalizado, a associação, os valores apresentados pelo painel, a zona autoritativa e o impacto em registros existentes serão estudados separadamente em `delivery-custom-domain`.
 
-Se `curl.exe` não for reconhecido no Windows, use a aba Rede do navegador. Em macOS/Linux, se `curl` estiver ausente, o navegador também serve para conferir URL, status e redirecionamento.
+## Resultado e evidência
 
-## Investigar uma página 404
+Registre em suas anotações:
 
-Se a URL abrir com 404:
+- identificação do deployment/branch/commit, se visível;
+- caminho usado no navegador;
+- HTML e CSS observados, ou a mensagem de proteção de acesso;
+- status realmente vistos, se a política permitir abrir a página;
+- distinção entre erro DNS, erro HTTP de caminho e controle de acesso.
 
-1. No painel, confira se o deploy está marcado como pronto e se você abriu a URL do projeto criado para este laboratório.
-2. Confira **Root Directory**: deve ser `labs/deployment-static`.
-3. Confira o diretório de saída: a página de entrada `index.html` e `styles.css` precisam estar dentro do conteúdo servido.
-4. Confira os logs de build e o commit implantado. Este laboratório não precisa executar `npm install` ou `npm run build`.
-5. Corrija uma configuração por vez e publique novamente. Não altere o domínio nem as configurações do projeto principal para contornar um 404 desta demonstração.
+Não registre cookies, tokens, cabeçalhos de autenticação nem dados pessoais. Se a tela de proteção impedir observar os recursos, descreva essa limitação em vez de presumir o resultado.
 
-Se a URL pedir autenticação Vercel em vez de mostrar a página, o deploy pode estar protegido. Isso não é um erro DNS. Confira a configuração de acesso **somente neste projeto didático sem dados**, e não remova proteção de um projeto que contém dados ou autenticação sem revisar o impacto.
+## Alternativa conceitual
 
-## Problemas comuns
-
-| Sinal | Causa provável | Próximo passo |
-|---|---|---|
-| 404 em `/` | Raiz ou diretório de saída não inclui `index.html` | Confira a pasta raiz e o resumo do deploy |
-| Página aparece sem estilos | Caminho ou arquivo CSS não foi servido | Na aba Rede, abra `/styles.css` e confira o status |
-| Painel pede login Vercel | Proteção de acesso ativa no projeto | Diferencie proteção de autenticação de erro DNS; verifique acesso do projeto isolado |
-| Deploy usa conteúdo antigo | Branch/commit diferente ou deploy ainda não concluiu | Confira o commit e o estado do deploy no painel |
-| URL HTTP não mostra a página esperada | Redirecionamento, cache ou política do provedor | Compare a cadeia completa e teste HTTPS diretamente |
-
-## Parar e retomar
-
-Não há processo local para encerrar: depois do deploy, a página fica hospedada. Para parar a prática, feche a aba. Para retomar, abra **Projects → projeto do laboratório → Deployments** e use a URL atribuída. Não exclua projeto nem domínio para “parar” um site; a remoção não é necessária para este exercício.
-
-## Alternativa para computador limitado
-
-Abra `index.html` localmente e confira a página com o navegador. Isso permite estudar estrutura, foco e responsividade, mas **não** comprova DNS, HTTPS nem publicação remota. Se não puder criar um projeto Vercel, registre essa limitação e faça o diagnóstico em um deploy de demonstração que tenha autorização para consultar.
-
-## Evidência a registrar
-
-- URL pública examinada.
-- Nome do projeto e raiz configurada (`labs/deployment-static`).
-- Status final de `/` e `/styles.css`.
-- Resultado ao começar em HTTP e URL final.
-- Largura e método de teclado usados.
-- Qualquer proteção, erro ou comportamento não verificado.
-
-Não registre chaves, cookies, dados pessoais ou tokens de verificação.
+Sem URL disponível ou sem permissão para abrir o Preview, trace o percurso `branch/commit → deployment Preview → hostname vercel.app → caminho do laboratório → HTML e CSS`. Identifique onde DNS, HTTPS e autenticação entram. Essa atividade ensina o modelo, mas não comprova uma resposta remota.
 
 ## Fontes oficiais
 
 - [Vercel: implantar repositórios Git](https://vercel.com/docs/git)
+- [Vercel: ambientes Preview e Production](https://vercel.com/docs/deployments/environments)
 - [Vercel: configurar build e diretório-raiz](https://vercel.com/docs/builds/configure-a-build)
 - [Vercel: certificados SSL](https://vercel.com/docs/domains/working-with-ssl)

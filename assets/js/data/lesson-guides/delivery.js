@@ -1195,6 +1195,133 @@ Object.assign(LESSON_GUIDES, {
       "Use intervalos IP de documentação e nomes .test apenas como exemplos; eles não servem como endereços de produção."
     ]
   },
+  "delivery-dns-resolution": {
+    "prerequisites": "Concluir delivery-web-foundations e delivery-dns. Não exige conta, compra de domínio, instalação ou alteração de DNS.",
+    "setup": "Use os nomes `.test` apenas no diagrama. A RFC 6761 reserva esse sufixo para testes; respostas em redes locais podem variar. Não use `example.test` como domínio público nem espere um endereço real.",
+    "why": "Conhecer quem pergunta, quem encaminha e quem responde por uma zona ajuda a localizar a camada que está errada antes de alterar registros.",
+    "example": {
+      "language": "text",
+      "code": "Caminho conceitual de um nome público devidamente configurado\n1. O dispositivo consulta o resolvedor recursivo configurado.\n2. Se não há resposta em cache, o resolvedor segue referências da raiz aos servidores do sufixo público.\n3. As delegações levam ao servidor autoritativo da zona, que responde pelo registro.\n4. O resolvedor guarda a resposta conforme o TTL e devolve o resultado ao dispositivo.\n\n`www.curso.example.test` serve apenas para separar rótulos; `.test` é reservado e nenhum pedido DNS é executado.",
+      "expected": "O cliente consulta um resolvedor recursivo; quando necessário, segue as delegações de um nome público configurado até o servidor autoritativo. A resposta também pode vir do cache. O rótulo `.test` aqui não representa uma zona pública resolvível.",
+      "explanation": [
+        "O dispositivo normalmente conversa com um resolvedor recursivo, que consulta outros servidores quando não encontra a resposta no cache.",
+        "Em uma consulta pública normal, servidores raiz e do sufixo registrado orientam a busca por referências; não guardam os registros finais de cada site. `.test` é reservado, e uma rede local pode tratar esse nome de forma própria.",
+        "A zona autoritativa contém os registros publicados pelo provedor DNS delegado para aquela parte da árvore.",
+        "Um TTL permite que resolvedores reutilizem respostas por algum tempo; mudanças não atualizam todos os caches ao mesmo instante."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Nome, árvore e zona",
+        "paragraphs": [
+          "Um nome DNS é lido da direita para a esquerda como níveis separados por pontos. Em `www.curso.example.test.`, o ponto final representa a raiz; `test` é o sufixo, `example` é o nível seguinte, e `curso` e `www` são nomes mais específicos. No navegador, o ponto final costuma ser omitido.",
+          "Uma zona é a parte da árvore cujos registros são mantidos por um conjunto de servidores autoritativos. Um domínio pode corresponder a uma zona inteira ou delegar uma parte, como `curso.example.test`, para outra administração. Domínio, zona e URL são conceitos relacionados, mas não sinônimos.",
+          "Pausa: antes de ver o diagrama, marque os rótulos em `api.aula.example.test` e diga qual deles identifica o subdomínio mais específico."
+        ],
+        "terms": [
+          { "term": "Zona DNS", "meaning": "Parte administrada da árvore de nomes, com registros publicados por servidores autoritativos." },
+          { "term": "Rótulo", "meaning": "Cada trecho entre pontos em um nome DNS, como `api` ou `aula`." }
+        ]
+      },
+      {
+        "title": "Resolvedor recursivo e servidor autoritativo",
+        "paragraphs": [
+          "O resolvedor recursivo recebe a pergunta do dispositivo, consulta o cache e, se necessário, busca respostas em etapas. Para um nome público registrado, pode perguntar a um servidor raiz quem conhece o sufixo, seguir a referência ao servidor do sufixo e continuar até o autoritativo da zona. `.test` é reservado; o nome deste exemplo não executa esse percurso público.",
+          "O servidor autoritativo publica a resposta oficial da zona que administra: por exemplo, um registro A, AAAA, CNAME ou uma resposta de que o nome não existe. A raiz e os servidores de sufixos fornecem referências para a próxima parte da árvore; eles não apontam diretamente cada visitante para o conteúdo do site.",
+          "Pausa: preveja se uma consulta repetida sempre percorre a árvore inteira. Depois compare sua previsão com o papel do cache do resolvedor."
+        ],
+        "terms": [
+          { "term": "Resolvedor recursivo", "meaning": "Serviço que procura a resposta para o cliente, consulta outros servidores quando necessário e pode manter cache." },
+          { "term": "Servidor autoritativo", "meaning": "Servidor que publica os registros oficiais de uma zona DNS." }
+        ]
+      },
+      {
+        "title": "Delegação e registros NS",
+        "paragraphs": [
+          "Uma delegação informa quais servidores são responsáveis por uma zona filha. Registros NS (name server, servidor de nomes) indicam os servidores autoritativos; a delegação publicada pela zona superior direciona a consulta para eles. No uso cotidiano, o painel do registrador pode permitir trocar os nameservers, enquanto o painel do provedor DNS guarda os registros da zona.",
+          "Se você muda um registro A no painel de um provedor que já não é autoritativo, os resolvedores podem continuar recebendo a resposta do provedor apontado pela delegação. Antes de editar, confira os nameservers realmente publicados e qual painel é responsável por eles.",
+          "Pausa: imagine que a zona superior delega `aula.example.test` para `ns1.dns-ficticio.test`, mas você edita o A em outro provedor. Preveja qual painel precisa ser investigado primeiro."
+        ],
+        "terms": [
+          { "term": "Delegação", "meaning": "Indicação feita pela zona superior de quais servidores respondem por uma zona filha." },
+          { "term": "NS", "meaning": "Tipo de registro que identifica servidores de nomes autoritativos para uma zona." }
+        ]
+      },
+      {
+        "title": "Cache e investigação sem mudança",
+        "paragraphs": [
+          "Uma resposta diferente entre dois resolvedores pode ocorrer porque consultaram em momentos distintos e ainda mantêm respostas em cache. O TTL indica por quanto tempo uma resposta pode ser reutilizada; reduzir o TTL agora não apaga cópias que já foram armazenadas. Respostas negativas também podem ser mantidas temporariamente.",
+          "Uma consulta local mostra apenas o que o resolvedor consultado respondeu naquele momento. `nslookup` costuma estar disponível em Windows, macOS e Linux, mas formato, endereço e quantidade de respostas variam. Ao examinar um Preview `*.vercel.app`, registre o nome consultado e os tipos/respostas observados; uma resposta DNS não prova que a página, o certificado ou a API funcionam.",
+          "Esta aula não exige rodar comandos nem ter rede. Se usar um domínio real de Preview, não cole cookies, tokens nem dados de conta na saída compartilhada."
+        ],
+        "terms": [
+          { "term": "Cache DNS", "meaning": "Cópia temporária de uma resposta que evita consultas repetidas até o período permitido terminar." },
+          { "term": "TTL", "meaning": "Tempo, normalmente expresso em segundos, que uma resposta pode permanecer em cache." }
+        ]
+      }
+    ],
+    "guided": [
+      { "instruction": "Separe os rótulos do nome `app.aula.example.test` e identifique qual sufixo está à direita.", "result": "Os rótulos aparecem em níveis; `test` é o sufixo e `app` é o nome mais específico." },
+      { "instruction": "Trace setas entre dispositivo, resolvedor recursivo e servidor autoritativo no diagrama.", "result": "O dispositivo pergunta ao resolvedor; o resolvedor consulta outros servidores somente se a resposta não estiver disponível em cache." },
+      { "instruction": "Compare a delegação NS com o provedor onde um A foi editado no cenário fictício.", "result": "A investigação identifica qual provedor é autoritativo antes de propor outra alteração." }
+    ],
+    "mistakes": [
+      "Achar que o navegador consulta diretamente todos os servidores raiz em cada visita.",
+      "Confundir o resolvedor recursivo do dispositivo com o servidor autoritativo da zona.",
+      "Editar registros em um painel sem verificar se aquele provedor ainda recebe a delegação NS.",
+      "Esperar que reduzir o TTL apague imediatamente respostas já guardadas em cache."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: para um nome público registrado com delegações e registro configurados, desenhe o caminho quando o resolvedor não tem resposta em cache. Marque cliente, resolvedor, referências da raiz/sufixo e autoridade da zona.",
+        "expected": "O dispositivo pergunta ao resolvedor recursivo; este segue referências de um sufixo público até o autoritativo da zona, que responde pelo nome solicitado.",
+        "criteria": ["O desenho separa dispositivo, resolvedor recursivo e autoritativo.", "A raiz e o sufixo são tratados como referências, não como hospedagem do site.", "Não presume que `.test` tem delegação pública."],
+        "solution": "Dispositivo → resolvedor recursivo → referências dos servidores raiz e do sufixo público → autoritativo da zona → resposta volta pelo resolvedor ao dispositivo.",
+        "explanation": "A consulta é recursiva para o cliente e o resolvedor pode fazer consultas iterativas para encontrar a autoridade da resposta.",
+        "hints": ["Comece pelo serviço que recebe a consulta do dispositivo.", "O autoritativo da zona é quem publica a resposta final daquele nome."]
+      },
+      {
+        "prompt": "Alterar: uma pessoa mudou nameservers no registrador, mas continuou editando o A no painel DNS anterior. Descreva a primeira verificação e a menor correção a considerar, sem executar mudanças.",
+        "expected": "A primeira verificação identifica quais nameservers a delegação atual publica; a correção proposta é ajustar a zona no provedor autoritativo, após comparar e preservar os registros necessários.",
+        "criteria": ["Consulta a delegação NS antes de editar o A.", "Não presume que qualquer painel DNS é autoritativo nem recomenda apagar a zona anterior sem inventário."],
+        "solution": "Conferir os NS publicados para o domínio no registrador/resolvedor, localizar o provedor autoritativo indicado, comparar a zona existente e só então propor o A no painel correto.",
+        "explanation": "Registros guardados em um provedor não autoritativo não são a resposta consultada depois que a delegação aponta para outro lugar.",
+        "hints": ["Encontre primeiro quem responde pela zona neste momento.", "Antes de trocar registros, compare a zona antiga e a nova, inclusive e-mail."]
+      },
+      {
+        "prompt": "Construir: monte um mapa de resolução para `portal.preview.vercel.app` usando o hostname de um Preview que você já conhece ou o marcador `SEU-PREVIEW.vercel.app`. Mostre consulta local, resolvedor, resposta DNS e uma verificação HTTP separada. Não invente endereços IP.",
+        "expected": "O mapa separa a consulta DNS da requisição HTTP; os valores DNS são anotados somente se realmente observados, e a URL pode ser acessada por HTTPS sem domínio próprio.",
+        "criteria": ["Não preenche endereços ou nomes autoritativos não observados.", "A resposta DNS não é usada como prova de HTTPS, login ou saúde da aplicação.", "Usa o hostname Preview do provedor sem exigir domínio pessoal."],
+        "solution": "Escrever o hostname real do Preview, registrar a resposta observada pelo resolvedor local e, separadamente, abrir o caminho HTTPS da página ou verificar seu status HTTP. Se não houver acesso à rede, deixar os valores como não verificados.",
+        "explanation": "DNS localiza um destino; HTTP/HTTPS avalia o serviço e a conexão depois da resolução.",
+        "hints": ["Use um deployment Preview existente ou deixe um marcador explícito.", "Anote observação e ferramenta; não copie uma resposta genérica de outra pessoa."]
+      },
+      {
+        "prompt": "Investigar erro: um A novo aparece no painel do provedor, mas dois resolvedores ainda mostram endereços diferentes. Registre as evidências a coletar antes de editar qualquer coisa.",
+        "expected": "A investigação compara a delegação NS, o autoritativo consultado, as respostas e TTLs dos resolvedores; diferenças temporárias podem vir de caches consultados em horários distintos.",
+        "criteria": ["Confere qual provedor é autoritativo e quais respostas cada resolvedor recebeu.", "Não atribui a divergência a uma falha única sem comparar TTL e momento da consulta.", "Não faz outra alteração até identificar a camada responsável."],
+        "solution": "Registrar hostname/tipo consultado, NS autoritativos, horário, resposta e TTL de cada resolvedor; comparar com o registro publicado no autoritativo antes de decidir se a zona ou apenas o cache explica a divergência.",
+        "explanation": "A tela do painel confirma o que foi digitado ali, mas a delegação e as respostas observadas ajudam a confirmar o que os clientes consultam.",
+        "hints": ["O painel editado pode não corresponder ao provedor delegado.", "Compare o autoritativo e os resolvedores separadamente, anotando o TTL."]
+      }
+    ],
+    "quiz": [
+      { "question": "Quem normalmente recebe a pergunta DNS do dispositivo e procura a resposta quando ela não está em cache?", "options": ["O servidor HTTP da aplicação.", "O resolvedor recursivo.", "O registrador do domínio."], "correctIndex": 1, "explanation": "O resolvedor recursivo consulta outros servidores quando não consegue responder do cache." },
+      { "question": "O que a delegação NS informa?", "options": ["O servidor autoritativo responsável por uma zona.", "O certificado TLS da aplicação.", "O endereço de e-mail do registrante."], "correctIndex": 0, "explanation": "A delegação indica quais nameservers respondem pela zona delegada." },
+      { "question": "Um site mostra a tela de proteção Vercel, mas o hostname Preview resolve. Qual conclusão é segura?", "options": ["O DNS está necessariamente errado.", "A consulta DNS e a política de acesso são camadas diferentes e precisam de verificações separadas.", "O banco de dados falhou."], "correctIndex": 1, "explanation": "Uma resposta DNS não prova acesso público nem saúde da aplicação." }
+    ],
+    "summary": [
+      "O dispositivo consulta um resolvedor recursivo; servidores raiz e zonas superiores podem encaminhar a consulta.",
+      "O servidor autoritativo publica os registros da zona indicada pela delegação NS.",
+      "Caches podem manter respostas diferentes por algum tempo; compare autoridade, resolvedor, horário e TTL.",
+      "DNS, HTTPS, proteção Vercel e funcionamento da aplicação são verificações distintas."
+    ],
+    "retry": {
+      "prompt": "Em um cenário fictício de DNS local para nomes `.test`, uma rede corporativa resolve `painel.curso.example.test` para um destino antigo, enquanto o DNS do celular mostra outro. Elabore um diagnóstico em ordem sem alterar registros.",
+      "expected": "O diagnóstico reconhece que `.test` é reservado e que a rede pode ter uma resposta local; compara resolvedores, horários e TTLs, e só procura delegação autoritativa se esse cenário a tiver configurado.",
+      "hint": "Diferencie uma resposta local para um sufixo reservado do cache de uma zona pública delegada."
+    }
+  },
   "delivery-https": {
     "prerequisites": "Concluir delivery-web-foundations e delivery-dns. Não é necessário instalar certificado ou alterar um domínio.",
     "setup": "Use os fluxos ilustrativos da aula; não envie dados pessoais nem credenciais por HTTP.",
@@ -1410,18 +1537,18 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
   "delivery-static-deploy": {
-    "prerequisites": "Concluir delivery-hosting-models e conseguir abrir uma pasta do projeto no computador. Você precisa de acesso autorizado ao repositório GitHub e à sua conta Vercel para concluir o deploy; não é necessário ter domínio próprio.",
-    "setup": "Abra `labs/deployment-static/README.md` no editor e siga as etapas por navegador ou terminal. A pasta tem somente `index.html` e `styles.css`; não usa Node, pacote, formulário, API, banco, chave ou dado pessoal. Crie um projeto Vercel separado, com a raiz exatamente `labs/deployment-static`; não modifique as configurações do projeto principal.",
-    "why": "Uma publicação estática permite conferir o percurso repositório → configuração → arquivos publicados → URL pública antes de introduzir funções de servidor, banco de dados, domínio personalizado ou segredos.",
+    "prerequisites": "Concluir delivery-hosting-models e conseguir abrir uma página no navegador. O laboratório usa o deployment Preview existente da branch `testes`; não exige conta Vercel, domínio próprio nem publicação de uma nova implantação.",
+    "setup": "Abra `labs/deployment-static/README.md` no editor. A página contém apenas `index.html` e `styles.css`, sem Node, pacote, formulário, API, banco, chave ou dado pessoal. Use o caminho `/labs/deployment-static/` na URL Preview fornecida pelo projeto. Não mude configurações Vercel nem a branch principal.",
+    "why": "Uma publicação estática permite observar como arquivos do repositório chegam a uma URL Preview e separar conteúdo, caminho, DNS e controle de acesso sem criar um domínio próprio.",
     "example": {
       "language": "text",
-      "code": "Repositório GitHub\n└── labs/deployment-static/\n    ├── index.html\n    └── styles.css\n\nProjeto Vercel separado\nRoot Directory: labs/deployment-static\nFramework Preset: Other\nBuild Command: vazio\nURL pública: https://<dominio-atribuido>.vercel.app/",
-      "expected": "O deploy serve `index.html` e `styles.css` a partir da pasta configurada; a URL HTTPS mostra a página sem pedir login Vercel. O comando de build fica vazio porque o laboratório não transforma arquivos.",
+      "code": "Repositório GitHub\n└── labs/deployment-static/\n    ├── index.html\n    └── styles.css\n\nProjeto Vercel já conectado ao repositório\nbranch `testes` → deployment Preview\nURL Preview: https://<deployment>.vercel.app/labs/deployment-static/",
+      "expected": "O estudante identifica a URL Preview da branch `testes`, localiza o caminho do laboratório e verifica a página e o CSS se o acesso estiver disponível. Se a Vercel pedir autenticação, registra proteção de acesso como resultado; isso não comprova falha DNS nem exige desativar a proteção.",
       "explanation": [
-        "O diretório-raiz limita quais arquivos o projeto de deploy consegue acessar. A pasta `labs/deployment-static` contém todo o necessário.",
-        "O preset Other e o build vazio atendem a uma página que consiste em arquivos HTML/CSS prontos. Se o painel apresentar configurações diferentes, confira a documentação oficial atual antes de salvar.",
-        "A URL atribuída é evidência do deploy. A aba Rede do navegador ajuda a verificar o status de `/` e `/styles.css` separadamente.",
-        "O projeto do laboratório é isolado para não mudar raiz, domínio ou ambiente do site principal."
+        "A branch `testes` produz um Preview do repositório já conectado; o exercício não cria projeto Vercel nem muda diretório-raiz.",
+        "O caminho `/labs/deployment-static/` corresponde à pasta da página dentro da raiz atual do repositório. O navegador solicita também `/labs/deployment-static/styles.css`.",
+        "A aba Rede ajuda a conferir HTML e CSS separadamente quando a política de acesso permite. Uma tela de login Vercel informa que há uma barreira antes do conteúdo; não é necessário removê-la para concluir a parte conceitual.",
+        "O hostname `vercel.app` é atribuído pelo provedor. Este laboratório não adiciona domínio personalizado nem altera DNS."
       ]
     },
     "sections": [
@@ -1438,39 +1565,39 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "title": "Configurar a Vercel sem tocar no projeto principal",
+        "title": "Preview por branch e caminho publicado",
         "paragraphs": [
-          "Crie um projeto novo importando o repositório existente. Defina o diretório-raiz como `labs/deployment-static`, preset Other e nenhum comando de build. A documentação da Vercel informa que projetos estáticos sem etapa de build podem servir a raiz do projeto; ajuste o diretório de saída apenas conforme a interface atual indicar.",
-          "Não adicione variáveis de ambiente, domínio personalizado nem segredo. Como esta pasta não contém pasta `public`, o conteúdo servido está no diretório selecionado. Um segundo projeto no mesmo repositório permite aprender sem alterar as configurações de produção do Tech Learning Hub."
+          "A branch `testes` gera um deployment Preview no projeto Vercel já conectado ao repositório. Use a URL do deployment e acrescente o caminho `/labs/deployment-static/`; a branch de Preview não é a URL raiz do domínio e não equivale ao ambiente Production.",
+          "Um deployment representa um commit e tem uma URL própria. A raiz configurada no projeto continua sendo a raiz do repositório; este exercício não pede para criar outro projeto, alterar configurações do Vercel, promover o Preview a Production ou mexer na proteção de acesso."
         ]
       },
       {
-        "title": "Verificar URL, status e HTTPS",
+        "title": "Observar resposta e proteção do Preview",
         "paragraphs": [
-          "Quando o deploy terminar, abra a URL de produção atribuída. Confira `/` e `/styles.css` na aba Rede e registre os status reais. O resultado esperado para os dois arquivos é uma resposta final de sucesso. Se começar em HTTP, observe a cadeia de respostas e anote se o endereço termina em HTTPS; não considere um redirecionamento como prova do status dos demais arquivos.",
-          "A configuração de certificado e acesso é do provedor. Para domínio personalizado, a Vercel informa que tenta emitir certificado após adicionar o domínio e validar DNS. Neste laboratório não há domínio próprio; use a URL padrão indicada no painel e não invente registros DNS."
+          "Se o deployment Preview estiver acessível, abra `/labs/deployment-static/` e use a aba Rede para examinar o documento e `styles.css`. Registre a URL e os status realmente observados. Se houver uma tela de autenticação da Vercel, registre que o conteúdo está protegido e não tente desativar a barreira; a atividade pode ser concluída com a análise dos caminhos e da diferença entre DNS e controle de acesso.",
+          "A URL Preview usa HTTPS fornecido pelo hostname `vercel.app`. Esta prática não precisa testar um domínio personalizado, comprar domínio ou alterar registros DNS. Ela ensina o conceito e deixa validação de domínio real fora do escopo."
         ],
         "diagramTitle": "Publicação estática observável",
-        "diagram": "git commit\n   │ repositório + raiz correta\n   ▼\nVercel seleciona os arquivos estáticos\n   │ cria deploy e URL\n   ▼\nnavegador ── GET / ──▶ index.html\n          └ GET /styles.css ──▶ styles.css\nVerifique status, URL final, HTTPS e acesso público."
+        "diagram": "commit da branch `testes`\n   │ integração Git existente\n   ▼\ndeployment Preview da Vercel\n   │ URL atribuída pelo provedor\n   ▼\nnavegador ── GET /labs/deployment-static/ ──▶ index.html\n          └ GET /labs/deployment-static/styles.css ──▶ styles.css\nUma tela de proteção é controle de acesso, não prova de erro DNS."
       },
       {
-        "title": "Diagnosticar 404 ou acesso protegido",
+        "title": "Diagnosticar caminho, Preview e DNS",
         "paragraphs": [
-          "Um 404 costuma apontar para uma raiz ou diretório de saída que não contém `index.html`, mas confirme os logs e o commit implantado. Se o CSS falha enquanto o HTML abre, confira o caminho relativo e o status de `/styles.css`. Um deploy marcado como pronto não garante que o arquivo esperado foi incluído.",
-          "Se a URL pede login Vercel, pode haver proteção de acesso; isso não é falha DNS. O laboratório não contém dados privados, mas a proteção deve ser avaliada somente neste projeto separado. Registre o que observou; não remova proteção do projeto principal para fazer o teste passar."
+          "Um 404 pode vir de caminho incorreto, arquivo que não existe naquele commit ou rota que não foi publicada. Confira o deployment e os caminhos relativos. Para esta página, o HTML está em `/labs/deployment-static/` e o CSS em `/labs/deployment-static/styles.css`; a raiz do repositório não precisa mudar.",
+          "Uma tela de login Vercel indica proteção de acesso antes de servir o conteúdo. Um hostname que resolve não garante que a pessoa tenha autorização. Registre essa distinção; a aula não pede acesso anônimo, alteração da proteção ou validação de domínio."
         ]
       }
     ],
     "guided": [
       { "instruction": "Abra `index.html` localmente e confira a folha `styles.css` na pasta. Antes de publicar, anote a URL relativa usada pelo link de estilos.", "result": "Os arquivos estão juntos e o caminho `styles.css` pode ser resolvido a partir do documento." },
-      { "instruction": "Na configuração do projeto novo, confira o repositório, diretório-raiz e preset antes de iniciar o deploy.", "result": "A raiz é `labs/deployment-static`, o preset é Other e nenhuma variável secreta é necessária." },
-      { "instruction": "Depois do deploy, abra a URL pública e verifique separadamente os pedidos de `/` e `/styles.css`.", "result": "A página e o CSS retornam respostas de sucesso; o endereço HTTPS e a política de acesso são anotados." }
+      { "instruction": "Localize o deployment Preview da branch `testes` e acrescente o caminho `/labs/deployment-static/` à URL exibida.", "result": "A URL aponta ao Preview existente e ao diretório do laboratório; nenhuma configuração de projeto foi alterada." },
+      { "instruction": "Se o Preview abrir, examine o HTML e `styles.css`; se pedir login Vercel, registre a proteção como observação.", "result": "A evidência separa resposta dos arquivos e política de acesso, sem supor acesso anônimo obrigatório." }
     ],
     "mistakes": [
-      "Criar o projeto com raiz no repositório inteiro em vez da pasta didática indicada.",
-      "Configurar um comando de build inexistente e esperar que ele gere arquivos.",
+      "Tratar uma URL Preview de branch como se fosse o deployment Production.",
+      "Esquecer que os arquivos do laboratório estão sob `/labs/deployment-static/` no repositório atual.",
       "Tratar deploy marcado como pronto como prova de que todos os caminhos funcionam.",
-      "Interpretar tela de login Vercel como falha DNS ou retirar proteção do projeto principal."
+      "Interpretar tela de login Vercel como falha DNS ou remover proteção para concluir a aula."
     ],
     "exercises": [
       {
@@ -1490,31 +1617,156 @@ Object.assign(LESSON_GUIDES, {
         "hints": ["O laboratório não possui etapas de compilação.", "Depois da configuração, verifique tanto a entrada quanto a folha de estilos." ]
       },
       {
-        "prompt": "Construir: publique o laboratório em um projeto Vercel separado. Registre a raiz, preset, URL pública, status final de `/` e `/styles.css`, protocolo inicial/final e resultado da navegação por teclado.",
-        "expected": "A evidência permite repetir a configuração e inclui os dois status reais, a URL HTTPS e o teste de teclado; não contém chave, cookie nem dado pessoal.",
-        "criteria": ["O projeto separado usa a raiz `labs/deployment-static` e não altera o principal.", "Registra respostas observadas para HTML e CSS.", "Registra HTTPS e navegação por teclado."],
-        "solution": "Siga `labs/deployment-static/README.md`, copie os resultados observados e a URL fornecida pelo painel. Status, URL e proteção variam por deploy; não os invente.",
-        "explanation": "O valor deste exercício é produzir evidência de uma publicação real, não copiar um hostname ou status de exemplo.",
-        "hints": ["Abra a aba Rede antes de recarregar a página.", "A URL não é a única evidência: examine também os dois pedidos de arquivo." ]
+        "prompt": "Construir: monte um roteiro reprodutível para conferir `labs/deployment-static` no Preview de `testes`. Registre como localizar o deployment, formar a URL com o caminho da pasta, examinar HTML/CSS quando disponível e classificar uma tela de login Vercel.",
+        "expected": "O roteiro aponta ao deployment Preview e ao caminho correto, solicita evidências observadas dos arquivos ou registra a proteção, e não depende de domínio próprio ou acesso anônimo.",
+        "criteria": ["Usa o Preview da branch `testes` e o caminho `/labs/deployment-static/`.", "Distingue resposta HTTP dos arquivos de controle de acesso.", "Não altera configurações da Vercel nem inventa status."],
+        "solution": "Siga `labs/deployment-static/README.md`, use o hostname exibido pelo projeto e acrescente `/labs/deployment-static/`. Registre a resposta real para HTML e CSS se puder abrir; se surgir login Vercel, anote proteção e encerre a conferência remota.",
+        "explanation": "O objetivo é observar um deployment Preview e entender as camadas; domínio personalizado e acesso público anônimo não são pré-requisitos.",
+        "hints": ["O caminho do laboratório faz parte da URL porque o projeto publica o repositório inteiro.", "Uma política de acesso pode impedir observar os arquivos sem indicar falha no DNS." ]
       },
       {
-        "prompt": "Investigar erro: a URL da Vercel retorna 404 e `/styles.css` não carrega. Registre a evidência, formule uma hipótese de raiz/diretório e proponha um teste após corrigir somente essa configuração.",
-        "expected": "A investigação compara a raiz configurada com os caminhos reais, verifica logs/commit e faz novo deploy; depois confirma status de `/` e `/styles.css`.",
-        "criteria": ["A hipótese menciona raiz ou saída com evidência de arquivo ausente.", "A correção não altera o projeto principal nem troca DNS sem necessidade.", "O teste final verifica os dois arquivos."],
-        "solution": "Confirmar que a raiz é `labs/deployment-static`; corrigir a raiz se necessário, publicar e verificar `/` e `/styles.css` na aba Rede.",
-        "explanation": "A ausência dos arquivos publicados é compatível com diretório incorreto; o painel e o status das rotas ajudam a confirmar.",
-        "hints": ["Compare o caminho do arquivo no Git com Root Directory.", "Uma resposta 404 de arquivo não é, por si só, erro de resolução DNS." ]
+        "prompt": "Investigar erro: a URL Preview abre o projeto, mas `/styles.css` retorna 404. Sem mudar DNS ou configurações do projeto, liste as evidências para comparar caminho pedido, referência no HTML e arquivos existentes no commit.",
+        "expected": "A análise compara `/labs/deployment-static/styles.css`, o `href` relativo e a presença do arquivo no commit; se a Vercel pedir login, registra que não foi possível observar os pedidos protegidos.",
+        "criteria": ["Investiga caminho, referência e commit antes de propor correção.", "Não conclui falha DNS a partir de um 404 de arquivo.", "Não exige domínio, acesso anônimo ou mudança de configuração Vercel."],
+        "solution": "Na aba Rede, confirme o caminho solicitado e status; no HTML, confira o caminho relativo `styles.css`; no commit, verifique se o arquivo existe ao lado de `index.html`. Se o acesso estiver protegido, anote a limitação sem alterar a proteção.",
+        "explanation": "O endereço do arquivo no repositório e o caminho HTTP publicado ajudam a separar falha de conteúdo de resolução DNS.",
+        "hints": ["O HTML e o CSS estão na mesma pasta.", "Descubra se a requisição chegou à Vercel antes de atribuir o resultado ao DNS." ]
       }
     ],
     "quiz": [
-      { "question": "Qual diretório deve ser a raiz deste projeto Vercel?", "options": ["A raiz do repositório inteiro.", "`labs/deployment-static`, onde estão `index.html` e `styles.css`.", "A pasta `assets/js` do curso."], "correctIndex": 1, "explanation": "A raiz selecionada deve conter todos os arquivos necessários para a página publicada." },
-      { "question": "O que comprova que o CSS foi publicado?", "options": ["O deploy aparece como pronto.", "O pedido de `/styles.css` retorna uma resposta de sucesso.", "A URL contém a palavra Vercel."], "correctIndex": 1, "explanation": "É preciso conferir o recurso individual, além do documento principal." },
-      { "question": "Uma tela de login Vercel na URL didática prova falha DNS?", "options": ["Sim, sempre.", "Não; pode indicar proteção de acesso do deploy.", "Sim, se o HTML usa CSS."], "correctIndex": 1, "explanation": "A política de acesso e a resolução do domínio são verificações distintas." }
+      { "question": "Qual caminho contém a página do laboratório no repositório atual?", "options": ["`/labs/deployment-static/` no Preview da branch `testes`.", "A raiz da conta Vercel.", "Um domínio personalizado obrigatório."], "correctIndex": 0, "explanation": "O deployment atual publica o repositório inteiro, e os arquivos didáticos estão na pasta indicada." },
+      { "question": "O que significa ver a tela de login Vercel no Preview?", "options": ["É evidência de uma proteção de acesso, não por si só de falha DNS.", "Prova que o domínio não existe.", "Prova que o HTML não foi publicado."], "correctIndex": 0, "explanation": "A resolução e a política de acesso são camadas diferentes." },
+      { "question": "É preciso ter domínio próprio para fazer esta prática?", "options": ["Sim, para toda URL HTTPS.", "Não; usa-se a URL Preview `vercel.app` existente.", "Sim, e é necessário alterar os nameservers."], "correctIndex": 1, "explanation": "A URL fornecida pelo provedor basta para observar o Preview; domínio próprio fica fora do escopo." }
     ],
     "summary": [
       "Uma página HTML/CSS pronta pode ser publicada sem instalar pacote nem executar build.",
-      "A raiz do projeto precisa conter `index.html` e os caminhos de seus recursos.",
-      "Verifique separadamente a URL, status dos arquivos, HTTPS, acesso e teclado; não confunda essa prática com uma API ou banco persistente."
+      "No projeto atual, os arquivos do laboratório são acessados sob `/labs/deployment-static/` no deployment Preview da branch `testes`.",
+      "Uma tela de proteção Vercel não é uma prova de falha DNS. A aula não exige domínio próprio nem alteração da política de acesso."
+    ]
+  },
+  "delivery-custom-domain": {
+    "prerequisites": "Concluir delivery-web-foundations, delivery-dns, delivery-dns-resolution e delivery-static-deploy. Nenhuma compra, conta nova, configuração DNS ou validação de domínio real é necessária.",
+    "setup": "Use somente o cenário de papel descrito aqui. `example.test` é reservado para exemplos e não deve ser consultado como domínio público. Não cole valores reais de verificação nem altere registros.",
+    "why": "Associar domínio envolve várias camadas e pode interromper e-mail ou outros serviços se registros forem substituídos sem inventário. Planejar antes ensina o processo sem exigir um domínio de propriedade do aluno.",
+    "example": {
+      "language": "text",
+      "code": "CENÁRIO CONCEITUAL — nada será configurado\n\n1. A URL Preview `https://<deployment>.vercel.app/` já atende à demonstração.\n2. Para um domínio hipotético, a equipe adicionaria `www.curso.example.test` ao projeto host.\n3. O painel exibiria o tipo e o valor DNS específicos daquela configuração.\n4. A pessoa inventariaria registros existentes, inclusive MX/TXT de e-mail.\n5. Só depois de revisar impacto, faria a mudança e verificaria DNS, HTTPS e aplicação.\n\n`<valor-exibido-no-painel>` é um marcador, não um destino válido.",
+      "expected": "A sequência separa URL do provedor, associação do host, configuração DNS, validação TLS e resposta da aplicação. Valores DNS e etapas dependem do painel e do provedor autoritativo; nenhum valor fixo é copiado deste exemplo.",
+      "explanation": [
+        "A URL `vercel.app` atribuída a um deployment não exige domínio comprado pelo aluno. Um domínio personalizado é uma opção para usar um nome próprio.",
+        "Registrador, provedor DNS e hospedagem podem ser empresas diferentes. Adicionar um nome ao projeto e publicar o registro DNS são tarefas relacionadas, mas distintas.",
+        "A, AAAA, CNAME, TXT e NS têm funções diferentes. O painel atual do host e o DNS autoritativo fornecem valores específicos; não memorize um endereço de outro projeto.",
+        "Trocar nameservers muda quem responde por toda a zona. Antes, copie e compare registros necessários, inclusive MX e TXT usados por e-mail, SPF, DKIM e verificações de serviços.",
+        "Resposta DNS não comprova que TLS foi emitido nem que a aplicação funciona. Verifique resolução, associação, certificado e resposta HTTPS em etapas separadas.",
+        "Esta aula termina em um plano fictício. Validação com domínio real é opcional e não é requisito para concluir o Preview."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Preview e domínio personalizado",
+        "paragraphs": [
+          "Um deployment Preview recebe um endereço `vercel.app` do provedor e permite revisar uma versão do projeto. Para este curso, o Preview da branch `testes` é suficiente. Não é preciso comprar domínio para praticar publicação, HTTPS ou fluxo de branches.",
+          "Um domínio personalizado é um nome escolhido e controlado pela pessoa ou organização, associado a um projeto de hospedagem. Ele pode oferecer um endereço próprio, mas também depende da renovação do registro e de configuração DNS correta.",
+          "Pausa: explique qual endereço usaria para compartilhar a prévia do projeto e qual só existiria depois de associar um domínio próprio."
+        ],
+        "terms": [
+          { "term": "Preview", "meaning": "Deployment de prévia ligado a uma branch ou commit, separado do ambiente Production." },
+          { "term": "Domínio personalizado", "meaning": "Nome registrado e controlado pelo proprietário, apontado para um serviço de hospedagem." }
+        ]
+      },
+      {
+        "title": "Associação, DNS e registros existentes",
+        "paragraphs": [
+          "Num fluxo típico, alguém com acesso ao projeto informa o domínio no painel da hospedagem; o painel verifica a associação e apresenta instruções para o provedor DNS. A forma exata varia: pode solicitar A, CNAME, TXT ou nameservers. Não memorize um endereço de outra conta nem use valor de exemplo em produção.",
+          "Antes de editar a zona, anote os registros atuais e a função de cada um. MX direciona e-mail; TXT pode carregar verificações e políticas como SPF ou DKIM. Substituir nameservers sem recriar registros pode interromper e-mail, subdomínios ou verificações de outros serviços. Se não conhecer um registro, pare e identifique a dependência.",
+          "Pausa: antes de confirmar uma troca de nameservers, que inventário e revisão precisam acontecer?"
+        ],
+        "terms": [
+          { "term": "Registrador", "meaning": "Serviço usado para registrar e renovar o direito de uso de um nome de domínio." },
+          { "term": "Provedor DNS", "meaning": "Serviço que publica a zona e responde pelos registros conforme a delegação NS." },
+          { "term": "MX", "meaning": "Registro que informa os servidores responsáveis por receber e-mail do domínio." }
+        ]
+      },
+      {
+        "title": "Valores específicos e ordem de verificação",
+        "paragraphs": [
+          "Um serviço pode pedir CNAME para subdomínio, endereço para domínio raiz, ou TXT para demonstrar controle. A instrução que vale é a mostrada no painel atual do projeto e do provedor DNS autoritativo; esses valores podem mudar, então esta aula usa marcadores em vez de números fixos.",
+          "Confirme nome/host, tipo, destino ou conteúdo, TTL e se o provedor aceita aquele formato. Evite registros conflitantes. Ao trocar nameservers, a zona passa a ser servida por outros servidores e os registros precisam existir lá também.",
+          "Depois de publicar, confira delegação e resposta autoritativa; compare resolvedores e TTL se houver divergência. Em seguida, confira associação, certificado TLS e comportamento da aplicação. Cada etapa precisa de evidência própria."
+        ],
+        "terms": [
+          { "term": "A", "meaning": "Associa um nome a um endereço IPv4." },
+          { "term": "CNAME", "meaning": "Faz um nome apontar para outro nome DNS; não é um endereço IP." },
+          { "term": "TXT", "meaning": "Armazena texto DNS, muitas vezes usado para comprovação ou política de serviços." }
+        ]
+      },
+      {
+        "title": "Plano de mudança e rollback",
+        "paragraphs": [
+          "Antes de uma mudança real, defina o objetivo e o ambiente, confirme quem controla o registrador, quem hospeda DNS e quem opera a aplicação. Guarde uma cópia dos registros e do estado anterior em local autorizado, sem publicar tokens ou informações internas.",
+          "Escreva o plano de reversão antes da alteração: quais registros anteriores serão restaurados, quem pode restaurá-los, como verificar e-mail, subdomínios, HTTPS e aplicação, e como identificar o limite para interromper a mudança. Reverter DNS não apaga imediatamente caches; compare os TTLs.",
+          "Esta prática termina no plano. O aluno não compra domínio nem executa mudança real. Para uso apenas em Preview, basta saber como o processo funcionaria e por que valores e validação dependem do ambiente escolhido."
+        ]
+      }
+    ],
+    "guided": [
+      { "instruction": "Marque no exemplo o que já funciona no Preview e o que só seria necessário para um nome próprio.", "result": "Preview usa endereço do provedor; domínio personalizado exige associação e instruções DNS, mas ambos podem servir o mesmo projeto." },
+      { "instruction": "Separe os papéis do registrador, provedor DNS e hospedagem.", "result": "Renovação do domínio, publicação de registros e entrega da aplicação são responsabilidades diferentes." },
+      { "instruction": "Revise a lista de registros antes de trocar nameservers.", "result": "O plano preserva MX/TXT e demais serviços antes de delegar a zona a outro provedor." }
+    ],
+    "mistakes": [
+      "Achar que toda publicação exige domínio comprado.",
+      "Copiar valores DNS de tutorial ou de outro projeto em vez de seguir o painel atual.",
+      "Confundir registrar domínio, delegar nameservers e adicionar A/CNAME.",
+      "Apagar MX/TXT sem identificar dependências de e-mail e verificação.",
+      "Concluir que DNS funcionando comprova certificado, autorização ou funcionamento da aplicação.",
+      "Esperar que rollback DNS elimine imediatamente todos os caches."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: você só precisa revisar uma mudança na branch `testes`. Compare `https://<deployment>.vercel.app/` com `www.curso.example.test`. Qual endereço pode ser usado sem comprar domínio e qual exige configuração adicional?",
+        "expected": "A URL Preview atribuída pelo provedor pode ser usada sem domínio próprio; o nome hipotético exigiria controle do domínio, associação ao projeto e instruções DNS.",
+        "criteria": ["Identifica Preview como suficiente para revisar a branch.", "Não recomenda comprar ou configurar domínio para esta prática."],
+        "solution": "Use o Preview `vercel.app` para compartilhar a prévia; domínio próprio é opcional e depende de controle e configuração DNS.",
+        "explanation": "Endereços de deployment e domínios registrados têm ciclos e responsabilidades diferentes.",
+        "hints": ["Pergunte quem forneceu o hostname e quem precisa controlar o nome.", "A aula pode ser concluída sem apontar domínio personalizado."]
+      },
+      {
+        "prompt": "Alterar: o painel hipotético pede um CNAME para `www`, mas a pessoa não sabe se esse nome já tem registros. Descreva as consultas e precauções anteriores à edição.",
+        "expected": "A pessoa identifica a zona autoritativa, consulta registros existentes para `www`, confirma tipo e valor atuais e compara o destino fornecido pelo painel; conflito ou dependência não identificada interrompe a mudança.",
+        "criteria": ["Confere autoridade e registros atuais antes de editar.", "Não inventa alvo CNAME nem apaga registros automaticamente."],
+        "solution": "Verifique a delegação NS e a zona ativa, inventarie `www`, confirme a instrução CNAME do painel e avalie conflitos/dependências antes de planejar a mudança.",
+        "explanation": "Registros estão numa zona servida por um provedor específico; outro painel pode não refletir as respostas públicas.",
+        "hints": ["Primeiro identifique quem publica a zona.", "Nome e destino devem vir do painel atual, não de exemplos fixos."]
+      },
+      {
+        "prompt": "Construir: faça uma tabela fictícia para `www.curso.example.test` com: papel do serviço, estado atual, instrução do painel, registros a preservar, evidência de conclusão e rollback. Use marcadores, sem valores DNS reais.",
+        "expected": "A tabela separa registrador, DNS e hospedagem; usa placeholders fictícios; inventaria MX/TXT; exige validações distintas de DNS, TLS e aplicação; descreve restauração do estado anterior.",
+        "criteria": ["Todos os valores são placeholders, não instruções executáveis.", "Preserva explicitamente registros de e-mail/verificação.", "Inclui evidência por camada e rollback observável."],
+        "solution": "Exemplo: DNS autoritativo=`<provedor atual>`; tipo=`CNAME`; destino=`<valor exibido no painel>`; MX/TXT=`preservar e comparar`; evidências=`NS/resposta DNS, certificado, resposta HTTPS`; rollback=`restaurar registro anterior e revalidar serviços`. Nada é aplicado a DNS real.",
+        "explanation": "Um plano pode ser revisado por outra pessoa sem transformar a aula em instrução copiável de produção.",
+        "hints": ["Inclua quem é responsável por cada serviço.", "DNS, certificado e aplicação são verificações distintas."]
+      },
+      {
+        "prompt": "Investigar erro: depois de uma troca hipotética de nameservers, o site abre, mas o recebimento de e-mail falha. Formule hipóteses e liste evidências sem fazer nova alteração.",
+        "expected": "A investigação compara a zona antiga e a atual, confirma a delegação NS e procura MX/TXT necessários ao e-mail; o site funcionar não prova que toda a zona foi migrada.",
+        "criteria": ["Considera registros de e-mail ausentes ou divergentes na zona atual.", "Confirma nameservers autoritativos antes de editar.", "Evita recomendar outra mudança sem inventário."],
+        "solution": "Identifique os NS publicados, compare a zona anterior e atual, confira MX e TXT e envolva quem administra o e-mail. Depois planeje recuperar registros documentados e testar envio/recebimento.",
+        "explanation": "A aplicação web pode funcionar enquanto registros independentes de e-mail estão ausentes na zona autoritativa.",
+        "hints": ["Trocar nameservers muda a zona consultada pelos visitantes.", "Verifique MX e TXT antes de restaurar qualquer valor."]
+      }
+    ],
+    "quiz": [
+      { "question": "Para revisar um Preview da branch `testes`, é obrigatório comprar domínio?", "options": ["Sim, todo Preview depende de domínio próprio.", "Não; a URL `vercel.app` do deployment é suficiente.", "Sim, é preciso trocar NS antes de abrir."], "correctIndex": 1, "explanation": "O endereço do Preview permite a revisão sem domínio personalizado." },
+      { "question": "Antes de trocar nameservers, qual cuidado é essencial?", "options": ["Apagar todos os registros antigos.", "Inventariar e recriar no novo provedor os registros necessários, incluindo MX/TXT.", "Copiar o endereço A de um tutorial."], "correctIndex": 1, "explanation": "A zona inteira passa a ser servida pelos nameservers delegados; outros serviços também dependem dos registros." },
+      { "question": "O painel mostra um valor CNAME para seu projeto. Qual fonte usar?", "options": ["Um valor fixo de exemplo antigo.", "O valor específico do painel atual e a zona DNS autoritativa.", "Qualquer endereço IP próximo."], "correctIndex": 1, "explanation": "O valor depende do projeto, hostname e estado do provedor." }
+    ],
+    "summary": [
+      "Preview `vercel.app` atende ao uso deste curso sem domínio comprado.",
+      "Registrador, provedor DNS e hospedagem podem ser serviços separados.",
+      "Valores A, AAAA, CNAME, TXT ou NS devem vir das instruções atuais do projeto e do DNS autoritativo.",
+      "Inventarie e preserve MX/TXT, documente rollback e verifique DNS, TLS e aplicação separadamente.",
+      "O exemplo é conceitual; não houve validação com domínio real."
     ]
   }
 });
@@ -1573,9 +1825,19 @@ Object.assign(LESSON_GUIDES, {
       hint: "Identifique primeiro se o dado estava em memória, no sistema de arquivos efêmero ou em um banco durável."
     },
     "delivery-static-deploy": {
-      prompt: "O HTML abre após publicar em um projeto separado, mas a folha de estilos retorna 404. Confira a raiz, o caminho relativo e o status de cada arquivo; proponha um ajuste e uma confirmação sem alterar o projeto principal.",
-      expected: "A correção mantém a raiz `labs/deployment-static`, confirma que `styles.css` está incluído e referenciado relativamente e verifica novamente `/` e `/styles.css` no deploy novo.",
-      hint: "A página pode aparecer sem CSS se o HTML foi encontrado, mas o caminho relativo ou a pasta servida do arquivo CSS está incorreta."
+      prompt: "O Preview abre o HTML do laboratório, mas o CSS retorna 404. Confira o caminho `/labs/deployment-static/styles.css`, a referência relativa no HTML e a presença do arquivo no commit; se o Preview pedir login, registre a proteção sem tentar removê-la.",
+      expected: "A investigação compara caminho, referência e commit, sem mudar DNS ou exigir domínio próprio; uma tela de login é identificada como controle de acesso.",
+      hint: "HTML e CSS estão na mesma pasta. Um 404 de recurso é diferente de uma falha de resolução do hostname."
+    },
+    "delivery-dns-resolution": {
+      prompt: "Uma pessoa tenta `www.curso.example.test` e não recebe resposta pública. Explique por que isso não demonstra que o resolvedor está com defeito e descreva como estudaria o fluxo usando um hostname Preview real sem expor dados de sessão.",
+      expected: "`.test` é reservado para exemplos e não representa um destino público; o estudante pode traçar o papel do resolvedor e usar um hostname Preview se permitido, separando DNS de acesso HTTP e proteção Vercel.",
+      hint: "Separe o nome reservado do hostname real. Uma resposta DNS, uma resposta HTTP e uma tela de autenticação são observações de camadas diferentes."
+    },
+    "delivery-custom-domain": {
+      prompt: "Uma equipe de demonstração em Preview decide não comprar domínio. Em seguida, um colega propõe migrar nameservers para preparar um domínio hipotético. Escreva uma revisão que indique o que é desnecessário agora e quais registros precisariam ser inventariados antes de qualquer migração futura.",
+      expected: "A equipe pode seguir usando o Preview sem domínio ou mudança DNS; numa futura migração, deverá identificar autoridade e preservar registros existentes como MX/TXT antes de delegar a zona.",
+      hint: "Diferencie a necessidade atual de compartilhar um Preview da decisão futura de controlar um nome próprio; trocar NS afeta a zona toda."
     }
   };
 

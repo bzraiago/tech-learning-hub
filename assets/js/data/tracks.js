@@ -4866,6 +4866,33 @@
             ]
           },
           {
+            "id": "delivery-dns-resolution",
+            "title": "Como o DNS encontra um destino",
+            "minutes": 70,
+            "concept": "Acompanhe a consulta de um resolvedor recursivo até os servidores autoritativos, compreendendo zonas, delegação e cache sem alterar um domínio.",
+            "objectives": [
+              "Desenhar o caminho cache local → resolvedor recursivo → delegações DNS → servidor autoritativo.",
+              "Distinguir resolvedor recursivo, servidor autoritativo, zona e delegação por NS.",
+              "Diagnosticar qual camada consultar quando os servidores autoritativos e os resolvedores mostram respostas diferentes."
+            ],
+            "exercise": "Trace a resolução de um nome fictício e investigue uma resposta antiga sem modificar registros.",
+            "code": "Navegador\n  ↓ resolvedor local e cache\nResolvedor recursivo\n  ↓ consulta iterativa e referências\nRaiz → sufixo público registrado → servidor autoritativo\n  ↓ resposta A/AAAA/CNAME\nResolvedor devolve resposta até o navegador\n\n`example.test` só ilustra rótulos: .test é reservado e nenhum pedido DNS é feito.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "IETF · RFC 1034 — conceitos de domínios, zonas e resolvedores",
+                "url": "https://www.rfc-editor.org/rfc/rfc1034.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "IETF · RFC 6761 — nomes reservados para teste",
+                "url": "https://www.rfc-editor.org/rfc/rfc6761.html",
+                "language": "EN"
+              }
+            ]
+          },
+          {
             "id": "delivery-https",
             "title": "HTTPS, TLS e certificado",
             "minutes": 65,
@@ -4921,16 +4948,16 @@
           },
           {
             "id": "delivery-static-deploy",
-            "title": "Primeira publicação estática na Vercel",
+            "title": "Primeira publicação estática em Preview na Vercel",
             "minutes": 75,
-            "concept": "Publique uma página HTML/CSS independente da aplicação principal e confira sua URL, a resposta HTTP e a conexão HTTPS.",
+            "concept": "Confira uma página HTML/CSS na implantação Preview da branch testes e diferencie endereço do provedor, proteção de acesso e domínio personalizado.",
             "objectives": [
-              "Configurar um projeto Vercel separado com raiz em `labs/deployment-static` e sem etapa de build.",
-              "Verificar a página publicada, o status final e a URL HTTPS com navegador ou cliente HTTP.",
-              "Diagnosticar uma página 404 distinguindo raiz do projeto, diretório publicado e arquivo de entrada."
+              "Localizar o deployment Preview da branch `testes` e abrir `/labs/deployment-static/` sem mudar as configurações do projeto.",
+              "Verificar separadamente a página, `styles.css`, HTTPS e eventual proteção de acesso na URL `vercel.app`.",
+              "Diagnosticar um 404 distinguindo caminho publicado, commit implantado e proteção de acesso, sem atribuir o problema ao DNS sem evidência."
             ],
-            "exercise": "Publique o laboratório estático em um projeto separado e registre evidências de HTTP, HTTPS e resolução de uma falha simulada de diretório.",
-            "code": "Repositório GitHub\n└── labs/deployment-static/   ← raiz do projeto Vercel\n    ├── index.html            ← página inicial\n    └── styles.css            ← apresentação\n\nPreset: Other · Build Command: vazio · sem dependências",
+            "exercise": "Abra o Preview da branch `testes`, examine a página e o CSS e registre HTTPS e o estado de acesso sem configurar domínio próprio.",
+            "code": "Projeto Vercel existente · Root Directory: repositório\n└── branch `testes` → deployment Preview\n    └── /labs/deployment-static/\n        ├── index.html\n        └── styles.css\n\nEndereço `vercel.app` fornecido pelo provedor; domínio próprio opcional.",
             "docs": [
               {
                 "kind": "doc",
@@ -4948,6 +4975,39 @@
                 "kind": "doc",
                 "title": "Vercel · Certificados SSL",
                 "url": "https://vercel.com/docs/domains/working-with-ssl",
+                "language": "EN"
+              }
+            ]
+          },
+          {
+            "id": "delivery-custom-domain",
+            "title": "Domínio personalizado: plano seguro de configuração",
+            "minutes": 75,
+            "concept": "Planeje como associar um domínio ao projeto, ler valores DNS específicos do painel, preservar outros serviços e desfazer a mudança sem precisar comprar ou configurar um domínio.",
+            "objectives": [
+              "Distinguir uma URL Preview `vercel.app` de um domínio personalizado que exige associação ao projeto e configuração DNS.",
+              "Prever quando o painel pode solicitar A, CNAME, TXT ou nameservers sem inventar os valores do projeto.",
+              "Escrever um plano que inventaria registros existentes, preserva e-mail e define confirmação e rollback antes de uma mudança."
+            ],
+            "exercise": "Monte, com nomes e valores fictícios, um plano de associação e reversão de `www.curso.example.test` sem alterar DNS real.",
+            "code": "SIMULAÇÃO — não copie estes marcadores para DNS real\n\nPreview atual: https://<deployment>.vercel.app/\nDomínio hipotético: www.curso.example.test\nTipo solicitado pelo painel: CNAME\nDestino: <valor-exato-exibido-no-painel>\nRegistros de e-mail: preservar MX/TXT existentes\nRollback: restaurar o registro anterior documentado\n\nA página Preview continua disponível sem domínio personalizado.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "Vercel · Adicionar e configurar domínio personalizado",
+                "url": "https://vercel.com/docs/domains/working-with-domains/add-a-domain",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Vercel · Gerenciar registros DNS",
+                "url": "https://vercel.com/docs/domains/managing-dns-records",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Vercel · Ambientes de deploy Preview e Production",
+                "url": "https://vercel.com/docs/deployments/environments",
                 "language": "EN"
               }
             ]

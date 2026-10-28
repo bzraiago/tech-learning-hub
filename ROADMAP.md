@@ -128,8 +128,8 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Apresentar objetivo antes de pré-requisitos, ambiente e conceitos; manter exemplo, resultado, prática, solução recolhida, erros, verificação e revisão na ordem compartilhada pelas aulas.
 - [x] Tornar observáveis os 365 objetivos atuais das aulas.
   - [x] Reescrever seis objetivos abstratos como ações conferíveis e adicionar verificação ao validador para impedir que objetivos comecem por verbos vagos.
-- [x] Separar resultado esperado e critérios de aceite das soluções ocultas nos 478 exercícios.
-  - [x] Exibir antes do rascunho o resultado esperado dos 478 exercícios e exigir critérios específicos por aula no validador de conteúdo.
+- [x] Separar resultado esperado e critérios de aceite das soluções ocultas nos 486 exercícios.
+  - [x] Exibir antes do rascunho o resultado esperado dos 486 exercícios e exigir critérios específicos por aula no validador de conteúdo.
   - [x] Detalhar critérios observáveis nos quatro exercícios de `prep-tools`, sem expor as respostas nos resultados visíveis.
   - [x] Detalhar critérios observáveis nos quatro exercícios de `prep-files` e preservar a investigação antes da dica.
   - [x] Detalhar critérios observáveis nos quatro exercícios de `prep-workspace`, cobrindo contexto do terminal e editor.
@@ -172,7 +172,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Revisar os 24 exercícios das seis aulas de Qualidade, acrescentar critérios específicos e evitar antecipar a entrada que demonstra coerção na investigação.
   - [x] Revisar os 25 exercícios das seis aulas de Entrega, acrescentar critérios específicos e ajustar três resultados que antecipavam previsões ou respostas de autorização.
 - [~] Garantir exemplos executáveis com saída ou comportamento visível.
-  - [x] O validador exige código, configuração/ambiente, explicação e resultado esperado para cada uma das 119 aulas; também verifica a sintaxe dos exemplos JavaScript e scripts embutidos em HTML.
+  - [x] O validador exige código, configuração/ambiente, explicação e resultado esperado para cada uma das 121 aulas; também verifica a sintaxe dos exemplos JavaScript e scripts embutidos em HTML.
   - [x] Executar os 32 exemplos Python em pastas temporárias; validar 18 exemplos JavaScript por sintaxe; abrir os 23 exemplos HTML no Chrome e interagir com os seis exemplos HTML + JavaScript.
   - [x] Executar nove exemplos Node com saída bem-sucedida, confirmar que `quality-debug` mostra dois testes aprovados e uma falha intencional, e executar os dez exemplos SQL SQLite em memória; a preparação SQLite alternativa também criou e consultou um banco temporário.
   - [x] Executar os exemplos reais em serviços descartáveis, sem usar SQLite como substituto: `db-postgres` e quatro exercícios em PostgreSQL 17; `db-mariadb` e quatro em MariaDB 11.8.9; `db-firebird` e quatro em Firebird 5.0.4; `db-mongo-crud` e `db-mongo-pipelines` com exemplos e oito exercícios em MongoDB 8.0.34. Consultas, agregações, transações, restrições e validações produziram os resultados esperados; containers e volumes temporários foram removidos. Fontes oficiais das imagens: [PostgreSQL](https://hub.docker.com/_/postgres), [MariaDB](https://hub.docker.com/_/mariadb), [Firebird](https://www.firebirdsql.org/en/docker/) e [MongoDB](https://hub.docker.com/_/mongo).
@@ -184,16 +184,16 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Vincular o desafio ao assunto de cada aula, pedindo que a pessoa formule uma mudança relevante e compare um comportamento preservado com outro alterado.
   - [ ] Conferir visualmente a sequência no site publicado, com teclado e salvamento na nuvem.
 - [~] Garantir, em cada aula, atividades de prever, alterar, construir e investigar erro.
-  - [x] Definir as quatro ações com instrução e critério de aceite em `EXERCISE_STAGES`; o validador confirma os tipos, e as 119 aulas têm pelo menos quatro exercícios com dicas utilizáveis.
-  - [x] Renderizar em Chromium a 375 px os guias-base de 114 aulas e as cinco aulas novas de hospedagem/DNS; conferir títulos, critérios, anotações e chegada por teclado ao campo final.
+  - [x] Definir as quatro ações com instrução e critério de aceite em `EXERCISE_STAGES`; o validador confirma os tipos, e as 121 aulas têm pelo menos quatro exercícios com dicas utilizáveis.
+  - [x] Renderizar em Chromium a 375 px os 114 guias-base e cinco guias de integração/hospedagem já existentes; conferir títulos, critérios, anotações e chegada por teclado ao campo final.
   - [ ] Conferir estilo e salvamento remoto na aplicação publicada, incluindo login e confirmação de sincronização na nuvem.
 - [~] Adicionar erros comuns e como reconhecê-los pela mensagem ou comportamento.
-  - [x] As 119 aulas têm de três a cinco erros comuns; a revisão ensina a registrar mensagem/comportamento, passo que o causou e resultado esperado antes de corrigir.
+  - [x] As 121 aulas têm de três a cinco erros comuns; a revisão ensina a registrar mensagem/comportamento, passo que o causou e resultado esperado antes de corrigir.
   - [x] O validador exige pelo menos três itens textuais não vazios por aula.
   - [x] Renderizar a aba Revisão dos 114 guias-base e dos cinco guias novos em Chromium; conferir instruções e quantidade de erros.
   - [ ] Conferir a aba Revisão no site publicado e verificar que as mensagens de erro continuam legíveis com teclado e em largura móvel.
 - [x] Adicionar exercício de transferência em contexto diferente.
-  - [x] As 119 aulas têm uma segunda tentativa com enunciado, critério de aceite e pista; o validador exige os três campos e rejeita enunciado idêntico ao de um exercício.
+  - [x] As 121 aulas têm uma segunda tentativa com enunciado, critério de aceite e pista; o validador exige os três campos e rejeita enunciado idêntico ao de um exercício.
   - [x] Auditoria de termos compartilhados entre cada segunda tentativa e os exercícios da aula não encontrou sobreposição Jaccard igual ou superior a 0,5; amostras das nove trilhas usam contextos distintos.
 - [x] Dividir a aula de funções JavaScript em blocos menores com prática intermediária.
 - [x] Mapear outras aulas com mais de quatro conceitos centrais sem prática intermediária.
@@ -377,16 +377,16 @@ Toda implementação só pode ser considerada pronta quando:
 ### Fase 7.1 — Fundamentos de internet, hospedagem e DNS
 
 - [x] Explicar cliente, servidor, hospedagem, região, CDN, domínio, registrador e provedor DNS em `delivery-web-foundations`.
-- [x] Ensinar resolução DNS com registros `A`, `AAAA`, `CNAME` e `TXT`, TTL, caches e diagnóstico em `delivery-dns`.
+- [x] Ensinar registros `A`, `AAAA`, `CNAME` e `TXT`, TTL, caches e diagnóstico em `delivery-dns`.
   - [x] Referenciar as RFCs oficiais que reservam `192.0.2.0/24`, `2001:db8::/32` e `.test` para exemplos e testes.
+- [x] Explicar árvore e zonas DNS, resolvedor recursivo, autoridade, delegação NS e cache em `delivery-dns-resolution`.
 - [x] Explicar HTTPS, certificado TLS, redirecionamento de HTTP para HTTPS e conteúdo misto em `delivery-https`.
 - [x] Comparar publicação estática, funções sob demanda, servidor persistente e serviço gerenciado em `delivery-hosting-models`.
 - [ ] Publicar uma página mínima na Vercel e verificar URL, status HTTP e HTTPS.
-  - [x] Criar `labs/deployment-static` com HTML/CSS acessíveis, sem dependências, e README com projeto Vercel separado, raiz, preset, build vazio, verificação HTTP/HTTPS e diagnóstico.
-  - [ ] Executar o deploy do laboratório e confirmar URL, status de `/` e `/styles.css`, HTTPS e acesso sem login Vercel; a conta não está conectada e a CLI Vercel não está instalada neste ambiente.
-- [ ] Conectar um domínio de laboratório, validar registros DNS e documentar como desfazer a configuração.
-  - [ ] A conta Vercel não está conectada nesta sessão; a liberação de previews autorizada pelo dono e a verificação anônima aguardam acesso autenticado.
-  - [ ] Nenhum domínio de laboratório foi comprado ou alterado; manter os exemplos com domínios reservados até haver um domínio controlado para o exercício.
+  - [x] Criar `labs/deployment-static` com HTML/CSS acessíveis e README que usa a URL Preview existente da branch `testes`, inclui o caminho do laboratório e diagnostica DNS, HTTP e proteção de acesso.
+  - [ ] Quando houver sessão Vercel autorizada, conferir o Preview em `/labs/deployment-static/` e os arquivos HTML/CSS se a política permitir; não é necessário desativar proteção nem demonstrar acesso anônimo.
+- [x] Ensinar em `delivery-custom-domain` um plano conceitual para associar domínio, seguir os valores atuais do painel, preservar MX/TXT e preparar rollback.
+  - [x] Usar `.test` e marcadores fictícios; não comprar domínio, mudar DNS nem condicionar a conclusão do curso à validação real.
 
 ### Fase 7.2 — Stack guiada de referência
 
@@ -644,12 +644,13 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 27/10/2026 | Fase 6/7 — falha de banco e rollback | `ea4ca2d` | `npm test` passou nos 32 testes; validador de conteúdo passou. API real com PostgreSQL indisponível respondeu `500` genérico sem expor detalhes; `start:memory` identificou armazenamento temporário e a API respondeu `200` com dados fictícios. O guia de rollback foi corrigido conforme a documentação atual da Vercel. Rollback remoto e acesso anônimo aos previews seguem pendentes. |
 | 27/10/2026 | Fase 7 — backup e restauração comprovados | `33d1df8` | `npm run test:backup-restore` passou localmente com PostgreSQL 17: dump custom, índice conferido, restauração em base nova, duas tabelas comparadas e origem preservada (`2` estudos, `1` sessão fictícia). Os jobs [backup-restore](https://github.com/bzraiago/tech-learning-hub/actions/runs/40617482760/job/122583268293) e [validate-and-test](https://github.com/bzraiago/tech-learning-hub/actions/runs/40617482760/job/122583268183) passaram; o Preview Vercel também concluiu com sucesso. A configuração, o container e o volume temporários foram removidos após a execução. |
 | 27/10/2026 | Fase 6 — Docker Compose local | Sem alteração de código | Com Docker Engine 29.7.2 e PostgreSQL 17, conexão e migrations passaram; o teste de integração passou (1/1). A API retornou `201` para criação e `409` para duplicidade, e o registro permaneceu após reiniciar a API. O container, a rede, o volume e o `.env` fictícios desta execução foram removidos. |
+| 27/10/2026 | Fase 7.1 — DNS e domínio conceituais | Commit pendente | Duas aulas adicionais explicam resolução recursiva/delegação e um plano seguro de domínio personalizado, com oito exercícios e seis questões. O laboratório estático foi reorientado ao Preview existente da branch `testes`; nenhuma mudança DNS ou teste com domínio próprio foi executado. Contagens atuais: 121 aulas, 486 exercícios e 361 questões. Validação estrutural e revisão visual/teclado ainda pendentes. |
 | 27/10/2026 | Fase 3 — execução de exemplos | `53c9c16` | Além das execuções já registradas, os exemplos e exercícios de `db-postgres`, `db-mariadb`, `db-firebird`, `db-mongo-crud` e `db-mongo-pipelines` passaram em PostgreSQL 17, MariaDB 11.8.9, Firebird 5.0.4 e MongoDB 8.0.34 reais em containers descartáveis. As restrições inválidas foram observadas e as verificações confirmaram que nenhuma tentativa recusada alterou os dados. Containers e volumes de teste foram removidos. |
 | 27/10/2026 | Fase 3 — progressão dos exercícios | Commit pendente | A interface nomeia as etapas, oferece um desafio final de mudança de requisito com critérios e salva as anotações na chave compatível do estado atual; o validador exige quatro exercícios e dicas. Auditoria do encaixe aula a aula e conferência visual/teclado/sincronização publicada ainda pendentes. |
 | 27/10/2026 | Fase 3 — tipos de atividade | Commit pendente | `EXERCISE_STAGES` define prever, alterar, construir e investigar erro com instrução e critério observável. As 114 aulas têm ao menos quatro exercícios com dicas e o validador verifica a sequência comum. O renderizador de produção exibiu os títulos, critérios e desafio final para os 114 guias em Chromium a 375 px; o teclado alcançou o campo final. Estilo da aplicação e salvamento remoto ainda precisam de conferência publicada. |
 | 27/10/2026 | Fase 3 — reconhecimento de erros | Commit pendente | As 114 aulas contêm de três a cinco erros comuns; o validador agora exige pelo menos três e a Revisão ensina a capturar sinal, passo causador e resultado esperado antes da correção. O renderizador em Chromium exibiu os erros e a orientação em todos os guias; estilo, teclado e conferência no site publicado ainda pendentes. |
 | 27/10/2026 | Fase 3 — transferência | Commit pendente | As 114 aulas têm segunda tentativa com resultado e pista; nenhuma foi idêntica ao exercício de origem e a auditoria de termos mostrou baixa sobreposição com os exercícios da própria aula. O renderizador de produção exibiu a recuperação após quiz errado nos 114 guias em Chromium a 375 px; o teclado alcançou o rascunho. As amostras das nove trilhas mudam cenário e dados. |
-| 27/10/2026 | Fase 7.1 — fundamentos de hospedagem e DNS | Commit pendente | Cinco aulas novas cobrem resolução de nome, papéis de registrador/DNS/hospedagem, registros A/AAAA/CNAME/TXT, TTL, HTTPS/TLS, modelos e primeiro deploy, com 20 exercícios e 14 questões. `labs/deployment-static` e instruções para criar um projeto Vercel isolado foram preparados. RFC 5737, RFC 3849 e RFC 6761 foram conferidas para os exemplos fictícios. Deploy público e laboratório de domínio real ainda pendentes de acesso à conta e domínio controlado. Contagens: 119 aulas, 478 exercícios e 355 questões. |
+| 27/10/2026 | Fase 7.1 — fundamentos de hospedagem e DNS | Commit pendente | Sete aulas cobrem papéis de registrador/DNS/hospedagem, resolução recursiva, registros A/AAAA/CNAME/TXT/NS, TTL, HTTPS/TLS, modelos, Preview e plano conceitual de domínio; total de 28 exercícios e 20 questões. `labs/deployment-static` usa o Preview existente e inclui alternativa conceitual se protegido. RFC 5737, RFC 3849, RFC 1034 e RFC 6761 foram conferidas para exemplos. A checagem remota do Preview ainda pode ser bloqueada por autenticação Vercel; domínio real e testes dependentes dele estão fora do escopo por decisão do dono. Contagens: 121 aulas, 486 exercícios e 361 questões. |
 
 ## Decisões e bloqueios
 
@@ -661,3 +662,4 @@ Registre aqui mudanças de direção e impedimentos que afetem a sequência.
 | 27/10/2026 | Prática CI | Foi introduzida e corrigida uma expectativa de teste incorreta em branch temporária; `main` permaneceu intacta e verde. | A prática demonstrou localizar a primeira etapa vermelha, comparar esperado/observado, restaurar a asserção e esperar a CI confirmar os testes seguintes. | Integrar e documentar um serviço externo real no laboratório backend. |
 | 27/10/2026 | Acesso à demonstração | A Vercel concluiu o deploy do commit `43decdc`, mas o alias `git-main` mostra “Login – Vercel” a clientes sem sessão. O dono autorizou tornar previews públicos. | A proteção dos previews é independente da autenticação Clerk da aplicação; a configuração ainda não foi alterada porque esta sessão não tem acesso autenticado à Vercel. | Conectar a conta Vercel ou desativar a proteção apenas para Preview no painel; depois conferir a página e o JSON em janela anônima. |
 | 27/10/2026 | Docker Compose local | O Docker Engine foi iniciado pelo dono do projeto; o caminho Compose do laboratório foi validado com PostgreSQL 17 e dados fictícios. | O backup foi restaurado e comparado com a origem; o volume temporário foi removido depois do teste. | Continuar os itens pendentes do roadmap; Docker local não é pré-requisito para validar o deploy Preview da Vercel. |
+| 27/10/2026 | Escopo de DNS e domínio | O projeto será usado apenas por Preview, sem domínio próprio. | O dono pediu conceitos detalhados de DNS e publicação mesmo sem validar um domínio real. | Manter exemplos `.test` e marcadores fictícios; não comprar, configurar ou testar domínio customizado. |
