@@ -304,11 +304,11 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 8. [x] Corrigir a inconsistência da porta do PostgreSQL (55432) entre laboratório Docker e projeto relacional.
 9. [ ] Dividir aulas com excesso de conceitos (a aula de funções em JavaScript já foi dividida; mapear as demais).
    - [x] Aprofundar js-callbacks-closures: diferenciar callback imediato e posterior, explicar a ligação da closure, mostrar execução de ambientes independentes e avisar que closure não protege segredos no navegador; Chromium a 375 px confirmou rolagem da tabela por teclado.
-10. [ ] Demonstrações visuais de execução (laços, referências, `JOIN`, requisições HTTP).
-11. [ ] Revisão acumulativa e recuperação de dificuldades (indicar aula a revisar e segunda tentativa diferente).
+10. [x] Demonstrações visuais de execução (laços, referências, `JOIN`, requisições HTTP), registradas em `js-flow`, `js-arrays`, `js-es6`, `db-joins` e `delivery-http`.
+11. [x] Revisão acumulativa e recuperação de dificuldades: quiz errado aponta para conceitos da aula, oferece segunda tentativa diferente e a primeira aula de cada módulo posterior recupera conteúdo anterior com rascunho persistente.
 12. [x] Persistir progresso e anotações automaticamente por conta no Supabase, sem depender de `localStorage`.
 13. [ ] Modo de leitura prolongada (sumário, posição salva, ajustes de leitura).
-14. [ ] Glossário contextual no ponto de uso.
+14. [x] Glossário contextual no ponto de uso, renderizado por `readerTerms()` nas seções que apresentam termos novos.
 15. [ ] Laboratório de leitura de projeto alheio (achar ponto de entrada e corrigir um defeito).
 16. [ ] Ponte da IA simulada para IA conectada a um modelo real, com avaliações distintas.
 

@@ -275,7 +275,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Integração e entrega: seis casos novos sobre HTTP, formulários, acesso, ambientes, CI e requisitos.
   - [x] Engenharia de IA: dezoito casos novos, de modelos e prompts a avaliação, segurança e projeto final.
   - [x] Expandir as segundas tentativas para as demais aulas (114 de 114 guias).
-- [ ] Exigir explicação das decisões nas provas de nível.
+- [x] Exigir explicação das decisões nas provas de nível.
   - [x] Exigir explicação das decisões e da verificação ao registrar os 20 projetos existentes naquela etapa, preservando entregas anteriores; os projetos de fechamento usam o mesmo registro.
   - [x] Aplicar a exigência às provas e aos projetos de conclusão: `projectFooter()` pede decisão, motivo e verificação; `requireProjectExplanation()` impede nova entrega vazia em todos os fluxos; `sanitizeState()` preserva entregas antigas e indica explicação pendente.
 - [x] Evitar que quiz de múltipla escolha seja tratado como comprovação prática: contagens separadas para conceitos, prática, revisão e problema novo, com feedback explícito.
