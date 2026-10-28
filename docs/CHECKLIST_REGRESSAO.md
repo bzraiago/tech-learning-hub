@@ -11,7 +11,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 
 ## Carregamento e navegação
 
-- [ ] A página inicial mostra 9 trilhas e 132 aulas no total.
+- [ ] A página inicial mostra 9 trilhas e 145 aulas no total.
 - [ ] A trilha ativa, os módulos e os cards de progresso aparecem corretamente.
 - [ ] Busca encontra uma aula de outra trilha e permite limpar o resultado.
 - [ ] Filtros “Todas”, “Pendentes” e “Concluídas” atualizam a listagem.
@@ -37,6 +37,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 ## Aula, quiz e anotações
 
 - [ ] Abas Conceitos, Exemplo, Prática, Revisão e Fontes funcionam.
+- [x] `modo-leitura.spec.cjs` valida em Chromium local o sumário/controles por teclado, 375/1280 px, posição e preferências após recarga e estado separado entre contas fictícias; os serviços são mocks e as regras estruturais de flex/overflow são fornecidas pelo harness.
 - [ ] Na aba Prática, cada aula mostra previsão guiada, alteração com pistas, construção para um caso novo, investigação de erro segura e desafio de mudança de requisito, nessa ordem.
 - [ ] Em uma aula de cada trilha alterada, os critérios específicos da atividade aparecem junto dos critérios próprios do exercício e antes da solução recolhida.
 - [ ] Na aba Revisão, instruções de diagnóstico pedem mensagem ou comportamento observado, passo causador e resultado esperado antes de aplicar correção; erros comuns permanecem legíveis por teclado e em 375 px.

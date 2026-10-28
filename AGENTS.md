@@ -309,7 +309,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 10. [x] Demonstrações visuais de execução (laços, referências, `JOIN`, requisições HTTP), registradas em `js-flow`, `js-arrays`, `js-es6`, `db-joins` e `delivery-http`.
 11. [x] Revisão acumulativa e recuperação de dificuldades: quiz errado aponta para conceitos da aula, oferece segunda tentativa diferente e a primeira aula de cada módulo posterior recupera conteúdo anterior com rascunho persistente.
 12. [x] Persistir progresso e anotações automaticamente por conta no Supabase, sem depender de `localStorage`.
-13. [~] Modo de leitura prolongada implementado: sumário navegável, posição por aula/aba e ajustes salvos na conta Supabase; conferência manual em navegador autenticado ainda pendente.
+13. [~] Modo de leitura prolongada implementado; Playwright headless cobriu teclado, 375/1280 px, retomada após recarga e isolamento entre contas fictícias via mocks. Conferência com Clerk/Supabase reais no Preview ainda pendente.
 14. [x] Glossário contextual no ponto de uso, renderizado por `readerTerms()` nas seções que apresentam termos novos.
 15. [ ] Laboratório de leitura de projeto alheio (achar ponto de entrada e corrigir um defeito).
 16. [ ] Ponte da IA simulada para IA conectada a um modelo real, com avaliações distintas.
