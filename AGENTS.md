@@ -272,7 +272,8 @@ Vem da análise em `ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima para baixo e
 6. [ ] **CI, publicação e integração externa** como práticas guiadas e verificáveis (observar falha, corrigir, conferir URL final, voltar versão).
    - [x] Criar `labs/bug-investigation` com teste de regressão que falha antes e passa depois da correção; a execução red/green foi verificada em ambiente temporário.
    - [x] Automatizar um fluxo do navegador em Chromium headless, isolado ao laboratório de backend e sem depender de banco.
-   - [x] Criar workflow real de GitHub Actions com validação, testes, PostgreSQL efêmero e Playwright; primeira execução remota pendente.
+   - [x] Criar workflow real de GitHub Actions com validação, testes, PostgreSQL efêmero e Playwright; execução `40605904963` passou em `main`.
+   - [ ] Observar e corrigir uma falha controlada do CI numa branch temporária.
 7. [ ] Atividades gerais de conclusão (prova básica disponível no curso; intermediária pendente) — ver seção 9.
 8. [x] Corrigir a inconsistência da porta do PostgreSQL (55432) entre laboratório Docker e projeto relacional.
 9. [ ] Dividir aulas com excesso de conceitos (a aula de funções em JavaScript já foi dividida; mapear as demais).

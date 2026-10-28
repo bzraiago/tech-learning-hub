@@ -191,7 +191,7 @@ Se o executável do navegador não for encontrado, repita `playwright install ch
 
 ## CI real no GitHub Actions
 
-O workflow `.github/workflows/ci.yml`, na raiz do repositório, executa a validação do curso, os testes unitários, migrations e integração PostgreSQL em um serviço descartável, e o fluxo Chromium. Ele roda em `push` para `main`, em pull requests direcionados a `main` e por acionamento manual. A senha da base é fictícia e usada somente no container efêmero do CI.
+O workflow `.github/workflows/ci.yml`, na raiz do repositório, executa a validação do curso, os testes unitários, migrations e integração PostgreSQL em um serviço descartável, e o fluxo Chromium. Ele roda em pushes de qualquer branch, em pull requests direcionados a `main` e por acionamento manual. A senha da base é fictícia e usada somente no container efêmero do CI.
 
 Depois que uma alteração chegar ao GitHub, abra a aba **Actions**, selecione a execução mais recente de **CI** e confira cada etapa. Se algo falhar, registre o primeiro passo vermelho, leia a mensagem completa, reproduza o comando correspondente no ambiente local e faça uma correção pequena. Uma execução verde confirma somente os cenários que o workflow rodou; ela não comprova que todos os comportamentos possíveis estão corretos.
 

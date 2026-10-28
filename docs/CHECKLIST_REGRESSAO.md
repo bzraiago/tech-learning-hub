@@ -65,7 +65,8 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `labs/backend-layers`, falha de banco retorna 500 sem incluir detalhes internos; `npm run start:memory` identifica que os dados são temporários.
 - [x] Em `labs/bug-investigation`, o teste de preservação da lista reproduz a falha inicial; a suíte passa após corrigir a função numa cópia de verificação.
 - [x] Em `labs/backend-layers`, `npm run test:e2e` abre Chromium headless, cria um estudo pela interface, confirma `201`, rejeita duplicidade com `409` e encerra a API em memória.
-- [ ] Em GitHub Actions, a execução de CI completa validação de conteúdo, testes unitários, migrations, integração PostgreSQL e fluxo Playwright; investigar e corrigir qualquer etapa vermelha.
+- [x] Em GitHub Actions, run `40605904963` passou na validação de conteúdo, testes unitários, migrations, integração PostgreSQL 17 e fluxo Playwright.
+- [ ] Numa branch temporária, observar uma falha de teste no CI, corrigir sua causa e confirmar nova execução verde sem deixar `main` quebrada.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.
