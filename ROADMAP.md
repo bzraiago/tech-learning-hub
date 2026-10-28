@@ -444,13 +444,15 @@ Toda implementação só pode ser considerada pronta quando:
 
 ### Fase 7.4 — Redis, desempenho e operação
 
-- [ ] Ensinar primeiro quando não usar Redis: PostgreSQL continua sendo a fonte de verdade do projeto.
-- [ ] Introduzir Redis como armazenamento em memória para cache, sessão, contador e limitação de requisições.
-- [ ] Implementar cache-aside com TTL, chave versionada e invalidação após escrita.
-- [ ] Demonstrar cache miss, dado obsoleto, indisponibilidade do Redis e fallback controlado.
-- [ ] Implementar rate limiting por identidade e IP sem armazenar dado pessoal além do necessário.
+- [x] Ensinar primeiro quando não usar Redis: PostgreSQL continua sendo a fonte de verdade do projeto (`delivery-redis-foundations`).
+- [x] Introduzir Redis como armazenamento em memória para cache, sessão, contador e limitação de requisições, incluindo requisitos distintos por uso (`delivery-redis-foundations`).
+- [~] Ensinar cache-aside com TTL, chave versionada e invalidação após escrita (`delivery-redis-cache-aside`); laboratório reproduz o fluxo Redis CLI com fonte `Map` fictícia, sem integração ao PostgreSQL/API.
+- [~] Demonstrar cache miss, dado obsoleto e invalidação com leitura renovada no laboratório; indisponibilidade e fallback controlado estão descritos conceitualmente, sem falha injetada em uma API real.
+- [~] Demonstrar contador atômico com TTL e identidade fictícia (`delivery-redis-rate-limit`, Lua local); limite por IP confiável e middleware HTTP continuam pendentes.
 - [ ] Medir antes e depois, registrar custo e latência e justificar se a complexidade compensa.
-- [ ] Não guardar tokens, senhas ou dados sensíveis desnecessários no cache.
+- [x] Não guardar tokens, senhas ou dados sensíveis desnecessários no cache; o laboratório usa apenas chaves e dados fictícios.
+
+**Verificação parcial em 28/10/2026:** `docker-compose config` válido; imagem oficial Redis saudável em Compose local, limitada a `127.0.0.1:56379`, sem volume/persistência; os scripts de cache-aside e rate limit passaram. Integração com a API/PostgreSQL, indisponibilidade injetada, testes de middleware e medição de desempenho permanecem pendentes. Não foi feito teste de Preview ou domínio; o percurso usa somente Preview e não depende de domínio próprio.
 
 ### Fase 7.5 — Operação e portabilidade
 
@@ -679,6 +681,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 28/10/2026 | Fase 7.3 — Abuso de API e consumo de recursos | Aula conceitual concluída; implementação de rate limit segue na Fase 7.4 | `delivery-api-abuse` diferencia OWASP API4/API6, custo por pedido e por fluxo, quotas, limites por identidade, status 429/Retry-After, idempotência, IP, observabilidade e plano de testes locais determinísticos. Analisa `backend-validation` (413 por corpo grande) e `backend-layers` sem confundir com rate limiter. Referências oficiais OWASP conferidas. Não houve teste de carga, Preview ou domínio; o projeto será usado apenas em Preview e não exige domínio próprio. Contagens: 128 aulas, 514 exercícios e 390 questões. |
 | 28/10/2026 | Fase 7.3 — Cadeia de suprimentos | Aula e inspeção estática concluídas; `npm audit` não executado | `delivery-supply-chain` diferencia dependências diretas/transitivas, runtime/dev, manifesto/lockfile, `npm ci` e `npm audit`; inspeciona os arquivos versionados de `labs/backend-layers` e o workflow real sem instalar ou atualizar pacotes. Fonte OWASP A03:2025 PT-BR e documentação oficial npm conferidas. A atividade não afirma estado atual de vulnerabilidades e não exige domínio/Preview. Contagens: 129 aulas, 518 exercícios e 394 questões. |
 | 28/10/2026 | Fase 7.3 — CSRF em laboratório local | Prática local concluída (7/7); navegador/provedor não testados | `labs/security-csrf` compara rota que confia só em cookie fictício com rota que valida origem e token; verifica 200/401/403/413 e se a nota em memória mudou. `node --check` nos dois arquivos e `node --test labs/security-csrf/server.test.cjs` passaram. Os testes não simulam cookie automático, SameSite, CORS real, Clerk/Supabase, Preview ou domínio. |
+| 28/10/2026 | Fase 7.4 — fundamentos e demonstrações locais de Redis | Base didática concluída; integração de aplicação e medição pendentes | Três aulas cobrem decisão de adoção, cache-aside, TTL, invalidação, dados obsoletos, contadores e janela fixa. `labs/redis-fundamentals` limita Redis a loopback, desativa persistência e usa dados fictícios. `docker-compose config`, `check-cache-aside.cjs` e `check-rate-limit.cjs` passaram; não há conexão com PostgreSQL, middleware HTTP, teste de indisponibilidade injetada ou benchmark. Nenhum teste de Preview/domínio foi executado. Contagens: 132 aulas, 530 exercícios e 406 questões. |
 
 ## Decisões e bloqueios
 

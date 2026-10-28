@@ -5372,6 +5372,102 @@
             ]
           },
           {
+            "id": "delivery-redis-foundations",
+            "title": "Redis: quando usar e como opera",
+            "minutes": 70,
+            "concept": "Decida quando Redis resolve uma necessidade medida e quando PostgreSQL ou uma solução simples bastam; entenda cache, sessão, contador, TTL, memória e indisponibilidade sem mover a fonte de verdade do projeto.",
+            "objectives": [
+              "Explicar por que Redis é opcional e não substitui PostgreSQL como fonte persistente de verdade no projeto.",
+              "Diferenciar cache, sessão, contador, fila e mensageria como usos com requisitos diferentes de duração e recuperação.",
+              "Desenhar o caminho da API até Redis e banco, incluindo rede, TTL, falha e limite de memória.",
+              "Indicar condições observáveis para adotar Redis e medidas que acompanham a complexidade adicional."
+            ],
+            "exercise": "Faça uma matriz de quatro necessidades (consulta repetida, autenticação, contador temporário e registro de progresso) e justifique se Redis deve participar, o que permanece como fonte de verdade e como cada dado se recupera.",
+            "code": "DECISÃO DE ARQUITETURA — exemplos fictícios\n\nProgresso do curso → Supabase/PostgreSQL é persistente e autoritativo\nCache de leitura → Redis guarda cópia com TTL; pode ser descartado\nContador de tentativas → Redis recebe chave temporária e expira\nSessão → depende de duração, revogação, segurança e recuperação\n\nRedis acrescenta: processo, rede, memória, credencial, configuração,\nmonitoramento, custo e modo de falha.\nPergunta: qual medida mostra que o benefício paga essa complexidade?",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "Redis · Redis Open Source no Docker",
+                "url": "https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/docker/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Redis · Casos de uso",
+                "url": "https://redis.io/docs/latest/develop/use-cases/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Redis · Limites de memória",
+                "url": "https://redis.io/docs/latest/management/optimization/memory-optimization/",
+                "language": "EN"
+              }
+            ]
+          },
+          {
+            "id": "delivery-redis-cache-aside",
+            "title": "Cache-aside: TTL, invalidação e falhas",
+            "minutes": 90,
+            "concept": "Implemente e explique a leitura cache-aside como cópia temporária do banco, com chave versionada, TTL, invalidação após gravação e comportamento previsto quando Redis falha.",
+            "objectives": [
+              "Percorrer cache hit, cache miss, consulta à fonte, preenchimento com TTL e invalidação após escrita.",
+              "Usar chaves com namespace e versão sem incluir token, e definir TTL que limite a janela de dado antigo.",
+              "Explicar dado obsoleto, concorrência no miss, indisponibilidade de Redis e fallback limitado ao banco.",
+              "Validar o exemplo local, identificando que a fonte de dados é simulada e não é o PostgreSQL do projeto."
+            ],
+            "exercise": "Execute `labs/redis-fundamentals/check-cache-aside.cjs`, trace a chave e o contador de leituras e proponha uma política de cache para leitura que não altere o salvamento autoritativo no PostgreSQL.",
+            "code": "CACHE-ASIDE (simulação local):\n1. GET cache:v1:studies:demo-user → nil (miss)\n2. Consultar fonte principal e obter objeto fictício com items = HTML\n3. SET cache:v1:studies:demo-user valor EX 30\n4. Próxima leitura → hit; TTL limita a idade máxima planejada\n5. Após commit na fonte principal → DEL chave\n\nO script local usa uma Map em memória como fonte fictícia; não conecta\na PostgreSQL nem altera os dados do aluno.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "Redis · Cache-aside",
+                "url": "https://redis.io/docs/latest/develop/use-cases/cache-aside/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Redis · Strings, GET, SET e expiração",
+                "url": "https://redis.io/docs/latest/develop/data-types/strings/",
+                "language": "EN"
+              }
+            ]
+          },
+          {
+            "id": "delivery-redis-rate-limit",
+            "title": "Contadores e rate limiting no Redis",
+            "minutes": 90,
+            "concept": "Use contador Redis com TTL e execução atômica para limitar tentativas por identidade fictícia; compare janela fixa, janela deslizante e token bucket e defina resposta/falha sem armazenar identificadores desnecessários.",
+            "objectives": [
+              "Distinguir janela fixa, janela deslizante e token bucket, incluindo a rajada possível nas bordas de janela fixa.",
+              "Explicar por que incremento e expiração precisam ser atômicos e como TTL limpa contadores temporários.",
+              "Projetar chaves separadas por dimensão de limite e mapear excesso para resposta 429/Retry-After na camada HTTP.",
+              "Executar o script Redis com contas fictícias e reconhecer que ele ainda não é middleware da API do projeto."
+            ],
+            "exercise": "Execute `labs/redis-fundamentals/check-rate-limit.cjs` e produza política local de tentativas por conta e endpoint sensível; inclua janela, limite, chave pseudônima, teste positivo/negativo, 429, TTL e política quando Redis fica indisponível.",
+            "code": "LIMITADOR FIXO FICTÍCIO — 3 chamadas por chave em 60 s\nConta demo A: allowed 1, allowed 2, allowed 3, limited 4\nConta demo B: allowed 1 (contador independente)\n\nLua executa INCR + EXPIRE sem outra chamada intercalar.\nA chave expira; depois, uma janela nova começa.\nA API HTTP teria que interpretar `limited` e responder 429.\nEste laboratório de CLI não integra rota HTTP nem mede carga.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "Redis · Rate limiter",
+                "url": "https://redis.io/docs/latest/develop/use-cases/rate-limiter/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Redis · INCR e padrões de rate limiting",
+                "url": "https://redis.io/docs/latest/commands/incr/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Redis · Eviction de chaves",
+                "url": "https://redis.io/docs/latest/develop/reference/eviction/",
+                "language": "EN"
+              }
+            ]
+          },
+          {
             "id": "delivery-api-abuse",
             "title": "Abuso de API: recursos e fluxos sensíveis",
             "minutes": 95,

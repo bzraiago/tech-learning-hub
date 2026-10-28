@@ -11,7 +11,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 
 ## Carregamento e navegação
 
-- [ ] A página inicial mostra 9 trilhas e 129 aulas no total.
+- [ ] A página inicial mostra 9 trilhas e 132 aulas no total.
 - [ ] A trilha ativa, os módulos e os cards de progresso aparecem corretamente.
 - [ ] Busca encontra uma aula de outra trilha e permite limpar o resultado.
 - [ ] Filtros “Todas”, “Pendentes” e “Concluídas” atualizam a listagem.
@@ -29,6 +29,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] `labs/security-csrf/server.test.cjs` passa 7/7 localmente; a rota vulnerável e a protegida usam somente sessão/token fictícios, recusas preservam estado e o relatório diz que o teste não simula browser ou serviço remoto.
 - [ ] Na aula `delivery-api-abuse`, a pessoa diferencia API4 de API6, limite por requisição de quota acumulada, autorização de rate limiting e reconhece 413/429; os exemplos não geram carga nem alegam que os laboratórios existentes implementam rate limiter.
 - [ ] Na aula `delivery-supply-chain`, a pessoa diferencia dependências diretas/transitivas, runtime/dev, manifesto/lockfile, explica limites de `npm ci`/`npm audit` e marca auditoria atual como não executada; nenhum pacote é instalado/atualizado na atividade.
+- [ ] `labs/redis-fundamentals` só publica Redis em loopback, não persiste dados e usa fonte fictícia; `check-cache-aside.cjs` confirma miss/hit/TTL/invalidação e `check-rate-limit.cjs` confirma limite/contador independente, sem alegar integração HTTP ou desempenho de produção.
 - [ ] O plano de autorização para `learning_state` concede apenas SELECT/INSERT/UPDATE às próprias linhas; os testes de isolamento por duas contas ficam identificados como planejados até haver evidência real.
 - [ ] Na aula HTTPS, o checklist verifica certificado, redirecionamento e recursos ativos sem afirmar que TLS substitui autorização da aplicação.
 - [ ] O laboratório `labs/deployment-static` abre localmente, tem layout para 375 px e permite usar o link para pular o conteúdo com teclado. A conferência do Preview usa o caminho `/labs/deployment-static/`; domínio próprio e acesso anônimo não são requisitos.

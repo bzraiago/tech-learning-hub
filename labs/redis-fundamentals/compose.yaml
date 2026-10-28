@@ -1,0 +1,14 @@
+name: tech-learning-hub-redis-lab
+services:
+  redis:
+    image: redis:8.8.4-alpine3.23
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "64mb", "--maxmemory-policy", "noeviction"]
+    ports:
+      - "127.0.0.1:56379:6379"
+    volumes:
+      - ./fixed-window.lua:/scripts/fixed-window.lua:ro
+    healthcheck:
+      test: ["CMD", "redis-cli", "PING"]
+      interval: 2s
+      timeout: 2s
+      retries: 15

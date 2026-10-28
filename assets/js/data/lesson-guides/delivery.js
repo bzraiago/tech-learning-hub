@@ -1960,6 +1960,391 @@ Object.assign(LESSON_GUIDES, {
       "A inspeção desta aula é estática; não afirma estado atual de vulnerabilidades nem execução de auditoria."
     ]
   },
+  "delivery-redis-foundations": {
+    "prerequisites": "Concluir `setup-docker`, `setup-node`, `db-postgres` e `delivery-api-abuse`; conhecer banco relacional, API e execução de containers. A decisão arquitetural usa o PostgreSQL/Supabase existente como fonte de verdade.",
+    "setup": "No editor, leia `labs/redis-fundamentals/README.md` e `compose.yaml`. No terminal, abra a pasta `labs/redis-fundamentals`, execute `docker compose config` e depois `docker compose up -d --wait`; com Compose standalone, use `docker-compose`. A saída esperada inclui um serviço `redis` saudável publicado em 127.0.0.1:56379. Execute `docker compose exec -T redis redis-cli PING`; a resposta esperada é `PONG`. A primeira execução baixa a imagem oficial. Não usa rede pública de dados, domínio, Preview ou credenciais reais. Pare com `docker compose down`; para retomar, repita `up -d --wait`. Se Docker não estiver disponível, desenhe o fluxo sem instalar nada.",
+    "why": "Redis adiciona uma dependência operacional e um caminho de rede. Uma aplicação pequena pode continuar mais confiável e simples usando PostgreSQL, que já guarda estado persistente e transações. Adote Redis quando um gargalo ou requisito medido justificar cache, contador ou limite compartilhado, sabendo como recuperar dados e operar quando o serviço falhar.",
+    "example": {
+      "language": "text",
+      "code": "FLUXO DO PROJETO\n\nNavegador → API → PostgreSQL/Supabase (fonte persistente)\n                         ├── transações e progresso do aluno\n                         └── cache Redis opcional → cópia temporária\n\nRedis pode apoiar cache, sessão, contador e rate limit.\nA demonstração local usa chaves sem dados pessoais e sem persistência.\nO projeto não precisa mover `learning_state` para Redis.",
+      "expected": "PostgreSQL/Supabase continua autoritativo para o progresso; Redis é um componente opcional e temporário com custo e modo de falha próprios.",
+      "explanation": [
+        "Redis é um armazenamento de dados em memória com estruturas e comandos próprios; também pode persistir dados se configurado. Nesta arquitetura didática, cache e contadores podem ser reconstruídos, então o Compose local desliga snapshots e AOF.",
+        "Usos comuns incluem cache de leitura, sessão, contadores, publicação/assinatura e fila. Esses usos têm requisitos diferentes de durabilidade, ordenação, expiração, recuperação e entrega; o nome Redis não define automaticamente a garantia.",
+        "O banco relacional existente oferece integridade, relações, transações e durabilidade para o progresso. Colocar esse estado em um cache aumenta risco de perda ou divergência sem benefício medido.",
+        "A imagem local tem 64 MB de memória, política noeviction e porta publicada apenas em loopback. É uma configuração descartável para estudo, não uma recomendação pronta para produção."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Comece pela necessidade, não pela ferramenta",
+        "paragraphs": [
+          "Se há uma pessoa usando uma aplicação pequena e as consultas ao PostgreSQL são rápidas, Redis pode acrescentar mais trabalho que benefício. Meça antes: volume e repetição de leitura, p95 da API, consultas lentas, saturação do banco e custo. Verifique índices, paginação e N+1 antes de colocar uma cópia em outro serviço.",
+          "Redis faz sentido quando um requisito pede resposta temporária muito rápida, contador compartilhado entre réplicas, sessão centralizada ou proteção de uma API por quota. Se o dado precisa de transação, consulta relacional, restrição ou recuperação como registro oficial, mantenha-o no banco durável. Um Redis pode ter persistência configurada, mas isso exige projeto e operação explícitos e não transforma automaticamente qualquer cache em banco principal.",
+          "Para o Tech Learning Hub, `learning_state` no Supabase continua persistente e vinculado à conta. Redis não substituirá esse armazenamento. A aula usa somente dados fictícios, e o contêiner de laboratório perde seus dados ao encerrar.",
+          "Pausa: para cada proposta — melhorar uma consulta lenta, manter sessão, contar tentativas e salvar progresso — diga que evidência seria necessária antes de decidir por Redis."
+        ],
+        "terms": [
+          { "term": "Fonte de verdade", "meaning": "Armazenamento autoritativo do qual as cópias e relatórios podem ser reconstruídos." },
+          { "term": "p95", "meaning": "Latência abaixo da qual 95% das observações medidas terminaram; ajuda a analisar a cauda lenta." },
+          { "term": "Cache", "meaning": "Cópia temporária que pode ser descartada e reconstruída a partir de uma fonte autoritativa." }
+        ]
+      },
+      {
+        "title": "Usos diferentes trazem garantias diferentes",
+        "paragraphs": [
+          "Cache armazena cópia de algo que pode ser recarregado. Sessão guarda contexto que pode ser sensível e precisa de expiração, revogação e controle de acesso. Contador agrega eventos por chave e período. Fila precisa de semântica de entrega, confirmação, repetição e tratamento de mensagem morta; uma lista ou Pub/Sub não resolve automaticamente essas garantias.",
+          "TTL (time to live, tempo de vida) limita quanto uma chave pode permanecer. Expiração reduz lixo e pode limitar a idade planejada de uma cópia, mas não substitui invalidação quando uma escrita precisa aparecer imediatamente. Chave sem TTL pode acumular sem limite; `TTL -1` indica que uma chave não tem expiração configurada.",
+          "Redis usa memória limitada. Ao atingir o limite, política de expulsão pode remover chaves ou a política `noeviction` pode fazer gravações falharem. Para cache, descartar uma cópia costuma ser recuperável; expulsar contador de limite antes do fim da janela pode liberar tentativas adicionais. Configure política segundo uso e comportamento de falha, não como valor universal.",
+          "Pausa: classifique cada dado como reconstruível, persistente, segredo/sensível ou mensagem que precisa ser processada. Indique TTL e plano de recuperação."
+        ],
+        "terms": [
+          { "term": "TTL", "meaning": "Duração depois da qual uma chave deve expirar automaticamente." },
+          { "term": "Expulsão (eviction)", "meaning": "Remoção de chaves para respeitar limite de memória conforme política configurada." },
+          { "term": "Persistência", "meaning": "Mecanismo para recuperar estado depois de reinício; depende da configuração e não é sinônimo de replicação ou backup." }
+        ]
+      },
+      {
+        "title": "Mapeie a nova dependência e sua indisponibilidade",
+        "paragraphs": [
+          "Com Redis, cada pedido pode adicionar conexão de rede, timeout, autenticação, memória, latência e ponto de falha. Use monitoramento e limite de conexões, acesso restrito à rede, ACL/autenticação e TLS conforme topologia. Não exponha porta à internet. A demonstração sem senha é aceitável somente em container local ligado a 127.0.0.1, sem dados e sem persistência.",
+          "Quando Redis cai, a API precisa de uma decisão explícita. Cache de leitura pode tentar a fonte principal com timeout e controle de concorrência; repetir sem limite pode sobrecarregar o banco. Uma rota de limite pode escolher falhar aberta ou fechada segundo dano e disponibilidade. Sessão, pagamento, criação de convite e cache público não têm sempre a mesma regra.",
+          "Compare benefício e custo com a mesma amostra e perfil de requisição: p50/p95, taxa de cache hit, chamadas ao banco, memória, erros e custo. Uma medição em laboratório local não prediz produção ou Vercel Preview. Esta aula não fez benchmark de API nem chamada remota.",
+          "Pausa: Redis fica indisponível durante leitura pública, gravação de progresso e envio de código de recuperação. Escolha fallback ou recusa para cada operação e justifique pelo impacto."
+        ],
+        "terms": [
+          { "term": "Fail-open", "meaning": "Permitir a operação quando o mecanismo de proteção não está disponível; pode preservar disponibilidade e reduzir a proteção." },
+          { "term": "Fail-closed", "meaning": "Recusar a operação quando o controle está indisponível; preserva uma regra de segurança e pode interromper uso legítimo." },
+          { "term": "Cache hit ratio", "meaning": "Proporção de leituras atendidas pela cópia de cache em relação às leituras medidas." }
+        ]
+      }
+    ],
+    "diagramTitle": "Decidir se Redis participa do fluxo",
+    "diagram": "Requisito e medida → PostgreSQL sozinho resolve?\n                         ├── sim → preservar caminho simples\n                         └── não, há benefício medido\n                                ↓\n                         Redis para papel explícito\n                         ├── dado temporário e recuperável?\n                         ├── TTL, memória e rede definidos?\n                         ├── comportamento de indisponibilidade definido?\n                         └── custo/benefício medidos?",
+    "guided": [
+      { "instruction": "Execute `docker compose config` e identifique a porta host, o serviço e se existe volume persistente. Se usa Compose standalone, substitua o prefixo por `docker-compose`.", "result": "Há um serviço redis em 127.0.0.1:56379; não há volume, snapshots ou AOF no exemplo descartável." },
+      { "instruction": "Execute `docker compose exec -T redis redis-cli PING` e registre a resposta. Depois pare o serviço com `docker compose down`.", "result": "Redis responde PONG; down remove o container e a rede do projeto, sem apagar serviços de outros Compose." },
+      { "instruction": "Para cada uso — cache, sessão e progresso do curso — marque fonte de verdade, expiração e recuperação.", "result": "Cache pode ser refeito; sessão exige expiração/revogação e proteção; progresso do projeto permanece no Supabase/PostgreSQL." }
+    ],
+    "mistakes": [
+      "Adicionar Redis antes de medir uma necessidade ou otimizar consultas e índices existentes.",
+      "Tratar Redis como fonte de verdade apenas por ele responder rápido.",
+      "Supor que todo dado Redis é volátil ou que configurar snapshot equivale a backup testado.",
+      "Usar a mesma política de memória, TTL ou indisponibilidade para cache e rate limiter.",
+      "Expor a porta Redis na rede ou usar a configuração local sem autenticação em produção.",
+      "Declarar ganho de desempenho com base apenas em latência de um comando isolado."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: a API tem 1 usuário, o p95 é 18 ms e PostgreSQL responde sem consultas lentas. A equipe propõe adicionar Redis para progresso. Preveja dois custos novos e diga que medida poderia justificar reconsiderar depois.",
+        "expected": "Redis acrescenta rede/timeout, operação, memória, monitoramento e modo de falha; sem gargalo medido não há benefício comprovado. A decisão pode ser revista com volume, p95, taxa de leitura repetida ou saturação observada.",
+        "criteria": ["Identifica ao menos dois custos operacionais/rede.", "Mantém PostgreSQL como fonte de verdade.", "Escolhe uma medida observável para uma revisão futura."],
+        "solution": "Adiar Redis: o banco responde em p95 de 18 ms e não há consulta lenta. Custos incluem outra conexão e serviço a monitorar, além de política de falha. Reavaliar se medições mostram muitas leituras idênticas, aumento de p95 ou saturação que índices/paginação não resolvem.",
+        "explanation": "Uma tecnologia adicional precisa resolver um problema observado e justificar seu ciclo de operação.",
+        "hints": ["O que acontece se Redis falhar?", "Qual indicador comprovaria que a cópia ajuda?", "Onde permanece o progresso persistente?"]
+      },
+      {
+        "prompt": "Alterar: reescreva a arquitetura hipotética para que sessão de login, contador temporário e progresso do aluno tenham papéis e recuperação distintos. O progresso não pode depender do cache.",
+        "expected": "A proposta identifica Redis/TTL como opção para sessão ou contador temporário, descreve revogação/recuperação e deixa progresso persistente no Supabase/PostgreSQL, nunca somente em Redis.",
+        "criteria": ["Separa os três tipos de dado.", "Define recuperação/expiração para sessão e contador.", "Mantém progresso em armazenamento persistente autoritativo."],
+        "solution": "Sessão: serviço de autenticação já existente ou store compartilhado com TTL, revogação e ACL. Contador: Redis com chave mínima e TTL. Progresso: tabela Supabase/PostgreSQL por usuário com RLS; cache opcional só de leitura e invalidado após gravação.",
+        "explanation": "Requisitos de durabilidade, privacidade e recuperação variam entre os dados.",
+        "hints": ["Quais dados podem ser descartados e reconstruídos?", "O que não pode sumir em reinício?", "Como revogar uma sessão?"]
+      },
+      {
+        "prompt": "Construir: desenhe o fluxo Navegador → API → PostgreSQL e marque onde Redis poderia participar como cache e contador. Para cada seta, indique credencial, dado permitido e comportamento se Redis cair.",
+        "expected": "O diagrama mostra API mediando dados, PostgreSQL como autoritativo, cache sem segredos, contador com chave minimizada e fallback/recusa deliberados conforme operação; Redis não recebe token ou anotação sem necessidade.",
+        "criteria": ["PostgreSQL fica como fonte persistente de progresso.", "Cache e contador têm usos separados.", "Indica fallback/recusa quando Redis está indisponível.", "Evita tokens e dados privados nas chaves."],
+        "solution": "Navegador autenticado → API valida sessão → PostgreSQL lê/grava progresso. API → Redis opcional: GET cache:v1:study:<id interno> para resposta pública ou INCR rate:v1:<id opaco> para quota. Se cache falha, tentativa limitada no Postgres; se contador que protege operação crítica falha, recusar ou seguir política documentada. Nunca incluir bearer/token na key.",
+        "explanation": "Limites claros entre componentes permitem decidir identidade, fonte, privacidade e falha sem pressupor que Redis substitui o banco.",
+        "hints": ["A interface não deve conectar direto ao Redis.", "Que dado precisa sobreviver a reinício?", "Que endpoint pode permitir tudo se o contador some?"]
+      },
+      {
+        "prompt": "Investigar erro: após adicionar Redis, a API fica mais lenta quando Redis não responde. Planeje uma investigação pequena para separar DNS/rede, timeout, conexões, memória e fallback ao Postgres; não envie carga ao Preview.",
+        "expected": "O plano registra latência de conexão e query, timeout, pool, saúde/memória de Redis, chamadas de fallback e p50/p95 em cenário local controlado; limita retries e evita benchmark público/remoto.",
+        "criteria": ["Separa rede/timeout de consulta do banco.", "Observa conexões/memória e cascata de fallback.", "Define limite de retry/timeout.", "Usa ambiente local/dados fictícios sem teste de domínio."],
+        "solution": "Reproduzir localmente com poucas leituras fictícias; registrar tempo de conexão Redis, GET, consulta Postgres, quantidade de conexões e p95; provocar indisponibilidade apenas no compose próprio; confirmar timeout finito, retry limitado e modo escolhido. Não medir Vercel Preview nem comparar uma única chamada como benchmark.",
+        "explanation": "Fallback sem limite pode transferir toda a carga ao Postgres e transformar uma falha parcial em indisponibilidade ampla.",
+        "hints": ["Qual componente demora primeiro?", "Quantas conexões são abertas em cada retry?", "O banco recebe todas as leituras durante a queda do cache?"]
+      }
+    ],
+    "quiz": [
+      { "question": "Qual é a fonte de verdade do progresso neste projeto?", "options": ["Redis descartável do laboratório.", "Supabase/PostgreSQL persistente vinculado à conta.", "Uma chave de cache sem TTL."], "correctIndex": 1, "explanation": "O laboratório Redis não substitui o armazenamento autoritativo do progresso." },
+      { "question": "Quando adicionar Redis é mais justificável?", "options": ["Quando uma medida mostra necessidade que o caminho atual não resolve com simplicidade.", "Sempre que uma API é criada.", "Antes de medir consultas."], "correctIndex": 0, "explanation": "Redis traz rede, memória, operação e novos modos de falha." },
+      { "question": "O que TTL define?", "options": ["Quanto uma chave pode permanecer antes de expirar.", "Quem pode ver o token.", "Número de conexões abertas."], "correctIndex": 0, "explanation": "TTL controla duração da chave e ajuda a limitar retenção/idade da cópia." },
+      { "question": "Por que política de memória deve considerar uso?", "options": ["Expulsar cache e contador tem efeitos diferentes sobre recuperação e limite.", "Redis não tem limites de memória.", "Todas as chaves podem durar para sempre."], "correctIndex": 0, "explanation": "Remover uma cópia de cache pode ser aceitável; apagar um contador ainda ativo pode enfraquecer quota." }
+    ],
+    "summary": [
+      "Meça primeiro; PostgreSQL continua suficiente para a fonte persistente do progresso.",
+      "Cache, sessão, contador e fila têm exigências diferentes de duração e recuperação.",
+      "TTL, memória, rede, credenciais e indisponibilidade fazem parte do projeto Redis.",
+      "O Compose é local, sem volume e ligado ao loopback; não é uma configuração de produção.",
+      "Nenhum benchmark ou teste de Preview/domínio foi executado."
+    ]
+  },
+  "delivery-redis-cache-aside": {
+    "prerequisites": "Concluir `delivery-redis-foundations` e `db-postgres`; saber ler dados de uma fonte persistente e distinguir cópia de registro autoritativo.",
+    "setup": "Com Redis iniciado pela aula anterior, abra `labs/redis-fundamentals` no terminal e execute `node check-cache-aside.cjs`. A saída esperada termina em `Cache-aside Redis: PASS`; o script comprova miss, hit, valor antigo sem invalidação, invalidação e TTL. A fonte é uma Map local, não PostgreSQL. O script apaga a chave aleatória que cria. Se Compose standalone, o programa tenta `docker-compose`; se Redis não responder, confira `docker compose ps`/`docker-compose ps` e o README. Não abre domínio, Preview nem banco remoto.",
+    "why": "Cache-aside pode reduzir consultas repetidas, mas cria uma cópia que pode ficar velha ou indisponível. O desenho precisa limitar staleness, invalidar após escrita e preservar a fonte persistente.",
+    "example": {
+      "language": "text",
+      "code": "LEITURA\nGET cache:v1:studies:<id-opaco> → hit? devolver cópia\n                      └── miss → consultar PostgreSQL\n                                  SET cache:v1:studies:<id-opaco> JSON EX 30\n                                  devolver dado da fonte\n\nESCRITA\nPostgreSQL COMMIT → DEL cache:v1:studies:<id-opaco>\n\nA key tem versão/escopo, TTL limita envelhecimento e Redis não vira fonte.",
+      "expected": "Uma falta consulta PostgreSQL e preenche uma cópia versionada com TTL; uma escrita bem-sucedida invalida a cópia depois do commit.",
+      "explanation": [
+        "Cache-aside: aplicação consulta cache, busca fonte principal em miss e grava cópia temporária para próxima leitura.",
+        "Namespace e versão como `cache:v1:...` ajudam a separar tipo/formato; identificador opaco evita colocar email, token ou dado pessoal em chave/log.",
+        "TTL dá limite superior planejado para vida da cópia; `DEL` após commit reduz staleness imediatamente. Se invalidar antes do commit, leitura concorrente pode repor valor antigo.",
+        "Uma expiração de chave popular pode disparar muitas leituras simultâneas ao banco (cache stampede). Cache lock, jitter, refresh antecipado ou coalescing ajudam, mas aumentam complexidade.",
+        "O script do laboratório usa fonte em memória. É evidência do comportamento Redis e de cache-aside simulado, não integração com PostgreSQL nem medida de desempenho real."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Percorra miss, fonte e hit",
+        "paragraphs": [
+          "No primeiro GET, a chave não existe: cache miss. A API lê a fonte persistente, serializa um resultado que pode ser compartilhado com aquele escopo e grava no Redis com TTL. Na próxima chamada, cache hit pode evitar uma consulta ao banco. Se a fonte retorna registro inexistente, decida se armazena uma resposta vazia por pouco tempo; cuidado para não esconder uma criação recente.",
+          "Chave deve identificar a entidade, versão de formato e escopo de acesso. Para dados por usuário, inclua um ID interno apropriado e mantenha autorização antes de devolver valor; a chave não é controle de acesso. Um cache compartilhado sem escopo por tenant pode servir dados de uma conta para outra.",
+          "Evite guardar segredo de sessão, bearer token, anotação privada ou resposta pessoal sem política justificada. Se o valor contém dados do aluno, o risco e retenção mudam; use minimização, TTL adequado e isolamento por conta. Não coloque token em nome de key nem em log.",
+          "Pausa: trace uma leitura em que o primeiro pedido é miss e o seguinte hit. Em que ponto o banco é consultado e qual camada autoriza o usuário?"
+        ],
+        "terms": [
+          { "term": "Cache miss", "meaning": "A chave não foi encontrada e a aplicação consulta a fonte autoritativa." },
+          { "term": "Cache hit", "meaning": "A aplicação encontrou uma cópia que ainda considera válida e pode devolvê-la segundo sua política." },
+          { "term": "Namespace", "meaning": "Prefixo estruturado de key que separa entidade, versão, ambiente ou escopo." }
+        ]
+      },
+      {
+        "title": "Limite idade com TTL e invalidação após escrita",
+        "paragraphs": [
+          "TTL como 30 segundos é apenas um valor fictício. Escolha uma duração conforme frescor aceitável e custo de recarga; não copie um número sem conhecer o requisito. Expiração limita a janela planejada para dado antigo, mas relógio, failover, processo e cópias locais podem ter efeitos diferentes.",
+          "Caminho de escrita típico: validar e autorizar; gravar no PostgreSQL; confirmar commit; então invalidar key Redis. Se o commit falhar, não deve apagar ou confirmar uma atualização inexistente. Se invalidação falhar depois do commit, TTL reduz a duração de dado antigo; registre falha e escolha outra forma de consistência se o requisito não tolera essa janela.",
+          "Uma corrida ainda é possível: leitura consulta banco antigo; escrita faz commit e DEL; leitura antiga termina depois e grava valor antigo no cache. Estratégias como versão de cache, compare-and-set, lock ou invalidação por versão podem evitar situações específicas, mas trazem custo. Explique a consistência oferecida antes de adotar cache.",
+          "Pausa: compare escrita SQL que falhou versus escrita confirmada seguida de falha no DEL. Qual versão deve ser devolvida e que compensação existe?"
+        ],
+        "terms": [
+          { "term": "Staleness", "meaning": "Período em que uma cópia difere da fonte autoritativa." },
+          { "term": "Invalidação", "meaning": "Remoção ou mudança de versão de uma cópia para que a próxima leitura volte à fonte." },
+          { "term": "Cache stampede", "meaning": "Várias requisições concorrentes recarregam o mesmo dado ao mesmo tempo após miss/expiração." }
+        ]
+      },
+      {
+        "title": "Responda a falta e indisponibilidade sem cascata",
+        "paragraphs": [
+          "O laboratório usa TTL e chave versionada. `check-cache-aside.cjs` faz a primeira leitura em uma Map fictícia, retorna cópia no segundo acesso, simula atualização da fonte sem invalidar para mostrar valor velho e em seguida invalida para recarregar. A saída `PASS` confirma esse roteiro pequeno, não um SLO de aplicação.",
+          "Redis fora do ar não deve causar retry infinito. Configure timeout, limite de conexões e um fallback controlado ao PostgreSQL apenas para leitura que tolera isso. Cache bypass amplia consultas; limite concorrência, monitore a fonte e decida se serve cópia velha explicitamente. Para escrita de progresso, a confirmação vem do banco durável; não confirme com base apenas em cache.",
+          "Planeje cache hit ratio, miss, falhas Redis, tempo de GET, latência e consultas ao banco. Antes/depois precisa usar mesma versão de dados, aquecimento e perfil; compare p50/p95 e memória. Nesta etapa o teste confirma lógica simples no container, mas não mede ganho de throughput ou custo.",
+          "Pausa: se Redis cai e todos os clientes dão miss ao PostgreSQL, que limite evita transformar fallback em pico de carga?"
+        ],
+        "terms": [
+          { "term": "Fallback", "meaning": "Caminho alternativo quando o componente primário da operação não responde, com limites e garantias definidos." },
+          { "term": "Stale-if-error", "meaning": "Política explícita que aceita servir cópia antiga durante falha da fonte, quando o tipo de dado permite." },
+          { "term": "Hit ratio", "meaning": "Percentual de leituras observadas respondidas pelo cache." }
+        ]
+      }
+    ],
+    "diagramTitle": "Cache-aside no caminho de leitura e escrita",
+    "diagram": "LEITURA: API → GET Redis → hit ─────────→ responder cópia permitida\n                    └── miss → Postgres → SET Redis com TTL → responder fonte\n\nESCRITA: API → autorizar → Postgres COMMIT → invalidar chave Redis\n                                                ↓\n                                      próximo pedido recarrega",
+    "guided": [
+      { "instruction": "Execute `node check-cache-aside.cjs` e anote qual chamada foi miss, qual foi hit e quantas vezes a fonte fictícia foi lida.", "result": "A fonte Map é lida na primeira chamada e novamente após invalidar; a segunda leitura antes da mudança usa Redis." },
+      { "instruction": "No `compose.yaml`, localize versão `v1`, porta loopback e o TTL 30 do script; descreva o que cada um limita.", "result": "Versão separa espaço de keys; 127.0.0.1 limita alcance de rede; EX 30 dá expiração curta à cópia de demonstração." },
+      { "instruction": "Desenhe ordem de escrita com commit Postgres e DEL Redis; indique comportamento se o commit falhar ou DEL falhar.", "result": "Só invalida depois de commit confirmado; se o banco falha, mantém estado anterior; se DEL falha depois, assume staleness limitada por TTL ou registra incidente." }
+    ],
+    "mistakes": [
+      "Chamar cache-aside de fonte de verdade ou confirmar gravação antes do banco.",
+      "Não colocar TTL e deixar chave crescer sem limite temporal.",
+      "Invalidar antes do commit e permitir repopular valor antigo.",
+      "Esquecer escopo de tenant/usuário e misturar respostas de contas diferentes.",
+      "Fazer fallback ilimitado ao banco durante falha do cache.",
+      "Supor que o script local usa PostgreSQL ou prova ganho de desempenho real."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: cache contém título HTML. A pessoa atualiza a fonte para CSS, mas a API não envia DEL. Preveja o que vê o próximo GET e até quando a divergência pode persistir no exemplo com TTL.",
+        "expected": "O próximo hit ainda devolve HTML; a cópia pode permanecer até TTL expirar, se não houver outro mecanismo de invalidação.",
+        "criteria": ["Identifica leitura como hit do valor antigo.", "Relaciona janela máxima planejada ao TTL.", "Diz que PostgreSQL continua com o valor novo."],
+        "solution": "O próximo GET devolve HTML enquanto key existir. Com TTL 30, o exemplo pretende limitar vida da chave a até 30 segundos desde SET; a fonte principal pode já conter CSS.",
+        "explanation": "Cache-aside precisa de uma política de frescor, não apenas de gravação de cópia.",
+        "hints": ["O que GET encontra primeiro?", "A atualização foi feita na fonte ou no cache?", "Que comando remove a cópia após commit?"]
+      },
+      {
+        "prompt": "Alterar: uma tela tem chave `cache:perfil:<email>`. Reescreva o padrão para prefixo/versão/escopo com ID opaco, TTL e invalidação após uma gravação confirmada. Use placeholders.",
+        "expected": "A key evita email/token, inclui namespace e versão, e atualização invalida depois de commit; autorização segue no servidor.",
+        "criteria": ["Remove email e credenciais da key.", "Inclui namespace/version e escopo por identidade interna.", "Indica TTL e ordem commit→invalidação.", "Não trata key como autorização."],
+        "solution": "`cache:v1:profile:<user-id-opaco>` com TTL apropriado; a API valida sessão e dono, grava Postgres, confirma commit e executa DEL dessa key. Em falha do DEL, observa falha e aceita só staleness definida até expiração.",
+        "explanation": "A key organiza cache e reduz exposição de identificador; a decisão de acesso ainda é do servidor/banco.",
+        "hints": ["Que informação não deveria aparecer em logs de chave?", "Que prefixo permite migrar formato?", "Quando o banco confirmou a escrita?"]
+      },
+      {
+        "prompt": "Construir: execute o teste de cache e crie uma tabela de estado com cache vazio, hit, fonte alterada sem invalidar e `DEL` após commit; inclua fonte consultada, valor esperado e TTL.",
+        "expected": "A tabela mostra miss/fonte HTML, hit/HTML sem nova leitura, dado velho HTML após mudança da Map para CSS e miss/CSS após DEL com TTL de 30 segundos; declara que fonte é simulada.",
+        "criteria": ["Registra estados e fonte observados.", "Mostra o valor velho sem invalidar.", "Mostra valor atualizado após DEL.", "Declara que fonte Map não é PostgreSQL."],
+        "solution": "Estado 1 key ausente: consulta Map (HTML), SET EX 30. Estado 2 GET retorna HTML, Map sem leitura adicional. Estado 3 Map recebe CSS, key ainda devolve HTML. Estado 4 DEL remove cópia; leitura volta à Map e devolve CSS. Esse script não abre conexão SQL.",
+        "explanation": "A tabela separa o estado autoritativo fictício do cache temporário e prova o efeito da invalidação.",
+        "hints": ["Use contador `sourceReads` do script.", "Qual chave é removida?", "O que está explicitamente simulado?"]
+      },
+      {
+        "prompt": "Investigar erro: Redis caiu e o banco recebeu dez vezes mais leituras. Proponha diagnóstico e contenção sem desligar indiscriminadamente o banco nem testar Preview.",
+        "expected": "Mede falhas/latência/cache misses e fallback, limita timeouts/retries/concorrência, avalia stale-if-error apenas para leitura tolerante e monitora carga; registra condição de retorno gradual.",
+        "criteria": ["Distingue falha do cache de falha do Postgres.", "Limita retries e chamadas concorrentes.", "Define se cópia antiga pode ser servida e para quais dados.", "Não usa teste remoto ou domínio."],
+        "solution": "Compare métricas de Redis, misses, conexões e queries Postgres; confirme timeout e cause. Contenha com circuit breaker e limite de fallback; sirva stale apenas em leitura pública se política permitir; escale/recupere Redis e aqueça gradualmente; não altere serviço remoto sem evidência.",
+        "explanation": "Fallback ilimitado pode multiplicar o defeito que o cache deveria absorver.",
+        "hints": ["Cada miss dispara quantas consultas?", "Qual dado pode tolerar staleness?", "Como reabrir gradualmente a leitura Redis?"]
+      }
+    ],
+    "quiz": [
+      { "question": "No cache-aside, o que ocorre em miss?", "options": ["A aplicação consulta a fonte e pode preencher Redis com TTL.", "Redis apaga o banco.", "A key vira autorização."], "correctIndex": 0, "explanation": "A fonte autoritativa continua respondendo quando a cópia não existe." },
+      { "question": "Por que invalidar depois do commit?", "options": ["Para não apagar cópia como se escrita tivesse ocorrido quando o banco falhou.", "Para desativar autorização.", "Para não precisar de TTL."], "correctIndex": 0, "explanation": "A ordem mantém cache e fonte coerentes quanto ao sucesso da gravação." },
+      { "question": "O que faz o script `check-cache-aside.cjs`?", "options": ["Usa uma fonte Map simulada e testa miss/hit/staleness/invalidação.", "Conecta ao Supabase.", "Mede latência de produção."], "correctIndex": 0, "explanation": "O resultado é local e a fonte é memória do processo." },
+      { "question": "Por que limitar fallback ao banco?", "options": ["Sem controle, muitas falhas de cache podem sobrecarregar a fonte.", "Porque cache miss nunca consulta o banco.", "Porque Redis é a única fonte persistente."], "correctIndex": 0, "explanation": "Retries e concorrência precisam de limite em incidentes." }
+    ],
+    "summary": [
+      "Cache miss consulta fonte; hit pode evitar leitura; TTL limita duração da cópia.",
+      "Use key versionada, escopo correto e dados minimizados.",
+      "Após commit no PostgreSQL, invalide; falhas de cache e DB têm tratamentos diferentes.",
+      "O fallback deve ser limitado para evitar cascata; medir antes/depois com perfil controlado.",
+      "A prática usa Map fictícia e não mede API nem toca banco remoto."
+    ]
+  },
+  "delivery-redis-rate-limit": {
+    "prerequisites": "Concluir `delivery-redis-foundations`, `delivery-api-abuse` e `delivery-http`; saber request/response, status HTTP e identidade autenticada.",
+    "setup": "Na pasta `labs/redis-fundamentals`, inicie o container com `docker compose up -d --wait` (ou `docker-compose up -d --wait`) e execute `node check-rate-limit.cjs`. A saída esperada termina em `Rate limiter Redis: PASS`; três chamadas são permitidas, a quarta limitada e uma segunda chave tem contador separado. O verificador envia poucas chamadas determinísticas ao Redis local, apaga apenas as keys que cria e não envia tráfego HTTP nem carga. Sem Docker, siga o diagrama e responda os exercícios sem afirmar execução.",
+    "why": "Rate limiting limita volume/frequência, enquanto limite por corpo controla o custo de uma chamada. Redis pode compartilhar contadores entre instâncias; algoritmo, chave, privacidade, atomicidade e modo de falha precisam ser decisões explícitas.",
+    "example": {
+      "language": "text",
+      "code": "JANELA FIXA FICTÍCIA: máximo 3 chamadas em 60 segundos por key\nINCR rate:v1:demo-account:<id-opaco>\nna primeira chamada → EXPIRE key 60\nresposta do script: allowed, count, TTL\ncount > 3 → limited; API deveria decidir 429 e Retry-After\n\nLua executa incremento e TTL sem interleaving de outro cliente.",
+      "expected": "As três primeiras operações da key passam, a quarta é negada; outra key começa em 1 e o TTL tem valor positivo até 60 segundos.",
+      "explanation": [
+        "Janela fixa agrupa operações em intervalos; é simples, mas buckets alinhados podem permitir rajadas perto da troca de janela. Janela deslizante conta período móvel com maior custo; token bucket permite rajadas limitadas e controla taxa média.",
+        "INCR seguido de EXPIRE em comandos separados pode deixar contador sem expiração se a aplicação parar entre eles. Lua executa a lógica como uma unidade atômica no Redis; chaves com TTL são removidas após janela.",
+        "Key por conta/tenant limita quota de negócio; IP pode ser sinal suplementar, mas NAT e rotação afetam pessoas e proxy headers precisam de origem confiável. Não armazene IP bruto sem necessidade/retention; pseudonimizar também exige avaliar reidentificação.",
+        "Redis pode expulsar ou perder contador; indisponibilidade e fail-open podem abrir limite, enquanto fail-closed pode interromper uso. Escolha por rota e dano, timeout e métrica.",
+        "`check-rate-limit.cjs` executa script Redis local e testa identidade fictícia. Não implementa middleware Node, não responde status HTTP e não mede capacidade ou carga."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Escolha algoritmo e política com um fluxo real",
+        "paragraphs": [
+          "Uma janela fixa conta até N ações na janela; é simples e barata, mas fronteiras adjacentes podem deixar uma rajada maior do que N em intervalo curto. Janela deslizante aproxima limite temporal mais uniforme à custa de estado/cálculo. Token bucket repõe tokens com o tempo e permite rajada limitada; escolha com base em UX, custo e consequência de abuso.",
+          "Limite por requisição (bytes, página, timeout) protege uma chamada pesada; quota por pessoa/tenant controla consumo acumulado; concorrência limita operações simultâneas. Esses controles se somam e nenhum substitui autorização. O endpoint responde 429 quando a política de taxa rejeita e pode fornecer Retry-After. `413` continua sendo corpo excessivo, não rate limit.",
+          "Cada regra precisa dizer endpoint/operação, identidade, janela, contagem de tentativas (inclusive inválidas ou só aprovadas), limite, reset, retry legítimo, observabilidade e efeito do bloqueio. Não copie números arbitrários; veja custo e comportamento esperado.",
+          "Pausa: um pedido único consulta 200 mil linhas; outra pessoa faz 300 pedidos leves por minuto. Qual limite controla cada cenário?"
+        ],
+        "terms": [
+          { "term": "Janela fixa", "meaning": "Contador que vale para um intervalo delimitado e reinicia ao expirar/virar bucket." },
+          { "term": "Janela deslizante", "meaning": "Contagem ou aproximação sobre intervalo que avança com o tempo, reduzindo rajada em fronteiras." },
+          { "term": "Token bucket", "meaning": "Algoritmo com capacidade de tokens que se repõem ao longo do tempo e limitam taxa/rajada." },
+          { "term": "429 Too Many Requests", "meaning": "Status HTTP para recusa por excesso de requisições segundo a política aplicada." }
+        ]
+      },
+      {
+        "title": "Mantenha contador e expiração atômicos",
+        "paragraphs": [
+          "O script `fixed-window.lua` incrementa key, configura expiração na primeira chamada, lê TTL e devolve `allowed`/`limited`. Como a lógica roda em um script, outro pedido Redis não se intercala entre leitura, decisão e gravação. A janela desta demonstração começa no primeiro hit; não é o mesmo que bucket alinhado ao relógio.",
+          "Um contador precisa de TTL para evitar chaves permanentes. Se operação limitada continua incrementando, a contagem passa do limite até expirar; outras políticas podem parar de incrementar após negar para economizar. Escolha key e comportamento conscientemente. Prefixo `rate:v1` permite trocar formato; use id de conta pseudônimo e não inclua token de sessão.",
+          "Na aplicação, escolha conexão/client Redis com timeout e pool, execute operação atômica e converta resultado para resposta HTTP. O laboratório atual só retorna strings do script pelo CLI; não representa middleware ou biblioteca cliente da aplicação. Redis 8.8 também possui comandos de contador com expiração e limite; a aula mantém Lua para estudar a unidade atômica e ilustrar compatibilidade entre versões.",
+          "Pausa: se `INCR` funcionar mas `EXPIRE` não rodar, qual risco aparece? Como uma execução atômica evita essa lacuna?"
+        ],
+        "terms": [
+          { "term": "Atomicidade", "meaning": "Execução observada como uma operação única em relação a outros comandos concorrentes." },
+          { "term": "Contador distribuído", "meaning": "Contador compartilhado em armazenamento central para várias instâncias da mesma API." },
+          { "term": "Chave pseudônima", "meaning": "Identificador de controle que não expõe diretamente nome/email e cuja reversibilidade/risco ainda deve ser avaliada." }
+        ]
+      },
+      {
+        "title": "Defina identidade, privacidade e indisponibilidade",
+        "paragraphs": [
+          "Use uma identidade adequada ao fluxo. Conta autenticada ou tenant costuma permitir quota justa; IP pode ajudar contra tráfego não autenticado, mas pessoas atrás de NAT compartilham endereço e atacantes distribuem endereços. Cabeçalhos como X-Forwarded-For só são confiáveis quando proxy confiável os define e limpa entrada do cliente.",
+          "Evite armazenar identificador pessoal ou token na key/log. Um hash simples de IP ainda pode ser dado correlacionável; defina necessidade, segredo de pseudonimização, retenção e controle. Observe excesso em contagens agregadas e retenha o mínimo para investigação proporcional.",
+          "Decida fail-open/fail-closed por rota e risco. Falha em limite de recuperação de senha pode exigir bloqueio/segunda defesa; falha em recurso de leitura pública de baixo risco talvez permita operação temporária com limite no gateway. Circuit breaker e timeout evitam espera ilimitada; fallback em memória não mantém limite global entre réplicas.",
+          "A política noeviction do container faz gravações falharem quando memória atinge máximo. Se a aplicação ignorar erro e permitir chamada, o limitador pode falhar aberto; se negar sempre, o usuário legítimo pode ficar bloqueado. Monitore erro e decida antes do incidente.",
+          "Pausa: Redis cai em endpoint de convite que envia email faturado. Especifique resultado, status e alerta sem revelar se endereço de uma pessoa existe."
+        ],
+        "terms": [
+          { "term": "NAT", "meaning": "Tradução de rede que pode fazer pessoas diferentes compartilharem um mesmo IP público." },
+          { "term": "Circuit breaker", "meaning": "Controle que suspende chamadas repetidas a uma dependência que falha, permitindo recuperação e fallback definido." },
+          { "term": "Fail-open / fail-closed", "meaning": "Política para permitir ou recusar operação quando o mecanismo de limite não responde." }
+        ]
+      },
+      {
+        "title": "Verifique a regra sem gerar carga",
+        "paragraphs": [
+          "Execute sete passos do script: resposta Redis, 3 allowed, 4 limited, TTL positivo, outra identidade iniciando contador em 1 e remoção das keys temporárias. Isso confere algoritmo elementar, isolamento de keys e expiração no container. Não cria requests de API nem mede throughput.",
+          "Testes de integração do middleware deveriam cobrir antes/dentro/depois do limite com relógio controlado, identidade A/B, origem de IP confiável, nenhuma ação após recusa, Retry-After, Redis fora do ar, timeout, counter eviction e concorrência limitada. Usar poucos testes determinísticos já comprova mais que enviar carga sem escopo.",
+          "Para medir, compare serviço com e sem limitador num ambiente próprio e mesma carga controlada; registre p50/p95 da API e do Redis, decisões permitidas/negadas, memória, custo e precisão. Não faça flood, stress test ou teste de domínio/Preview público. A implementação Node completa ainda requer escolher cliente Redis e integrar middleware no laboratório de backend.",
+          "Pausa: qual evidência o script fornece e qual evidência só integração HTTP pode fornecer?"
+        ],
+        "terms": [
+          { "term": "Retry-After", "meaning": "Cabeçalho HTTP que orienta quando tentar novamente após uma recusa temporária." },
+          { "term": "Teste determinístico", "meaning": "Teste com entradas e estado controlados que gera resultado repetível sem carga ou serviço externo." },
+          { "term": "Métrica p50/p95", "meaning": "Medidas de latência mediana e da cauda de 95% das observações." }
+        ]
+      }
+    ],
+    "diagramTitle": "Da requisição à decisão distribuída",
+    "diagram": "API autentica/identifica → compõe key opaca → EVAL atômico Redis\n                                              ├── dentro → permitir\n                                              └── acima → recusar\n                                                        status HTTP 429\n                                                        Retry-After derivado do TTL\n\nErro/timeout Redis → aplicar fail-open ou fail-closed definido para a rota",
+    "guided": [
+      { "instruction": "Execute `node check-rate-limit.cjs` e escreva as cinco decisões esperadas para conta A e conta B.", "result": "A: allowed 1, 2 e 3; limited 4. B: allowed 1 porque usa outra key." },
+      { "instruction": "Abra `fixed-window.lua` e explique por que expiração só é definida quando count é 1.", "result": "As próximas chamadas não estendem a janela; TTL é contado desde o primeiro incremento e a key expira." },
+      { "instruction": "Desenhe a resposta da API para resultado `limited` e o que ocorre se a chamada Redis expira por timeout.", "result": "Resposta de excesso pode ser 429 com Retry-After; timeout segue política fail-open/closed da rota, com métrica e sem retry infinito." }
+    ],
+    "mistakes": [
+      "Chamar o script CLI de middleware HTTP completo.",
+      "Usar só IP ou confiar em X-Forwarded-For não higienizado.",
+      "Executar INCR e EXPIRE separadamente e ignorar corrida/TTL ausente.",
+      "Tratar janela fixa como se eliminasse rajada nas fronteiras.",
+      "Repetir indefinidamente quando Redis cai ou ignorar erro de memória.",
+      "Colocar token, email ou IP bruto na key sem regra de minimização/retention.",
+      "Fazer carga no Preview público como substituto de teste de política local."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: limite 3 por key com janela iniciada no primeiro pedido. Registre resultados para quatro chamadas seguidas e outra identidade; depois explique a consequência quando o TTL expira.",
+        "expected": "Mesma key: allowed 1/2/3 e limited 4. Outra key começa allowed 1. Após expiração, primeira chamada cria contador novo; a janela fixa tem comportamento próprio nas fronteiras.",
+        "criteria": ["Prevê as quatro respostas da key inicial.", "Mantém contador independente para segunda identidade.", "Relaciona expiração a reinício do contador.", "Não chama isso janela deslizante."],
+        "solution": "Execute `node check-rate-limit.cjs`. A key A atinge contagem 4 e devolve limited; a key B começa em 1. Depois do TTL, Redis remove key A e ela começa uma janela novamente; não é uma contagem contínua de últimos 60 segundos.",
+        "explanation": "Contador TTL simples implementa janela fixa ancorada no primeiro pedido.",
+        "hints": ["Qual é o limite numérico?", "As keys de A e B são iguais?", "O script renova o TTL em todo request?"]
+      },
+      {
+        "prompt": "Alterar: uma chave atual é `rate:<email>:reset-password`. Proponha namespace/versionamento e uma identidade pseudônima segura, mais regra para um sinal IP opcional; não use valores reais.",
+        "expected": "A key não contém email/token, usa versão e identificador interno mínimo; IP é separado e derivado apenas de proxy confiável com retenção curta e política explícita.",
+        "criteria": ["Remove email/credenciais da key.", "Mantém escopo/versão claros.", "Não confia em cabeçalho arbitrário de proxy.", "Explica que hash de IP também pode correlacionar pessoa."],
+        "solution": "Exemplo: `rate:v1:recovery:account:<id-opaco>` e, como dimensão auxiliar, `rate:v1:recovery:trusted-ip:<digest-rotativo>`. O servidor valida sessão/proxy; define retenção e não registra o endereço bruto; não mistura as duas quotas.",
+        "explanation": "Rate limit precisa de identidade útil sem transformar chave Redis em repositório de PII.",
+        "hints": ["Quem gera o identificador confiável?", "O IP vem de qual proxy?", "Que retenção está definida?"]
+      },
+      {
+        "prompt": "Construir: escreva uma política para três convites por conta a cada 60 segundos, com quota secundária por IP confiável. Inclua algoritmo, keys fictícias, status, Retry-After, teste A/B e resposta se Redis falhar.",
+        "expected": "A política define janela e contagem, keys independentes por dimensão, 429 e TTL para orientação, teste que permite quota e recusa excesso sem envio, e fail-open/closed com justificativa/alerta.",
+        "criteria": ["Define conta, IP confiável, janela e limite sem valor real.", "Diferencia 429 de 400/413.", "Inclui teste positivo, negativo e ausência de side effect ao negar.", "Escolhe modo de falha por risco e mede indisponibilidade."],
+        "solution": "Conta `rate:v1:invite:account:<id-opaco>`: três por 60s; origem IP só do proxy confiável em key separada; se qualquer quota excede, API retorna 429 com Retry-After calculado do TTL e nenhum convite é enviado. Teste A1-A3 permitidos, A4 negado, conta B ainda permitida e IP compartilhado observado. Redis indisponível: escolher recusa temporária para envio faturável, alerta e retry limitado; revisar impacto em conta legítima.",
+        "explanation": "As quotas protegem tanto fluxo de negócio quanto rede sem confundir autorização com frequência.",
+        "hints": ["A ação externa acontece antes ou depois da decisão?", "Como uma segunda conta prova isolamento?", "Qual é o custo de falhar aberto para email?"]
+      },
+      {
+        "prompt": "Investigar erro: usuários recebem 429 depois de mudança de proxy; Redis também está próximo do limite de memória. Registre hipótese, métrica e ação inicial sem apagar contador nem gerar carga remota.",
+        "expected": "Verifica IP vindo do proxy confiável, NAT, quota por conta, janela/TTL, evictions/OOM e contadores; preserva evidência, não remove chaves em massa e escolhe contenção controlada/fail-mode documentado.",
+        "criteria": ["Distingue falso 429 de regra de quota real.", "Inspeciona confiança do proxy e dimensão do contador.", "Verifica memória/eviction e TTL.", "Evita reset geral ou teste público de carga."],
+        "solution": "Compare eventos agregados por endpoint/conta/key class, status, TTL e horário; confirme configuração do proxy e compartilhamento NAT. Examine `INFO memory`, eviction e erro de gravação. Preserve counters, ajuste só regra comprovadamente incorreta e limite retry/indisponibilidade sem flood público.",
+        "explanation": "Resetar todos os contadores esconderia a causa e poderia liberar abuso; inspeção deve separar regra, proxy e falha Redis.",
+        "hints": ["O contador é por IP, conta ou tenant?", "A origem do X-Forwarded-For é confiável?", "Redis recusou escrita por memória ou expulsou keys?"]
+      }
+    ],
+    "quiz": [
+      { "question": "Qual risco janela fixa apresenta perto da fronteira?", "options": ["Pode permitir rajadas em intervalos adjacentes.", "Nunca expira.", "Substitui autorização."], "correctIndex": 0, "explanation": "Um bucket pode terminar e outro começar com pouco tempo entre chamadas." },
+      { "question": "Por que script Lua é usado no exemplo?", "options": ["Para fazer incremento e TTL/decisão em uma execução atômica.", "Para ocultar token no código.", "Para transformar redis-cli em servidor HTTP."], "correctIndex": 0, "explanation": "A atomização evita interleaving entre operações que compõem o contador." },
+      { "question": "O que o script local devolve quando passa do limite?", "options": ["Resultado `limited`; a API real ainda teria de mapear para 429.", "Resposta HTTP 429 automaticamente.", "JWT de usuário."], "correctIndex": 0, "explanation": "O laboratório usa redis-cli; ele não está ligado a uma rota HTTP." },
+      { "question": "Que cuidado há com chave por IP?", "options": ["NAT/rotação afetam justiça e cabeçalho de proxy deve ser confiável.", "IP nunca pode identificar uma pessoa.", "Hash simples elimina necessidade de privacidade."], "correctIndex": 0, "explanation": "Endereço pode ser dado correlacionável e uma origem compartilhada afeta vários usuários." }
+    ],
+    "summary": [
+      "Escolha janela/algoritmo por regra e custo; 429 comunica excesso na camada HTTP.",
+      "Contador e expiração precisam ser coerentes e ter TTL; Lua é atômico no exemplo.",
+      "Use identidade por conta e IP confiável como sinais separados, com minimização de dados.",
+      "Defina fail-open/closed, timeout, memória, eviction e alerta por endpoint.",
+      "O script Redis está verificado localmente, mas não integra API Node nem mede carga."
+    ]
+  },
   "delivery-requirements": {
     "prerequisites": "Concluir setup-node, delivery-forms e delivery-ci; ter a lista de estudos do laboratório e saber alterar funções e testes. O exemplo usa apenas Node.",
     "setup": "Na pasta da aula, salve o exemplo como requisito.js no editor. No terminal aberto nessa pasta, execute node requisito.js; a saída esperada é false e true em linhas separadas. O processo termina sozinho; para retomar, execute o mesmo comando. Se node não for reconhecido, revise setup-node. Use a lista de estudos da aula delivery-forms para planejar a integração, mas este arquivo não altera server.js. Escreva critérios antes de editar o projeto.",
@@ -2972,6 +3357,21 @@ Object.assign(LESSON_GUIDES, {
       prompt: "Uma dependência direta parece saudável, mas o lockfile mostra muitos pacotes transitivos. Faça triagem de necessidade, origem, integridade registrada, manutenção/licença, avisos conhecidos, CI e plano de atualização sem instalar nem auditar automaticamente.",
       expected: "A triagem separa campos observados no manifesto/lockfile de consultas atuais pendentes, verifica origem e licença, avalia a árvore transitiva, confere escopo de CI e exige responsável/testes/rollback; não chama lockfile ou scanner de garantia de segurança.",
       hint: "Marque cada afirmação como observada no repositório ou pendente de verificação atual."
+    },
+    "delivery-redis-foundations": {
+      prompt: "Uma proposta adiciona Redis para guardar progresso, cache e contadores. Faça um mapa separando fonte persistente, dados reconstruíveis, TTL, custo operacional e evidência necessária para justificar cada uso.",
+      expected: "Progresso permanece no Supabase/PostgreSQL; cache/contadores podem ser reconstruíveis com TTL; qualquer sessão exige requisitos próprios; adoção depende de medida e plano de falha, não de preferência pela ferramenta.",
+      hint: "Pergunte o que não pode se perder, o que pode ser reconstruído e qual gargalo medido Redis resolveria."
+    },
+    "delivery-redis-cache-aside": {
+      prompt: "Uma leitura recebe dado antigo depois de atualização no banco. Investigue se houve commit, invalidação após commit, race de leitura, TTL expirado e fallback de Redis; diferencie evidência do script de cache e comportamento de uma API/Postgres real.",
+      expected: "A investigação rastreia ordem de commit e DEL, estado da key/TTL e leitura concorrente; propõe correção limitada e registra que o script usa fonte Map simulada e não verifica PostgreSQL.",
+      hint: "Observe se uma leitura antiga pode gravar valor de volta depois de uma invalidação."
+    },
+    "delivery-redis-rate-limit": {
+      prompt: "Um endpoint recebe chamadas rápidas de contas diferentes e um mesmo IP compartilhado. Desenhe políticas separadas por conta/IP confiável, janela, efeito 429/Retry-After, privacidade e comportamento se Redis estiver fora.",
+      expected: "Políticas separam identidade da conta e sinal IP/NAT, limitam dados e tempo, recusam sem efeito, escolhem fail-open/closed por operação e deixam explícita a limitação de que o script não integra middleware HTTP.",
+      hint: "O limite controla frequência, mas a chave também precisa respeitar identidade confiável e privacidade."
     },
     "delivery-ci": {
       prompt: "Uma publicação altera a validação de minutos e o POST começa a aceitar -5. Defina um teste que falhe antes da correção, indique onde a CI deve executá-lo e descreva como conter a versão ruim enquanto investiga.",
