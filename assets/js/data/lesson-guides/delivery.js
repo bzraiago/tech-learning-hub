@@ -1804,6 +1804,147 @@ Object.assign(LESSON_GUIDES, {
       "O curso só faz análises com dados fictícios; rate limiting distribuído será implementado na Fase 7.4 com Redis."
     ]
   },
+  "delivery-supply-chain": {
+    "prerequisites": "Concluir `delivery-owasp-top10` e `quality-refactor`; conhecer dependências de projeto, Git e CI. A aula examina arquivos versionados do laboratório, sem instalar pacote ou executar código de terceiro.",
+    "setup": "No editor, abra `labs/backend-layers/package.json`, `labs/backend-layers/package-lock.json`, `labs/backend-layers/README.md` e `.github/workflows/ci.yml`. Siga o caminho pelo manifesto até a instalação da CI. A leitura funciona em Windows, macOS e Linux e não requer terminal, rede, Preview ou domínio. Para manter a análise segura e repetível, não execute `npm install`, `npm audit fix` ou scripts de dependências como parte desta atividade. `npm audit`, se usado depois em uma cópia local, consulta a registry configurada pela internet; primeiro revise o que será enviado e nunca interprete “sem avisos” como garantia de pacote confiável.",
+    "why": "Um aplicativo herda riscos dos componentes e ferramentas que o constroem e atualizam. Uma dependência pode estar vulnerável, abandonada, comprometida ou vir de uma fonte inesperada; CI, credenciais de publicação e artefatos também integram a cadeia. O lockfile e o scanner ajudam a controlar parte desse risco, sem atestar que cada código é benigno.",
+    "example": {
+      "language": "text",
+      "code": "MAPA ESTÁTICO DO LABORATÓRIO\n\npackage.json\n├── dependencies: pg 8.23.1 — necessário em runtime para PostgreSQL\n└── devDependencies: @playwright/test 1.64.1 — testes de navegador\n\npackage-lock.json\n├── fixa o grafo resolvido e registra metadados dos pacotes\n└── inclui também dependências transitivas (pacotes usados por outros pacotes)\n\n.github/workflows/ci.yml\n└── executa npm ci com esse lockfile antes dos testes\n\nConclusão segura: arquivos registram escolhas e tornam a instalação revisável/reproduzível.\nConclusão que NÃO se pode tirar: “todos os pacotes são seguros e sem vulnerabilidades”.",
+      "expected": "A leitura separa dependência direta de transitiva e runtime de ferramenta de desenvolvimento; explica a função do lockfile e de `npm ci`, mas não atribui nota de segurança nem conclui ausência de vulnerabilidades.",
+      "explanation": [
+        "A03:2025 amplia o foco além de componentes com vulnerabilidade conhecida: também considera comprometimentos em construção, distribuição, atualização, ferramentas e dependências.",
+        "O `package.json` declara o que o projeto pede diretamente; o lockfile registra o grafo resolvido para a instalação usada pelo ecossistema npm. Dependência direta pode trazer vários pacotes transitivos.",
+        "`npm ci` exige lockfile compatível com o manifesto, instala o projeto a partir dele e falha em caso de divergência. Repetibilidade não garante que o pacote selecionado seja benigno ou esteja livre de falhas.",
+        "`npm audit` consulta a registry padrão/configurada para comparar o grafo com avisos conhecidos. Um relatório sem vulnerabilidades conhecidas não detecta todo código malicioso, bug sem aviso, dependência não inventariada ou comprometimento futuro.",
+        "No laboratório, `pg` é dependência de execução e `@playwright/test` é de desenvolvimento. A CI chama `npm ci`; essa leitura é uma fotografia do repositório, não uma auditoria atual das versões."
+      ]
+    },
+    "sections": [
+      {
+        "title": "A cadeia vai além da biblioteca que importamos",
+        "paragraphs": [
+          "A cadeia de suprimentos de software inclui quem publica um pacote, o registro que distribui, dependências aninhadas, ferramentas de desenvolvimento, repositório, CI, artefatos e processo de atualização. Se um pacote legítimo é comprometido ou uma conta de publicação é roubada, código malicioso pode entrar mesmo sem alteração visível na aplicação. Uma dependência também pode estar abandonada, usar licença incompatível ou receber uma atualização que quebra o contrato.",
+          "Dependência direta é declarada pelo seu projeto. Dependência transitiva chega porque uma dependência direta precisa dela. Um inventário que lista só `pg` pode esconder uma árvore de dezenas de componentes. O lockfile torna a árvore escolhida examinável; um inventário ou SBOM (Software Bill of Materials, lista de materiais de software) descreve componentes e versões para acompanhamento, mas nenhum desses arquivos sozinho demonstra que o código é seguro.",
+          "O risco não se restringe ao servidor. Scripts de instalação podem executar etapas definidas por pacotes durante a instalação. Ferramentas, extensões do editor, imagens de container, workflow de CI, tokens de publicação e segredos de deploy também merecem origem, atualização e permissão limitadas. Por isso A03:2025 abrange processo de construção, distribuição e atualização.",
+          "Pausa: liste os elos entre package.json, registry, node_modules, CI e artefato. Marque uma pergunta de confiança que deve ser respondida em cada passagem."
+        ],
+        "terms": [
+          { "term": "Cadeia de suprimentos de software", "meaning": "Pessoas, componentes, serviços, ferramentas e processos que constroem, distribuem e atualizam um software." },
+          { "term": "Dependência direta", "meaning": "Pacote declarado diretamente no manifesto do projeto." },
+          { "term": "Dependência transitiva", "meaning": "Pacote instalado porque outra dependência do projeto depende dele." },
+          { "term": "SBOM", "meaning": "Inventário de componentes e versões incluídos em um software, útil para responder a avisos e acompanhar a cadeia." }
+        ]
+      },
+      {
+        "title": "Escolha e instale com uma justificativa verificável",
+        "paragraphs": [
+          "Antes de adicionar um pacote, descreva o problema e compare com API nativa, código pequeno já existente ou uma dependência aprovada. Depois confira nome exato, organização/publicador, registro configurado, documentação, compatibilidade, licença, atividade de manutenção, política de suporte e caminho de atualização. Evite escolher apenas por número de downloads ou por aparecer primeiro numa busca: popularidade não prova integridade.",
+          "Confusão de nome (typosquatting) usa grafia parecida com um pacote conhecido. Pacote copiado, domínio/registro alterado, conta do mantenedor comprometida e atualização maliciosa são outros cenários. Em contexto didático, não instale um pacote suspeito para experimentar: use um caso fictício e descreva como confirmar nome, origem e responsável por canais oficiais.",
+          "Use permissões mínimas para contas do repositório e da CI. Não coloque token de publicação no código, não deixe workflow de contribuição externa com segredo desnecessário e exija revisão apropriada antes de promover mudanças sensíveis. Atualização de dependência deve ter diff legível, teste de compatibilidade, plano de rollback e responsável para acompanhar avisos.",
+          "Pausa: uma dependência nova promete economizar dez linhas, mas introduz 40 dependências transitivas, licença ainda não verificada e scripts de instalação. Escreva as evidências que faltam antes de decidir."
+        ],
+        "terms": [
+          { "term": "Typosquatting", "meaning": "Uso de nome muito parecido com outro pacote para induzir uma instalação equivocada." },
+          { "term": "Menor privilégio", "meaning": "Conceder a cada usuário, serviço ou workflow só os acessos necessários à tarefa." },
+          { "term": "Superfície de ataque", "meaning": "Componentes e caminhos que podem ser alcançados ou abusados; dependências sem uso aumentam o que precisa ser mantido." }
+        ]
+      },
+      {
+        "title": "Manifesto, lockfile e auditoria cumprem papéis diferentes",
+        "paragraphs": [
+          "No laboratório, abra `package.json`: `pg` é usado pelo servidor para PostgreSQL; `@playwright/test` dá suporte aos testes de interface. Abra o começo de `package-lock.json`, confira versões, origem do pacote, integridade registrada e entradas dos pacotes transitivos. Compare com `.github/workflows/ci.yml` e identifique em qual pasta o workflow executa `npm ci`. Não edite esses arquivos nesta atividade.",
+          "`npm ci` é uma instalação limpa orientada a manifesto e lockfile. Ela exige os dois coerentes, remove a árvore local anterior e falha em vez de atualizar o lockfile se houver divergência. Isso ajuda a CI a instalar uma árvore repetível. O comando ainda baixa componentes e a instalação pode acionar processos definidos pelo ecossistema; use a origem confiável e as proteções da máquina/CI.",
+          "`npm audit` envia uma descrição do grafo de dependências ao registro npm padrão/configurado para comparar com avisos conhecidos. O relatório ajuda a priorizar por severidade, caminho e disponibilidade de correção. Ele não substitui revisão da origem, manutenção, integridade, análise de código nem avaliação de uso. A base de avisos muda; um resultado limpo é apenas ‘não encontrei avisos conhecidos neste grafo, nesta consulta’.",
+          "Não rode `npm audit fix` às cegas. Uma correção pode mudar versões e comportamento, inclusive exigir mudança incompatível; examine diff, changelog, advisory, testes e lockfile. Em ambiente sem rede, faça a inspeção estática do manifesto e do lockfile e anote que a consulta de vulnerabilidades não foi executada.",
+          "Pausa: explique por que lockfile + `npm ci` melhoram reprodução, mas não verificam intenção benigna; depois explique por que `npm audit` sem avisos também não é certificação."
+        ],
+        "terms": [
+          { "term": "Manifesto", "meaning": "Arquivo que declara nome, scripts, versões/faixas e dependências diretas do projeto." },
+          { "term": "Lockfile", "meaning": "Arquivo gerado que registra as escolhas resolvidas da árvore e metadados usados na instalação." },
+          { "term": "npm ci", "meaning": "Instalação limpa a partir de um lockfile compatível, apropriada para reconstrução/CI." },
+          { "term": "npm audit", "meaning": "Consulta pacotes a avisos conhecidos na registry configurada; não é um detector universal de malware." }
+        ]
+      },
+      {
+        "title": "Atualize, responda e acompanhe ao longo do tempo",
+        "paragraphs": [
+          "Quando um aviso afeta uma dependência, localize o caminho transitivo e a versão vulnerável, confira a recomendação do mantenedor e avalie se o trecho vulnerável é usado e qual o impacto. A exposição concreta pode variar, mas uma suposição de ‘não usamos essa função’ precisa de evidência. Priorize risco, disponibilidade de correção, janela de suporte e impacto da mudança; registre quando aceita risco temporário e quem revisará novamente.",
+          "Atualize em branch pequena: altere a dependência por ferramenta apropriada, revise package.json e lockfile, leia o diff, execute testes do domínio e da integração afetada, verifique build/CI e registre rollback. Atualize com cadência e responda a avisos urgentes, em vez de deixar uma pilha grande de mudanças para um único salto. Um scanner precisa ter responsável por triagem e prazo, não apenas um badge verde.",
+          "Para este laboratório, o manifesto e o lockfile ficam dentro de `labs/backend-layers`; a raiz do curso estático não carrega `pg` nem Playwright. `.github/workflows/ci.yml` aponta ao lockfile desse laboratório e roda a instalação antes das verificações. Esse isolamento limita escopo, mas ainda exige inventário e atualização dos pacotes do próprio laboratório.",
+          "A aula é uma inspeção estática versionada. Não executou `npm audit`, não determina se a árvore atual está sem avisos e não altera dependências; o aluno pode realizar uma consulta autorizada e documentada depois, em cópia local e com internet, se necessário."
+        ],
+        "terms": [
+          { "term": "Advisory", "meaning": "Aviso publicado sobre uma vulnerabilidade, escopo afetado e, quando existe, orientação de correção." },
+          { "term": "Triagem", "meaning": "Processo de entender exposição, impacto, prioridade, responsável e prazo para uma descoberta." },
+          { "term": "Proveniência", "meaning": "Informações verificáveis sobre origem e processo de construção de um artefato." }
+        ]
+      }
+    ],
+    "diagramTitle": "Da declaração de dependência ao artefato publicado",
+    "diagram": "Manifesto ──► resolução/lockfile ──► registry e pacotes\n    │                     │                       │\n    └──── revisão de nome, versão, origem, licença e avisos ────┘\n                          │\n                 instalação reprodutível\n                          │\n       CI com permissões mínimas + testes + artefato\n                          │\n       publicação gradual + inventário + atualização\n\nCada seta é uma fronteira de confiança; nenhum scanner elimina o risco.",
+    "guided": [
+      { "instruction": "Abra `labs/backend-layers/package.json` e identifique dependência de runtime e ferramenta de desenvolvimento.", "result": "`pg` suporta conexão PostgreSQL em runtime; `@playwright/test` é ferramenta de desenvolvimento para fluxo de navegador." },
+      { "instruction": "Abra `package-lock.json` e localize uma entrada direta e uma dependência transitiva dela; observe versão, resolved e integrity.", "result": "O lockfile registra pacotes resolvidos e seus metadados; o inventário inclui mais itens que o manifesto. Integrity é um dado de verificação de conteúdo, não prova de que o pacote é benigno." },
+      { "instruction": "Leia `.github/workflows/ci.yml` e encontre a etapa de instalação, o diretório e o arquivo de lock indicado para cache.", "result": "A CI instala na pasta do laboratório com `npm ci` e usa seu lockfile; o site estático não instala os pacotes desse laboratório." }
+    ],
+    "mistakes": [
+      "Achar que lockfile prova que pacote é seguro ou que `npm ci` verifica código malicioso.",
+      "Confundir scanner sem alertas conhecidos com auditoria completa de vulnerabilidade, integridade e licença.",
+      "Olhar só dependências diretas e esquecer as transitivas, ferramentas e pipeline.",
+      "Instalar pacote sem verificar grafia, registry, responsável, licença, manutenção e necessidade.",
+      "Rodar `npm audit fix` sem revisar mudanças incompatíveis, lockfile e testes.",
+      "Acreditar que uma vulnerabilidade sem uso aparente pode ser ignorada sem evidência ou registro de decisão.",
+      "Deixar um alerta sem responsável, prioridade, prazo ou nova verificação."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: a CI executa `npm ci` e termina com erro de que package.json e package-lock.json não correspondem. Preveja se os testes chegaram a rodar e diga quais arquivos e eventos comparar antes de editar.",
+        "expected": "A instalação limpa falha antes dos testes quando manifesto e lockfile divergem. A análise confere diretório da CI, diff dos dois arquivos e comandos recentes de alteração; não apaga o lockfile nem atualiza versões no escuro.",
+        "criteria": ["Identifica instalação como etapa anterior à suíte de testes.", "Compara manifesto, lockfile e pasta usada pelo workflow.", "Não recomenda apagar lockfile ou aplicar update sem revisar a mudança."],
+        "solution": "Primeiro confirme no log que o job parou no npm ci. Depois verifique se a CI está na pasta `labs/backend-layers`, inspecione `git diff -- package.json package-lock.json` nessa pasta e descubra qual comando alterou apenas um dos arquivos. Atualize o lockfile de forma intencional, revise o novo grafo e rode os testes antes de enviar.",
+        "explanation": "npm ci não corrige o lockfile para o manifesto; falhar explicitamente evita que CI use uma árvore não revisada.",
+        "hints": ["A primeira etapa que falha é instalação ou teste?", "A raiz do repositório tem o manifesto ou a subpasta do laboratório?", "Que mudança deveria modificar os dois arquivos juntos?"]
+      },
+      {
+        "prompt": "Alterar: uma tarefa pede biblioteca para formatar uma data, mas `Intl.DateTimeFormat` pode atender. Faça uma matriz de decisão com necessidade, alternativa nativa, pacote/origem, manutenção/licença, dependências transitivas, testes e decisão; use apenas marcadores, sem instalar nada.",
+        "expected": "A matriz compara necessidade real e solução nativa, exige verificar nome/origem, suporte e licença, estima custo transitivo e define testes/rollback. A decisão fica explícita como adiar ou aceitar mediante evidência, sem comando de instalação.",
+        "criteria": ["Compara alternativa nativa e benefício concreto.", "Inclui origem, manutenção, licença e árvore transitiva.", "Define testes de compatibilidade e rollback.", "Não instala pacote nem inventa dados de segurança."],
+        "solution": "Necessidade: formatar datas para interface. Alternativa: Intl.DateTimeFormat cobre idioma e fuso deste requisito. Pacote: `<nome exato>`; origem: `<registry oficial>`; manutenção/licença: `<verificar e registrar>`; dependências transitivas: `<avaliar no lockfile>`; teste: casos de fuso/idioma em módulo local; rollback: remover dependência e retornar à API nativa. Decisão inicial: adiar até surgir requisito que a API nativa não cubra.",
+        "explanation": "A menor dependência possível reduz componentes a inventariar e manter.",
+        "hints": ["Qual caso concreto a API nativa não resolve?", "Que informações ainda não foram verificadas?", "Como outra pessoa repetiria a decisão?"]
+      },
+      {
+        "prompt": "Construir: usando somente os manifestos e workflow versionados, monte um inventário para `pg`, `@playwright/test` e uma dependência transitiva identificada no lockfile. Inclua finalidade, tipo, versão resolvida, origem declarada, licença, evidência de manutenção e próxima ação; se um dado exigir consulta externa, marque como pendente.",
+        "expected": "O inventário diferencia runtime/dev/transitiva, registra versões e metadados observados, marca manutenção e alertas como não verificados quando não há evidência atual e não afirma segurança ou licença além do arquivo consultado.",
+        "criteria": ["Distingue dependência direta e transitiva e uso runtime/dev.", "Registra apenas campos observados nos arquivos.", "Marca status de manutenção/avisos como pendente sem consulta atual.", "Não classifica pacote como seguro a partir do lockfile."],
+        "solution": "Use as dependências declaradas `pg` e `@playwright/test` como diretas e selecione um pacote sob `node_modules/pg/...` ou outra entrada transitiva do lockfile. Copie versão, registry/resolved, license e integridade visíveis; associe uso pelo manifesto/árvore. Para atividade de manutenção e avisos atuais, escreva `pendente — exige consulta às fontes do mantenedor e advisory database`; não invente conclusão.",
+        "explanation": "Inventário confiável separa observação local de informação atual que ainda não foi pesquisada.",
+        "hints": ["Quais dados vêm dos arquivos versionados?", "O que depende de consulta atual?", "O fato de haver hash demonstra intenção benigna?"]
+      },
+      {
+        "prompt": "Investigar erro: uma atualização proposta altera package.json e renova muitos pacotes no lockfile; os testes de API falham. Escreva um plano de triagem para identificar a menor mudança causadora, avaliar aviso de segurança, compatibilidade e rollback sem publicar nem atualizar todas as dependências.",
+        "expected": "O plano identifica primeiro pacote/caminho e a mudança de versão, confere changelog/advisory oficial, reproduz testes locais na branch, reduz o diff/atualiza em passos e só então propõe correção/rollback documentado; não promove a mudança sem CI verde.",
+        "criteria": ["Localiza mudança de dependência e caminho afetado antes de trocar várias versões.", "Consulta advisory e compatibilidade por fonte apropriada.", "Usa testes na branch e preserva evidência antes/depois.", "Define rollback e não publica versão reprovada."],
+        "solution": "Na branch, registre o commit base e o resultado de testes. Compare o lockfile para localizar pacote e versões alterados; consulte advisory oficial e notas do mantenedor. Reproduza o primeiro teste que falhou. Separe atualizações em mudanças pequenas, corrija incompatibilidade ou reverta o pacote que a introduziu, rode toda a suíte e peça CI verde antes de promover. Registre o risco tratado e o rollback.",
+        "explanation": "Um patch de segurança é importante, mas uma atualização sem compatibilidade também pode quebrar o serviço; revisão e teste completam a resposta.",
+        "hints": ["Qual foi o primeiro teste vermelho e qual pacote mudou antes dele?", "O advisory se aplica a esta versão e a este caminho transitivo?", "Como voltar ao último estado comprovado?"]
+      }
+    ],
+    "quiz": [
+      { "question": "O que o lockfile permite concluir com mais segurança?", "options": ["Que os pacotes são benignos.", "Quais escolhas resolvidas e metadados a instalação usa.", "Que nenhuma vulnerabilidade será descoberta depois."], "correctIndex": 1, "explanation": "O arquivo apoia inventário/reprodução, mas não garante segurança futura ou intenção do publicador." },
+      { "question": "Qual opção descreve uma dependência transitiva?", "options": ["Pacote necessário por outra dependência do projeto.", "Qualquer pasta no repositório.", "Uma variável de ambiente."], "correctIndex": 0, "explanation": "O grafo inclui pacotes que o projeto não declara diretamente." },
+      { "question": "O que significa `npm audit` sem vulnerabilidades conhecidas no relatório?", "options": ["Todo o código foi provado seguro.", "Não foram encontrados avisos conhecidos no grafo consultado naquele momento.", "A licença de cada pacote é compatível."], "correctIndex": 1, "explanation": "A base muda e não detecta todo risco de integridade, manutenção, licença ou código malicioso." },
+      { "question": "Por que revisar o diff e rodar testes após atualizar uma dependência?", "options": ["Porque correções podem alterar versões e comportamento, inclusive de modo incompatível.", "Porque o lockfile não pode ser versionado.", "Para remover todas as dependências transitivas."], "correctIndex": 0, "explanation": "Atualizar corrige riscos, mas precisa preservar o contrato do produto e permitir rollback." }
+    ],
+    "summary": [
+      "A03:2025 abrange a cadeia de construção, distribuição e atualização, não apenas CVEs em bibliotecas.",
+      "Inventarie dependências diretas, transitivas, ferramentas, CI e origem; minimize o que não é necessário.",
+      "Manifesto, lockfile, npm ci e npm audit têm funções complementares e limites diferentes.",
+      "Revise atualizações em passos pequenos com advisory, compatibilidade, testes, CI e rollback.",
+      "A inspeção desta aula é estática; não afirma estado atual de vulnerabilidades nem execução de auditoria."
+    ]
+  },
   "delivery-requirements": {
     "prerequisites": "Concluir setup-node, delivery-forms e delivery-ci; ter a lista de estudos do laboratório e saber alterar funções e testes. O exemplo usa apenas Node.",
     "setup": "Na pasta da aula, salve o exemplo como requisito.js no editor. No terminal aberto nessa pasta, execute node requisito.js; a saída esperada é false e true em linhas separadas. O processo termina sozinho; para retomar, execute o mesmo comando. Se node não for reconhecido, revise setup-node. Use a lista de estudos da aula delivery-forms para planejar a integração, mas este arquivo não altera server.js. Escreva critérios antes de editar o projeto.",
@@ -2811,6 +2952,11 @@ Object.assign(LESSON_GUIDES, {
       prompt: "Uma rota de relatórios aceita uma página grande e também pode ser chamada muitas vezes por conta. Proponha testes locais unitários da política para limite por pedido, quota por conta, resposta 429, isolamento entre contas fictícias e nenhuma gravação após rejeição. Explique por que isso não é um teste de carga nem prova da capacidade do Preview.",
       expected: "Os testes usam poucos casos determinísticos e estado isolado: o limite dentro da faixa permite; excesso de tamanho recebe resposta do contrato; excesso da quota recebe 429 e Retry-After; contas têm contadores separados; pedido recusado não grava. Não envia carga nem afirma comportamento remoto.",
       hint: "Teste a regra e o efeito sobre o estado com uma quantidade pequena e conhecida de chamadas em ambiente local próprio."
+    },
+    "delivery-supply-chain": {
+      prompt: "Uma dependência direta parece saudável, mas o lockfile mostra muitos pacotes transitivos. Faça triagem de necessidade, origem, integridade registrada, manutenção/licença, avisos conhecidos, CI e plano de atualização sem instalar nem auditar automaticamente.",
+      expected: "A triagem separa campos observados no manifesto/lockfile de consultas atuais pendentes, verifica origem e licença, avalia a árvore transitiva, confere escopo de CI e exige responsável/testes/rollback; não chama lockfile ou scanner de garantia de segurança.",
+      hint: "Marque cada afirmação como observada no repositório ou pendente de verificação atual."
     },
     "delivery-ci": {
       prompt: "Uma publicação altera a validação de minutos e o POST começa a aceitar -5. Defina um teste que falhe antes da correção, indique onde a CI deve executá-lo e descreva como conter a versão ruim enquanto investiga.",

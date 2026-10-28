@@ -5231,7 +5231,8 @@
               "Distinguir autenticação de autorização e reconhecer BOLA/IDOR como falha de controle de acesso a um objeto.",
               "Executar o laboratório local com contas e progresso fictícios, observar a rota vulnerável e a corrigida.",
               "Propor testes positivos e negativos que confirmem acesso próprio e bloqueiem acesso cruzado.",
-              "Relacionar A05 Injection à aula `db-security`, que usa parâmetros SQLite e testa entrada de aparência SQL como dado literal."
+              "Relacionar A05 Injection à aula `db-security`, que usa parâmetros SQLite e testa entrada de aparência SQL como dado literal.",
+              "Relacionar A03 Software Supply Chain Failures à aula `delivery-supply-chain` sem reduzir a categoria a dependências com CVE."
             ],
             "exercise": "Siga `labs/security-basics/README.md`, compare a resposta das rotas vulnerável e corrigida e explique qual verificação falta em cada requisição.",
             "code": "OWASP Top 10 2025 — categorias de conscientização\nA01 Broken Access Control             A06 Insecure Design\nA02 Security Misconfiguration          A07 Authentication Failures\nA03 Software Supply Chain Failures     A08 Software or Data Integrity Failures\nA04 Cryptographic Failures              A09 Security Logging & Alerting Failures\nA05 Injection                           A10 Mishandling of Exceptional Conditions\n\nExperimento local (somente IDs e tokens fictícios):\nGET /demo/vulnerable/progress/aluno-b  → token A; resposta 200 com marcador B\nGET /demo/fixed/progress/aluno-b      → token A; resposta 404 sem dados de B\n\nA01: a sessão está autenticada, mas a autorização do objeto não foi verificada.",
@@ -5326,6 +5327,46 @@
                 "kind": "doc",
                 "title": "MDN · CORS",
                 "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS",
+                "language": "EN"
+              }
+            ]
+          },
+          {
+            "id": "delivery-supply-chain",
+            "title": "Dependências e cadeia de suprimentos de software",
+            "minutes": 100,
+            "concept": "Analise dependências diretas e transitivas, origem, manutenção, lockfile, auditoria, CI e mudanças de versão como partes de uma cadeia de confiança — sem tratar um scan ou lockfile como garantia de segurança.",
+            "objectives": [
+              "Explicar por que A03:2025 abrange dependências, ferramentas, repositórios, CI e distribuição, além de vulnerabilidades conhecidas.",
+              "Ler package.json e package-lock.json para separar dependências de execução, ferramentas de desenvolvimento e dependências transitivas.",
+              "Descrever o alcance e os limites de npm ci e npm audit, inclusive que auditoria consulta a registry configurada e não prova ausência de código malicioso.",
+              "Planejar uma atualização pequena com revisão de origem, licença, manutenção, compatibilidade, diff, testes e rollback."
+            ],
+            "exercise": "Inspecione os manifestos do laboratório backend e produza um inventário fictício/reprodutível com papel, origem, risco, evidência e próximo passo; não altere as dependências.",
+            "code": "INSPEÇÃO SOMENTE DE LEITURA — labs/backend-layers\npackage.json: pg 8.23.1 (execução), @playwright/test 1.64.1 (desenvolvimento)\npackage-lock.json: versões e dependências transitivas resolvidas\n.github/workflows/ci.yml: npm ci instala a partir do lockfile\n\nPerguntas para revisão:\n1. A dependência é necessária e de fonte confiável?\n2. Quem mantém o pacote e como verificar avisos?\n3. O lockfile corresponde ao manifesto?\n4. Que teste detecta uma atualização incompatível?\n5. Que acesso a CI e segredos é realmente necessário?\n\nEste retrato é estático; não afirma que versões estão sem vulnerabilidades.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "OWASP Top 10 2025 · A03 em português",
+                "url": "https://top10.owasp.org/2025/pt-BR/A03_2025-Software_Supply_Chain_Failures/",
+                "language": "PT-BR"
+              },
+              {
+                "kind": "doc",
+                "title": "npm Docs · npm ci",
+                "url": "https://docs.npmjs.com/cli/commands/npm-ci/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "npm Docs · Auditing package dependencies",
+                "url": "https://docs.npmjs.com/auditing-package-dependencies-for-security-vulnerabilities/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "npm Docs · Scripts",
+                "url": "https://docs.npmjs.com/cli/using-npm/scripts/",
                 "language": "EN"
               }
             ]
