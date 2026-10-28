@@ -8,15 +8,60 @@ const { criarRepositorioEstudosPostgres } = require('./src/repositorio-estudos-p
 const { criarRepositorioEstudos } = require('./src/repositorio-estudos-memoria.cjs');
 const { criarClienteOpenMeteo } = require('./src/cliente-open-meteo.cjs');
 const { criarRotaPrevisao } = require('./src/rota-previsao.cjs');
+const { criarLimitadorRedis } = require('./src/rate-limiter-redis.cjs');
+const { criarLimitadorEmMemoria } = require('./src/rate-limiter-memory.cjs');
+const { createClient } = require('redis');
 
 const pagina = path.join(__dirname, 'index.html');
 const paginaDemo = path.join(__dirname, 'demo', 'index.html');
 const scriptDemo = path.join(__dirname, 'demo', 'app.js');
 const limiteCorpo = 1024;
 
-function responderJson(res, status, dados) {
-  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
+function responderJson(res, status, dados, cabecalhos = {}) {
+  res.writeHead(status, {
+    'Content-Type': 'application/json; charset=utf-8',
+    ...cabecalhos
+  });
   res.end(JSON.stringify(dados));
+}
+
+function obterIdentidadePorIpObservado(req) {
+  const endereco = req.socket.remoteAddress;
+  if (typeof endereco !== 'string' || !endereco.trim()) {
+    throw new Error('Endereço remoto indisponível');
+  }
+  return endereco.startsWith('::ffff:') ? endereco.slice('::ffff:'.length) : endereco;
+}
+
+async function verificarLimiteDeGravacao(req, res, limitador) {
+  let decisao;
+  try {
+    decisao = await limitador.verificar(obterIdentidadePorIpObservado(req));
+    if (
+      !decisao ||
+      typeof decisao.permitido !== 'boolean' ||
+      !Number.isInteger(decisao.tentarDepoisDeSegundos) ||
+      decisao.tentarDepoisDeSegundos < 1
+    ) {
+      throw new Error('Resposta inválida do limitador');
+    }
+  } catch (erro) {
+    const codigo = erro && (erro.code || erro.name);
+    console.error(`Falha no rate limit: ${codigo || 'erro desconhecido'}`);
+    responderJson(res, 503, { erro: 'Limitador temporariamente indisponível.' });
+    return false;
+  }
+
+  if (!decisao.permitido) {
+    responderJson(
+      res,
+      429,
+      { erro: 'Limite de gravações atingido. Tente novamente depois.' },
+      { 'Retry-After': String(decisao.tentarDepoisDeSegundos) }
+    );
+    return false;
+  }
+  return true;
 }
 
 async function lerJson(req) {
@@ -34,7 +79,7 @@ async function lerJson(req) {
   }
 }
 
-async function responder(req, res, servico, rotaPrevisao) {
+async function responder(req, res, servico, rotaPrevisao, limitador) {
   if (req.method === 'GET' && req.url === '/') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     fs.createReadStream(pagina).pipe(res);
@@ -62,6 +107,7 @@ async function responder(req, res, servico, rotaPrevisao) {
     return;
   }
   if (req.method === 'POST' && req.url === '/api/estudos') {
+    if (!await verificarLimiteDeGravacao(req, res, limitador)) return;
     if (!/^application\/json(?:\s*;|\s*$)/i.test(req.headers['content-type'] || '')) {
       responderJson(res, 415, { erro: 'Use Content-Type: application/json' });
       return;
@@ -80,6 +126,7 @@ async function responder(req, res, servico, rotaPrevisao) {
     return;
   }
   if (req.method === 'POST' && req.url === '/api/estudos-com-sessao') {
+    if (!await verificarLimiteDeGravacao(req, res, limitador)) return;
     if (!/^application\/json(?:\s*;|\s*$)/i.test(req.headers['content-type'] || '')) {
       responderJson(res, 415, { erro: 'Use Content-Type: application/json' });
       return;
@@ -100,10 +147,13 @@ async function responder(req, res, servico, rotaPrevisao) {
   responderJson(res, 404, { erro: 'Rota não encontrada' });
 }
 
-function criarServidor(servico, servicoPrevisao) {
+function criarServidor(servico, servicoPrevisao, limitador) {
+  if (!limitador || typeof limitador.verificar !== 'function') {
+    throw new TypeError('Informe um limitador de gravações com verificar()');
+  }
   const rotaPrevisao = criarRotaPrevisao(servicoPrevisao);
   return http.createServer((req, res) => {
-    responder(req, res, servico, rotaPrevisao).catch((erro) => {
+    responder(req, res, servico, rotaPrevisao, limitador).catch((erro) => {
       console.error(`Falha interna na API: ${erro.code || erro.name || 'erro desconhecido'}`);
       if (!res.headersSent) {
         responderJson(res, 500, { erro: 'Falha interna do servidor' });
@@ -115,26 +165,70 @@ function criarServidor(servico, servicoPrevisao) {
 }
 
 if (require.main === module) {
-  const usarMemoria = process.env.BACKEND_STORAGE === 'memory';
-  const repositorio = usarMemoria
-    ? criarRepositorioEstudos()
-    : criarRepositorioEstudosPostgres();
-  const servico = criarServicoEstudos(repositorio);
-  const servicoPrevisao = criarClienteOpenMeteo();
-  const servidor = criarServidor(servico, servicoPrevisao);
-  servidor.listen(4180, '127.0.0.1', () => {
-    console.log(`Abra http://127.0.0.1:4180 · armazenamento: ${usarMemoria ? 'memória (temporário)' : 'PostgreSQL'}`);
-  });
+  async function iniciar() {
+    const usarMemoria = process.env.BACKEND_STORAGE === 'memory';
+    const repositorio = usarMemoria
+      ? criarRepositorioEstudos()
+      : criarRepositorioEstudosPostgres();
+    const servico = criarServicoEstudos(repositorio);
+    const servicoPrevisao = criarClienteOpenMeteo();
+    let clienteRedis;
+    let limitador;
 
-  function encerrar() {
-    servidor.close(async () => {
-      if (repositorio.encerrar) await repositorio.encerrar();
-      console.log('Servidor encerrado');
+    if (usarMemoria) {
+      limitador = criarLimitadorEmMemoria();
+    } else {
+      clienteRedis = createClient({
+        url: process.env.REDIS_URL || 'redis://127.0.0.1:56380',
+        disableOfflineQueue: true,
+        commandsQueueMaxLength: 100,
+        commandOptions: { timeout: 1000 },
+        socket: {
+          connectTimeout: 1000,
+          reconnectStrategy: false
+        }
+      });
+      clienteRedis.on('error', (erro) => {
+        const codigo = erro && (erro.code || erro.name);
+        console.error(`Falha na conexão Redis: ${codigo || 'erro desconhecido'}`);
+      });
+      limitador = criarLimitadorRedis(clienteRedis, {
+        limite: Number(process.env.RATE_LIMIT_MAX_REQUESTS || 3),
+        janelaSegundos: Number(process.env.RATE_LIMIT_WINDOW_SECONDS || 60)
+      });
+      try {
+        await clienteRedis.connect();
+      } catch (erro) {
+        if (clienteRedis.isOpen) clienteRedis.destroy();
+        throw erro;
+      }
+    }
+
+    const servidor = criarServidor(servico, servicoPrevisao, limitador);
+    servidor.listen(4180, '127.0.0.1', () => {
+      const modoLimite = usarMemoria ? 'memória local (temporário)' : 'Redis';
+      console.log(
+        `Abra http://127.0.0.1:4180 · armazenamento: ${usarMemoria ? 'memória (temporário)' : 'PostgreSQL'} · rate limit: ${modoLimite}`
+      );
     });
+
+    function encerrar() {
+      servidor.close(async () => {
+        if (repositorio.encerrar) await repositorio.encerrar();
+        if (clienteRedis && clienteRedis.isOpen) clienteRedis.destroy();
+        console.log('Servidor encerrado');
+      });
+    }
+
+    process.once('SIGINT', encerrar);
+    process.once('SIGTERM', encerrar);
   }
 
-  process.once('SIGINT', encerrar);
-  process.once('SIGTERM', encerrar);
+  iniciar().catch((erro) => {
+    const codigo = erro && (erro.code || erro.name);
+    console.error(`Não foi possível iniciar a API: ${codigo || 'erro desconhecido'}`);
+    process.exitCode = 1;
+  });
 }
 
 module.exports = { criarServidor };

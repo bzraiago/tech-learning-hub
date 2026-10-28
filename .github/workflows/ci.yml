@@ -27,6 +27,15 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
+      redis:
+        image: redis:8.8.4-alpine3.23
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s
+          --health-timeout 2s
+          --health-retries 15
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -48,6 +57,13 @@ jobs:
       - name: Run unit tests
         working-directory: labs/backend-layers
         run: npm test
+
+      - name: Test Redis-backed HTTP rate limiter
+        working-directory: labs/backend-layers
+        env:
+          RUN_REDIS_INTEGRATION: '1'
+          REDIS_URL: redis://127.0.0.1:6379
+        run: npm run test:redis
 
       - name: Configure disposable PostgreSQL connection
         working-directory: labs/backend-layers

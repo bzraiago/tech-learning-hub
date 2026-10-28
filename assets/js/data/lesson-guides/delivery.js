@@ -1688,7 +1688,7 @@ Object.assign(LESSON_GUIDES, {
         "API4:2023 trata de consumo irrestrito de recursos: banda, CPU, memória, armazenamento e serviços cobrados por chamada podem ser excedidos por parâmetros, lote, upload ou ausência de timeout/limite.",
         "API6:2023 trata de acesso irrestrito a um fluxo de negócio sensível: operações individualmente válidas, como comentar, reservar ou enviar convites, podem causar dano quando automatizadas ou repetidas sem controle adequado.",
         "Rate limit controla taxa numa janela; quota pode limitar volume/custo acumulado; limite de corpo/página/tempo controla o peso de cada operação. Os controles se complementam, mas não substituem autorização.",
-        "O laboratório `backend-validation` já rejeita corpo acima de 1024 bytes com 413 e valida título; isso é limitação de entrada, não rate limiter. `backend-layers` trata duplicidade com 409, que também não é limite de taxa."
+        "O laboratório `backend-validation` rejeita corpo acima de 1024 bytes com 413; isso é limitação de entrada, não rate limiter. `backend-layers` trata duplicidade com 409 e agora limita tentativas de POST com Redis, que responde 429; cada status descreve uma causa diferente."
       ]
     },
     "sections": [
@@ -1728,7 +1728,7 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "Para cada fluxo, escreva quem pode iniciá-lo, qual benefício legítimo entrega, qual recurso consome, qual dano o excesso causa e que limite preserva acesso justo. Exemplos fictícios: impedir que relatórios muito grandes bloqueiem o salvamento; limitar convites repetidos; limitar reservas simultâneas; restringir criação automática de sessões; definir orçamento de SMS/e-mail.",
           "Evite regra sem conta: ‘no máximo 5’ precisa dizer por pessoa, tenant, IP ou instalação; janela móvel ou fixa; o que conta como tentativa; quando reseta; se a operação tem custo; como tratar retry legítimo; e qual sinal alerta a equipe. Comece pelo comportamento de pessoas reais e pelos custos/contratos do provedor, não por número arbitrário copiado de uma postagem.",
-          "Proteja também leitura e CPU: não permita qualquer parâmetro de ordenação SQL, expansão ilimitada, busca sem paginação, filtros caros e formatos de relatório sem restrição. O capítulo `db-security` separa parametrização e proprietário; `backend-validation` demonstra tamanho máximo de corpo; `backend-layers` inclui queries e limites do domínio. Nenhum deles sozinho é um sistema completo de rate limiting.",
+          "Proteja também leitura e CPU: não permita qualquer parâmetro de ordenação SQL, expansão ilimitada, busca sem paginação, filtros caros e formatos de relatório sem restrição. O capítulo `db-security` separa parametrização e proprietário; `backend-validation` demonstra tamanho máximo de corpo; `backend-layers` inclui queries, limites do domínio e rate limit local por IP observado. Nenhum desses controles sozinho é proteção completa.",
           "Métricas devem ajudar a decidir: quantidade permitida/rejeitada por rota e classe, latência, fila, erros do fornecedor e custo. Não grave token, conteúdo de anotação nem identificador pessoal desnecessário. Agregue ou pseudonimize conforme necessidade e retenção; alerta precisa ter responsável e resposta.",
           "Um limite centralizado em processo pode reiniciar e perder contadores ou divergirem entre réplicas. Um armazenamento compartilhado, por exemplo Redis, pode sincronizar contadores, mas traz custo, expiração, particionamento e indisponibilidade. A implementação prática e os trade-offs serão tratados na Fase 7.4; esta aula não afirma que o projeto já esteja limitado."
         ],
@@ -1744,7 +1744,7 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "Comece com testes unitários da política, sem tráfego alto: dentro do limite a chamada é permitida; acima, recebe 429; o estado reseta conforme janela; uma conta não consome a quota de outra; um corpo/página acima do máximo recebe 413/400 conforme contrato; serviço limitador indisponível segue uma decisão de fail-open/fail-closed documentada. Teste relógio e concorrência com cenário determinístico.",
           "Em integração local, use poucos pedidos, dados fictícios e uma API própria. Registre quantidade, janela, identidade fictícia, status, cabeçalhos e efeito; confirme que nenhum request recusado causou gravação. Teste desempenho ou carga somente em ambiente isolado, com autorização e limite operacional. Não faça flood, stress test ou simulação automatizada em Preview público, API de provedor ou serviço de outra pessoa.",
-          "Os laboratórios existentes não implementam um rate limiter: `backend-validation` protege tamanho do corpo e campos; `backend-layers` demonstra conflito, timeout de API externa e teste de integração. Use esses controles como partes do contrato. A implementação de contador com Redis, TTL, janela, retry e fallback pertence à Fase 7.4.",
+          "`backend-validation` protege tamanho do corpo e campos. `backend-layers` agora usa Redis e Lua para limitar os dois POSTs a três tentativas por IP observado em uma janela fixa de 60 segundos; o teste local confirma 429, Retry-After e ausência da quarta gravação. Como a API de laboratório não autentica contas, isso não comprova quota por usuário, proteção atrás de proxy nem desempenho. A medição e os próximos controles operacionais permanecem na Fase 7.4.",
           "Pausa: para uma quota que atingiu limite, escreva um critério observável para 429 e um teste que mostre que a operação proibida não foi aplicada. Não simule carga contra endpoint remoto."
         ],
         "terms": [
@@ -1816,7 +1816,7 @@ Object.assign(LESSON_GUIDES, {
       "Combine limites de entrada, tamanho de página, tempo, concorrência, identidade, quota e custo.",
       "Use 429/Retry-After para política de taxa e status distintos para causas distintas.",
       "Idempotência, CAPTCHA e IP são controles parciais, não defesas universais.",
-      "O curso só faz análises com dados fictícios; rate limiting distribuído será implementado na Fase 7.4 com Redis."
+      "O rate limit Redis de laboratório é executado localmente com identidade por IP observado; quota por conta validada e medição antes/depois continuam pendentes."
     ]
   },
   "delivery-supply-chain": {
@@ -1825,14 +1825,14 @@ Object.assign(LESSON_GUIDES, {
     "why": "Um aplicativo herda riscos dos componentes e ferramentas que o constroem e atualizam. Uma dependência pode estar vulnerável, abandonada, comprometida ou vir de uma fonte inesperada; CI, credenciais de publicação e artefatos também integram a cadeia. O lockfile e o scanner ajudam a controlar parte desse risco, sem atestar que cada código é benigno.",
     "example": {
       "language": "text",
-      "code": "MAPA ESTÁTICO DO LABORATÓRIO\n\npackage.json\n├── dependencies: pg 8.23.1 — necessário em runtime para PostgreSQL\n└── devDependencies: @playwright/test 1.64.1 — testes de navegador\n\npackage-lock.json\n├── fixa o grafo resolvido e registra metadados dos pacotes\n└── inclui também dependências transitivas (pacotes usados por outros pacotes)\n\n.github/workflows/ci.yml\n└── executa npm ci com esse lockfile antes dos testes\n\nConclusão segura: arquivos registram escolhas e tornam a instalação revisável/reproduzível.\nConclusão que NÃO se pode tirar: “todos os pacotes são seguros e sem vulnerabilidades”.",
+      "code": "MAPA ESTÁTICO DO LABORATÓRIO\n\npackage.json\n├── dependencies: pg 8.23.1 — PostgreSQL em runtime\n├── dependencies: redis 6.3.0 — limitador Redis em runtime\n└── devDependencies: @playwright/test 1.64.1 — testes de navegador\n\npackage-lock.json\n├── fixa o grafo resolvido e registra metadados dos pacotes\n└── inclui também dependências transitivas (pacotes usados por outros pacotes)\n\n.github/workflows/ci.yml\n└── executa npm ci com esse lockfile antes dos testes\n\nConclusão segura: arquivos registram escolhas e tornam a instalação revisável/reproduzível.\nConclusão que NÃO se pode tirar: “todos os pacotes são seguros e sem vulnerabilidades”.",
       "expected": "A leitura separa dependência direta de transitiva e runtime de ferramenta de desenvolvimento; explica a função do lockfile e de `npm ci`, mas não atribui nota de segurança nem conclui ausência de vulnerabilidades.",
       "explanation": [
         "A03:2025 amplia o foco além de componentes com vulnerabilidade conhecida: também considera comprometimentos em construção, distribuição, atualização, ferramentas e dependências.",
         "O `package.json` declara o que o projeto pede diretamente; o lockfile registra o grafo resolvido para a instalação usada pelo ecossistema npm. Dependência direta pode trazer vários pacotes transitivos.",
         "`npm ci` exige lockfile compatível com o manifesto, instala o projeto a partir dele e falha em caso de divergência. Repetibilidade não garante que o pacote selecionado seja benigno ou esteja livre de falhas.",
         "`npm audit` consulta a registry padrão/configurada para comparar o grafo com avisos conhecidos. Um relatório sem vulnerabilidades conhecidas não detecta todo código malicioso, bug sem aviso, dependência não inventariada ou comprometimento futuro.",
-        "No laboratório, `pg` é dependência de execução e `@playwright/test` é de desenvolvimento. A CI chama `npm ci`; essa leitura é uma fotografia do repositório, não uma auditoria atual das versões."
+        "No laboratório, `pg` e `redis` são dependências de execução; `@playwright/test` é de desenvolvimento. A CI chama `npm ci`; a atividade examina o manifesto e o lockfile sem transformar essa leitura em certificação de segurança."
       ]
     },
     "sections": [
@@ -1868,7 +1868,7 @@ Object.assign(LESSON_GUIDES, {
       {
         "title": "Manifesto, lockfile e auditoria cumprem papéis diferentes",
         "paragraphs": [
-          "No laboratório, abra `package.json`: `pg` é usado pelo servidor para PostgreSQL; `@playwright/test` dá suporte aos testes de interface. Abra o começo de `package-lock.json`, confira versões, origem do pacote, integridade registrada e entradas dos pacotes transitivos. Compare com `.github/workflows/ci.yml` e identifique em qual pasta o workflow executa `npm ci`. Não edite esses arquivos nesta atividade.",
+          "No laboratório, abra `package.json`: `pg` conecta o servidor ao PostgreSQL, `redis` dá suporte ao rate limit distribuído, e `@playwright/test` aos testes de interface. Abra o começo de `package-lock.json`, confira versões, origem do pacote, integridade registrada e entradas dos pacotes transitivos. Compare com `.github/workflows/ci.yml` e identifique em qual pasta o workflow executa `npm ci`. Não edite esses arquivos nesta atividade.",
           "`npm ci` é uma instalação limpa orientada a manifesto e lockfile. Ela exige os dois coerentes, remove a árvore local anterior e falha em vez de atualizar o lockfile se houver divergência. Isso ajuda a CI a instalar uma árvore repetível. O comando ainda baixa componentes e a instalação pode acionar processos definidos pelo ecossistema; use a origem confiável e as proteções da máquina/CI.",
           "`npm audit` envia uma descrição do grafo de dependências ao registro npm padrão/configurado para comparar com avisos conhecidos. O relatório ajuda a priorizar por severidade, caminho e disponibilidade de correção. Ele não substitui revisão da origem, manutenção, integridade, análise de código nem avaliação de uso. A base de avisos muda; um resultado limpo é apenas ‘não encontrei avisos conhecidos neste grafo, nesta consulta’.",
           "Não rode `npm audit fix` às cegas. Uma correção pode mudar versões e comportamento, inclusive exigir mudança incompatível; examine diff, changelog, advisory, testes e lockfile. Em ambiente sem rede, faça a inspeção estática do manifesto e do lockfile e anote que a consulta de vulnerabilidades não foi executada.",
@@ -1899,7 +1899,7 @@ Object.assign(LESSON_GUIDES, {
     "diagramTitle": "Da declaração de dependência ao artefato publicado",
     "diagram": "Manifesto ──► resolução/lockfile ──► registry e pacotes\n    │                     │                       │\n    └──── revisão de nome, versão, origem, licença e avisos ────┘\n                          │\n                 instalação reprodutível\n                          │\n       CI com permissões mínimas + testes + artefato\n                          │\n       publicação gradual + inventário + atualização\n\nCada seta é uma fronteira de confiança; nenhum scanner elimina o risco.",
     "guided": [
-      { "instruction": "Abra `labs/backend-layers/package.json` e identifique dependência de runtime e ferramenta de desenvolvimento.", "result": "`pg` suporta conexão PostgreSQL em runtime; `@playwright/test` é ferramenta de desenvolvimento para fluxo de navegador." },
+      { "instruction": "Abra `labs/backend-layers/package.json` e identifique dependências de runtime e ferramenta de desenvolvimento.", "result": "`pg` suporta conexão PostgreSQL e `redis` o limitador distribuído em runtime; `@playwright/test` é ferramenta de desenvolvimento para fluxo de navegador." },
       { "instruction": "Abra `package-lock.json` e localize uma entrada direta e uma dependência transitiva dela; observe versão, resolved e integrity.", "result": "O lockfile registra pacotes resolvidos e seus metadados; o inventário inclui mais itens que o manifesto. Integrity é um dado de verificação de conteúdo, não prova de que o pacote é benigno." },
       { "instruction": "Leia `.github/workflows/ci.yml` e encontre a etapa de instalação, o diretório e o arquivo de lock indicado para cache.", "result": "A CI instala na pasta do laboratório com `npm ci` e usa seu lockfile; o site estático não instala os pacotes desse laboratório." }
     ],
@@ -1930,10 +1930,10 @@ Object.assign(LESSON_GUIDES, {
         "hints": ["Qual caso concreto a API nativa não resolve?", "Que informações ainda não foram verificadas?", "Como outra pessoa repetiria a decisão?"]
       },
       {
-        "prompt": "Construir: usando somente os manifestos e workflow versionados, monte um inventário para `pg`, `@playwright/test` e uma dependência transitiva identificada no lockfile. Inclua finalidade, tipo, versão resolvida, origem declarada, licença, evidência de manutenção e próxima ação; se um dado exigir consulta externa, marque como pendente.",
+        "prompt": "Construir: usando somente os manifestos e workflow versionados, monte um inventário para `pg`, `redis`, `@playwright/test` e uma dependência transitiva identificada no lockfile. Inclua finalidade, tipo, versão resolvida, origem declarada, licença, evidência de manutenção e próxima ação; se um dado exigir consulta externa, marque como pendente.",
         "expected": "O inventário diferencia runtime/dev/transitiva, registra versões e metadados observados, marca manutenção e alertas como não verificados quando não há evidência atual e não afirma segurança ou licença além do arquivo consultado.",
         "criteria": ["Distingue dependência direta e transitiva e uso runtime/dev.", "Registra apenas campos observados nos arquivos.", "Marca status de manutenção/avisos como pendente sem consulta atual.", "Não classifica pacote como seguro a partir do lockfile."],
-        "solution": "Use as dependências declaradas `pg` e `@playwright/test` como diretas e selecione um pacote sob `node_modules/pg/...` ou outra entrada transitiva do lockfile. Copie versão, registry/resolved, license e integridade visíveis; associe uso pelo manifesto/árvore. Para atividade de manutenção e avisos atuais, escreva `pendente — exige consulta às fontes do mantenedor e advisory database`; não invente conclusão.",
+        "solution": "Use as dependências declaradas `pg`, `redis` e `@playwright/test` como diretas e selecione um pacote sob `node_modules/pg/...` ou outra entrada transitiva do lockfile. Copie versão, registry/resolved, license e integridade visíveis; associe uso pelo manifesto/árvore. Para atividade de manutenção e avisos atuais, escreva `pendente — exige consulta às fontes do mantenedor e advisory database`; não invente conclusão.",
         "explanation": "Inventário confiável separa observação local de informação atual que ainda não foi pesquisada.",
         "hints": ["Quais dados vêm dos arquivos versionados?", "O que depende de consulta atual?", "O fato de haver hash demonstra intenção benigna?"]
       },
@@ -2206,19 +2206,19 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
   "delivery-redis-rate-limit": {
-    "prerequisites": "Concluir `delivery-redis-foundations`, `delivery-api-abuse` e `delivery-http`; saber request/response, status HTTP e identidade autenticada.",
-    "setup": "Na pasta `labs/redis-fundamentals`, inicie o container com `docker compose up -d --wait` (ou `docker-compose up -d --wait`) e execute `node check-rate-limit.cjs`. A saída esperada termina em `Rate limiter Redis: PASS`; três chamadas são permitidas, a quarta limitada e uma segunda chave tem contador separado. O verificador envia poucas chamadas determinísticas ao Redis local, apaga apenas as keys que cria e não envia tráfego HTTP nem carga. Sem Docker, siga o diagrama e responda os exercícios sem afirmar execução.",
-    "why": "Rate limiting limita volume/frequência, enquanto limite por corpo controla o custo de uma chamada. Redis pode compartilhar contadores entre instâncias; algoritmo, chave, privacidade, atomicidade e modo de falha precisam ser decisões explícitas.",
+    "prerequisites": "Concluir `delivery-redis-foundations`, `delivery-api-abuse` e `delivery-http`; saber request/response, status HTTP e diferenciar IP observado de identidade autenticada.",
+    "setup": "Na pasta `labs/backend-layers`, siga o README até preparar `.env` e instalar dependências (`npm.cmd ci` no Windows; `npm ci` em macOS/Linux). Inicie os containers com `docker compose up -d --wait`; Redis fica em `127.0.0.1:56380`, sem volume. No PowerShell, defina `$env:RUN_REDIS_INTEGRATION = '1'`, execute `npm.cmd run test:redis` e depois `Remove-Item Env:RUN_REDIS_INTEGRATION`; em macOS/Linux, execute `RUN_REDIS_INTEGRATION=1 npm run test:redis`. Saída esperada: um teste aprovado que permite três `POST`, recusa o quarto com `429`/`Retry-After`, mantém as gravações em três e, após desconexão do cliente Redis, retorna `503` sem gravação adicional. Variações em `X-Forwarded-For` não mudam a identidade observada. O teste usa servidor HTTP e Redis reais, identidade por IP local e serviço de gravação fictício; não usa Postgres, Preview ou carga. Sem Docker, execute `npm test` para verificar a política e as respostas com doubles; marque a conexão Redis real como não executada.",
+    "why": "Rate limiting limita volume/frequência, enquanto limite por corpo controla o custo de uma chamada. Redis pode compartilhar contadores entre instâncias; algoritmo, chave, privacidade, atomicidade e modo de falha precisam ser decisões explícitas. A API local não autentica contas, então a prática usa IP observado e ensina por que isso não é quota por conta.",
     "example": {
       "language": "text",
-      "code": "JANELA FIXA FICTÍCIA: máximo 3 chamadas em 60 segundos por key\nINCR rate:v1:demo-account:<id-opaco>\nna primeira chamada → EXPIRE key 60\nresposta do script: allowed, count, TTL\ncount > 3 → limited; API deveria decidir 429 e Retry-After\n\nLua executa incremento e TTL sem interleaving de outro cliente.",
-      "expected": "As três primeiras operações da key passam, a quarta é negada; outra key começa em 1 e o TTL tem valor positivo até 60 segundos.",
+      "code": "JANELA FIXA DO LABORATÓRIO: máximo 3 gravações em 60 segundos\nPOST /api/estudos → IP observado pelo socket → key rate:v1:backend-layers:write:<IP>\nEVAL fixed-window.lua → allowed, count, TTL\ncount > 3 → HTTP 429 + Retry-After\nRedis indisponível → HTTP 503 antes de gravar\n\nA API não autentica contas, não confia em X-Forwarded-For e não registra IP em log.",
+      "expected": "As três primeiras gravações chegam ao serviço, a quarta recebe 429 com Retry-After e nenhuma gravação ocorre; outra key começa em 1. A política 3/60 é didática, não recomendação de produção.",
       "explanation": [
         "Janela fixa agrupa operações em intervalos; é simples, mas buckets alinhados podem permitir rajadas perto da troca de janela. Janela deslizante conta período móvel com maior custo; token bucket permite rajadas limitadas e controla taxa média.",
         "INCR seguido de EXPIRE em comandos separados pode deixar contador sem expiração se a aplicação parar entre eles. Lua executa a lógica como uma unidade atômica no Redis; chaves com TTL são removidas após janela.",
         "Key por conta/tenant limita quota de negócio; IP pode ser sinal suplementar, mas NAT e rotação afetam pessoas e proxy headers precisam de origem confiável. Não armazene IP bruto sem necessidade/retention; pseudonimizar também exige avaliar reidentificação.",
         "Redis pode expulsar ou perder contador; indisponibilidade e fail-open podem abrir limite, enquanto fail-closed pode interromper uso. Escolha por rota e dano, timeout e métrica.",
-        "`check-rate-limit.cjs` executa script Redis local e testa identidade fictícia. Não implementa middleware Node, não responde status HTTP e não mede capacidade ou carga."
+        "O script CLI demonstra o contador; `labs/backend-layers` agora também liga o mesmo Lua a `POST` HTTP com o cliente `node-redis`. O teste real usa Redis local e serviço de gravação fictício; não mede capacidade nem prova configuração de proxy/conta."
       ]
     },
     "sections": [
@@ -2242,7 +2242,8 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "O script `fixed-window.lua` incrementa key, configura expiração na primeira chamada, lê TTL e devolve `allowed`/`limited`. Como a lógica roda em um script, outro pedido Redis não se intercala entre leitura, decisão e gravação. A janela desta demonstração começa no primeiro hit; não é o mesmo que bucket alinhado ao relógio.",
           "Um contador precisa de TTL para evitar chaves permanentes. Se operação limitada continua incrementando, a contagem passa do limite até expirar; outras políticas podem parar de incrementar após negar para economizar. Escolha key e comportamento conscientemente. Prefixo `rate:v1` permite trocar formato; use id de conta pseudônimo e não inclua token de sessão.",
-          "Na aplicação, escolha conexão/client Redis com timeout e pool, execute operação atômica e converta resultado para resposta HTTP. O laboratório atual só retorna strings do script pelo CLI; não representa middleware ou biblioteca cliente da aplicação. Redis 8.8 também possui comandos de contador com expiração e limite; a aula mantém Lua para estudar a unidade atômica e ilustrar compatibilidade entre versões.",
+          "`labs/backend-layers/src/rate-limiter-redis.cjs` usa `node-redis`, um tempo máximo por comando e fila offline desativada. Ele executa o Lua compartilhado com o laboratório, transforma a decisão em dados verificáveis e devolve o TTL para o cabeçalho `Retry-After`. A rota confere o limite antes de ler o corpo e só chama o serviço de gravação quando Redis permite.",
+          "A política testada limita três tentativas por 60 segundos; até pedidos inválidos contam porque o limitador roda primeiro. Redis 8.8 também tem comandos de limite, mas Lua foi mantido para reutilizar o exemplo e observar a unidade atômica.",
           "Pausa: se `INCR` funcionar mas `EXPIRE` não rodar, qual risco aparece? Como uma execução atômica evita essa lacuna?"
         ],
         "terms": [
@@ -2254,9 +2255,9 @@ Object.assign(LESSON_GUIDES, {
       {
         "title": "Defina identidade, privacidade e indisponibilidade",
         "paragraphs": [
-          "Use uma identidade adequada ao fluxo. Conta autenticada ou tenant costuma permitir quota justa; IP pode ajudar contra tráfego não autenticado, mas pessoas atrás de NAT compartilham endereço e atacantes distribuem endereços. Cabeçalhos como X-Forwarded-For só são confiáveis quando proxy confiável os define e limpa entrada do cliente.",
-          "Evite armazenar identificador pessoal ou token na key/log. Um hash simples de IP ainda pode ser dado correlacionável; defina necessidade, segredo de pseudonimização, retenção e controle. Observe excesso em contagens agregadas e retenha o mínimo para investigação proporcional.",
-          "Decida fail-open/fail-closed por rota e risco. Falha em limite de recuperação de senha pode exigir bloqueio/segunda defesa; falha em recurso de leitura pública de baixo risco talvez permita operação temporária com limite no gateway. Circuit breaker e timeout evitam espera ilimitada; fallback em memória não mantém limite global entre réplicas.",
+          "A API do laboratório não autentica usuário e escuta somente em `127.0.0.1`; os pedidos deste exercício chegam como loopback. Ela usa `req.socket.remoteAddress` observado pelo servidor para uma proteção local grosseira e ignora `X-Forwarded-For` enviado pelo cliente. Isso não prova quota por conta: NAT pode juntar pessoas legítimas e um atacante pode distribuir origens. Em endpoint autenticado, a key de conta deve vir da sessão validada no servidor; nunca aceite ID de usuário no corpo como identidade confiável.",
+          "A key de demonstração contém o IP observado e tem TTL de no máximo 60 segundos; Redis local desativa persistência e a API não registra o IP. Isso reduz retenção, mas não torna o endereço anônimo. Uma publicação atrás de proxy precisa configurar quais proxies são confiáveis antes de usar qualquer cabeçalho de origem.",
+          "A aplicação escolhe fail-closed para gravações: Redis fora do ar ou timeout devolve `503` genérico antes de iniciar a operação; `GET` continua disponível. O cliente usa timeout de conexão/comando e não enfileira comandos enquanto está offline. O modo didático `start:memory` usa um contador só do processo e não é equivalente a Redis compartilhado.",
           "A política noeviction do container faz gravações falharem quando memória atinge máximo. Se a aplicação ignorar erro e permitir chamada, o limitador pode falhar aberto; se negar sempre, o usuário legítimo pode ficar bloqueado. Monitore erro e decida antes do incidente.",
           "Pausa: Redis cai em endpoint de convite que envia email faturado. Especifique resultado, status e alerta sem revelar se endereço de uma pessoa existe."
         ],
@@ -2269,9 +2270,9 @@ Object.assign(LESSON_GUIDES, {
       {
         "title": "Verifique a regra sem gerar carga",
         "paragraphs": [
-          "Execute sete passos do script: resposta Redis, 3 allowed, 4 limited, TTL positivo, outra identidade iniciando contador em 1 e remoção das keys temporárias. Isso confere algoritmo elementar, isolamento de keys e expiração no container. Não cria requests de API nem mede throughput.",
-          "Testes de integração do middleware deveriam cobrir antes/dentro/depois do limite com relógio controlado, identidade A/B, origem de IP confiável, nenhuma ação após recusa, Retry-After, Redis fora do ar, timeout, counter eviction e concorrência limitada. Usar poucos testes determinísticos já comprova mais que enviar carga sem escopo.",
-          "Para medir, compare serviço com e sem limitador num ambiente próprio e mesma carga controlada; registre p50/p95 da API e do Redis, decisões permitidas/negadas, memória, custo e precisão. Não faça flood, stress test ou teste de domínio/Preview público. A implementação Node completa ainda requer escolher cliente Redis e integrar middleware no laboratório de backend.",
+          "Execute `RUN_REDIS_INTEGRATION=1 npm run test:redis` (no PowerShell, defina e depois remova `$env:RUN_REDIS_INTEGRATION`). O teste confirma o script no Redis real, keys separadas, respostas `201`/`429`, `Retry-After`, nenhuma gravação recusada e que mudar `X-Forwarded-For` não muda o IP observado. O serviço de gravação é fictício; não há escrita no Postgres.",
+          "`npm test` verifica casos determinísticos de janela, expiração, resposta inválida, Redis não pronto, falha fechada `503` e rotas HTTP usando doubles. `npm run test:redis` verifica a integração local real; a CI também roda essa integração com Redis descartável. Nenhum teste simula proxy confiável, autenticação de conta, eviction ou serviço de produção.",
+          "A medição de latência/custo antes e depois é uma prioridade separada da Fase 7.4. Não faça flood, stress test nem carga no Preview público; quando medir, compare a mesma operação e conjunto de dados num ambiente isolado e registre p50/p95, memória, decisões e custo.",
           "Pausa: qual evidência o script fornece e qual evidência só integração HTTP pode fornecer?"
         ],
         "terms": [
@@ -2282,15 +2283,15 @@ Object.assign(LESSON_GUIDES, {
       }
     ],
     "diagramTitle": "Da requisição à decisão distribuída",
-    "diagram": "API autentica/identifica → compõe key opaca → EVAL atômico Redis\n                                              ├── dentro → permitir\n                                              └── acima → recusar\n                                                        status HTTP 429\n                                                        Retry-After derivado do TTL\n\nErro/timeout Redis → aplicar fail-open ou fail-closed definido para a rota",
+    "diagram": "API local sem login → socket.remoteAddress observado → key Redis com TTL curto\n                                      │\n                                      ├── permitido → continua validação e gravação\n                                      └── acima → 429 + Retry-After; sem gravação\n\nRedis indisponível → 503 fail-closed; GET continua disponível\nConta autenticada em sistema futuro → identidade somente da sessão validada",
     "guided": [
-      { "instruction": "Execute `node check-rate-limit.cjs` e escreva as cinco decisões esperadas para conta A e conta B.", "result": "A: allowed 1, 2 e 3; limited 4. B: allowed 1 porque usa outra key." },
+      { "instruction": "Execute `node check-rate-limit.cjs` e `RUN_REDIS_INTEGRATION=1 npm run test:redis`; no Windows, use `$env:RUN_REDIS_INTEGRATION = '1'` e `npm.cmd run test:redis`. Compare a resposta CLI com a resposta HTTP.", "result": "O script mostra 3 allowed e 1 limited; a API permite três pedidos e responde 429 + Retry-After ao quarto, sem chamar o serviço de gravação." },
       { "instruction": "Abra `fixed-window.lua` e explique por que expiração só é definida quando count é 1.", "result": "As próximas chamadas não estendem a janela; TTL é contado desde o primeiro incremento e a key expira." },
-      { "instruction": "Desenhe a resposta da API para resultado `limited` e o que ocorre se a chamada Redis expira por timeout.", "result": "Resposta de excesso pode ser 429 com Retry-After; timeout segue política fail-open/closed da rota, com métrica e sem retry infinito." }
+      { "instruction": "Desenhe a resposta de excesso e desligue Redis depois de iniciar a API; observe uma gravação e um GET.", "result": "Excesso retorna 429 com Retry-After sem gravar; Redis indisponível retorna 503 genérico antes de gravar; GET continua disponível. Pare a API antes de encerrar o container." }
     ],
     "mistakes": [
       "Chamar o script CLI de middleware HTTP completo.",
-      "Usar só IP ou confiar em X-Forwarded-For não higienizado.",
+      "Confundir rate limit por IP observado com quota por conta autenticada ou confiar em X-Forwarded-For não higienizado.",
       "Executar INCR e EXPIRE separadamente e ignorar corrida/TTL ausente.",
       "Tratar janela fixa como se eliminasse rajada nas fronteiras.",
       "Repetir indefinidamente quando Redis cai ou ignorar erro de memória.",
@@ -2334,15 +2335,15 @@ Object.assign(LESSON_GUIDES, {
     "quiz": [
       { "question": "Qual risco janela fixa apresenta perto da fronteira?", "options": ["Pode permitir rajadas em intervalos adjacentes.", "Nunca expira.", "Substitui autorização."], "correctIndex": 0, "explanation": "Um bucket pode terminar e outro começar com pouco tempo entre chamadas." },
       { "question": "Por que script Lua é usado no exemplo?", "options": ["Para fazer incremento e TTL/decisão em uma execução atômica.", "Para ocultar token no código.", "Para transformar redis-cli em servidor HTTP."], "correctIndex": 0, "explanation": "A atomização evita interleaving entre operações que compõem o contador." },
-      { "question": "O que o script local devolve quando passa do limite?", "options": ["Resultado `limited`; a API real ainda teria de mapear para 429.", "Resposta HTTP 429 automaticamente.", "JWT de usuário."], "correctIndex": 0, "explanation": "O laboratório usa redis-cli; ele não está ligado a uma rota HTTP." },
+      { "question": "O que a API do laboratório faz quando o quarto POST excede o limite?", "options": ["Responde 429 com Retry-After e não chama o serviço de gravação.", "Responde 201 e zera o contador.", "Confia no X-Forwarded-For enviado pelo navegador."], "correctIndex": 0, "explanation": "O middleware HTTP consulta o contador Redis antes de ler o corpo e só continua quando permitido." },
       { "question": "Que cuidado há com chave por IP?", "options": ["NAT/rotação afetam justiça e cabeçalho de proxy deve ser confiável.", "IP nunca pode identificar uma pessoa.", "Hash simples elimina necessidade de privacidade."], "correctIndex": 0, "explanation": "Endereço pode ser dado correlacionável e uma origem compartilhada afeta vários usuários." }
     ],
     "summary": [
       "Escolha janela/algoritmo por regra e custo; 429 comunica excesso na camada HTTP.",
       "Contador e expiração precisam ser coerentes e ter TTL; Lua é atômico no exemplo.",
-      "Use identidade por conta e IP confiável como sinais separados, com minimização de dados.",
+      "O laboratório limita por IP observado porque não autentica contas; isso não substitui quota por identidade validada.",
       "Defina fail-open/closed, timeout, memória, eviction e alerta por endpoint.",
-      "O script Redis está verificado localmente, mas não integra API Node nem mede carga."
+      "Com Redis disponível, `npm run test:redis` verifica a integração HTTP real: 429 sem gravação após o limite e 503 sem gravação após desconectar o cliente. Isso não mede desempenho nem comprova identidade de conta, proxy confiável ou disponibilidade de produção."
     ]
   },
   "delivery-requirements": {
@@ -3370,7 +3371,7 @@ Object.assign(LESSON_GUIDES, {
     },
     "delivery-redis-rate-limit": {
       prompt: "Um endpoint recebe chamadas rápidas de contas diferentes e um mesmo IP compartilhado. Desenhe políticas separadas por conta/IP confiável, janela, efeito 429/Retry-After, privacidade e comportamento se Redis estiver fora.",
-      expected: "Políticas separam identidade da conta e sinal IP/NAT, limitam dados e tempo, recusam sem efeito, escolhem fail-open/closed por operação e deixam explícita a limitação de que o script não integra middleware HTTP.",
+      expected: "Políticas separam identidade da conta e sinal IP/NAT, limitam dados e tempo, recusam sem efeito, escolhem fail-open/closed por operação e deixam explícito que o laboratório local limita por IP observado, não por conta autenticada, nem comprova produção.",
       hint: "O limite controla frequência, mas a chave também precisa respeitar identidade confiável e privacidade."
     },
     "delivery-ci": {

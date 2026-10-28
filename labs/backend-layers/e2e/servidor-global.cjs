@@ -3,6 +3,7 @@
 const { criarServidor } = require('../server.cjs');
 const { criarServicoEstudos } = require('../src/servico-estudos.cjs');
 const { criarRepositorioEstudos } = require('../src/repositorio-estudos-memoria.cjs');
+const { criarLimitadorEmMemoria } = require('../src/rate-limiter-memory.cjs');
 
 module.exports = async function iniciarServidorDeTeste() {
   const servicoPrevisao = {
@@ -19,7 +20,11 @@ module.exports = async function iniciarServidorDeTeste() {
       };
     }
   };
-  const servidor = criarServidor(criarServicoEstudos(criarRepositorioEstudos()), servicoPrevisao);
+  const servidor = criarServidor(
+    criarServicoEstudos(criarRepositorioEstudos()),
+    servicoPrevisao,
+    criarLimitadorEmMemoria()
+  );
 
   await new Promise((resolve, reject) => {
     servidor.once('error', reject);

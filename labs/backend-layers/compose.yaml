@@ -15,5 +15,15 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+  redis:
+    image: redis:8.8.4-alpine3.23
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "64mb", "--maxmemory-policy", "noeviction"]
+    ports:
+      - "127.0.0.1:${REDIS_HOST_PORT:-56380}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "PING"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
 volumes:
   backend-layers-dados:

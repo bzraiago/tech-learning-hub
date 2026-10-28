@@ -2,9 +2,9 @@
 
 ## Objetivo
 
-Conectar uma API Node.js ao PostgreSQL, aplicar uma migration reproduzível, persistir estudos entre reinicializações e responder com `409` quando duas criações disputarem o mesmo título. A aplicação usa uma interface assíncrona de repositório, uma regra de negócio e consultas parametrizadas.
+Conectar uma API Node.js ao PostgreSQL, aplicar uma migration reproduzível, persistir estudos entre reinicializações, responder com `409` para título duplicado e limitar gravações HTTP com um contador Redis atômico. A aplicação usa uma interface assíncrona de repositório, uma regra de negócio e consultas parametrizadas.
 
-Os registros `HTML` e `JavaScript` são fictícios. Este laboratório usa um banco Docker isolado chamado `backend_camadas`, uma porta própria `55433` e um volume próprio. Não conecte a API ao banco Supabase do Tech Learning Hub nem use dados pessoais.
+Os registros `HTML` e `JavaScript` são fictícios. Este laboratório usa um banco Docker isolado chamado `backend_camadas`, uma porta própria `55433` e um volume próprio. O Redis também é local, publicado somente em `127.0.0.1:56380`, sem volume ou persistência. Não conecte a API ao banco Supabase do Tech Learning Hub nem use dados pessoais.
 
 ## Pré-requisitos
 
@@ -29,13 +29,13 @@ npm.cmd ci
 npm ci
 ```
 
-O `package.json` e o `package-lock.json` locais fixam `pg` na versão `8.23.1`. A pasta `node_modules` é local e ignorada pelo Git. O site estático do curso não carrega nem instala essa dependência.
+O `package.json` e o `package-lock.json` locais fixam `pg` `8.23.1` e `redis` `6.3.0`. As duas dependências pertencem apenas a este laboratório; `node_modules` é local e ignorada pelo Git. O site estático do curso não as carrega nem instala.
 
 Saída esperada: npm termina sem erro e instala as dependências do laboratório. No Windows, use `npm.cmd` se a política do PowerShell bloquear `npm.ps1`.
 
 ### 2. Criar a configuração local
 
-Ainda em `labs/backend-layers`, copie o exemplo e abra `.env` no editor para substituir o texto de `PGPASSWORD` por uma senha local fictícia. O arquivo `.env` é ignorado pelo Git; não o envie nem cole sua senha em mensagens.
+Ainda em `labs/backend-layers`, copie o exemplo e abra `.env` no editor para substituir o texto de `PGPASSWORD` por uma senha local fictícia. Mantenha `REDIS_URL` apontando para `127.0.0.1:56380`; não coloque credenciais reais na URL. O arquivo `.env` é ignorado pelo Git; não o envie nem cole seus valores em mensagens.
 
 ```powershell
 # Windows PowerShell
@@ -49,7 +49,7 @@ cp .env.example .env
 # Abra .env no editor e troque o valor de PGPASSWORD.
 ```
 
-O exemplo usa host `127.0.0.1`, porta `55433`, usuário `aluno` e banco `backend_camadas`. A porta dedicada evita conflitar com a instância principal de aulas, que usa `55432`.
+O exemplo usa PostgreSQL em `127.0.0.1:55433` (usuário `aluno`, banco `backend_camadas`) e Redis em `127.0.0.1:56380`. A porta PostgreSQL dedicada evita conflitar com a instância principal de aulas, que usa `55432`; Redis não tem volume persistente.
 
 ### 3. Iniciar e conferir o banco
 
@@ -61,7 +61,7 @@ docker compose up -d
 docker compose ps
 ```
 
-Saída esperada: serviço `db` em estado `healthy`, publicado em `127.0.0.1:55433->5432/tcp`. Na primeira execução, o Docker pode baixar a imagem PostgreSQL 17.
+Saída esperada: serviços `db` e `redis` em estado `healthy`; as portas locais são `127.0.0.1:55433->5432/tcp` e `127.0.0.1:56380->6379/tcp`. Na primeira execução, o Docker pode baixar PostgreSQL 17 e Redis 8.8.4.
 
 Agora confira a conexão Node → banco:
 
@@ -105,7 +105,7 @@ Para praticar backup lógico e restauração numa base separada, siga o [roteiro
 
 ## Executar a API e observar a persistência
 
-1. No terminal em `labs/backend-layers`, execute `npm.cmd start` no Windows ou `npm start` em macOS/Linux. Saída esperada: `Abra http://127.0.0.1:4180 · armazenamento: PostgreSQL`.
+1. No terminal em `labs/backend-layers`, execute `npm.cmd start` no Windows ou `npm start` em macOS/Linux. Saída esperada: `Abra http://127.0.0.1:4180 · armazenamento: PostgreSQL · rate limit: Redis`.
 2. Abra `http://127.0.0.1:4180`. A lista inicial tem `HTML` e `JavaScript`.
 3. Cadastre `CSS`. A resposta HTTP é `201 Created` e a lista passa a ter três estudos.
 4. Atualize a página. `CSS` continua na lista porque está no PostgreSQL, não na memória do processo.
@@ -124,6 +124,39 @@ console.log(resposta.status, await resposta.json());
 Resultado esperado: `409` e uma mensagem de título já existente. A lista permanece com três itens. A consulta de verificação usa parâmetros `$1` e `$2`; o título enviado não é concatenado no SQL.
 
 Para ver o contrato por fora do formulário, o Console também pode executar `fetch('/api/estudos').then(async r => console.log(r.status, await r.json()))`. O `GET` responde `200` com JSON. Erros inesperados do banco viram `500` genérico; detalhes internos ficam apenas no terminal.
+
+## Rate limit HTTP com Redis
+
+### Contrato da demonstração
+
+| Pedido | Limite | Resposta ao exceder | Redis indisponível |
+|---|---|---|---|
+| `POST /api/estudos` e `POST /api/estudos-com-sessao` | 3 tentativas por IP observado pelo servidor em uma janela fixa de 60 segundos | `429` com `Retry-After` em segundos; nenhuma gravação é iniciada | `503` genérico; nenhuma gravação é iniciada |
+| `GET /api/estudos` | Não limitado por este contador | `200` conforme o serviço | Continua independente do limitador |
+
+O laboratório ainda não autentica contas. Por isso, a demonstração limita por `req.socket.remoteAddress`, um sinal de rede observado diretamente pelo Node, e ignora `X-Forwarded-For`. O servidor escuta apenas em `127.0.0.1`, então os pedidos do navegador local compartilham a key de loopback; não há IP público nesta prática. Isso **não** representa quota por conta: pessoas atrás do mesmo NAT compartilham o limite, e uma implantação atrás de proxy exige configuração de confiança explícita. Não use um ID recebido no corpo ou num cabeçalho arbitrário como identidade autenticada.
+
+O contador reaproveita [`fixed-window.lua`](../redis-fundamentals/fixed-window.lua): `INCR`, `EXPIRE` e a decisão ocorrem atomicamente. A key contém o IP observado durante no máximo 60 segundos; Redis local não persiste keys e a API não registra o IP. A política de 3/60 é somente didática, não um valor recomendado para produção. A API falha fechada nas gravações: se o contador não responder, retorna `503` sem alterar dados.
+
+### Conferir com poucos pedidos controlados
+
+Com Docker Compose iniciado, Node.js instalado e `.env` configurado, rode no terminal desta pasta:
+
+```powershell
+# Windows PowerShell
+$env:RUN_REDIS_INTEGRATION = '1'
+npm.cmd run test:redis
+Remove-Item Env:RUN_REDIS_INTEGRATION
+```
+
+```sh
+# macOS ou Linux
+RUN_REDIS_INTEGRATION=1 npm run test:redis
+```
+
+Resultado esperado: o teste conecta ao Redis local, demonstra 3 decisões permitidas e a quarta negada, compara uma segunda key, envia quatro pedidos HTTP locais e observa `201, 201, 201, 429`; só três chamadas chegam ao serviço de gravação. Depois desconecta o cliente Redis e confirma `503` genérico sem nova gravação. Os cabeçalhos `X-Forwarded-For` variam de propósito e não mudam a identidade observada. O teste apaga somente as keys aleatórias que criou. Ele não usa PostgreSQL, não mede capacidade, não testa múltiplas instâncias e não envia tráfego ao Preview.
+
+Sem Redis, `npm test` cobre a regra HTTP com doubles determinísticos, mas não prova a conexão ou o script no servidor real. O modo `start:memory` abaixo usa contadores locais temporários; ele não substitui o Redis compartilhado.
 
 ## Integração externa real: Open-Meteo
 
@@ -158,7 +191,7 @@ npm.cmd run start:memory
 BACKEND_STORAGE=memory npm run start:memory
 ```
 
-Saída esperada: `Abra http://127.0.0.1:4180 · armazenamento: memória (temporário)`. Mantenha este terminal aberto, acesse o endereço no navegador e consulte a previsão. Em outra aba, abra `http://127.0.0.1:4180/api/previsao?latitude=-3.73&longitude=-38.52` para observar o JSON e o status `200`.
+Saída esperada: `Abra http://127.0.0.1:4180 · armazenamento: memória (temporário) · rate limit: memória local (temporário)`. Mantenha este terminal aberto, acesse o endereço no navegador e consulte a previsão. Em outra aba, abra `http://127.0.0.1:4180/api/previsao?latitude=-3.73&longitude=-38.52` para observar o JSON e o status `200`. O contador também fica apenas no processo, perde o estado ao reiniciar e não coordena instâncias; essa alternativa leve não verifica Redis.
 
 Para conferir o contrato real sem abrir o navegador, pare o servidor com `Ctrl+C` e execute:
 
@@ -259,17 +292,17 @@ Com a API em execução, abra `http://127.0.0.1:4180/demo/`. Essa página usa o 
 
 ## CI real no GitHub Actions
 
-O workflow `.github/workflows/ci.yml`, na raiz do repositório, executa a validação do curso, os testes unitários, migrations e integração PostgreSQL em um serviço descartável, e o fluxo Chromium. Ele roda em pushes de qualquer branch, em pull requests direcionados a `main` e por acionamento manual. A senha da base é fictícia e usada somente no container efêmero do CI.
+O workflow `.github/workflows/ci.yml`, na raiz do repositório, executa a validação do curso, os testes unitários, o teste HTTP integrado a Redis real, migrations e integração PostgreSQL em serviços descartáveis, e o fluxo Chromium. Ele roda em pushes de qualquer branch, em pull requests direcionados a `main` e por acionamento manual. As credenciais da base e os dados do rate limit são fictícios e usados somente nos containers efêmeros do CI.
 
 Depois que uma alteração chegar ao GitHub, abra a aba **Actions**, selecione a execução mais recente de **CI** e confira cada etapa. Se algo falhar, registre o primeiro passo vermelho, leia a mensagem completa, reproduza o comando correspondente no ambiente local e faça uma correção pequena. Uma execução verde confirma somente os cenários que o workflow rodou; ela não comprova que todos os comportamentos possíveis estão corretos.
 
-Para conferir localmente os mesmos passos, execute `node scripts/validate-content.js` na raiz do repositório. Em `labs/backend-layers`, rode `npm ci`, `npm test`, configure uma base descartável PostgreSQL conforme a seção de migrations, execute `npm run db:check`, `npm run migrate`, `RUN_PG_INTEGRATION=1 npm run test:db` (no Windows, use `$env:RUN_PG_INTEGRATION = '1'` antes do comando) e `npm run test:e2e`.
+Para conferir localmente os mesmos passos, execute `node scripts/validate-content.js` na raiz do repositório. Em `labs/backend-layers`, rode `npm ci`, `npm test`, inicie PostgreSQL e Redis com `docker compose up -d --wait`, execute `RUN_REDIS_INTEGRATION=1 npm run test:redis`, configure uma base descartável PostgreSQL conforme a seção de migrations, execute `npm run db:check`, `npm run migrate`, `RUN_PG_INTEGRATION=1 npm run test:db` e `npm run test:e2e`. No Windows PowerShell, defina cada variável antes do comando (`$env:RUN_REDIS_INTEGRATION = '1'` e `$env:RUN_PG_INTEGRATION = '1'`) e remova-a depois; use `npm.cmd` se `npm.ps1` estiver bloqueado.
 
 ## Como parar e retomar
 
-- Pare a API com `Ctrl+C`; o pool fecha junto com o servidor.
-- Pare o banco sem apagar os dados: `docker compose down`.
-- Para retomar, execute `docker compose up -d`, espere `healthy` em `docker compose ps` e rode `npm start` (`npm.cmd start` no Windows).
+- Pare a API com `Ctrl+C`; os clientes de PostgreSQL e Redis fecham junto com o servidor.
+- Pare os serviços sem apagar o volume do PostgreSQL: `docker compose down`. O Redis não tem volume persistente e suas keys de teste são temporárias.
+- Para retomar, execute `docker compose up -d --wait`, confira `healthy` em `docker compose ps` e rode `npm start` (`npm.cmd start` no Windows).
 - **Não use `docker compose down -v`** neste laboratório: `-v` remove o volume e os dados persistidos.
 
 ## Problemas comuns
@@ -279,7 +312,10 @@ Para conferir localmente os mesmos passos, execute `node scripts/validate-conten
 | `npm.ps1 cannot be loaded` no Windows | Use `npm.cmd` nos comandos do roteiro; não altere a política global do PowerShell para este laboratório. |
 | Docker não alcança o servidor | Inicie Docker Desktop ou o serviço Docker e rode `docker version`; confira a seção Server. |
 | Porta `55433` já está ocupada | Pare a aplicação que ocupa a porta ou ajuste `PGPORT` em `.env`; depois recrie o serviço com `docker compose up -d`. Use o mesmo valor em Node e Compose. |
-| `ECONNREFUSED` | Confira `docker compose ps`, host `127.0.0.1`, porta `55433` e que a API está usando a pasta certa. |
+| Porta `56380` já está ocupada | Pare a aplicação que ocupa a porta ou escolha uma porta livre em `REDIS_HOST_PORT` e em `REDIS_URL` no `.env`; mantenha o serviço Redis interno na porta `6379`. |
+| `ECONNREFUSED` ao consultar banco | Confira `docker compose ps`, host `127.0.0.1`, porta `55433` e que a API está usando a pasta certa. |
+| `npm start` não conecta ao Redis | Inicie `docker compose up -d --wait`; confira `REDIS_URL` e `docker compose exec -T redis redis-cli PING`. O servidor só abre a porta depois de conectar ao Redis. |
+| API responde `503` ao gravar | Confira se `redis` está `healthy` em `docker compose ps`, se `REDIS_URL` aponta para a porta publicada e se `docker compose exec -T redis redis-cli PING` responde `PONG`. O GET não usa o rate limit; gravações falham fechadas enquanto Redis estiver indisponível. |
 | `password authentication failed` depois de trocar a senha | O volume já guarda a senha inicial do cluster. Reponha no `.env` a senha usada na primeira criação ou recupere o ambiente com o procedimento de `db-docker-operations`; não apague o volume para esconder o erro. |
 | `relation "estudos" does not exist` | Confirme o banco com `npm run db:check` e aplique `npm run migrate`. |
 | migration já aplicada | É o comportamento esperado ao repetir o comando. Para praticar a migration desde o início, use outro banco local descartável; não apague o volume que contém seus dados. |
@@ -288,7 +324,7 @@ Para conferir localmente os mesmos passos, execute `node scripts/validate-conten
 
 ## Alternativa quando não for possível usar PostgreSQL
 
-Para continuar estudando validação, regras e HTTP em um computador sem Docker/banco, no Windows execute `$env:BACKEND_STORAGE = 'memory'; npm.cmd run start:memory`; depois de parar com `Ctrl+C`, limpe a variável com `Remove-Item Env:BACKEND_STORAGE`. Em macOS/Linux execute `BACKEND_STORAGE=memory npm run start:memory`. A saída identifica `memória (temporário)`. Nesse modo os dados somem ao reiniciar o servidor; marque a integração PostgreSQL como pendente e volte a este roteiro quando o banco estiver disponível.
+Para continuar estudando validação, regras e HTTP em um computador sem Docker/banco, no Windows execute `$env:BACKEND_STORAGE = 'memory'; npm.cmd run start:memory`; depois de parar com `Ctrl+C`, limpe a variável com `Remove-Item Env:BACKEND_STORAGE`. Em macOS/Linux execute `BACKEND_STORAGE=memory npm run start:memory`. A saída identifica armazenamento e rate limit como `memória (temporário)`. Nesse modo os dados e contadores somem ao reiniciar o servidor e não são compartilhados; marque as integrações PostgreSQL/Redis como pendentes e volte a este roteiro quando Docker estiver disponível.
 
 Se Docker não estiver disponível mas o computador já tiver PostgreSQL local, conclua `setup-postgresql`, crie uma base descartável `backend_camadas` e ajuste em `.env` `PGHOST`, `PGPORT`, `PGUSER`, `PGDATABASE` e `PGPASSWORD` para essa instalação antes de executar `npm run db:check` e `npm run migrate`.
 
@@ -297,6 +333,7 @@ Se Docker não estiver disponível mas o computador já tiver PostgreSQL local, 
 | Parte | Responsabilidade | Arquivo |
 |---|---|---|
 | HTTP | Lê método, rota e JSON; escolhe status e resposta pública | `server.cjs` |
+| Rate limit | Usa IP remoto observado, consulta o contador atômico, responde `429`/`Retry-After` ou falha fechada com `503` | `src/rate-limiter-redis.cjs`, `src/rate-limiter-memory.cjs`, `redis-fundamentals/fixed-window.lua` |
 | Validação | Confere o formato do pedido e limpa o título | `src/validar-estudo.cjs` |
 | Regra de negócio | Compara títulos sem considerar espaços externos e caixa | `src/regra-titulo.cjs` e `src/servico-estudos.cjs` |
 | Repositório | Executa `SELECT`/`INSERT` com parâmetros e converte o resultado | `src/repositorio-estudos-postgres.cjs` |
@@ -384,3 +421,5 @@ Em cada mudança, anote camada alterada, comando, status e estado dos dados ante
 - [node-postgres: conexão e variáveis de ambiente](https://node-postgres.com/features/connecting) — configuração do pool com `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD` e `PGDATABASE`.
 - [node-postgres: consultas parametrizadas](https://node-postgres.com/features/queries) — enviar valores separados do texto SQL.
 - [node-postgres: pool de conexões](https://node-postgres.com/features/pooling) — reutilização e encerramento das conexões.
+- [Redis: bibliotecas clientes](https://redis.io/docs/latest/develop/clients/) — recomendação de `node-redis` para a maioria dos usos JavaScript.
+- [Redis: uso de node-redis em produção](https://redis.io/docs/latest/develop/clients/nodejs/produsage/) — eventos, timeout e fila offline; o laboratório desativa a fila para não atrasar gravações após reconexão.
