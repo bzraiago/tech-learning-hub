@@ -5115,6 +5115,46 @@
             ]
           },
           {
+            "id": "delivery-clerk-supabase",
+            "title": "Clerk + Supabase: token, RLS e isolamento por usuário",
+            "minutes": 120,
+            "concept": "Conecte conceitualmente o token de sessão Clerk ao Supabase como provedor de terceiros, leia o identificador `sub` e modele permissões mínimas com grants e políticas RLS por linha.",
+            "objectives": [
+              "Descrever como Supabase valida um token de sessão Clerk sem sincronizar automaticamente registros de usuário entre os serviços.",
+              "Interpretar políticas `USING` e `WITH CHECK` que comparam `user_id` ao claim `sub` verificado.",
+              "Separar a role Postgres `authenticated`, a identidade Clerk, grants, políticas RLS e chaves publicáveis/secretas.",
+              "Escrever uma matriz de testes para duas contas que inclui leitura, tentativa de falsificação de `user_id` e operações não concedidas."
+            ],
+            "exercise": "Analise `supabase/learning-state.sql` e `assets/js/cloud.js`; desenhe como as contas A e B são isoladas em leitura e escrita, sem confiar no `user_id` enviado pelo navegador.",
+            "code": "-- Versão didática do contrato em supabase/learning-state.sql\nalter table public.learning_state enable row level security;\nrevoke all on table public.learning_state from anon, authenticated;\ngrant select, insert, update on table public.learning_state to authenticated;\n\ncreate policy \"read own learning state\"\non public.learning_state for select to authenticated\nusing ((select auth.jwt()->>'sub') = user_id);\n\ncreate policy \"create own learning state\"\non public.learning_state for insert to authenticated\nwith check ((select auth.jwt()->>'sub') = user_id);\n\ncreate policy \"update own learning state\"\non public.learning_state for update to authenticated\nusing ((select auth.jwt()->>'sub') = user_id)\nwith check ((select auth.jwt()->>'sub') = user_id);\n\n-- Clerk assina o token; Supabase valida a integração de terceiro.\n-- RLS compara o subject verificado com o proprietário da linha.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "Clerk · Integrar Supabase com Clerk",
+                "url": "https://clerk.com/docs/guides/development/integrations/databases/supabase",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Supabase · Clerk como provedor de autenticação de terceiros",
+                "url": "https://supabase.com/docs/guides/auth/third-party/clerk",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Supabase · Row Level Security",
+                "url": "https://supabase.com/docs/guides/database/postgres/row-level-security",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Supabase · Chaves publicáveis e secretas",
+                "url": "https://supabase.com/docs/guides/getting-started/api-keys",
+                "language": "EN"
+              }
+            ]
+          },
+          {
             "id": "delivery-ci",
             "title": "Testes de entrega, observação e recuperação",
             "minutes": 130,

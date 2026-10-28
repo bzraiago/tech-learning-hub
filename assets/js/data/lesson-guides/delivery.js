@@ -801,6 +801,146 @@ Object.assign(LESSON_GUIDES, {
       "Login social não substitui token de acesso Supabase nem RLS. O hostname Preview basta para estudar; domínio próprio e validação de credenciais não são necessários nesta aula."
     ]
   },
+  "delivery-clerk-supabase": {
+    "prerequisites": "Concluir `delivery-oauth-google`, `delivery-environments` e o fundamento de tabela e chave primária em Database. Ler `docs/CONFIGURAR_SUPABASE.md`, `supabase/learning-state.sql` e `assets/js/cloud.js`. A aula usa IDs fictícios e análise de código; não exige conta, domínio ou alteração no Supabase remoto.",
+    "setup": "No editor, abra os três arquivos citados e compare o SQL, o pedido HTTP REST e o token de sessão enviado. Não abra nem copie valores de `.env`; `.env.example` contém somente marcadores públicos/fictícios. Use `user_demo_A` e `user_demo_B` como IDs hipotéticos. Esta atividade não executa consultas, não altera políticas ou dados remotos e não comprova a configuração do seu projeto.",
+    "why": "Uma autenticação identifica quem fez o pedido; autorização decide quais linhas essa identidade pode acessar. A validação do token e as políticas no PostgreSQL protegem a API mesmo quando alguém modifica o corpo ou a URL no navegador.",
+    "example": {
+      "language": "sql",
+      "code": "-- Contrato reduzido de supabase/learning-state.sql\nalter table public.learning_state enable row level security;\nrevoke all on table public.learning_state from anon, authenticated;\ngrant select, insert, update on public.learning_state to authenticated;\n\ncreate policy \"read own learning state\"\non public.learning_state for select to authenticated\nusing ((select auth.jwt()->>'sub') = user_id);\n\ncreate policy \"create own learning state\"\non public.learning_state for insert to authenticated\nwith check ((select auth.jwt()->>'sub') = user_id);\n\ncreate policy \"update own learning state\"\non public.learning_state for update to authenticated\nusing ((select auth.jwt()->>'sub') = user_id)\nwith check ((select auth.jwt()->>'sub') = user_id);",
+      "expected": "A conta A pode ler, criar e atualizar a linha cujo `user_id` corresponde ao `sub` do token validado. A conta B não vê nem altera essa linha; inserir ou atualizar atribuindo o ID de outra pessoa falha na verificação da política. `anon` não tem grants e exclusão não foi concedida.",
+      "explanation": [
+        "A conexão nativa registra Clerk como provedor de autenticação de terceiros no Supabase. Supabase valida o token assinado de sessão Clerk; isso não cria nem sincroniza uma linha correspondente em `auth.users`.",
+        "O claim `sub` identifica o usuário Clerk. Como o ID Clerk é texto, o esquema usa `user_id text` e compara com `(select auth.jwt()->>'sub')`; não converta esse identificador para UUID nem use `auth.uid()` como se fosse um ID Supabase Auth.",
+        "`USING` limita quais linhas existentes a operação pode localizar. `WITH CHECK` valida os valores da linha nova ou da linha resultante. Para `UPDATE`, as duas verificações impedem editar linha alheia ou transferir a propriedade.",
+        "Grants e políticas têm funções distintas: o grant autoriza a role Postgres a tentar uma operação na tabela; a política restringe linhas. Ambas as camadas precisam ser coerentes.",
+        "O código atual envia a URL Supabase e a chave `sb_publishable_...` no cabeçalho `apikey`, e o token da sessão Clerk no `Authorization: Bearer ...`. A página usa REST diretamente; não instala `@supabase/supabase-js`.",
+        "Chaves publicáveis do Clerk e Supabase podem chegar ao navegador conforme a documentação; elas não substituem autorização. `CLERK_SECRET_KEY`, `sb_secret_...`, `service_role` e senha de banco ficam no servidor ou painel seguro. Chave secreta pode contornar RLS e nunca deve entrar no bundle/browser.",
+        "A integração nativa evita compartilhar a chave JWT secreta do Supabase e usar o template JWT legado do Clerk. Uma chave `user_id` enviada pelo cliente serve como dado a comparar, nunca como prova de identidade."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Quem emite e quem valida o token",
+        "paragraphs": [
+          "O Clerk autentica a pessoa e emite um token de sessão assinado. Ao habilitar Clerk como provedor de terceiros no Supabase, Supabase passa a validar tokens dessa instância e reconhece a role de banco apropriada. A aplicação encaminha o token atual como bearer token nas chamadas; o banco recebe claims verificados, entre eles `sub`, que identifica a conta Clerk.",
+          "A integração nativa não sincroniza usuários entre Clerk e Supabase Auth. A tabela deste curso guarda o `user_id` Clerk como texto, sem criar usuário em `auth.users`. O token também não contém a regra completa da aplicação: a RLS avalia cada operação no banco.",
+          "O repositório usa a API REST do Supabase diretamente em `cloud.js`: manda `apikey` pública e `Authorization: Bearer` com token da sessão Clerk. Uma biblioteca cliente oficial pode oferecer outra interface ao mesmo serviço, mas este site não precisa ser convertido nem ganhar dependência para estudar o contrato.",
+          "Pausa: no pedido do navegador, qual dado identifica o projeto/cliente e qual credencial representa a conta autenticada?"
+        ],
+        "terms": [
+          { "term": "Provedor de terceiros", "meaning": "Serviço externo cujos tokens assinados o Supabase está configurado para validar." },
+          { "term": "JWT de sessão", "meaning": "Token assinado com claims como emissor e subject; o servidor valida assinatura e contexto antes de usar os claims." },
+          { "term": "`sub` (subject)", "meaning": "Claim que identifica a entidade autenticada pelo emissor do token; aqui, é o ID textual do usuário Clerk." },
+          { "term": "Role `authenticated`", "meaning": "Role Postgres assumida por uma chamada com identidade autenticada; não é o ID pessoal nem uma permissão irrestrita." }
+        ]
+      },
+      {
+        "title": "RLS como porteiro de cada linha",
+        "paragraphs": [
+          "Row Level Security (RLS) permite que o PostgreSQL aplique regras por linha em cada chamada. Uma policy como `using ((select auth.jwt()->>'sub') = user_id)` equivale a restringir a consulta aos registros cujo proprietário corresponde ao subject validado. A regra permanece no banco mesmo que a pessoa altere o pedido HTTP manualmente.",
+          "Para `SELECT`, `USING` define quais registros podem ser lidos. Para `INSERT`, `WITH CHECK` exige que a nova linha pertença à identidade que fez o pedido. Para `UPDATE`, `USING` limita a linha existente e `WITH CHECK` limita o estado resultante. Se uma ação não deve existir, como apagar o progresso neste projeto, não conceda grant nem crie policy de delete.",
+          "No schema atual, `user_id` é `text`, porque IDs Clerk como `user_...` não são UUIDs. O uso de `(select auth.jwt()->>'sub')` preserva esse tipo. `auth.uid()` é um helper voltado ao ID Supabase Auth no formato UUID; não o substitua mecanicamente quando a identidade vem do Clerk.",
+          "Pausa: uma pessoa autenticada envia no JSON `user_id: 'user_demo_B'`, mas o token validado contém `sub: 'user_demo_A'`. Qual campo deve ganhar na decisão do banco?"
+        ],
+        "terms": [
+          { "term": "RLS", "meaning": "Regras do PostgreSQL que filtram ou rejeitam operações em linhas conforme claims e contexto da solicitação." },
+          { "term": "`USING`", "meaning": "Condição que restringe as linhas existentes visíveis ou atingidas pela operação." },
+          { "term": "`WITH CHECK`", "meaning": "Condição que a linha nova ou atualizada precisa satisfazer para a gravação ser aceita." },
+          { "term": "Propriedade do registro", "meaning": "Vínculo entre uma linha e a identidade que pode gerenciá-la; deve ser conferido no banco." }
+        ]
+      },
+      {
+        "title": "Combinar grants, policies e privilégios mínimos",
+        "paragraphs": [
+          "O PostgreSQL verifica se a role tem grant para tentar a ação e depois aplica as policies para decidir quais linhas são permitidas. Uma policy não substitui grants, e conceder `SELECT` sem uma policy adequada pode expor todas as linhas que o papel consegue consultar.",
+          "O script deste projeto revoga grants amplos de `anon` e `authenticated`, concede apenas `select`, `insert` e `update` a `authenticated` e cria uma política por operação. A role `authenticated` é uma categoria de execução do banco; ela não significa que a pessoa possa ver os registros de todas as outras contas.",
+          "Evite autorização baseada em campos de perfil que o próprio usuário pode editar. O `sub` assinado pelo Clerk identifica a conta; se a aplicação tiver papéis organizacionais, modele a origem confiável desses claims e trate atualização de token e revogação como parte do desenho."
+        ],
+        "terms": [
+          { "term": "Grant", "meaning": "Permissão SQL que libera uma role a executar uma classe de operação numa tabela ou objeto." },
+          { "term": "Menor privilégio", "meaning": "Conceder somente as operações e dados necessários ao comportamento previsto." },
+          { "term": "`service_role` / chave secreta", "meaning": "Credencial privilegiada que pode ignorar RLS; deve permanecer em ambiente de servidor e ser usada apenas quando necessária." }
+        ]
+      },
+      {
+        "title": "Separar configuração pública de segredo e planejar a prova",
+        "paragraphs": [
+          "A URL do projeto Supabase, a chave publicável Supabase e a chave publicável Clerk são configurações que podem ser entregues ao navegador. Publicável não quer dizer que a tabela seja pública: a superfície continua segura apenas com grants mínimos, RLS e tokens verificados. O código do curso obtém somente esses valores de `/api/public-config`.",
+          "A chave secreta Supabase, `service_role`, `CLERK_SECRET_KEY` e senha do banco nunca devem aparecer na página, no `index.html`, em `assets/js`, no arquivo de exemplo público ou no DevTools do navegador. Como segredo pode contornar RLS, esconder o nome da variável não resolve uma exposição.",
+          "Para provar isolamento, prepare duas identidades de teste e uma linha fictícia por pessoa. Verifique leitura própria, ausência de leitura cruzada, rejeição de insert com ID alheio, atualização de registro próprio e tentativa de alterar dono; confirme também que a conta sem sessão não tem acesso. Esta aula só prepara a matriz: não executa nem afirma que essa prova foi feita no projeto remoto.",
+          "A URL `vercel.app` do Preview é suficiente para estudar a configuração de ambiente e a autenticação. Domínio personalizado, DNS ou publicação de Production não fazem parte deste exercício."
+        ],
+        "terms": [
+          { "term": "Chave publicável", "meaning": "Identificador de projeto/cliente destinado a uso no navegador; não autentica por si só um usuário nem substitui controles de dados." },
+          { "term": "Chave secreta", "meaning": "Credencial privilegiada para operação de servidor; deve ficar fora do frontend, repositório e exemplos públicos." },
+          { "term": "Matriz de autorização", "meaning": "Tabela de casos que registra identidade, ação, linha-alvo e resultado permitido ou negado." },
+          { "term": "Isolamento entre contas", "meaning": "Propriedade verificada quando cada identidade só acessa ou altera dados autorizados para ela." }
+        ]
+      }
+    ],
+    "guided": [
+      { "instruction": "No `cloud.js`, localize a chave do cabeçalho `apikey`, o token em `Authorization` e o filtro `user_id`. Para cada um, indique que informação fornece e se é ou não a regra final de autorização.", "result": "A chave publicável aponta ao projeto, o bearer token representa a sessão Clerk e o filtro pede uma linha; a policy RLS no PostgreSQL é a autoridade final sobre quais linhas podem ser acessadas." },
+      { "instruction": "Leia a policy de `SELECT` e a de `INSERT` no SQL. Compare o papel de `USING` com `WITH CHECK` e preveja o que acontece se a pessoa A enviar o ID da pessoa B.", "result": "`USING` limita linhas existentes; `WITH CHECK` verifica a nova linha. Como o `sub` autenticado é A, inserir/transferir a linha com `user_id` B não satisfaz a condição." },
+      { "instruction": "Preencha uma matriz de permissões para `anon` e `authenticated` nas ações SELECT, INSERT, UPDATE e DELETE, usando exatamente grants e policies de `learning-state.sql`.", "result": "`anon` não tem grants; `authenticated` pode SELECT, INSERT e UPDATE somente na linha do próprio `sub`; DELETE não foi concedido nem configurado." }
+    ],
+    "mistakes": [
+      "Achar que autenticação Clerk sincroniza automaticamente contas com `auth.users` do Supabase.",
+      "Usar `auth.uid()` como UUID quando o ID `sub` do Clerk é texto.",
+      "Confiar no `user_id` que o navegador manda em vez de comparar com claim assinado e validado.",
+      "Achar que habilitar RLS ou criar policy substitui os grants SQL necessários.",
+      "Conceder `service_role` ou chave secreta no frontend porque a chave publicável parece insuficiente.",
+      "Supor que estar na role `authenticated` permite ler todas as linhas.",
+      "Tratar um plano de testes com duas contas como prova de execução real das policies."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: a tabela contém uma linha de `user_demo_A`. Compare dois pedidos assinados, um com `sub = user_demo_A` e outro com `sub = user_demo_B`, ambos solicitando a mesma linha. Preveja quais linhas cada pedido poderá ver segundo a policy `SELECT`.",
+        "expected": "A conta A pode ver a própria linha; B não recebe essa linha. O filtro enviado pelo cliente não amplia a policy aplicada pelo PostgreSQL.",
+        "criteria": ["Usa o claim `sub` validado como identidade da chamada.", "Prevê ausência de acesso cruzado para B.", "Distingue filtro REST de autorização RLS."],
+        "solution": "Para A, `auth.jwt()->>'sub'` corresponde a `user_id`, então a policy permite a linha. Para B, a condição é falsa e a linha não fica visível, mesmo que a URL solicite esse `user_id`.",
+        "explanation": "A policy age como condição adicional aplicada no banco às linhas consultadas.",
+        "hints": ["Substitua `sub` por cada ID e compare ao `user_id` da linha.", "O parâmetro `user_id=eq...` é um filtro, não uma credencial."]
+      },
+      {
+        "prompt": "Alterar: a conta A tenta criar progresso com `user_id = user_demo_B` e depois atualizar a própria linha para transferi-la a B. Identifique qual verificação bloqueia cada ação e por quê.",
+        "expected": "O `WITH CHECK` da policy de INSERT recusa a nova linha porque B difere do `sub` de A; no UPDATE, `USING` localiza apenas linha de A e `WITH CHECK` impede que a versão resultante tenha dono B.",
+        "criteria": ["Aplica `WITH CHECK` ao INSERT.", "Usa `USING` e `WITH CHECK` no UPDATE para origem e novo estado.", "Não confia em validação apenas no cliente."],
+        "solution": "A condição de cada policy compara a identidade assinada ao `user_id`. INSERT exige que a nova linha pertença a A; UPDATE exige que a linha antiga seja de A e que a linha resultante continue sendo de A.",
+        "explanation": "Verificar só a linha existente deixa aberta a possibilidade de trocar sua propriedade na atualização.",
+        "hints": ["`USING` olha para a linha que a operação pode atingir.", "`WITH CHECK` valida os valores que serão gravados."]
+      },
+      {
+        "prompt": "Construir: escreva uma matriz conceitual de autorização para A, B e pessoa sem sessão nas operações SELECT, INSERT, UPDATE e DELETE da tabela `learning_state`. Registre também o resultado esperado quando A tenta usar a chave secreta no navegador; não execute nenhuma chamada real.",
+        "expected": "A só consulta/cria/atualiza a própria linha; B só a sua; sem sessão não há grant autenticado; DELETE é negado a todos pelo contrato atual. A chave secreta não deve chegar ao navegador, então a tentativa é marcada como configuração inválida e exposição crítica, não como caminho de teste.",
+        "criteria": ["Inclui as três identidades e quatro operações.", "Reflete grants e policies reais do arquivo SQL.", "Marca exposição de chave secreta como proibida e não executável.", "Deixa claro que a matriz é planejamento, não teste realizado."],
+        "solution": "Matriz resumida: A→SELECT/INSERT/UPDATE da linha A: permitido; mesma conta em linha B: negado; B repete apenas para a linha B; sem sessão: sem grant para a role authenticated; DELETE: sem grant/policy; chave secreta no navegador: não executar, remover e rotacionar se ocorresse.",
+        "explanation": "Matriz de casos torna visíveis os caminhos positivos e negativos antes de testar policies em ambiente descartável.",
+        "hints": ["Consulte a lista `revoke`/`grant` além das policies.", "Não classifique segredo como uma forma normal de autenticação do browser."]
+      },
+      {
+        "prompt": "Investigar erro: dois usuários autenticados enxergam o mesmo progresso. Sem abrir o banco remoto, trace hipóteses nos grants, estado RLS, policy `SELECT`, claim `sub`, chave enviada pelo frontend e uso acidental de `service_role`. Ordene o que verificaria sem revelar nenhum token.",
+        "expected": "Confirma ambiente/tabela e RLS habilitada, inspeciona grants e policy que compara `sub` a `user_id`, verifica que o token é da conta esperada e que o cliente usa chave publicável, e procura credencial privilegiada no frontend; não presume que o filtro de URL garante isolamento.",
+        "criteria": ["Inspeciona banco, policy e identidade antes de mudar código.", "Considera credencial privilegiada como possível bypass.", "Não solicita nem imprime token/segredo.", "Não afirma que uma configuração foi confirmada sem evidência."],
+        "solution": "Registre só status, ambiente e nome de configuração; compare RLS/grants/policies com `learning-state.sql`, verifique o `sub` sem divulgar o token e confira no código se `apikey` é publicável. Se segredo privilegiado chegou ao navegador, interrompa uso, revogue/rotacione no painel e corrija antes de repetir qualquer chamada.",
+        "explanation": "O sintoma pode vir de autorização aberta, identidade incorreta ou chave que ignora RLS; o diagnóstico deve proteger credenciais e distinguir cada causa.",
+        "hints": ["Primeiro confira se o banco está aplicando a policy de leitura esperada.", "O filtro no cliente pode estar ausente ou alterado sem representar uma falha do token."]
+      }
+    ],
+    "quiz": [
+      { "question": "O que a integração Clerk como provedor de terceiros faz para o Supabase?", "options": ["Permite validar tokens Clerk; não sincroniza automaticamente usuários em `auth.users`.", "Troca automaticamente todas as contas Clerk por contas Supabase Auth.", "Desativa a necessidade de policies RLS."], "correctIndex": 0, "explanation": "A integração estabelece confiança para verificar tokens externos; políticas de acesso e eventual sincronização são responsabilidades distintas." },
+      { "question": "Por que a policy compara `auth.jwt()->>'sub'` com `user_id` nesta tabela?", "options": ["Porque `sub` é o ID Clerk textual validado do token e `user_id` é texto.", "Porque qualquer texto enviado pelo cliente é confiável.", "Porque `auth.uid()` sempre retorna IDs Clerk em UUID."], "correctIndex": 0, "explanation": "O subject validado identifica o usuário Clerk; o esquema guarda esse identificador como texto." },
+      { "question": "Qual combinação protege uma tabela exposta?", "options": ["Apenas `GRANT`, sem RLS.", "Apenas RLS, sem grants.", "Grants mínimos e policies RLS coerentes por operação."], "correctIndex": 2, "explanation": "Grants controlam quais operações uma role pode tentar; RLS limita as linhas alcançadas." },
+      { "question": "Qual credencial pode contornar RLS e nunca deve ir ao navegador?", "options": ["A URL Supabase.", "A chave publicável `sb_publishable_...`.", "A chave secreta ou `service_role`."], "correctIndex": 2, "explanation": "Chaves privilegiadas pertencem ao servidor; credenciais publicáveis precisam de RLS e grants seguros." }
+    ],
+    "summary": [
+      "Clerk emite a identidade; Supabase valida o token como provedor de terceiros. Isso não sincroniza contas em `auth.users`.",
+      "O claim assinado `sub` é comparado ao `user_id` textual da linha; no projeto, não se usa `auth.uid()` para IDs Clerk.",
+      "`USING` limita linhas existentes, `WITH CHECK` valida as novas ou atualizadas; grants mínimos complementam policies RLS.",
+      "A chave publicável identifica o projeto; o token da sessão identifica a chamada; segredo/`service_role` fica no servidor.",
+      "A matriz de duas contas desta aula é um plano conceitual. A prova real das policies e do isolamento no Supabase continua pendente e não depende de domínio próprio."
+    ]
+  },
   "delivery-ci": {
     "prerequisites": "Concluir setup-node, js-debug e delivery-environments; saber executar Node no terminal e ter praticado testes de funções em JavaScript.",
     "setup": "Na pasta da aula, salve o exemplo como regra.test.js no editor. No terminal aberto nessa pasta, execute node --test regra.test.js; a saída esperada resume 2 testes aprovados e 0 falhas. Não é preciso instalar pacote. Para simular regressão, troque apenas return valor.trim() por return valor, rode novamente e observe 1 falha; restaure a linha e repita o comando. O processo termina sozinho; se node não for reconhecido, revise setup-node. Esta execução é local, sem serviço de CI remoto.",
@@ -1937,6 +2077,11 @@ Object.assign(LESSON_GUIDES, {
       prompt: "Um login mediado pelo Clerk termina no Preview, mas o Google informa `redirect_uri_mismatch`. Desenhe as setas do fluxo, marque o callback esperado em cada serviço e escreva três comparações exatas que podem localizar a divergência sem mostrar valores secretos.",
       expected: "A pessoa compara o URI enviado pelo Google ao URI autorizado no cliente OAuth selecionado, confirma callback e ambiente no Clerk e verifica separadamente a URL de retorno permitida do app; não altera DNS, não inventa curingas e não compartilha segredo.",
       hint: "Localize em qual salto a mensagem aparece e diferencie o receptor do callback Google do destino final do navegador."
+    },
+    "delivery-clerk-supabase": {
+      prompt: "A tela de progresso filtra `user_id=eq.user_demo_A`, mas um teste conceitual mostra dados de B ao entrar como A. Revise a comparação do `sub`, os grants/policies e a chave enviada; indique qual evidência distinguiria RLS aberto de credencial privilegiada, sem expor tokens.",
+      expected: "A análise confirma estado RLS e policy de SELECT, compara o `sub` autenticado com o proprietário da linha, verifica que o browser usa só chave publicável e procura grants amplos; não conclui a causa sem evidência nem imprime segredo.",
+      hint: "O filtro da URL é apenas uma condição do pedido. A decisão final ocorre no banco e pode ser contornada por uma credencial privilegiada."
     },
     "delivery-ci": {
       prompt: "Uma publicação altera a validação de minutos e o POST começa a aceitar -5. Defina um teste que falhe antes da correção, indique onde a CI deve executá-lo e descreva como conter a versão ruim enquanto investiga.",

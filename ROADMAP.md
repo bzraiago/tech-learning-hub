@@ -402,16 +402,20 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Configurar login social do Google pelo Clerk e ensinar os conceitos transferíveis de OAuth 2.0/OpenID Connect, redirect URI, consentimento, escopos e `state`.
   - [x] Criar `delivery-oauth-google` com fluxo navegador → Clerk → Google → callback → Preview, autenticação versus autorização, OAuth/OIDC, origem/callback/retorno, escopos mínimos, `state`/`nonce`, diagnóstico de `redirect_uri_mismatch` e fronteira de RLS.
   - [x] Usar documentação oficial e exemplos sem segredo; o dono confirmou anteriormente que o login Google funcionou. O material de domínio próprio permanece conceitual e não exige teste com domínio.
-- [ ] Conectar Clerk ao Supabase pela integração nativa atual, sem usar o template JWT legado.
-  - [x] Preparar cliente REST com token da sessão Clerk e guia da integração nativa; ativação e teste com duas contas pendentes.
+- [~] Conectar Clerk ao Supabase pela integração nativa atual, sem usar o template JWT legado.
+  - [x] Preparar o cliente REST com token da sessão Clerk e configurar a integração nativa documentada; o salvamento/carregamento na nuvem foi confirmado pelo dono.
+  - [x] Criar `delivery-clerk-supabase` para explicar assinatura/validação, `sub`, `auth.jwt()`, políticas atuais, RLS, grants e o motivo para não usar o template JWT legado.
+  - [ ] Comprovar isolamento com duas contas e tentativa de falsificar `user_id`; o plano didático não conta como execução da policy remota.
   - [x] Carregar automaticamente o progresso remoto da conta ao trocar de sessão, sem misturar estados de usuários.
   - [x] Enviar alterações automaticamente ao Supabase e remover controles de sincronização manual e arquivos locais; fluxo automatizado verificado, teste na Vercel pendente.
 - [ ] Criar tabelas e migrações no PostgreSQL do Supabase.
   - [x] Preparar `supabase/learning-state.sql` com tabela e políticas; execução no projeto remoto pendente.
-- [ ] Aplicar Row Level Security (RLS) e provar com duas contas que cada pessoa acessa somente seus próprios registros.
-- [ ] Diferenciar chave publicável, segredo de servidor e credenciais que nunca podem chegar ao navegador.
+- [~] Aplicar Row Level Security (RLS) e provar com duas contas que cada pessoa acessa somente seus próprios registros.
+  - [x] A aula compara grants e policies `SELECT`/`INSERT`/`UPDATE`, explica `USING`/`WITH CHECK` e traz uma matriz de autorização para duas identidades fictícias.
+  - [ ] Executar as tentativas positivas e negativas com duas identidades reais ou harness de banco isolado e registrar evidências sem publicar tokens.
+- [x] Diferenciar chave publicável, segredo de servidor e credenciais que nunca podem chegar ao navegador; a aula compara chave Supabase/Clerk, token de sessão e `service_role`.
 - [ ] Publicar na Vercel como Preview, configurar variáveis de Preview e atualizar URLs de retorno permitidas para o hostname Preview usado.
-- [ ] Executar smoke test no Preview: login, criação, leitura, edição, exclusão, logout e acesso negado.
+- [ ] Executar smoke test no Preview: login, criação e atualização de progresso, leitura da própria conta, isolamento entre contas, logout e acesso negado.
 
 ### Fase 7.3 — Segurança aplicada e privacidade
 
@@ -653,7 +657,8 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 27/10/2026 | Fase 3 — reconhecimento de erros | Commit pendente | As 114 aulas contêm de três a cinco erros comuns; o validador agora exige pelo menos três e a Revisão ensina a capturar sinal, passo causador e resultado esperado antes da correção. O renderizador em Chromium exibiu os erros e a orientação em todos os guias; estilo, teclado e conferência no site publicado ainda pendentes. |
 | 27/10/2026 | Fase 3 — transferência | Commit pendente | As 114 aulas têm segunda tentativa com resultado e pista; nenhuma foi idêntica ao exercício de origem e a auditoria de termos mostrou baixa sobreposição com os exercícios da própria aula. O renderizador de produção exibiu a recuperação após quiz errado nos 114 guias em Chromium a 375 px; o teclado alcançou o rascunho. As amostras das nove trilhas mudam cenário e dados. |
 | 27/10/2026 | Fase 7.1 — fundamentos de hospedagem e DNS | Commit pendente | Sete aulas cobrem papéis de registrador/DNS/hospedagem, resolução recursiva, registros A/AAAA/CNAME/TXT/NS, TTL, HTTPS/TLS, modelos, Preview e plano conceitual de domínio; total de 28 exercícios e 20 questões. `labs/deployment-static` usa o Preview existente e inclui alternativa conceitual se protegido. RFC 5737, RFC 3849, RFC 1034 e RFC 6761 foram conferidas para exemplos. A checagem remota do Preview ainda pode ser bloqueada por autenticação Vercel; domínio real e testes dependentes dele estão fora do escopo por decisão do dono. Contagens registradas naquela etapa: 121 aulas, 486 exercícios e 361 questões. |
-| 27/10/2026 | Fase 7.2 — OAuth/OIDC com Google e Clerk | Conceitos concluídos | `delivery-oauth-google` explica o fluxo mediado pelo Clerk, callback versus retorno ao Preview, consentimento, escopos mínimos, `state`/`nonce`, diagnóstico de `redirect_uri_mismatch` e separação de autenticação, autorização e RLS. O usuário já havia confirmado que o login Google funcionou. Conceitos apoiados em documentação oficial; domínio próprio e validação de produção não são requisitos. Contagens: 122 aulas, 490 exercícios e 366 questões. Validação de conteúdo passou; não foram feitos testes de domínio ou produção. |
+| 27/10/2026 | Fase 7.2 — OAuth/OIDC com Google e Clerk | Conceitos concluídos | `delivery-oauth-google` explica o fluxo mediado pelo Clerk, callback versus retorno ao Preview, consentimento, escopos mínimos, `state`/`nonce`, diagnóstico de `redirect_uri_mismatch` e separação de autenticação, autorização e RLS. O usuário já havia confirmado que o login Google funcionou. Conceitos apoiados em documentação oficial; domínio próprio e validação de produção não são requisitos. Contagens na etapa: 122 aulas, 490 exercícios e 366 questões. Validação de conteúdo passou; não foram feitos testes de domínio ou produção. |
+| 27/10/2026 | Fase 7.2 — integração Clerk–Supabase e RLS | Conceitos concluídos | `delivery-clerk-supabase` usa os arquivos reais `cloud.js` e `learning-state.sql` para explicar token de sessão, claim `sub`, roles, grants, `USING`, `WITH CHECK`, chaves e matriz de isolamento para duas contas. Validador de conteúdo passou. Nenhuma policy ou dado remoto foi alterado; a prova de isolamento por duas contas segue pendente. Sem teste de domínio/Production. Contagens: 123 aulas, 494 exercícios e 370 questões. |
 
 ## Decisões e bloqueios
 
