@@ -5755,7 +5755,7 @@
               "Planejar uma revisão controlada sem gerar carga contra Preview, serviços públicos ou contas reais."
             ],
             "exercise": "Use a matriz de cenários com números fictícios para propor limites e sinais; trace fixture → JWT assinado com chave gerada → sessão Clerk real opcional e explique que evidência cada etapa fornece.",
-            "code": "EXEMPLO DE ANÁLISE (dados fictícios; sessão real é uma prática local opcional):\n\nAPI normal do laboratório\nPOST /api/estudos -> IP observado pelo servidor -> contador Redis -> gravação\n\nFixture unitário (não autentica)\nBearer fixture-session-a -> adaptador falso -> subject inventado -> HMAC -> contador separado\n\nVerificador Clerk opcional\nAuthorization: Bearer <JWT de sessão>\n  -> @clerk/backend verifyToken() e chave pública PEM\n  -> conferir assinatura, exp/nbf, iss esperado e azp autorizado\n  -> exigir sub (pessoa) e sid (sessão); devolver somente sub\n  -> HMAC-SHA-256(sub, segredo privado separado) -> quota da conta\n\nSem BACKEND_ACCOUNT_AUTH=clerk, o servidor continua respondendo 404. O navegador não escolhe a conta por accountId ou X-Account-Id. O fixture testa o contrato; os testes RSA locais exercitam a verificação criptográfica; somente a prática `test:clerk-real` usa uma sessão da própria pessoa. Nenhuma prova concede autorização por registro.\n\nCom limite didático 3/60s, três gravações podem responder 201 e a quarta 429 + Retry-After. Redis indisponível responde 503 sem gravar; sessão inválida recebe 401 antes do contador. A página usa contadores locais temporários, não uma implantação de produção.",
+            "code": "EXEMPLO DE ANÁLISE (dados fictícios; sessão real é uma prática local opcional):\n\nAPI normal do laboratório\nPOST /api/estudos -> IP observado pelo servidor -> contador Redis -> gravação\n\nFixture unitário (não autentica)\nBearer fixture-session-a -> adaptador falso -> subject inventado -> HMAC -> contador separado\n\nVerificador Clerk opcional\nAuthorization: Bearer <JWT de sessão>\n  -> @clerk/backend verifyToken() e chave pública PEM\n  -> conferir assinatura, exp/nbf, iss esperado e azp autorizado\n  -> exigir sub (pessoa) e sid (sessão); devolver somente sub\n  -> HMAC-SHA-256(sub, segredo privado separado) -> quota da conta\n\nEste laboratório escolhe verifyToken() para deixar visível a validação do Bearer extraído; é uma API de nível mais baixo. Para muitos fluxos, Clerk recomenda authenticateRequest(request), que autentica o pedido e também pode verificar sem rede com PEM, desde que publishable key esteja configurada.\n\nSem BACKEND_ACCOUNT_AUTH=clerk, o servidor continua respondendo 404. O navegador não escolhe a conta por accountId ou X-Account-Id. O fixture testa o contrato; os testes RSA locais exercitam a verificação criptográfica; somente a prática `test:clerk-real` usa uma sessão da própria pessoa. Nenhuma prova concede autorização por registro.\n\nCom limite didático 3/60s, três gravações podem responder 201 e a quarta 429 + Retry-After. Redis indisponível responde 503 sem gravar; sessão inválida recebe 401 antes do contador. A página usa contadores locais temporários, não uma implantação de produção.",
             "docs": [
               {
                 "kind": "doc",
@@ -5797,6 +5797,12 @@
                 "kind": "doc",
                 "title": "Clerk · verifyToken() do Backend SDK",
                 "url": "https://clerk.com/docs/reference/backend/verify-token",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Clerk · authenticateRequest() do Backend SDK",
+                "url": "https://clerk.com/docs/reference/backend/authenticate-request",
                 "language": "EN"
               },
               {
