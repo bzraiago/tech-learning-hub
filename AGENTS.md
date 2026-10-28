@@ -280,7 +280,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
    - [x] Criar aplicador de migrations numeradas, segunda migration de sessões e transação estudo + sessão com rollback demonstrável.
    - [x] Criar teste de integração PostgreSQL e testes unitários para migrations, repositório transacional e respostas HTTP.
    - [x] Confirmar que uma conexão PostgreSQL recusada retorna `500` genérico sem detalhes internos e que `start:memory` sinaliza dados temporários.
-   - [x] Executar migrations e teste de integração em PostgreSQL real descartável; criação, unicidade, transação e persistência após reinício foram verificadas. O caminho específico de Docker Compose segue pendente.
+   - [x] Executar migrations e teste de integração em PostgreSQL real descartável; criação, unicidade, transação e persistência após reinício foram verificadas. O caminho Compose do laboratório também foi validado com PostgreSQL 17.
 6. [ ] **CI, publicação e integração externa** como práticas guiadas e verificáveis (observar falha, corrigir, conferir URL final, voltar versão).
    - [x] Criar aulas sobre domínio, DNS, HTTPS/TLS e opções de hospedagem, com fontes oficiais, exemplos fictícios e práticas diagnósticas.
    - [ ] Verificar a publicação anônima na Vercel e executar o laboratório de domínio; o acesso autenticado à conta e um domínio de laboratório continuam necessários.
@@ -293,7 +293,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
    - [ ] Conferir a URL pública final; o dono autorizou previews públicos, mas o ajuste e a validação anônima aguardam acesso autenticado à conta Vercel.
    - [x] Documentar o Instant Rollback da Vercel, seus limites por plano, o efeito na atribuição automática de domínios e a separação em relação aos dados do banco.
    - [x] Criar roteiro local de `pg_dump`/`pg_restore` para restaurar em uma base separada, sem alterar a origem; backups ficam ignorados pelo Git.
-   - [ ] Executar e verificar rollback real e backup/restauração; a conta Vercel aguarda conexão e o daemon Docker não está ativo nesta sessão.
+   - [~] Concluir as validações de recuperação: backup/restauração passou localmente via Docker Compose e no GitHub Actions; rollback real na Vercel aguarda acesso autenticado à conta.
 7. [ ] Atividades gerais de conclusão (prova básica disponível no curso; intermediária pendente) — ver seção 9.
 8. [x] Corrigir a inconsistência da porta do PostgreSQL (55432) entre laboratório Docker e projeto relacional.
 9. [ ] Dividir aulas com excesso de conceitos (a aula de funções em JavaScript já foi dividida; mapear as demais).

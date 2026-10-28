@@ -127,7 +127,7 @@ npm.cmd run test:backup-restore
 npm run test:backup-restore
 ```
 
-Resultado esperado: uma mensagem informa a contagem de estudos e sessões e confirma que a origem permaneceu igual. O script cria o dump em uma pasta temporária, verifica o índice, restaura em uma base com nome exclusivo, compara hashes das linhas das duas tabelas e remove apenas essa base temporária e os arquivos criados pelo próprio script. O workflow de CI semeia uma sessão fictícia antes da verificação para cobrir as duas tabelas com dados.
+Resultado esperado: `Backup PostgreSQL verificado: estudos=2, sessoes=1; origem preservada.` O script cria o dump em uma pasta temporária, verifica o índice, restaura em uma base com nome exclusivo, compara hashes das linhas das duas tabelas e remove apenas essa base temporária e os arquivos criados pelo próprio script. O workflow de CI semeia uma sessão fictícia antes da verificação para cobrir as duas tabelas com dados. Esta validação passou localmente e no job `backup-restore` do GitHub Actions (run 40617482760).
 
 ## Problemas comuns
 
