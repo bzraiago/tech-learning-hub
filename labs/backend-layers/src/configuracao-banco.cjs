@@ -1,6 +1,7 @@
 'use strict';
 
 const { Pool } = require('pg');
+const { logger } = require('./logger.cjs');
 
 function criarPoolEstudos() {
   const porta = Number(process.env.PGPORT || 55433);
@@ -18,7 +19,7 @@ function criarPoolEstudos() {
   });
 
   pool.on('error', (erro) => {
-    console.error(`Falha em conexão PostgreSQL ociosa: ${erro.code || erro.name || 'erro desconhecido'}`);
+    logger.error('api.postgres.idle_connection.failed', erro);
   });
 
   return pool;

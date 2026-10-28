@@ -106,8 +106,13 @@ test('Redis real limita pedidos HTTP, isola keys e falha fechado após desconex�
       erro: 'Limitador temporariamente indisponível.'
     });
     assert.equal(gravacoes, 3);
-    assert.deepEqual(logsFalha, ['Falha no rate limit: Error']);
+    const registroFalha = JSON.parse(logsFalha[0]);
+    assert.equal(registroFalha.event, 'api.rate_limit.unavailable');
+    assert.equal(registroFalha.route, 'POST /api/estudos');
+    assert.equal(registroFalha.errorCode, 'Error');
+    assert.equal(logsFalha.length, 1);
     assert.equal(logsFalha.join(' ').includes(identidadeA), false);
+    assert.equal(logsFalha.join(' ').includes('203.0.113.'), false);
   } finally {
     if (servidor.listening) {
       await new Promise((resolve) => servidor.close(resolve));

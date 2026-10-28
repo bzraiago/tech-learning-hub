@@ -1,5 +1,8 @@
 'use strict';
 
+const { logger } = require('./logger.cjs');
+const CATEGORIAS_SEGURAS = new Set(['tempo_limite', 'rede', 'autenticacao', 'http', 'resposta_invalida']);
+
 function responderJson(resposta, status, dados) {
   resposta.statusCode = status;
   resposta.end(JSON.stringify(dados));
@@ -46,8 +49,8 @@ function criarRotaPrevisao(servicoPrevisao, { cacheControl = 'no-store', coorden
       responderJson(res, 200, await servicoPrevisao.consultar({ latitude, longitude }));
     } catch (erro) {
       const status = erro?.tipo === 'tempo_limite' ? 504 : 502;
-      const categoria = typeof erro?.tipo === 'string' ? erro.tipo : 'integracao';
-      console.error(`Falha na integração externa: ${categoria}`);
+      const categoria = CATEGORIAS_SEGURAS.has(erro?.tipo) ? erro.tipo : 'integracao';
+      logger.error('api.weather.integration.failed', erro, { category: categoria });
       responderJson(res, status, {
         erro: 'Não foi possível obter a previsão agora.',
         codigo: categoria

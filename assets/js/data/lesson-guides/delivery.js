@@ -971,6 +971,20 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
+        "title": "Registre JSON que ajude sem carregar dados pessoais",
+        "paragraphs": [
+          "O laboratório `labs/backend-layers/src/logger.cjs` emite uma linha JSON por evento com timestamp, nível e nome fixo do evento. A falha de rota pode incluir um caminho conhecido sem query; o startup registra só os modos locais de armazenamento, cache e rate limit.",
+          "O logger aceita poucos campos por allowlist, reconhece códigos de erro comuns e substitui os demais. Não guarda mensagem ou stack da exceção, corpo, título, IP, coordenada, URL completa, token, senha ou cabeçalho. Isso reduz exposição, mas também limita o diagnóstico: acrescente contexto técnico por categoria permitida, não copiando a entrada da pessoa.",
+          "Para verificar, rode `node --test src/logger.test.cjs src/server.test.cjs` em `labs/backend-layers`. Os testes incluem strings fictícias parecidas com token, email, IP e erro privado e conferem que a saída JSONL contém apenas campos autorizados. stdout e stderr são fluxos distintos; `docker compose logs` permite ler a saída local, sem torná-la automaticamente persistente.",
+          "Pausa: de um registro que contém token, endereço IP, URL com coordenadas e stack trace, quais campos são necessários para explicar uma falha HTTP e como reduzi-los?"
+        ],
+        "terms": [
+          { "term": "JSONL", "meaning": "Formato em que cada linha contém um objeto JSON independente, adequado a leitura e filtros por evento/campo." },
+          { "term": "Allowlist", "meaning": "Lista explícita dos campos e valores que podem sair no log; entradas fora dela são descartadas." },
+          { "term": "Minimização de log", "meaning": "Registrar só o contexto operacional necessário, reduzindo coleta e retenção de dados pessoais ou credenciais." }
+        ]
+      },
+      {
         "title": "Recuperação e rollback",
         "paragraphs": [
           "Rollback é voltar a uma versão que se sabe funcionar quando a versão nova causa problema grave. Ele precisa ser planejado: identifique a versão anterior, preserve artefato ou commit, saiba como restaurar e verifique o fluxo principal depois. Se houve mudança de dados incompatível, voltar só os arquivos pode não bastar; comunique a dependência. Em exercício local, copie a versão anterior e reproduza a volta sem apagar o histórico da falha.",
@@ -1008,6 +1022,10 @@ Object.assign(LESSON_GUIDES, {
       {
         "instruction": "Restaure o código e rode novamente.",
         "result": "Os dois testes voltam a passar."
+      },
+      {
+        "instruction": "Em `labs/backend-layers`, rode `node --test src/logger.test.cjs src/server.test.cjs` e leia uma linha de erro JSON.",
+        "result": "O registro contém timestamp, level, event, rota conhecida e código permitido; não contém mensagem/stack, IP, body, token ou query string."
       }
     ],
     "exercises": [
@@ -1054,6 +1072,14 @@ Object.assign(LESSON_GUIDES, {
         "explanation": "O fluxo cobre diagnóstico e redução de impacto, não só alteração do código.",
         "expected": "Relato tem observação, contenção e prova posterior.",
         "criteria": ["Relato contém versão, rota, entrada mínima e resposta observada.","Contenção, regressão e prova final são verificáveis após recuperação."]
+      },
+      {
+        "prompt": "Alterar: remova de um log de erro os campos `token`, `ip`, `body` e `stack`. Proponha um registro JSON mínimo com timestamp, level, event, rota conhecida e errorCode seguro; explique qual contexto ainda permite investigar.",
+        "hints": ["Use um evento fixo e rota sem query string.", "Código bruto desconhecido não precisa ser copiado para a saída."],
+        "solution": "`{\"timestamp\":\"2026-10-28T12:00:00.000Z\",\"level\":\"error\",\"event\":\"api.request.failed\",\"route\":\"POST /api/estudos\",\"errorCode\":\"ECONNREFUSED\"}`. Use versão/ambiente num fluxo de diagnóstico separado, sem incluir credenciais ou conteúdo do pedido.",
+        "explanation": "Um evento e uma categoria de rota permitem localizar a classe da falha; mensagem e payload podem vazar informação sem aumentar a evidência útil.",
+        "expected": "JSONL tem somente campos operacionais autorizados e omite segredo, IP, body, stack e query string.",
+        "criteria": ["Registro inclui timestamp, level, event, rota estável e código seguro.", "Token, IP, body, stack e query foram removidos.", "Diagnóstico usa categorias ou versão sem copiar entrada da pessoa."]
       }
     ],
     "mistakes": [
@@ -1097,7 +1123,8 @@ Object.assign(LESSON_GUIDES, {
     "summary": [
       "Combine testes de regra, integração e navegação conforme o risco.",
       "CI repete verificações e ajuda a impedir entrega com falha conhecida.",
-      "Observe, reproduza, contenha, corrija e acrescente regressão."
+      "Observe, reproduza, contenha, corrija e acrescente regressão.",
+      "Use logs JSON estruturados com campos permitidos e sem payload, IP, credenciais ou stack."
     ]
   },
   "delivery-threat-model": {

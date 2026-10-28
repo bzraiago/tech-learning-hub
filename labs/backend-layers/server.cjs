@@ -11,6 +11,7 @@ const { criarRotaPrevisao } = require('./src/rota-previsao.cjs');
 const { criarLimitadorRedis } = require('./src/rate-limiter-redis.cjs');
 const { criarLimitadorEmMemoria } = require('./src/rate-limiter-memory.cjs');
 const { criarServicoEstudosComCache } = require('./src/servico-estudos-cache-aside.cjs');
+const { logger } = require('./src/logger.cjs');
 const { createClient } = require('redis');
 
 const pagina = path.join(__dirname, 'index.html');
@@ -34,6 +35,20 @@ function obterIdentidadePorIpObservado(req) {
   return endereco.startsWith('::ffff:') ? endereco.slice('::ffff:'.length) : endereco;
 }
 
+function obterRotaSeguraParaLog(req) {
+  const caminho = req.url.split('?')[0];
+  if (req.method === 'GET' && (caminho === '/api/previsao' || caminho === '/api/labs/open-meteo')) {
+    return `GET ${caminho}`;
+  }
+  const rota = `${req.method} ${caminho}`;
+  const rotasConhecidas = new Set([
+    'GET /api/estudos',
+    'POST /api/estudos',
+    'POST /api/estudos-com-sessao'
+  ]);
+  return rotasConhecidas.has(rota) ? rota : 'other';
+}
+
 async function verificarLimiteDeGravacao(req, res, limitador) {
   let decisao;
   try {
@@ -47,8 +62,7 @@ async function verificarLimiteDeGravacao(req, res, limitador) {
       throw new Error('Resposta inválida do limitador');
     }
   } catch (erro) {
-    const codigo = erro && (erro.code || erro.name);
-    console.error(`Falha no rate limit: ${codigo || 'erro desconhecido'}`);
+    logger.error('api.rate_limit.unavailable', erro, { route: obterRotaSeguraParaLog(req) });
     responderJson(res, 503, { erro: 'Limitador temporariamente indisponível.' });
     return false;
   }
@@ -155,7 +169,7 @@ function criarServidor(servico, servicoPrevisao, limitador) {
   const rotaPrevisao = criarRotaPrevisao(servicoPrevisao);
   return http.createServer((req, res) => {
     responder(req, res, servico, rotaPrevisao, limitador).catch((erro) => {
-      console.error(`Falha interna na API: ${erro.code || erro.name || 'erro desconhecido'}`);
+      logger.error('api.request.failed', erro, { route: obterRotaSeguraParaLog(req) });
       if (!res.headersSent) {
         responderJson(res, 500, { erro: 'Falha interna do servidor' });
       } else {
@@ -191,8 +205,7 @@ if (require.main === module) {
         }
       });
       clienteRedis.on('error', (erro) => {
-        const codigo = erro && (erro.code || erro.name);
-        console.error(`Falha na conexão Redis: ${codigo || 'erro desconhecido'}`);
+        logger.error('api.redis.connection.failed', erro);
       });
       servicoDaApi = criarServicoEstudosComCache(servico, clienteRedis, {
         ttlSegundos: Number(process.env.CACHE_TTL_SECONDS || 30)
@@ -211,18 +224,19 @@ if (require.main === module) {
 
     const servidor = criarServidor(servicoDaApi, servicoPrevisao, limitador);
     servidor.listen(4180, '127.0.0.1', () => {
-      const modoLimite = usarMemoria ? 'memória local (temporário)' : 'Redis';
-      const modoCache = usarMemoria ? 'desativado' : 'Redis (cache-aside)';
-      console.log(
-        `Abra http://127.0.0.1:4180 · armazenamento: ${usarMemoria ? 'memória (temporário)' : 'PostgreSQL'} · cache: ${modoCache} · rate limit: ${modoLimite}`
-      );
+      logger.info('api.started', {
+        address: '127.0.0.1:4180',
+        storage: usarMemoria ? 'memory' : 'postgresql',
+        cache: usarMemoria ? 'disabled' : 'redis_cache_aside',
+        rateLimit: usarMemoria ? 'memory_local' : 'redis'
+      });
     });
 
     function encerrar() {
       servidor.close(async () => {
         if (repositorio.encerrar) await repositorio.encerrar();
         if (clienteRedis && clienteRedis.isOpen) clienteRedis.destroy();
-        console.log('Servidor encerrado');
+        logger.info('api.stopped');
       });
     }
 
@@ -231,8 +245,7 @@ if (require.main === module) {
   }
 
   iniciar().catch((erro) => {
-    const codigo = erro && (erro.code || erro.name);
-    console.error(`Não foi possível iniciar a API: ${codigo || 'erro desconhecido'}`);
+    logger.error('api.startup.failed', erro);
     process.exitCode = 1;
   });
 }

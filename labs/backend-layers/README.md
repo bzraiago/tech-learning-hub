@@ -105,7 +105,7 @@ Para praticar backup lógico e restauração numa base separada, siga o [roteiro
 
 ## Executar a API e observar a persistência
 
-1. No terminal em `labs/backend-layers`, execute `npm.cmd start` no Windows ou `npm start` em macOS/Linux. Saída esperada: `Abra http://127.0.0.1:4180 · armazenamento: PostgreSQL · cache: Redis (cache-aside) · rate limit: Redis`.
+1. No terminal em `labs/backend-layers`, execute `npm.cmd start` no Windows ou `npm start` em macOS/Linux. A primeira linha é um registro JSON `api.started`, com endereço local e modos de armazenamento, cache e rate limit.
 2. Abra `http://127.0.0.1:4180`. A lista inicial tem `HTML` e `JavaScript`.
 3. Cadastre `CSS`. A resposta HTTP é `201 Created` e a lista passa a ter três estudos.
 4. Atualize a página. `CSS` continua na lista porque está no PostgreSQL, não na memória do processo.
@@ -124,6 +124,14 @@ console.log(resposta.status, await resposta.json());
 Resultado esperado: `409` e uma mensagem de título já existente. A lista permanece com três itens. A consulta de verificação usa parâmetros `$1` e `$2`; o título enviado não é concatenado no SQL.
 
 Para ver o contrato por fora do formulário, o Console também pode executar `fetch('/api/estudos').then(async r => console.log(r.status, await r.json()))`. O `GET` responde `200` com JSON. Erros inesperados do banco viram `500` genérico; detalhes internos ficam apenas no terminal.
+
+## Logs estruturados do serviço
+
+O processo da API emite uma linha JSON por evento. `timestamp`, `level` e `event` permitem filtrar e correlacionar falhas; rota é reduzida a um conjunto conhecido de caminhos, sem query string. Modos de armazenamento, cache e rate limit são valores de uma lista permitida, e códigos de erro são reconhecidos ou substituídos por `UNKNOWN`.
+
+O logger não grava corpo, título, endereço IP, coordenadas, URL completa, mensagem ou stack da exceção, senha, token ou cabeçalho. Eventos informativos vão para stdout e erros para stderr; o Compose deixa essa saída disponível em `docker compose logs`. Isso facilita processamento por linha sem transformar log local em histórico persistente.
+
+Para conferir os filtros e a resposta segura a uma falha interna, rode `node --test src/logger.test.cjs src/server.test.cjs` dentro desta pasta. Os testes inserem valores fictícios que parecem segredo, IP e dado pessoal e confirmam que esses campos não aparecem.
 
 ## Cache-aside no GET de estudos
 

@@ -21,10 +21,23 @@ test('falha inesperada do serviço retorna 500 sem expor detalhes internos', asy
   }));
 
   const endereco = servidor.address();
-  const resposta = await fetch(`http://127.0.0.1:${endereco.port}/api/estudos`);
+  const logs = [];
+  const logOriginal = console.error;
+  console.error = (linha) => logs.push(linha);
+  let resposta;
+  try {
+    resposta = await fetch(`http://127.0.0.1:${endereco.port}/api/estudos`);
+  } finally {
+    console.error = logOriginal;
+  }
 
   assert.equal(resposta.status, 500);
   assert.deepEqual(await resposta.json(), { erro: 'Falha interna do servidor' });
+  assert.equal(logs.length, 1);
+  const registroFalha = JSON.parse(logs[0]);
+  assert.deepEqual(Object.keys(registroFalha).sort(), ['errorCode', 'event', 'level', 'route', 'timestamp']);
+  assert.equal(registroFalha.route, 'GET /api/estudos');
+  assert.equal(JSON.stringify(logs).includes('detalhe privado do banco'), false);
 });
 
 test('rota da transação retorna estudo e sessão na mesma resposta 201', async (contexto) => {
@@ -123,7 +136,15 @@ test('falha externa de autenticação retorna mensagem segura e sem detalhes', a
   }));
 
   const endereco = servidor.address();
-  const resposta = await fetch(`http://127.0.0.1:${endereco.port}/api/previsao?latitude=-3.73&longitude=-38.52`);
+  const logs = [];
+  const logOriginal = console.error;
+  console.error = (linha) => logs.push(linha);
+  let resposta;
+  try {
+    resposta = await fetch(`http://127.0.0.1:${endereco.port}/api/previsao?latitude=-3.73&longitude=-38.52`);
+  } finally {
+    console.error = logOriginal;
+  }
   const dados = await resposta.json();
 
   assert.equal(resposta.status, 502);
@@ -132,6 +153,11 @@ test('falha externa de autenticação retorna mensagem segura e sem detalhes', a
     codigo: 'autenticacao'
   });
   assert.equal(JSON.stringify(dados).includes('token'), false);
+  const registro = JSON.parse(logs[0]);
+  assert.equal(registro.event, 'api.weather.integration.failed');
+  assert.equal(registro.category, 'autenticacao');
+  assert.equal(JSON.stringify(registro).includes('-3.73'), false);
+  assert.equal(JSON.stringify(registro).includes('-38.52'), false);
 });
 
 test('rate limit conta gravações por IP observado, ignora X-Forwarded-For e impede efeito recusado', async (contexto) => {

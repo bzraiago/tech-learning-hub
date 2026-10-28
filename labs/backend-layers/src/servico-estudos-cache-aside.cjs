@@ -1,6 +1,7 @@
 'use strict';
 
 const CHAVE_LISTA_ESTUDOS = 'cache:v1:backend-layers:studies:list';
+const { logger } = require('./logger.cjs');
 
 function validarRespostaCacheada(estudos) {
   return Array.isArray(estudos) && estudos.every((estudo) => (
@@ -13,7 +14,7 @@ function validarRespostaCacheada(estudos) {
 function criarServicoEstudosComCache(servico, clienteRedis, {
   ttlSegundos = 30,
   chave = CHAVE_LISTA_ESTUDOS,
-  registrarFalha = (mensagem) => console.error(mensagem)
+  registrarFalha = (evento, erro) => logger.error(evento, erro)
 } = {}) {
   if (!servico || typeof servico.listar !== 'function') {
     throw new TypeError('servico precisa oferecer listar()');
@@ -33,9 +34,8 @@ function criarServicoEstudosComCache(servico, clienteRedis, {
 
   let leituraDaFonteEmAndamento;
 
-  function registrarErro(contexto, erro) {
-    const codigo = erro && (erro.code || erro.name);
-    registrarFalha(`${contexto}: ${codigo || 'erro desconhecido'}`);
+  function registrarErro(evento, erro) {
+    registrarFalha(evento, erro);
   }
 
   async function invalidarLista() {
@@ -44,7 +44,7 @@ function criarServicoEstudosComCache(servico, clienteRedis, {
     } catch (erro) {
       // A escrita já foi confirmada na fonte; não transforme sucesso em falha aparente.
       // O TTL limita por quanto tempo uma cópia antiga ainda pode ser devolvida.
-      registrarErro('Falha ao invalidar cache', erro);
+      registrarErro('cache.invalidation.failed', erro);
     }
   }
 
@@ -56,7 +56,7 @@ function criarServicoEstudosComCache(servico, clienteRedis, {
           try {
             await clienteRedis.setEx(chave, ttlSegundos, JSON.stringify(estudos));
           } catch (erro) {
-            registrarErro('Falha ao preencher cache', erro);
+            registrarErro('cache.fill.failed', erro);
           }
         }
         return estudos;
@@ -86,7 +86,7 @@ function criarServicoEstudosComCache(servico, clienteRedis, {
           return estudos;
         }
       } catch (erro) {
-        registrarErro('Falha ao ler cache', erro);
+        registrarErro('cache.read.failed', erro);
         if (erro.code !== 'CACHE_INVALID' && !(erro instanceof SyntaxError)) {
           podePreencher = false;
         }

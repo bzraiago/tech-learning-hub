@@ -70,7 +70,7 @@ test('cache-aside usa PostgreSQL, invalida após escrita e recorre à fonte se R
     const servicoCacheado = criarServicoEstudosComCache(servicoFonte, clienteRedis, {
       ttlSegundos: 20,
       chave: chaveCache,
-      registrarFalha: (mensagem) => logsCache.push(mensagem)
+      registrarFalha: (evento, erro) => logsCache.push({ evento, codigo: erro.code || erro.name })
     });
     const servidorHttp = criarServidor(
       servicoCacheado,
@@ -119,8 +119,8 @@ test('cache-aside usa PostgreSQL, invalida após escrita e recorre à fonte se R
     assert.equal(estudosDeFallback.some((estudo) => estudo.id === idEstudo), true);
     assert.equal(leiturasDaFonte, 3, 'GET deve recorrer ao PostgreSQL quando Redis está indisponível');
     assert.equal(logsCache.length, 1);
-    assert.match(logsCache[0], /^Falha ao ler cache:/);
-    assert.equal(logsCache.every((mensagem) => !mensagem.includes(idExecucao)), true);
+    assert.equal(logsCache[0].evento, 'cache.read.failed');
+    assert.equal(JSON.stringify(logsCache).includes(idExecucao), false);
   } finally {
     if (servidor && servidor.listening) {
       await new Promise((resolve) => servidor.close(resolve));

@@ -107,13 +107,35 @@ test('falha do Redis na leitura recorre à fonte sem tentar preencher durante a 
   const estudos = [{ id: 1, titulo: 'HTML' }];
   const servico = criarServicoEstudosComCache({
     async listar() { leiturasDaFonte += 1; return estudos; }
-  }, cache, { registrarFalha: (mensagem) => falhas.push(mensagem) });
+  }, cache, { registrarFalha: (evento, erro) => falhas.push({ evento, codigo: erro.code || erro.name }) });
 
   assert.deepEqual(await servico.listar(), estudos);
   assert.equal(leiturasDaFonte, 1);
   assert.equal(cache.chamadas.setEx.length, 0);
-  assert.deepEqual(falhas, ['Falha ao ler cache: ECONNREFUSED']);
-  assert.equal(falhas.join(' ').includes('privado'), false);
+  assert.deepEqual(falhas, [{ evento: 'cache.read.failed', codigo: 'ECONNREFUSED' }]);
+});
+
+test('log padrão do cache é JSON estruturado e omite a mensagem da exceção', async () => {
+  const cache = criarCacheFalso({
+    aoLer() { throw new Error('token e título privado'); }
+  });
+  const logs = [];
+  const logOriginal = console.error;
+  console.error = (linha) => logs.push(linha);
+  const servico = criarServicoEstudosComCache({ async listar() { return []; } }, cache);
+
+  try {
+    assert.deepEqual(await servico.listar(), []);
+  } finally {
+    console.error = logOriginal;
+  }
+
+  assert.equal(logs.length, 1);
+  const registro = JSON.parse(logs[0]);
+  assert.equal(registro.event, 'cache.read.failed');
+  assert.equal(registro.errorCode, 'Error');
+  assert.equal(logs[0].includes('token'), false);
+  assert.equal(logs[0].includes('privado'), false);
 });
 
 test('cache corrompido é substituído e falha de DEL não mascara escrita confirmada', async () => {
@@ -127,13 +149,16 @@ test('cache corrompido é substituído e falha de DEL não mascara escrita confi
   const servico = criarServicoEstudosComCache({
     async listar() { return antigos; },
     async criar() { return { sucesso: true, estudo: novos.at(-1) }; }
-  }, cache, { registrarFalha: (mensagem) => falhas.push(mensagem) });
+  }, cache, { registrarFalha: (evento, erro) => falhas.push({ evento, codigo: erro.code || erro.name }) });
 
   assert.deepEqual(await servico.listar(), antigos);
   assert.equal(cache.valores.get(CHAVE_LISTA_ESTUDOS), JSON.stringify(antigos));
   assert.deepEqual(await servico.criar({ titulo: 'CSS' }), { sucesso: true, estudo: novos.at(-1) });
   assert.deepEqual(await servico.listar(), antigos);
-  assert.deepEqual(falhas, ['Falha ao ler cache: SyntaxError', 'Falha ao invalidar cache: ETIMEDOUT']);
+  assert.deepEqual(falhas, [
+    { evento: 'cache.read.failed', codigo: 'SyntaxError' },
+    { evento: 'cache.invalidation.failed', codigo: 'ETIMEDOUT' }
+  ]);
 });
 
 test('cache valida cliente, TTL e namespace antes de operar', () => {
