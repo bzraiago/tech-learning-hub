@@ -3090,7 +3090,7 @@ Object.assign(LESSON_GUIDES, {
   },
   "delivery-lgpd-rights-lifecycle": {
     "prerequisites": "Concluir delivery-lgpd-foundations e delivery-lgpd-legal-bases. Usar somente REQ-DEMO-14; nunca testar com conta, exportação ou dado real.",
-    "setup": "Use pedidos fictícios em papel ou editor. Liste sistemas, cópias e responsáveis. Não entre em conta, envie pedido real ou execute exclusão. Marque evidência e escale conflitos de conservação.",
+    "setup": "Use pedidos fictícios em papel ou editor. A matriz opcional está em labs/lgpd-data-rights/INVENTORY.md e pode ser feita sem instalar ferramentas; se não tiver o repositório, as tabelas desta aula contêm o exercício completo. Liste sistemas, cópias e responsáveis. Não entre em conta, envie pedido real ou execute exclusão. Marque evidência e escale conflitos de conservação.",
     "why": "Titulares precisam exercer direitos com segurança, e a equipe precisa saber onde dados estão e o que encerra cada uso. Excluir da tela pode deixar cópias; apagar tudo imediatamente também pode ignorar conservação legal. A aula ensina a rastrear e responder por etapas. Fontes oficiais são opcionais; conceitos e soluções estão aqui.",
     "example": {
       "language": "text",
@@ -3100,7 +3100,7 @@ Object.assign(LESSON_GUIDES, {
     },
     "guided": [
       {
-        "instruction": "Leia pedido fictício de acesso, liste cópias e confirme a pessoa pelo canal seguro antes de revelar dados.",
+        "instruction": "Leia pedido fictício de acesso e, se estiver com o repositório, compare com labs/lgpd-data-rights/INVENTORY.md. Liste cópias e confirme a pessoa pelo canal seguro antes de revelar dados.",
         "result": "Busca perfil, atividade, exportações e compartilhamentos conhecidos. Usa verificação proporcional definida pela equipe."
       },
       {

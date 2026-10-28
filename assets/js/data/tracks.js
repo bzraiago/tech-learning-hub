@@ -5524,7 +5524,7 @@
               "Reconhecer término do tratamento e exceções do art. 16.",
               "Registrar resposta e lacunas sem prometer prazo ou exclusão não comprovados."
             ],
-            "exercise": "Resolva pedidos inventados usando mapa e tabela de retenção. Não abra contas nem processe registros reais.",
+            "exercise": "Resolva pedidos inventados usando o mapa em labs/lgpd-data-rights/INVENTORY.md ou as tabelas desta aula. Não abra contas nem processe registros reais.",
             "code": "PEDIDO FICTÍCIO REQ-DEMO-14\nPedido: acesso e correção de e-mail de teste\nCópias: perfil, atividade e exportação de demonstração\nRegra: validar pessoa; localizar escopo; conferir finalidade/exceções; executar ou explicar impedimento; verificar cópias compartilhadas\nApagar a tela não prova que backups, logs ou fornecedores foram atualizados.",
             "docs": [
               {
