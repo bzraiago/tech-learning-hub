@@ -1100,7 +1100,151 @@ Object.assign(LESSON_GUIDES, {
       "Observe, reproduza, contenha, corrija e acrescente regressão."
     ]
   },
-"delivery-requirements": {
+  "delivery-threat-model": {
+    "prerequisites": "Concluir `delivery-environments`, `delivery-oauth-google` e `delivery-clerk-supabase`. Esta aula modela o fluxo do Tech Learning Hub com Preview Vercel, Clerk e Supabase; não precisa abrir os painéis nem possuir domínio ou credenciais.",
+    "setup": "Leia apenas os diagramas didáticos de `assets/js/cloud.js`, `assets/js/auth.js`, `api/public-config.mjs` e `supabase/learning-state.sql`. Use as identidades fictícias A/B e o fluxo nesta aula. Não envie pedidos a serviços, não abra arquivos `.env` e não cole tokens. O resultado é um modelo conceitual, não uma auditoria nem evidência de que os controles foram testados.",
+    "why": "Uma ameaça fica mais fácil de tratar quando sabemos que ativo proteger, por onde os dados passam, onde muda a confiança, qual condição pode causar dano e que evidência confirmaria o controle. Um modelo pequeno e atualizado ajuda a priorizar correções antes de ampliar uma aplicação.",
+    "example": {
+      "language": "text",
+      "code": "ESCOPO: autenticar e salvar progresso pessoal no Preview.\n\nAtor externo: pessoa usuária; atacante considerado: visitante que altera pedidos do próprio navegador.\nAtivos: progresso/anotações; identidade de sessão; disponibilidade; credenciais secretas.\n\nFluxo e fronteiras:\nPessoa → [navegador não confiável] → Vercel (HTML + /api/public-config com valores públicos)\nNavegador ↔ Clerk (sessão de identidade)\nNavegador → Supabase REST → valida token Clerk → grants + RLS → learning_state\n\nID | Cenário | Impacto | Controle | Evidência\nT1 | A muda user_id para B | leitura/alteração indevida | RLS compara sub ao user_id | teste negativo A→linha B\nT2 | segredo privilegiado no bundle | bypass de RLS | segredo só no servidor; config pública revisada | inspecionar resposta/bundle\nT3 | anotação vira HTML executável | roubo de sessão/ação indevida | escapar texto; usar textContent; manter sandbox | teste de renderização inerte\nT4 | pedidos repetidos exaurem cota | indisponibilidade/custo | limites por serviço e monitoramento | alerta e teste de limite\n\nHipótese ainda não verificada: Preview não contém service_role.\nRisco residual: serviços gerenciados podem falhar; mostrar estado e retry sem prometer disponibilidade.",
+      "expected": "O modelo delimita escopo, atores, ativos, fluxos e zonas de confiança; associa ameaças concretas a impacto, controle e evidência, e rotula hipóteses e riscos residuais como pendências em vez de fatos.",
+      "explanation": [
+        "A decomposição descreve o sistema que está sendo analisado: objetivo, atores, componentes, entradas, saídas, dados guardados e pressupostos. Um diagrama de fluxo deve mostrar onde os dados transitam e onde a confiança muda.",
+        "STRIDE é um conjunto de perguntas: spoofing (falsificação de identidade), tampering (adulteração), repudiation (negação sem evidência), information disclosure (exposição), denial of service (indisponibilidade) e elevation of privilege (elevação de privilégio). Não é uma prova automática de cobertura.",
+        "Uma ameaça é um cenário possível; uma fraqueza é uma condição que pode permiti-lo; risco combina chance e impacto no contexto. A estimativa pode ser qualitativa e deve registrar suas razões, não fingir precisão matemática.",
+        "Um controle reduz uma ameaça e precisa de uma evidência verificável. Um requisito de RLS pode ser verificado por caso negativo; uma regra de segredo exige conferir o caminho de publicação. A aula descreve as evidências, mas não executa a prova.",
+        "Mitigar reduz risco; eliminar remove a causa; transferir atribui parte da responsabilidade sem apagar o risco; aceitar requer uma decisão explícita e registro do risco residual, responsável e data de revisão.",
+        "OWASP Top 10 2025 é uma lista de conscientização e vocabulário compartilhado, não uma certificação nem uma lista que substitui o modelo específico da aplicação. Esta versão é a edição atual identificada pela página do projeto OWASP."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Delimitar o que está em avaliação",
+        "paragraphs": [
+          "Comece escrevendo o objetivo e o escopo em uma frase. Neste exercício, a fronteira inclui a página Preview, configuração pública, login Clerk, chamada REST ao Supabase e a tabela `learning_state`. Ela não inclui DNS de domínio próprio, credenciais internas dos provedores, computadores dos usuários ou uma revisão profissional de segurança.",
+          "Liste ativos conforme o impacto se forem expostos, alterados ou ficarem indisponíveis. Progresso e anotações pertencem à pessoa usuária; a identidade de sessão permite agir em seu nome; credenciais secretas podem conceder acesso privilegiado; disponibilidade afeta salvamento. Chave publicável é informação pública por desenho, mas seu uso ainda precisa de RLS.",
+          "Registre atores e pressupostos: usuário autenticado, visitante sem sessão, provedor Clerk, API Supabase e pessoa que mantém o projeto. Pressuposto não verificado — por exemplo, “nenhum segredo foi enviado ao browser” — recebe dono e evidência, não um visto automático.",
+          "Pausa: se uma pessoa perde o progresso por indisponibilidade, qual ativo e atributo de segurança são afetados? E se lê a linha de outra conta?"
+        ],
+        "terms": [
+          { "term": "Ativo", "meaning": "Dado, serviço ou capacidade que importa proteger, manter íntegro ou disponibilizar." },
+          { "term": "Ator", "meaning": "Pessoa, sistema ou organização que participa ou pode interagir com o fluxo." },
+          { "term": "Escopo", "meaning": "Limite explícito do que o modelo cobre e do que deixa para outra análise." },
+          { "term": "Pressuposto", "meaning": "Condição considerada verdadeira provisoriamente, que precisa poder ser confirmada ou revisada." },
+          { "term": "Confidencialidade, integridade e disponibilidade", "meaning": "Propriedades que descrevem impedir leitura indevida, alteração indevida e perda de acesso." }
+        ]
+      },
+      {
+        "title": "Desenhar fluxos e fronteiras de confiança",
+        "paragraphs": [
+          "Um diagrama útil mostra ator externo, navegador, componente de hospedagem, provedor de identidade, API de dados, banco e setas rotuladas com dados ou ações. Desenhe a fronteira entre o dispositivo não confiável e serviços, e entre a autenticação Clerk e a autorização no PostgreSQL.",
+          "O navegador pode ser modificado pelo usuário. Filtros na URL, campos ocultos e validações JavaScript ajudam a experiência, mas não provam propriedade. No fluxo deste curso, o Supabase verifica o token Clerk e a RLS compara o `sub` validado ao `user_id` da linha.",
+          "A barreira de acesso Vercel no Preview e o login Clerk dentro da aplicação são controles em camadas diferentes. Um resolve quem pode abrir o deployment; o outro autentica a pessoa perante a aplicação. Ter domínio próprio não muda esse modelo nem é necessário para desenhá-lo.",
+          "Pausa: marque no diagrama onde alguém pode alterar dados antes que Supabase os receba e onde o banco toma a decisão final por linha.",
+        ],
+        "diagramTitle": "Fronteiras de confiança do progresso",
+        "diagram": "Pessoa / navegador (não confiável)\n  ├─ GET página + /api/public-config ──▶ Vercel Preview\n  ├─ iniciar/retomar sessão ──────────▶ Clerk\n  └─ REST + token Clerk + chave pública ─▶ Supabase API\n                                         │ verifica assinatura/claims\n                                         ▼\n                                  PostgreSQL + grants/RLS\n                                         │ compara sub com user_id\n                                         ▼\n                                  learning_state da conta\n\nToken, filtro do navegador e decisão RLS são elementos distintos.",
+        "terms": [
+          { "term": "Fronteira de confiança", "meaning": "Limite entre componentes com pressupostos ou controles de confiança diferentes; dados que cruzam a fronteira precisam ser tratados conforme a origem." },
+          { "term": "Fluxo de dados", "meaning": "Caminho que uma informação ou ação percorre entre atores, processos e armazenamentos." },
+          { "term": "Superfície de ataque", "meaning": "Entradas e interfaces que podem receber dados ou ações externas." }
+        ]
+      },
+      {
+        "title": "Perguntar o que pode dar errado",
+        "paragraphs": [
+          "Aplique cada categoria STRIDE aos componentes e fluxos relevantes: alguém se passa por outra pessoa? Adultera estado? Nega uma alteração sem rastros? Lê dados alheios? Impede acesso ou gera custo? Consegue privilégio acima do permitido? Registre cenários específicos, não apenas o nome da categoria.",
+          "Exemplo: “A pessoa troca `user_id` na chamada e vê o progresso de B” é um cenário de elevação de acesso e exposição. “A tabela tem RLS” é um controle, não uma descrição da ameaça; ele só ajuda se a policy e os grants estiverem corretos e se a requisição não usar uma chave privilegiada.",
+          "Para priorizar, classifique impacto e possibilidade como baixo/médio/alto e explique o motivo. Uma ocorrência de baixa chance com alto impacto ainda pode merecer controle forte. Revisite ameaças quando adicionar anotações, exportação, novas tabelas, ferramentas administrativas ou outro fluxo de autenticação.",
+          "O OWASP Top 10 2025 dá nomes comuns para riscos como controle de acesso quebrado, má configuração, falhas na cadeia de suprimentos, injeção e falhas de autenticação. Use-o para ampliar perguntas e comunicar riscos; não tente encaixar toda falha em uma única categoria."
+        ],
+        "terms": [
+          { "term": "STRIDE", "meaning": "Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service e Elevation of Privilege; seis perguntas para brainstorm técnico." },
+          { "term": "Ameaça", "meaning": "Evento ou ação adversa plausível que pode prejudicar um ativo dentro do escopo." },
+          { "term": "Fraqueza", "meaning": "Condição ou defeito que facilita uma ameaça, como policy ausente ou entrada não escapada." },
+          { "term": "Risco", "meaning": "Avaliação contextual da chance e do impacto de uma ameaça explorando uma fraqueza." },
+          { "term": "OWASP Top 10", "meaning": "Documento de conscientização que organiza riscos frequentes; não substitui uma análise específica nem atesta segurança." }
+        ]
+      },
+      {
+        "title": "Escolher controles e combinar evidência",
+        "paragraphs": [
+          "Para cada ameaça priorizada, associe uma resposta: mitigar, eliminar, transferir responsabilidade ou aceitar deliberadamente. Identifique responsável e prazo de revisão. Se o risco permanecer, documente o risco residual e por que ele é tolerável naquele contexto.",
+          "Prefira controles observáveis: RLS por `sub` e testes de negação cruzada; escape de notas antes de renderizar; não enviar chaves secretas ao browser; limites de requisição e alertas; tratamento visível de indisponibilidade. Uma linha no documento que diz “seguro” não é evidência.",
+          "Separe estado do controle: planejado, implementado, testado, monitorado. “Implementado” não significa “testado”; um teste local simulado não comprova configuração remota. Para cada evidência, registre ambiente, entrada, resultado observado e data, sem publicar dados pessoais ou tokens.",
+          "Esta prática é um modelo de estudo do Preview, não auditoria técnica, parecer legal ou garantia de ausência de vulnerabilidade. Não execute exploração contra serviços públicos; validações futuras devem usar laboratório ou ambiente isolado e autorização explícita."
+        ],
+        "terms": [
+          { "term": "Controle", "meaning": "Medida técnica ou operacional que previne, detecta ou reduz o impacto de uma ameaça." },
+          { "term": "Risco residual", "meaning": "Risco que permanece depois dos controles escolhidos." },
+          { "term": "Evidência", "meaning": "Registro reproduzível do que foi observado e do ambiente em que o controle foi verificado." },
+          { "term": "Mitigar / eliminar / transferir / aceitar", "meaning": "Respostas possíveis ao risco; transferência e aceitação não provam que a ameaça desapareceu." }
+        ]
+      }
+    ],
+    "guided": [
+      { "instruction": "Separe os itens do exemplo em ativo, ator, fronteira, ameaça, controle, evidência ou hipótese. Marque quais ainda não foram verificados.", "result": "Progresso é ativo; pessoa é ator; navegador→serviço é fronteira; alterar `user_id` é ameaça; RLS é controle; teste negativo é evidência; ausência de `service_role` é hipótese até inspecionada." },
+      { "instruction": "Passe as seis perguntas STRIDE pelo fluxo de leitura e salvamento. Escreva pelo menos um cenário ligado a um componente, não só o nome de uma categoria.", "result": "O modelo contém ameaças específicas como falsificação/uso indevido de sessão, alteração de proprietário, exposição de progresso, indisponibilidade e excesso de privilégio; registra as categorias não aplicáveis com justificativa." },
+      { "instruction": "Escolha uma ameaça, registre impacto e chance qualitativos, atribua uma resposta, um responsável e a evidência que permitiria mudar o estado de planejado para testado.", "result": "A resposta liga risco a um controle mensurável e não declara testado antes de registrar ambiente, caso, resultado e data." }
+    ],
+    "mistakes": [
+      "Modelar uma solução de fornecedor em vez dos ativos, fluxos e limites do sistema real.",
+      "Achar que uma chave publicável é segredo ou, no extremo oposto, que sua presença torna os dados públicos por si só.",
+      "Tratar `user_id` enviado pelo cliente como identidade confiável.",
+      "Listar categorias STRIDE sem cenários, controles ou evidências concretas.",
+      "Declarar uma hipótese como controle verificado ou misturar teste local simulado com teste remoto real.",
+      "Aceitar risco sem registrar motivo, responsável, prazo ou impacto residual.",
+      "Usar OWASP Top 10 como checklist completo ou como certificação de segurança."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: uma pessoa altera `user_id` no filtro REST de `user_demo_A` para `user_demo_B`. Antes de consultar o banco, preveja que informação deve controlar o acesso e nomeie a fronteira que o pedido atravessa.",
+        "expected": "O token assinado e validado, em especial o `sub`, controla a política RLS; o navegador não confiável envia o pedido através da fronteira para a API/banco Supabase.",
+        "criteria": ["Marca o navegador como origem não confiável.", "Usa o claim validado pelo banco, não o filtro, como identidade.", "Nomeia a fronteira navegador→Supabase."],
+        "solution": "O banco deve comparar `auth.jwt()->>'sub'` com `user_id`. A URL pode pedir B, mas RLS determina quais linhas a identidade autenticada pode acessar.",
+        "explanation": "O filtro seleciona candidatos; não é prova de identidade ou propriedade.",
+        "hints": ["Quem controla o valor de query string?", "Qual componente valida assinatura e aplica policy por linha?"]
+      },
+      {
+        "prompt": "Alterar: o curso adicionará notas livres junto ao progresso. Atualize o escopo e liste dois ativos, uma nova entrada, duas ameaças plausíveis e um controle/evidência para cada uma. Não implemente nem use conteúdo real.",
+        "expected": "O escopo inclui notas; ativos incluem texto privado e sessão; entrada inclui texto do usuário; ameaças podem incluir XSS/exposição e acesso cruzado; controles incluem renderização segura e policy RLS, cada qual com teste inerte/negativo definido.",
+        "criteria": ["Atualiza o limite do modelo pelo novo requisito.", "Relaciona ameaças a ativos e fluxos concretos.", "Associa cada controle a evidência segura e reproduzível."],
+        "solution": "Escopo inclui criação/leitura de notas; ativos: texto privado e token de sessão; entrada: texto não confiável e ID da linha. Ameaça XSS: usar `textContent`/escape e confirmar que marcador HTML fica inerte; acesso cruzado: RLS por `sub` e teste A tentando ler B em ambiente isolado.",
+        "explanation": "Mudança de requisito altera dados, entradas e consequências; o threat model deve ser atualizado antes de implementar.",
+        "hints": ["Considere como o texto entra e como volta ao HTML.", "Considere se um usuário pode trocar o identificador de uma linha."]
+      },
+      {
+        "prompt": "Construir: crie um registro de ameaça com: ID, ativo, ator, componente/fronteira, cenário, impacto, chance, controle, evidência, estado e risco residual. Use `service_role` exposta como cenário hipotético e não cole nenhum segredo real.",
+        "expected": "O registro identifica exposição de credencial privilegiada, seu impacto de bypass de RLS, controle de segredo só no servidor e rotação se exposta; requer inspecionar a resposta/bundle, registra estado não verificado até obter evidência e descreve risco residual.",
+        "criteria": ["Inclui todos os campos pedidos com dados fictícios.", "Não afirma que a exposição ocorreu nem imprime credencial.", "Distingue controle planejado/implementado/testado e risco residual."],
+        "solution": "Exemplo: T-02; ativo=todas as linhas; ator=visitante com acesso ao bundle; fronteira=servidor/configuração→browser; cenário=chave privilegiada publicada; impacto=leitura/escrita ampla; chance=avaliar depois da inspeção; controle=remover e rotacionar, expor só chave publicável; evidência=verificar endpoint/bundle sem divulgar valores; estado=planejado; residual=credencial anterior pode ter sido copiada até revogação.",
+        "explanation": "Uma hipótese útil vira um plano verificável e mantém explicitamente a incerteza até observar o ambiente.",
+        "hints": ["Descreva o cenário e impacto em uma frase causal.", "Use apenas nome de categoria e status, nunca o valor de um segredo."]
+      },
+      {
+        "prompt": "Investigar erro: uma pessoa relata que o progresso de outra conta apareceu. Organize uma resposta inicial segura com ativo, ameaça, hipótese, evidência a preservar, controles a conferir, risco de exposição e critério para dizer que a correção foi verificada. Não mude dados remotos.",
+        "expected": "Trata como possível falha de controle de acesso, impede novas gravações/compartilhamento até compreender escopo, registra horário e conta ficticiamente identificada sem token, confere sub/RLS/grants/chave e define um teste negativo A→B; não declara causa nem resolução sem executar o teste autorizado.",
+        "criteria": ["Prioriza conter exposição e preservar evidência sem divulgar token.", "Investiga token, policy e privilégios como hipóteses separadas.", "Define evidência concreta antes de chamar a falha de corrigida."],
+        "solution": "Interrompa a exposição do dado e não continue compartilhando a tela. Registre ambiente, horário e passos sem tokens; verifique qual conta estava ativa, compare o `sub` com dono da linha, revise políticas/grants e confirme chave não privilegiada. Após correção, em ambiente autorizado, prove A lê A, não lê B e não pode escrever em B; documente o resultado e o risco residual.",
+        "explanation": "Um relato de acesso cruzado deve ser tratado como sinal de possível exposição até que dados e controles sejam analisados; uma mensagem de sucesso não basta para fechar o incidente.",
+        "hints": ["Separe o que foi observado do que é hipótese.", "Não faça nova escrita que possa contaminar evidência ou sobrescrever progresso."]
+      }
+    ],
+    "quiz": [
+      { "question": "Qual é a primeira etapa útil de um threat model?", "options": ["Listar exploits sem entender o sistema.", "Definir escopo, atores, ativos, componentes e fluxos.", "Marcar todos os riscos como corrigidos."], "correctIndex": 1, "explanation": "É preciso entender o que está sendo modelado e suas fronteiras antes de analisar o que pode dar errado." },
+      { "question": "O que uma fronteira de confiança representa?", "options": ["Um limite em que dados passam entre zonas com pressupostos ou controles diferentes.", "Uma tela de login que garante segurança completa.", "A linha que separa arquivos CSS e JavaScript."], "correctIndex": 0, "explanation": "Dados que cruzam fronteiras precisam ser tratados conforme sua origem e o componente receptor." },
+      { "question": "Quando um controle deve ser descrito como testado?", "options": ["Assim que aparece no código.", "Quando existe evidência observada no ambiente e caso registrados.", "Quando o modelo usa a palavra RLS."], "correctIndex": 1, "explanation": "Código implementado e controle testado são estados distintos; anote ambiente, entrada, resultado e data." },
+      { "question": "Como usar o OWASP Top 10?", "options": ["Como prova de conformidade completa.", "Como vocabulário de conscientização, junto com análise específica do sistema.", "Como substituto para desenhar fluxos e ameaças."], "correctIndex": 1, "explanation": "A lista ajuda a comunicar riscos comuns, mas não é uma certificação nem cobre automaticamente o contexto de cada aplicação." }
+    ],
+    "summary": [
+      "Defina escopo, atores, ativos, entradas, fluxos, armazenamentos, fronteiras e pressupostos.",
+      "Use STRIDE como prompts para cenários concretos; priorize impacto e chance com justificativa.",
+      "Associe cada ameaça a um controle e evidência; registre estado, responsável e risco residual.",
+      "Modelo conceitual e verificação executada são coisas diferentes; esta aula não é auditoria nem teste de domínio.",
+      "OWASP Top 10 2025 é referência de conscientização; atualize o modelo conforme mudam dados e requisitos."
+    ]
+  },
+  "delivery-requirements": {
     "prerequisites": "Concluir setup-node, delivery-forms e delivery-ci; ter a lista de estudos do laboratório e saber alterar funções e testes. O exemplo usa apenas Node.",
     "setup": "Na pasta da aula, salve o exemplo como requisito.js no editor. No terminal aberto nessa pasta, execute node requisito.js; a saída esperada é false e true em linhas separadas. O processo termina sozinho; para retomar, execute o mesmo comando. Se node não for reconhecido, revise setup-node. Use a lista de estudos da aula delivery-forms para planejar a integração, mas este arquivo não altera server.js. Escreva critérios antes de editar o projeto.",
     "why": "O trabalho raramente é criar tudo do zero com enunciado fechado. Saber traduzir um pedido, preservar o que já funciona e comunicar a entrega é uma competência central de entrada no mercado.",
@@ -2082,6 +2226,11 @@ Object.assign(LESSON_GUIDES, {
       prompt: "A tela de progresso filtra `user_id=eq.user_demo_A`, mas um teste conceitual mostra dados de B ao entrar como A. Revise a comparação do `sub`, os grants/policies e a chave enviada; indique qual evidência distinguiria RLS aberto de credencial privilegiada, sem expor tokens.",
       expected: "A análise confirma estado RLS e policy de SELECT, compara o `sub` autenticado com o proprietário da linha, verifica que o browser usa só chave publicável e procura grants amplos; não conclui a causa sem evidência nem imprime segredo.",
       hint: "O filtro da URL é apenas uma condição do pedido. A decisão final ocorre no banco e pode ser contornada por uma credencial privilegiada."
+    },
+    "delivery-threat-model": {
+      prompt: "Uma nova exportação permite baixar anotações de estudo como JSON. Atualize o modelo com a nova superfície de saída, identifique ameaças a confidencialidade/integridade e defina uma evidência por controle, mantendo dados fictícios.",
+      expected: "O fluxo inclui a saída/download e quem a pode iniciar; ameaças incluem exportar dados alheios ou vazar conteúdo; controles exigem autorização por dono, escape/formatos seguros e evidência negativa/positiva em ambiente autorizado.",
+      hint: "Siga o dado até a nova saída e pergunte quem recebe o arquivo e quais registros entram nele."
     },
     "delivery-ci": {
       prompt: "Uma publicação altera a validação de minutos e o POST começa a aceitar -5. Defina um teste que falhe antes da correção, indique onde a CI deve executá-lo e descreva como conter a versão ruim enquanto investiga.",

@@ -11,7 +11,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 
 ## Carregamento e navegação
 
-- [ ] A página inicial mostra 9 trilhas e 123 aulas no total.
+- [ ] A página inicial mostra 9 trilhas e 124 aulas no total.
 - [ ] A trilha ativa, os módulos e os cards de progresso aparecem corretamente.
 - [ ] Busca encontra uma aula de outra trilha e permite limpar o resultado.
 - [ ] Filtros “Todas”, “Pendentes” e “Concluídas” atualizam a listagem.
@@ -22,6 +22,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Na aula de domínio personalizado, a pessoa preserva registros MX/TXT no plano de migração, usa valores como marcadores conceituais e separa DNS, TLS e funcionamento da aplicação; não executa mudança real.
 - [ ] Na aula `delivery-oauth-google`, a pessoa diferencia OAuth 2.0 de OIDC, callback Google→Clerk de retorno Clerk→Preview, consentimento e escopos mínimos (`openid`, `profile`, `email` conforme uso), `state`/`nonce` e autenticação de autorização/RLS; nenhum domínio próprio ou segredo é exigido.
 - [ ] Na aula `delivery-clerk-supabase`, a pessoa liga o token Clerk ao claim `sub`, distingue `USING`, `WITH CHECK`, grants e roles, e identifica a diferença entre chave publicável e credencial que contorna RLS.
+- [ ] Na aula `delivery-threat-model`, a pessoa desenha escopo e fronteiras, liga ameaças a ativos, controles e evidências, marca hipóteses não verificadas e entende que OWASP Top 10 não certifica o sistema.
 - [ ] O plano de autorização para `learning_state` concede apenas SELECT/INSERT/UPDATE às próprias linhas; os testes de isolamento por duas contas ficam identificados como planejados até haver evidência real.
 - [ ] Na aula HTTPS, o checklist verifica certificado, redirecionamento e recursos ativos sem afirmar que TLS substitui autorização da aplicação.
 - [ ] O laboratório `labs/deployment-static` abre localmente, tem layout para 375 px e permite usar o link para pular o conteúdo com teclado. A conferência do Preview usa o caminho `/labs/deployment-static/`; domínio próprio e acesso anônimo não são requisitos.
@@ -76,7 +77,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Nos 73 exercícios de IA, critérios separam estrutura, evidência, autorização e execução real; previsões e métricas ficam registradas antes de conferir resultados.
 - [ ] Nos 24 exercícios Git, critérios verificam estado do índice, histórico, branch e remoto; a sequência segura evita perder alterações ou forçar atualização compartilhada.
 - [ ] Nos 24 exercícios de Qualidade, critérios cobrem limites, estado da interface, falhas locais/CI, regressão, módulos e revisão sem afirmar resultados não observados.
-- [ ] Nos 61 exercícios de Entrega, critérios verificam contratos HTTP, estados de formulário, autorização, resolução DNS, HTTPS, Preview, domínio conceitual, OAuth/OIDC, RLS e recuperação.
+- [ ] Nos 65 exercícios de Entrega, critérios verificam contratos HTTP, estados de formulário, autorização, resolução DNS, HTTPS, Preview, domínio conceitual, OAuth/OIDC, RLS, threat modeling e recuperação.
 - [ ] Em `labs/backend-validation`, formulário válido cria um estudo; pedidos diretos inválidos retornam erro e não alteram a lista.
 - [x] Em `labs/backend-layers`, `npm test` aprova os dezessete testes sem depender do PostgreSQL.
 - [ ] Em `labs/backend-layers`, a base isolada `backend_camadas` na porta `55433` fica healthy, e as migrations criam estudos, sessões e suas restrições.

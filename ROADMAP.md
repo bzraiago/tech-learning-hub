@@ -396,9 +396,9 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] O commit `ea4ca2d` enviado para `testes` criou um deployment Preview Vercel com status concluído.
   - [ ] Conferir a aplicação e as variáveis do Preview; a proteção do projeto redireciona visitantes sem sessão Vercel para login.
 - [ ] Implementar cadastro, login, logout, sessão expirada e estado de carregamento com Clerk.
-  - [x] Preparar interface de entrada/saída, função de configuração pública e guia de implantação; fluxo real pendente das chaves e do domínio Clerk.
+  - [x] Preparar interface de entrada/saída, função de configuração pública e guia de implantação; fluxo real pendente das chaves e da configuração da instância Clerk.
   - [x] Exigir login e carregamento do progresso da conta antes de liberar o conteúdo; verificação no navegador publicado pendente.
-  - [x] Separar a apresentação do curso da espera pela sessão Clerk e melhorar a entrada responsiva; teste no domínio publicado pendente.
+  - [x] Separar a apresentação do curso da espera pela sessão Clerk e melhorar a entrada responsiva; teste no Preview publicado pendente.
 - [x] Configurar login social do Google pelo Clerk e ensinar os conceitos transferíveis de OAuth 2.0/OpenID Connect, redirect URI, consentimento, escopos e `state`.
   - [x] Criar `delivery-oauth-google` com fluxo navegador → Clerk → Google → callback → Preview, autenticação versus autorização, OAuth/OIDC, origem/callback/retorno, escopos mínimos, `state`/`nonce`, diagnóstico de `redirect_uri_mismatch` e fronteira de RLS.
   - [x] Usar documentação oficial e exemplos sem segredo; o dono confirmou anteriormente que o login Google funcionou. O material de domínio próprio permanece conceitual e não exige teste com domínio.
@@ -419,7 +419,9 @@ Toda implementação só pode ser considerada pronta quando:
 
 ### Fase 7.3 — Segurança aplicada e privacidade
 
-- [ ] Criar threat model simples: ativos, entradas, fronteiras de confiança, ameaças e controles.
+- [x] Criar threat model simples: ativos, entradas, fronteiras de confiança, ameaças e controles.
+  - [x] Criar `delivery-threat-model` para delimitar escopo, mapear ativos/atores/fluxos, usar STRIDE como perguntas, priorizar risco e associar cada ameaça a controle e evidência.
+  - [x] Aplicar o modelo conceitualmente ao fluxo Clerk–Vercel–Supabase com dados fictícios; separar hipótese não verificada, controle implementado, teste executado e risco residual.
 - [ ] Ensinar OWASP Top 10 por meio de falhas reproduzíveis e correções verificadas, sem conteúdo ofensivo fora do laboratório.
 - [ ] Cobrir autenticação versus autorização, IDOR/BOLA, XSS, CSRF, SQL injection, abuso de API, rate limiting e gestão de dependências.
 - [ ] Implementar cabeçalhos de segurança, validação no servidor, mensagens de erro seguras e princípio do menor privilégio.
@@ -448,7 +450,7 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Criar rollback da aplicação e migração de banco compatível com a versão anterior quando necessário.
 - [ ] Produzir runbook de deploy, falha de autenticação, falha de banco, incidente e recuperação.
 
-**Aceite:** existem evidências da execução remota da CI, da publicação acessível, da recuperação de versão e dados e da correção de uma falha protegida por regressão.
+**Aceite:** existem evidências da execução remota da CI, do Preview acessível com HTTPS, da recuperação de versão e dados e da correção de uma falha protegida por regressão. Domínio próprio não é requisito de publicação para este projeto.
 
 **Aceite adicional da stack guiada:** duas contas reais de teste acessam somente seus próprios dados; o login Google usa URLs autorizadas; nenhum segredo aparece no repositório ou bundle do navegador; o Preview `vercel.app` funciona com HTTPS; uma falha e um rollback são observados; o aluno explica o papel de Clerk, Supabase, Vercel, DNS e Redis e consegue indicar alternativas. Domínio próprio é opcional: seu funcionamento é ensinado conceitualmente, sem exigir compra, configuração ou validação real.
 
@@ -658,7 +660,8 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 27/10/2026 | Fase 3 — transferência | Commit pendente | As 114 aulas têm segunda tentativa com resultado e pista; nenhuma foi idêntica ao exercício de origem e a auditoria de termos mostrou baixa sobreposição com os exercícios da própria aula. O renderizador de produção exibiu a recuperação após quiz errado nos 114 guias em Chromium a 375 px; o teclado alcançou o rascunho. As amostras das nove trilhas mudam cenário e dados. |
 | 27/10/2026 | Fase 7.1 — fundamentos de hospedagem e DNS | Commit pendente | Sete aulas cobrem papéis de registrador/DNS/hospedagem, resolução recursiva, registros A/AAAA/CNAME/TXT/NS, TTL, HTTPS/TLS, modelos, Preview e plano conceitual de domínio; total de 28 exercícios e 20 questões. `labs/deployment-static` usa o Preview existente e inclui alternativa conceitual se protegido. RFC 5737, RFC 3849, RFC 1034 e RFC 6761 foram conferidas para exemplos. A checagem remota do Preview ainda pode ser bloqueada por autenticação Vercel; domínio real e testes dependentes dele estão fora do escopo por decisão do dono. Contagens registradas naquela etapa: 121 aulas, 486 exercícios e 361 questões. |
 | 27/10/2026 | Fase 7.2 — OAuth/OIDC com Google e Clerk | Conceitos concluídos | `delivery-oauth-google` explica o fluxo mediado pelo Clerk, callback versus retorno ao Preview, consentimento, escopos mínimos, `state`/`nonce`, diagnóstico de `redirect_uri_mismatch` e separação de autenticação, autorização e RLS. O usuário já havia confirmado que o login Google funcionou. Conceitos apoiados em documentação oficial; domínio próprio e validação de produção não são requisitos. Contagens na etapa: 122 aulas, 490 exercícios e 366 questões. Validação de conteúdo passou; não foram feitos testes de domínio ou produção. |
-| 27/10/2026 | Fase 7.2 — integração Clerk–Supabase e RLS | Conceitos concluídos | `delivery-clerk-supabase` usa os arquivos reais `cloud.js` e `learning-state.sql` para explicar token de sessão, claim `sub`, roles, grants, `USING`, `WITH CHECK`, chaves e matriz de isolamento para duas contas. Validador de conteúdo passou. Nenhuma policy ou dado remoto foi alterado; a prova de isolamento por duas contas segue pendente. Sem teste de domínio/Production. Contagens: 123 aulas, 494 exercícios e 370 questões. |
+| 27/10/2026 | Fase 7.2 — integração Clerk–Supabase e RLS | Conceitos concluídos | `delivery-clerk-supabase` usa os arquivos reais `cloud.js` e `learning-state.sql` para explicar token de sessão, claim `sub`, roles, grants, `USING`, `WITH CHECK`, chaves e matriz de isolamento para duas contas. Validador de conteúdo passou. Nenhuma policy ou dado remoto foi alterado; a prova de isolamento por duas contas segue pendente. Sem teste de domínio/Production. Contagens na etapa: 123 aulas, 494 exercícios e 370 questões. |
+| 27/10/2026 | Fase 7.3 — modelagem de ameaças | Conceitos concluídos | `delivery-threat-model` delimita escopo, ativos, atores, entradas e fronteiras; usa STRIDE, classifica ameaças, escolhe controle/evidência e registra hipóteses e risco residual. Inclui referências oficiais OWASP Top 10 2025 e Threat Modeling. A atividade é conceitual, usa exemplos fictícios e não executa ataque nem testa domínio. Validador de conteúdo passou; revisão visual manual pendente. Contagens: 124 aulas, 498 exercícios e 374 questões. |
 
 ## Decisões e bloqueios
 

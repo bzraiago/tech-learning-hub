@@ -5188,6 +5188,40 @@
             ]
           },
           {
+            "id": "delivery-threat-model",
+            "title": "Modelagem de ameaças: ativos, limites e controles",
+            "minutes": 120,
+            "concept": "Modele o fluxo Clerk–Vercel–Supabase do curso por ativos, atores, entradas, limites de confiança e ameaças, convertendo cada risco priorizado em controle e evidência verificável.",
+            "objectives": [
+              "Desenhar um modelo de fluxo que identifique ativos, atores, componentes, entradas, armazenamentos e fronteiras de confiança.",
+              "Usar STRIDE como conjunto de perguntas para encontrar ameaças, sem tratar a lista como garantia de cobertura.",
+              "Distinguir ameaça, fraqueza, risco, controle, risco residual e hipótese ainda não validada.",
+              "Escrever uma ameaça de acesso indevido a progresso e vinculá-la a RLS e a um teste negativo observável."
+            ],
+            "exercise": "Produza um threat model curto para o fluxo fictício de progresso do curso; não use credenciais, dados reais nem envie requisições a serviços publicados.",
+            "code": "Escopo: carregar e salvar progresso pessoal no Preview.\n\nAtor → fluxo → componente/dado → fronteira\nPessoa → navegador → site estático Vercel → Clerk (login)\nPessoa → navegador → Supabase REST → validação do token → policy RLS → learning_state\n\nAtivos: progresso/anotações; identidade de sessão; configuração pública; credenciais secretas.\nEntradas: texto de anotação; ID pedido na URL/corpo; ação de login; requisição REST.\n\nAmeaça: usuário A troca user_id para B.\nControle: comparar sub assinado com user_id na RLS.\nEvidência: teste negativo de leitura e escrita cruzadas.\n\nHipótese: o Preview não usa service_role no navegador.\nStatus: verificar bundle/configuração; não assumir como fato.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "OWASP · Threat Modeling Cheat Sheet",
+                "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "OWASP · Top 10 de riscos para aplicações Web 2025",
+                "url": "https://owasp.org/projects/top-ten?lang=en",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "OWASP Developer Guide · Threat Modeling na prática",
+                "url": "https://devguide.owasp.org/en/04-design/01-threat-modeling/07-practical-threat-modeling/",
+                "language": "EN"
+              }
+            ]
+          },
+          {
             "id": "delivery-requirements",
             "title": "Requisitos novos, colaboração e portfólio",
             "minutes": 140,
