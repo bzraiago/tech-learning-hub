@@ -80,7 +80,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const preco = 1800;\nconst entrada = \"2\";\nconst total = preco * Number(entrada);\ndocument.getElementById(\"saida\").textContent = `Total: ${total} centavos`;",
         "explanation": "Os dados de entrada têm papéis separados. A conversão fica explícita e a apresentação só ocorre depois de calcular. Confira também typeof total no Console.",
-        "expected": "Previsão registrada antes da execução; a página mostra Total: 3600 centavos e o tipo do total é number."
+        "expected": "A previsão é anotada antes da conversão; a página e typeof permitem conferir o total calculado e seu tipo.",
+        "criteria": ["Previsão registrada antes da conversão e execução.","Total exibido e tipo conferido com typeof."]
       },
       {
         "prompt": "Alterar: no script do exemplo, substitua temporariamente as expressões do Console por \"5\" + 2, Number(\"5\") + 2 e Boolean(\"false\"). Registre a previsão de resultado e tipo antes de executar, depois restaure o script.",
@@ -90,7 +91,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "console.log(\"5\" + 2, typeof (\"5\" + 2));\nconsole.log(Number(\"5\") + 2, typeof (Number(\"5\") + 2));\nconsole.log(Boolean(\"false\"), typeof Boolean(\"false\"));",
         "explanation": "A primeira operação continua textual; a segunda passa a numérica porque converteu a entrada. A terceira verifica se há texto e não interpreta a palavra false.",
-        "expected": "No Console: 52 string; 7 number; true boolean."
+        "expected": "As previsões de valor e tipo são registradas primeiro; depois, compare as expressões no Console e restaure o script.",
+        "criteria": ["Valor e tipo previstos para cada expressão antes de rodar.","Resultados comparados com o Console e script original restaurado."]
       },
       {
         "prompt": "Construir: uma meta é estudar 120 minutos. Você estudou \"35\" minutos de manhã e \"25\" à noite. Calcule o total, quanto falta e se a meta já foi atingida. Mostre os três resultados.",
@@ -100,7 +102,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const meta = 120;\nconst total = Number(\"35\") + Number(\"25\");\nconst falta = meta - total;\nconst atingiu = total >= meta;\ndocument.getElementById(\"saida\").textContent = `Total: ${total}\nFaltam: ${falta}\nMeta atingida: ${atingiu}`;",
         "explanation": "Calcular e comparar são operações distintas. Com os dados propostos ainda faltam 60 minutos; na próxima aula aprenderemos a impedir uma mensagem de minutos negativos quando a meta for ultrapassada.",
-        "expected": "Total: 60; Faltam: 60; Meta atingida: false."
+        "expected": "Total: 60; Faltam: 60; Meta atingida: false.",
+        "criteria": ["Cálculo usa os dois valores recebidos para total e diferença.","Página mostra total, restante e estado da meta calculados."]
       },
       {
         "prompt": "Investigar erro: const pontos = \"10\"; pontos = pontos + 5; deveria produzir 15. Leia o primeiro erro no Console, explique também o que aconteceria ao trocar apenas const por let e corrija as duas causas.",
@@ -110,7 +113,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "let pontos = Number(\"10\");\npontos = pontos + 5;\ndocument.getElementById(\"saida\").textContent = String(pontos);",
         "explanation": "A correção precisa permitir a reatribuição e transformar o valor inicial em número. Resolva uma causa de cada vez e atualize a página, pois o erro original interrompia o script.",
-        "expected": "A página mostra 15 e typeof pontos é number."
+        "expected": "A correção resolve a reatribuição indevida e a concatenação de tipos; a página exibe um total numérico.",
+        "criteria": ["Diagnóstico separa reatribuição de const e concatenação de texto.","Correção produz número e não deixa erro no Console."]
       }
     ],
     "mistakes": [
@@ -255,7 +259,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const temperatura = 18;\nlet mensagem;\nif (temperatura \u003c 20) { mensagem = \"Frio\"; } else { mensagem = \"Agradável\"; }\ndocument.getElementById(\"saida\").textContent = mensagem;",
         "explanation": "Uma variável de saída reúne a decisão e evita duplicar a linha que escreve na página. Testar 20 comprova que a fronteira está no ramo correto.",
-        "expected": "Previsão registrada antes da execução; 18 e 19 mostram Frio e 20 mostra Agradável."
+        "expected": "As previsões são anotadas antes da execução e comparadas com os resultados observados.",
+        "criteria": ["Classificações dos três valores anotadas antes.","Resultados conferidos em relação ao limite definido."]
       },
       {
         "prompt": "Alterar: no exemplo, substitua temporariamente o relatório de sessões por um for que some os inteiros de 1 a 5 e mostre a soma. Não escreva 1+2+3+4+5 diretamente; depois restaure o script.",
@@ -265,7 +270,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "let soma = 0;\nfor (let numero = 1; numero \u003c= 5; numero += 1) { soma += numero; }\ndocument.getElementById(\"saida\").textContent = String(soma);",
         "explanation": "Cada volta adiciona o número atual. O rastreamento deve mostrar totais 1, 3, 6, 10 e 15, permitindo encontrar uma contagem ausente.",
-        "expected": "15."
+        "expected": "15.",
+        "criteria": ["Laço soma o intervalo sem expressão de soma escrita à mão.","Relatório original é restaurado após o teste."]
       },
       {
         "prompt": "Construir: crie um relatório dos dias 1 a 7. Dias 6 e 7 mostram Descanso; os demais mostram Estudo. Ao fim mostre o total de dias de estudo. Use um laço e condições.",
@@ -275,7 +281,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "let texto = \"\";\nlet diasDeEstudo = 0;\nfor (let dia = 1; dia \u003c= 7; dia += 1) {\n  if (dia >= 6) { texto += `Dia ${dia}: Descanso\\n`; }\n  else { texto += `Dia ${dia}: Estudo\\n`; diasDeEstudo += 1; }\n}\ntexto += `Total de dias de estudo: ${diasDeEstudo}`;\ndocument.getElementById(\"saida\").textContent = texto;",
         "explanation": "Contar todos os dias fora da condição daria 7 e violaria a regra. O laço representa a passagem dos dias; a condição representa a atividade de cada um.",
-        "expected": "Sete linhas de dias e total 5. Os dois últimos dias são Descanso."
+        "expected": "Sete linhas de dias e total 5. Os dois últimos dias são Descanso.",
+        "criteria": ["Laço mostra sete dias e marca descanso apenas nos dois últimos.","Total de estudo é contado pelas condições, não fixado."]
       },
       {
         "prompt": "Investigar erro: let n = 3; while (n > 0) { console.log(n); } não termina. Sem executar o laço defeituoso no navegador, rastreie n em duas voltas, identifique a atualização ausente e escreva a correção. Diga quantas voltas haverá.",
@@ -285,7 +292,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "let n = 3;\nlet texto = \"\";\nwhile (n > 0) { texto += `${n}\\n`; n -= 1; }\ndocument.getElementById(\"saida\").textContent = texto;",
         "explanation": "Sem atualização n permanece 3. Com a subtração, o teste antes da quarta volta encontra zero e encerra sem imprimir zero.",
-        "expected": "Três voltas: 3, 2 e 1 em linhas separadas."
+        "expected": "O rastreamento mostra por que a condição não termina; a correção produz uma execução finita.",
+        "criteria": ["Rastreamento identifica o valor que não muda e a condição.","Correção termina; caso infinito não é executado no navegador."]
       }
     ],
     "mistakes": [
@@ -390,7 +398,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "function dobro(numero) { return numero * 2; }\nconst resultado = dobro(6);\ndocument.getElementById(\"saida\").textContent = String(resultado);",
         "explanation": "A função não depende da página. O chamador decide o que fazer com o resultado, podendo testar, guardar ou apresentar o valor.",
-        "expected": "12."
+        "expected": "A comparação permite observar o retorno da função e o texto produzido pelo Console.",
+        "criteria": ["Previsões anotadas antes das duas versões.","Verificação separa retorno de saída do Console."]
       },
       {
         "prompt": "Alterar: crie saudacao(nome = \"Visitante\") e teste sem argumento, com \"Ana\" e com undefined. Retorne uma mensagem.",
@@ -400,7 +409,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "function saudacao(nome = \"Visitante\") { return `Olá, ${nome}!`; }\nconsole.log(saudacao());\nconsole.log(saudacao(\"Ana\"));\nconsole.log(saudacao(undefined));",
         "explanation": "O valor padrão pertence ao parâmetro. null não seria substituído: saudacao(null) produziria Olá, null!, portanto a política para null precisaria ser definida separadamente.",
-        "expected": "Olá, Visitante!; Olá, Ana!; Olá, Visitante! no Console."
+        "expected": "Olá, Visitante!; Olá, Ana!; Olá, Visitante! no Console.",
+        "criteria": ["Testa omissão, nome informado e undefined explícito.","Retorna mensagem e demonstra o padrão apenas nos casos cabíveis."]
       },
       {
         "prompt": "Construir: escreva minutosRestantes(meta, estudado). Aceite apenas números finitos não negativos. Retorne null para inválidos, zero quando a meta foi alcançada e a diferença nos demais casos. Teste (60,20), (60,80), (-1,20) e (60,\"20\").",
@@ -410,7 +420,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "function minutosRestantes(meta, estudado) {\n  if (!Number.isFinite(meta) || !Number.isFinite(estudado) || meta \u003c 0 || estudado \u003c 0) { return null; }\n  if (estudado >= meta) { return 0; }\n  return meta - estudado;\n}\nconsole.log(minutosRestantes(60,20), minutosRestantes(60,80), minutosRestantes(-1,20), minutosRestantes(60,\"20\"));",
         "explanation": "O contrato não converte texto silenciosamente. O retorno zero é sucesso, enquanto null indica recusa. Essa distinção permite uma interface orientar o usuário com precisão.",
-        "expected": "40, 0, null e null."
+        "expected": "40, 0, null e null.",
+        "criteria": ["Aceita números finitos não negativos e retorna null para inválidos.","Trata meta alcançada com zero e calcula diferença nos demais casos."]
       },
       {
         "prompt": "Investigar erro: function somar(a,b) { console.log(a+b); } const resultado = somar(2,3); mostra 5 no Console mas resultado é undefined. Corrija e explique.",
@@ -420,7 +431,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "function somar(a,b) { return a+b; }\nconst resultado = somar(2,3);\ndocument.getElementById(\"saida\").textContent = String(resultado);",
         "explanation": "O Console era um efeito da execução, mas nenhum return entregava o valor. Depois da correção a função pode participar de outras expressões como somar(2,3) * 2.",
-        "expected": "resultado vale 5 e a página mostra 5."
+        "expected": "resultado vale 5 e a página mostra 5.",
+        "criteria": ["Retorno chega ao chamador e é mostrado na página.","Explicação distingue return de console.log."]
       }
     ],
     "mistakes": [
@@ -499,10 +511,10 @@ Object.assign(LESSON_GUIDES, {
       { "instruction": "Troque meta por zero e observe o contrato.", "result": "A página mostra Dados inválidos." }
     ],
     "exercises": [
-      { "prompt": "Prever: há const taxa = 2 fora de function multiplicar(valor) { const taxa = 3; return valor * taxa; }. Sem executar, diga o retorno de multiplicar(4) e explique qual taxa é usada.", "hints": ["Procure primeiro no escopo mais próximo."], "solution": "O retorno é 12. O parâmetro valor e a taxa declarada dentro da função estão no escopo local; a taxa externa fica ocultada nessa função.", "explanation": "A resolução de nomes começa no escopo atual e segue para os externos apenas se o nome não for encontrado.", "expected": "12, usando a taxa local 3." },
-      { "prompt": "Alterar: transforme function totalComTaxa(valor) { return valor * taxa; } em uma função que não dependa da variável externa taxa.", "hints": ["Faça a dependência aparecer entre os parâmetros."], "solution": "function totalComTaxa(valor, taxa) { return valor * taxa; }\nconsole.log(totalComTaxa(100, 1.1));", "explanation": "A chamada agora mostra todos os dados que influenciam o retorno.", "expected": "110 no Console, admitindo a imprecisão comum de ponto flutuante quando aplicável." },
-      { "prompt": "Construir: crie calcularProgresso(meta, realizado), sem ler nem alterar variáveis externas. Retorne null para entradas inválidas e a porcentagem limitada a 100 nos demais casos. Apresente o resultado fora da função.", "hints": ["Valide números finitos; meta deve ser maior que zero.", "Use Math.min para limitar o resultado."], "solution": "function calcularProgresso(meta, realizado) {\n  if (!Number.isFinite(meta) || !Number.isFinite(realizado) || meta \u003c= 0 || realizado \u003c 0) return null;\n  return Math.min(100, Math.round((realizado / meta) * 100));\n}\nconst valor = calcularProgresso(80, 20);\ndocument.getElementById(\"saida\").textContent = valor === null ? \"Inválido\" : `${valor}%`;", "explanation": "O cálculo continua utilizável sem DOM; apenas o chamador apresenta o retorno.", "expected": "25% na página." },
-      { "prompt": "Investigar erro: function registrar() { if (true) { const minutos = 30; } return minutos; } causa ReferenceError. Localize o escopo do nome e corrija sem trocar const por var.", "hints": ["minutos só existe dentro do bloco do if."], "solution": "function registrar() {\n  const minutos = 30;\n  if (true) { console.log(\"Sessão válida\"); }\n  return minutos;\n}", "explanation": "A declaração foi movida para o escopo da função, onde o return também pode acessá-la.", "expected": "registrar() retorna 30 sem ReferenceError." }
+      { "prompt": "Prever: há const taxa = 2 fora de function multiplicar(valor) { const taxa = 3; return valor * taxa; }. Sem executar, diga o retorno de multiplicar(4) e explique qual taxa é usada.", "hints": ["Procure primeiro no escopo mais próximo."], "solution": "O retorno é 12. O parâmetro valor e a taxa declarada dentro da função estão no escopo local; a taxa externa fica ocultada nessa função.", "explanation": "A resolução de nomes começa no escopo atual e segue para os externos apenas se o nome não for encontrado.", "expected": "A previsão é registrada antes da chamada e a explicação identifica a ligação local escolhida.", "criteria": ["Previsão do retorno e da variável usada anotada antes.","Explicação identifica o escopo local."] },
+      { "prompt": "Alterar: transforme function totalComTaxa(valor) { return valor * taxa; } em uma função que não dependa da variável externa taxa.", "hints": ["Faça a dependência aparecer entre os parâmetros."], "solution": "function totalComTaxa(valor, taxa) { return valor * taxa; }\nconsole.log(totalComTaxa(100, 1.1));", "explanation": "A chamada agora mostra todos os dados que influenciam o retorno.", "expected": "110 no Console, admitindo a imprecisão comum de ponto flutuante quando aplicável.", "criteria": ["Dependência externa passa a ser argumento explícito.","Chamada de teste não depende de variável global."] },
+      { "prompt": "Construir: crie calcularProgresso(meta, realizado), sem ler nem alterar variáveis externas. Retorne null para entradas inválidas e a porcentagem limitada a 100 nos demais casos. Apresente o resultado fora da função.", "hints": ["Valide números finitos; meta deve ser maior que zero.", "Use Math.min para limitar o resultado."], "solution": "function calcularProgresso(meta, realizado) {\n  if (!Number.isFinite(meta) || !Number.isFinite(realizado) || meta \u003c= 0 || realizado \u003c 0) return null;\n  return Math.min(100, Math.round((realizado / meta) * 100));\n}\nconst valor = calcularProgresso(80, 20);\ndocument.getElementById(\"saida\").textContent = valor === null ? \"Inválido\" : `${valor}%`;", "explanation": "O cálculo continua utilizável sem DOM; apenas o chamador apresenta o retorno.", "expected": "25% na página.", "criteria": ["Função usa apenas argumentos e não altera estado externo.","Invalidez retorna null e resultado é limitado a 100%."] },
+      { "prompt": "Investigar erro: function registrar() { if (true) { const minutos = 30; } return minutos; } causa ReferenceError. Localize o escopo do nome e corrija sem trocar const por var.", "hints": ["minutos só existe dentro do bloco do if."], "solution": "function registrar() {\n  const minutos = 30;\n  if (true) { console.log(\"Sessão válida\"); }\n  return minutos;\n}", "explanation": "A declaração foi movida para o escopo da função, onde o return também pode acessá-la.", "expected": "registrar() retorna 30 sem ReferenceError.", "criteria": ["Diagnóstico localiza a declaração fora do escopo de retorno.","Mantém const e retorna número sem ReferenceError."] }
     ],
     "mistakes": [
       "Tentar acessar fora do bloco um let ou const declarado dentro dele.",
@@ -540,10 +552,10 @@ Object.assign(LESSON_GUIDES, {
       { "instruction": "Acrescente outro() ao final da lista.", "result": "A nova linha mostra 2; o estado de outro permanece independente de contar." }
     ],
     "exercises": [
-      { "prompt": "Prever: qual é a diferença entre executar aplicar(5, dobro) e tentar aplicar(5, dobro(5))? Responda antes de rodar.", "hints": ["Na segunda forma, observe o que é passado como segundo argumento."], "solution": "aplicar(5, dobro) retorna 10. Em aplicar(5, dobro(5)), dobro(5) vira 10 antes da chamada; aplicar tenta executar o número 10 como função e lança TypeError.", "explanation": "Callbacks são passados por referência, sem parênteses.", "expected": "10 na primeira forma; TypeError na segunda." },
-      { "prompt": "Alterar: adapte aplicar para receber dois valores e um callback, permitindo aplicar(3, 4, somar).", "hints": ["Chame operacao com dois argumentos."], "solution": "function aplicar(a, b, operacao) { return operacao(a, b); }\nfunction somar(a, b) { return a + b; }\nconsole.log(aplicar(3, 4, somar));", "explanation": "A função de ordem superior controla a chamada sem conhecer a regra específica.", "expected": "7 no Console." },
-      { "prompt": "Construir: crie criarMarcador(inicial), que devolve uma função capaz de somar uma quantidade ao valor preservado. Crie dois marcadores e demonstre que seus estados são independentes.", "hints": ["Declare valor na função externa.", "A função interna recebe quantidade, altera valor e o retorna."], "solution": "function criarMarcador(inicial) {\n  let valor = inicial;\n  return function (quantidade) { valor += quantidade; return valor; };\n}\nconst a = criarMarcador(10);\nconst b = criarMarcador(0);\nconsole.log(a(5), a(2), b(3));", "explanation": "Cada chamada da função externa cria um ambiente separado conservado pela função interna.", "expected": "15, 17 e 3 no Console." },
-      { "prompt": "Investigar erro: const contar = criarContador; console.log(contar()) devolve uma função em vez de 1. Explique e corrija.", "hints": ["criarContador é a fábrica; ela precisa ser chamada para produzir o contador."], "solution": "const contar = criarContador();\nconsole.log(contar());", "explanation": "Sem os primeiros parênteses, contar referencia a função externa. A chamada correta cria e guarda a função interna.", "expected": "1 no Console." }
+      { "prompt": "Prever: qual é a diferença entre executar aplicar(5, dobro) e tentar aplicar(5, dobro(5))? Responda antes de rodar.", "hints": ["Na segunda forma, observe o que é passado como segundo argumento."], "solution": "aplicar(5, dobro) retorna 10. Em aplicar(5, dobro(5)), dobro(5) vira 10 antes da chamada; aplicar tenta executar o número 10 como função e lança TypeError.", "explanation": "Callbacks são passados por referência, sem parênteses.", "expected": "A observação compara a função passada como callback com o resultado de uma chamada antecipada.", "criteria": ["Previsão anotada antes das chamadas.","Compara callback passado com valor produzido por chamada antecipada."] },
+      { "prompt": "Alterar: adapte aplicar para receber dois valores e um callback, permitindo aplicar(3, 4, somar).", "hints": ["Chame operacao com dois argumentos."], "solution": "function aplicar(a, b, operacao) { return operacao(a, b); }\nfunction somar(a, b) { return a + b; }\nconsole.log(aplicar(3, 4, somar));", "explanation": "A função de ordem superior controla a chamada sem conhecer a regra específica.", "expected": "7 no Console.", "criteria": ["aplicar recebe dois valores e função callback.","Resultado é obtido sem executar callback antes da função externa."] },
+      { "prompt": "Construir: crie criarMarcador(inicial), que devolve uma função capaz de somar uma quantidade ao valor preservado. Crie dois marcadores e demonstre que seus estados são independentes.", "hints": ["Declare valor na função externa.", "A função interna recebe quantidade, altera valor e o retorna."], "solution": "function criarMarcador(inicial) {\n  let valor = inicial;\n  return function (quantidade) { valor += quantidade; return valor; };\n}\nconst a = criarMarcador(10);\nconst b = criarMarcador(0);\nconsole.log(a(5), a(2), b(3));", "explanation": "Cada chamada da função externa cria um ambiente separado conservado pela função interna.", "expected": "15, 17 e 3 no Console.", "criteria": ["Função interna preserva valor entre chamadas.","Duas instâncias mantêm estado independente em chamadas intercaladas."] },
+      { "prompt": "Investigar erro: const contar = criarContador; console.log(contar()) devolve uma função em vez de 1. Explique e corrija.", "hints": ["criarContador é a fábrica; ela precisa ser chamada para produzir o contador."], "solution": "const contar = criarContador();\nconsole.log(contar());", "explanation": "Sem os primeiros parênteses, contar referencia a função externa. A chamada correta cria e guarda a função interna.", "expected": "1 no Console.", "criteria": ["Correção chama a função devolvida pela fábrica.","Console mostra número, não referência à função."] }
     ],
     "mistakes": ["Executar o callback ao passá-lo, usando parênteses quando era necessária a referência.", "Confundir a função externa, que cria o ambiente, com a função interna que o utiliza.", "Usar estado oculto quando parâmetros e retorno deixariam o cálculo mais simples."],
     "quiz": [
@@ -636,7 +648,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const numeros = [10,20,30];\nconst dobros = numeros.map(function(n) { return n * 2; });\ndocument.getElementById(\"saida\").textContent = dobros.join(\", \");\nconsole.log(numeros);",
         "explanation": "map preserva a quantidade de itens, substituindo cada posição pelo retorno. O array numeros continua com seus valores originais.",
-        "expected": "Previsão registrada antes da execução; a página mostra 20, 40, 60 e o array original permanece [10,20,30]."
+        "expected": "A previsão da quantidade e do efeito no original é anotada; o teste permite conferir transformação e página.",
+        "criteria": ["Previsão sobre quantidade e mutação anotada primeiro.","map transforma a exibição sem alterar entrada."]
       },
       {
         "prompt": "Alterar: no catálogo do exemplo, mude a busca para o produto id 99 e apresente Não encontrado sem lançar erro. Preserve os três produtos do catálogo.",
@@ -646,7 +659,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const item = produtos.find(function(p) { return p.id === 99; });\nlet mensagem = \"Não encontrado\";\nif (item !== undefined) { mensagem = item.nome; }\ndocument.getElementById(\"saida\").textContent = mensagem;",
         "explanation": "Este trecho deve ser usado após a declaração de produtos do exemplo. O caso sem correspondência é esperado e tratado explicitamente.",
-        "expected": "Não encontrado."
+        "expected": "Não encontrado.",
+        "criteria": ["Busca ausente mostra mensagem sem exceção.","Catálogo mantém os três produtos."]
       },
       {
         "prompt": "Construir: crie um array com três sessões: HTML 30 minutos, CSS 45 e JS 20. Filtre as de pelo menos 30 minutos, some apenas essas durações e apresente seus nomes e o total. O array original deve continuar com três itens.",
@@ -656,7 +670,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const sessoes = [{nome:\"HTML\",minutos:30},{nome:\"CSS\",minutos:45},{nome:\"JS\",minutos:20}];\nconst longas = sessoes.filter(function(s) { return s.minutos >= 30; });\nconst total = longas.reduce(function(soma,s) { return soma+s.minutos; },0);\nconst nomes = longas.map(function(s) { return s.nome; });\ndocument.getElementById(\"saida\").textContent = `${nomes.join(\", \")}\\nTotal: ${total}`;\nconsole.log(sessoes.length);",
         "explanation": "A seleção precede a soma porque o requisito exclui sessões curtas. Nenhum callback altera os registros e filter cria outra coleção de referências.",
-        "expected": "HTML, CSS; Total: 75. O Console mostra 3."
+        "expected": "HTML, CSS; Total: 75. O Console mostra 3.",
+        "criteria": ["Filtro e soma consideram só sessões elegíveis.","Nomes e total aparecem; array de entrada conserva três itens."]
       },
       {
         "prompt": "Investigar erro: const original = [10,2,30]; const copia = original; copia.sort(); não preserva o original nem ordena numericamente. Antes de corrigir, desenhe se os dois nomes apontam para o mesmo array e preveja a ordem após sort(). Corrija ambos os problemas.",
@@ -666,7 +681,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const original = [10,2,30];\nconst copia = original.slice().sort(function(a,b) { return a-b; });\nconsole.log(original.join(\",\"), copia.join(\",\"));",
         "explanation": "Criar outro nome não copia o array. O comparador é um segundo problema independente: a ordenação padrão não representa magnitude numérica.",
-        "expected": "Original: 10,2,30. Cópia: 2,10,30."
+        "expected": "A previsão da referência e da ordem é registrada antes da correção e comparada com os arrays.",
+        "criteria": ["Previsão de alias e ordenação anotada antes de sort.","Cópia independente e comparador numérico preservam e ordenam dados."]
       }
     ],
     "mistakes": [
@@ -795,7 +811,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const triplo = (n) => n * 3;\ndocument.getElementById(\"saida\").textContent = String(triplo(4));",
         "explanation": "As duas formas produzem o mesmo cálculo porque só dependem do parâmetro. A concisão não muda o contrato.",
-        "expected": "Previsão registrada antes da execução; as duas versões devolvem 12."
+        "expected": "A previsão é anotada antes da conversão; os retornos das duas implementações são comparados.",
+        "criteria": ["Previsão anotada antes da conversão para arrow.","Duas implementações devolvem resultado equivalente."]
       },
       {
         "prompt": "Alterar: no script do exemplo, substitua temporariamente o perfil por um curso { titulo:\"JS\", vagas:0 }; extraia titulo como nomeCurso e mostre vagas usando padrão 10 somente se ausente. Depois restaure o exemplo.",
@@ -805,7 +822,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const curso = { titulo:\"JS\", vagas:0 };\nconst { titulo: nomeCurso } = curso;\nconst vagas = curso.vagas ?? 10;\ndocument.getElementById(\"saida\").textContent = `${nomeCurso}: ${vagas}`;",
         "explanation": "Zero significa que não há vagas, e trocar por 10 inventaria disponibilidade. O padrão se aplica a ausência, não a uma contagem válida igual a zero.",
-        "expected": "JS: 0."
+        "expected": "JS: 0.",
+        "criteria": ["Título extraído com o alias pedido e vagas exibidas.","Valor zero é mantido; padrão só cobre valor ausente."]
       },
       {
         "prompt": "Construir: dado aluno = {nome:\"Bia\", plano:{minutos:30}}, crie outro objeto com minutos 45 sem alterar aluno. Acrescente uma sessão de 15 ao array [20,30] sem alterá-lo. Mostre as duas versões.",
@@ -815,7 +833,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const aluno = {nome:\"Bia\", plano:{minutos:30}};\nconst novoAluno = {...aluno, plano:{...aluno.plano,minutos:45}};\nconst sessoes = [20,30];\nconst novasSessoes = [...sessoes,15];\ndocument.getElementById(\"saida\").textContent = `${aluno.plano.minutos} / ${novoAluno.plano.minutos}\\n${sessoes.join(\",\")} / ${novasSessoes.join(\",\")}`;",
         "explanation": "A cópia de cada nível alterado protege o objeto original. O array contém números, portanto a cópia rasa é suficiente para acrescentar um item sem compartilhar um objeto interno modificado.",
-        "expected": "30 / 45; 20,30 / 20,30,15."
+        "expected": "30 / 45; 20,30 / 20,30,15.",
+        "criteria": ["Objeto e array originais permanecem intactos.","Novos valores são criados sem compartilhar a parte aninhada alterada."]
       },
       {
         "prompt": "Investigar erro: const criar = nome => { nome: nome }; não devolve o objeto desejado. Antes de corrigir, preveja o retorno e identifique se as chaves iniciam um bloco ou objeto. Corrija e verifique criar(\"Lia\").nome.",
@@ -825,7 +844,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const criar = (nome) => ({ nome: nome });\ndocument.getElementById(\"saida\").textContent = criar(\"Lia\").nome;",
         "explanation": "O corpo original é interpretado como bloco, com uma instrução rotulada, e não executa return. Os parênteses tornam o literal de objeto uma expressão retornada.",
-        "expected": "Lia."
+        "expected": "A previsão é registrada primeiro; a execução permite conferir a interpretação das chaves e do objeto.",
+        "criteria": ["Previsão e hipótese sobre chaves registradas antes.","Função devolve objeto e nome acessível após chamada."]
       }
     ],
     "mistakes": [
@@ -952,7 +972,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "function dobro(n) { return n*2; }\nconsole.assert(dobro(3) === 6, \"dobro de 3\");\nconsole.assert(dobro(0) === 0, \"dobro de 0\");",
         "explanation": "Os testes normais não precisam mostrar uma mensagem de sucesso. A alteração controlada demonstra que as expectativas detectam uma regra errada. Restaure a multiplicação após a experiência.",
-        "expected": "Previsão registrada antes da execução; nenhuma falha com n*2 e duas falhas com n+2."
+        "expected": "Previsões e asserções ficam registradas antes; compare os resultados antes e depois da alteração.",
+        "criteria": ["Previsões e asserções registradas antes.","Falhas após mudança são observadas e função restaurada."]
       },
       {
         "prompt": "Alterar: no script do exemplo, substitua o relatório de testes por uma chamada a media([]) tratada em try/catch e mostre a mensagem do erro na página. Mantenha a função media e não substitua a média inválida por zero.",
@@ -962,7 +983,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "try {\n  const resultado = media([]);\n  document.getElementById(\"saida\").textContent = String(resultado);\n} catch (erro) {\n  document.getElementById(\"saida\").textContent = erro.message;\n}",
         "explanation": "Mantenha a declaração de media antes deste trecho e substitua o restante do script. A mensagem informa o que falta, sem fabricar um resultado matemático válido.",
-        "expected": "Informe ao menos uma nota."
+        "expected": "Informe ao menos uma nota.",
+        "criteria": ["Erro é capturado e mensagem aparece na página.","Função não muda e dado inválido não vira zero silenciosamente."]
       },
       {
         "prompt": "Construir: implemente dividir(a,b) para números finitos, recusando divisor zero com RangeError e outros dados inválidos com TypeError. Teste 10/2, 0/2, divisor zero e entrada \"10\".",
@@ -972,7 +994,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "function dividir(a,b) {\n  if (!Number.isFinite(a) || !Number.isFinite(b)) { throw new TypeError(\"Use números finitos.\"); }\n  if (b === 0) { throw new RangeError(\"Divisor não pode ser zero.\"); }\n  return a/b;\n}\nconsole.assert(dividir(10,2) === 5, \"10/2\");\nconsole.assert(dividir(0,2) === 0, \"0/2\");\nlet recusouZero = false;\ntry { dividir(10,0); } catch (e) { recusouZero = e instanceof RangeError; }\nconsole.assert(recusouZero, \"recusa zero\");\nlet recusouTexto = false;\ntry { dividir(\"10\",2); } catch(e) { recusouTexto = e instanceof TypeError; }\nconsole.assert(recusouTexto, \"recusa texto\");",
         "explanation": "Os flags começam falsos para que a ausência de exceção não passe despercebida. Conferir a categoria evita aceitar um erro completamente diferente como prova de validação correta.",
-        "expected": "Quatro verificações sem falhas. Os retornos válidos são 5 e 0."
+        "expected": "Quatro verificações sem falhas. Os retornos válidos são 5 e 0.",
+        "criteria": ["Valida finitude e tipo antes de dividir.","Zero gera RangeError; dados inválidos geram TypeError."]
       },
       {
         "prompt": "Investigar erro: uma função calcula soma / (notas.length - 1). Para [6,8] devolve 14. Registre esperado e observado, localize a expressão divergente, corrija e acrescente um teste de regressão com uma nota única.",
@@ -982,7 +1005,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "function mediaSimples(notas) {\n  return notas.reduce((soma,n) => soma+n,0) / notas.length;\n}\nconsole.assert(mediaSimples([6,8]) === 7, \"duas notas\");\nconsole.assert(mediaSimples([4]) === 4, \"uma nota\");",
         "explanation": "Este trecho isola o cálculo para diagnosticar o divisor. Na função final mantenha também a validação completa do exemplo, pois esta versão reduzida pressupõe array não vazio de notas válidas.",
-        "expected": "As duas expectativas passam e a causa é a confusão entre contagem e último índice."
+        "expected": "As duas expectativas passam e a causa é a confusão entre contagem e último índice.",
+        "criteria": ["Reproduz diferença para duas notas.","Teste de regressão também cobre uma nota."]
       }
     ],
     "mistakes": [
@@ -1102,7 +1126,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "CSS fica riscado. O resumo informa 2 assuntos.",
         "explanation": "A condição utiliza a posição, não o nome HTML. Mudar os dados altera o texto, mas preserva a regra.",
-        "expected": "Dois li e apenas CSS com classe feito."
+        "expected": "A previsão é anotada antes; a inspeção permite contar itens e conferir classes.",
+        "criteria": ["Previsão de classe e contagem registrada antes.","Lista e resumo são conferidos após renderização."]
       },
       {
         "prompt": "Modificar: deixe todos os itens sem risco e informe somente o total no resumo.",
@@ -1112,7 +1137,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "item.classList.toggle(\"feito\", false);\n// Dentro de renderizar, depois do laço:\nresumo.textContent = `${assuntos.length} assuntos disponíveis.`;",
         "explanation": "São mudanças de apresentação. Não precisamos apagar nem duplicar os dados para realizá-las.",
-        "expected": "Nenhum item riscado; total correto no parágrafo."
+        "expected": "Nenhum item riscado; total correto no parágrafo.",
+        "criteria": ["Itens ficam sem classe de concluído.","Resumo mostra quantidade calculada, sem outros dados."]
       },
       {
         "prompt": "Construir: substitua o array por objetos {nome, concluido}. Mostre os nomes e risque apenas os concluídos. Conte quantos foram concluídos no resumo.",
@@ -1122,7 +1148,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const assuntos = [{nome:\"HTML\",concluido:true},{nome:\"CSS\",concluido:false}];\n// No laço de renderizar:\nitem.textContent = assunto.nome;\nitem.classList.toggle(\"feito\", assunto.concluido);\n// Depois do laço:\nresumo.textContent = `${assuntos.filter(a => a.concluido).length} de ${assuntos.length} concluídos.`;",
         "explanation": "Substitua as linhas equivalentes do exemplo. O estado deixa de depender da posição e passa a pertencer a cada objeto.",
-        "expected": "HTML riscado, CSS normal e resumo 1 de 2 concluídos."
+        "expected": "HTML riscado, CSS normal e resumo 1 de 2 concluídos.",
+        "criteria": ["Cada objeto fornece nome e conclusão para renderizar.","Só concluídos recebem classe e contador vem dos dados."]
       },
       {
         "prompt": "Depurar: querySelector(\"lista\").textContent = \"Olá\" gera erro. Identifique a causa e corrija sem esconder o problema.",
@@ -1132,7 +1159,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const lista = document.querySelector(\"#lista\");\nif (!lista) throw new Error(\"Elemento #lista não encontrado\");",
         "explanation": "Corrigir o seletor resolve a origem. A verificação adicional oferece uma mensagem clara se o HTML mudar; não substitui conferir o documento.",
-        "expected": "A consulta encontra ul; nenhuma leitura de propriedade de null ocorre."
+        "expected": "A inspeção permite localizar o elemento selecionado e evitar acesso a uma referência ausente.",
+        "criteria": ["Diagnóstico identifica o alvo encontrado pelo seletor.","Correção confere elemento antes de ler textContent."]
       }
     ],
     "mistakes": [
@@ -1253,7 +1281,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "target pode ser o span; currentTarget é ul. closest encontra o botão ancestral.",
         "explanation": "Delegação não depende de o alvo ser diretamente o botão.",
-        "expected": "Cliques no conteúdo interno continuam encontrando a ação correta."
+        "expected": "A previsão é registrada antes do clique; a inspeção permite comparar alvo e controle ouvinte.",
+        "criteria": ["Previsão anotada antes do clique interno.","Delegação encontra ação pelo ancestral do evento."]
       },
       {
         "prompt": "Modificar: recuse nomes com mais de 30 caracteres, mantendo o máximo do HTML e a regra JavaScript coerentes.",
@@ -1263,7 +1292,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003c!-- No input: maxlength=\"30\" -->\nconst invalido = nome.length \u003c 2 || nome.length > 30;\ncampo.setCustomValidity(invalido ? \"Use entre 2 e 30 caracteres.\" : \"\");",
         "explanation": "O limite visual e a regra normalizada expressam a mesma decisão. Use também uma descrição coerente no label.",
-        "expected": "Nomes de 2 a 30 caracteres válidos são aceitos; fora dessa regra não entram."
+        "expected": "Nomes de 2 a 30 caracteres válidos são aceitos; fora dessa regra não entram.",
+        "criteria": ["Limites da validação JavaScript e HTML são coerentes.","Casos dentro e fora dos limites são testados."]
       },
       {
         "prompt": "Construir: recuse duplicatas ignorando maiúsculas e espaços nas pontas. Mostre uma mensagem no campo sem apagar o que foi digitado.",
@@ -1273,7 +1303,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const repetido = assuntos.some(a => a.nome.toLowerCase() === nome.toLowerCase());\nif (repetido) {\n  campo.setCustomValidity(\"Este assunto já está na lista.\");\n  campo.reportValidity();\n  return;\n}\n// Insira depois da validação básica e antes de assuntos.push.",
         "explanation": "A decisão ocorre antes da mutação. O texto digitado permanece para permitir correção, e a comparação não muda o nome exibido.",
-        "expected": "Depois de HTML, tentar html ou HTML com espaços não aumenta o total."
+        "expected": "Depois de HTML, tentar html ou HTML com espaços não aumenta o total.",
+        "criteria": ["Normaliza espaços e caixa antes de comparar duplicados.","Recusa informa erro e preserva campo e total."]
       },
       {
         "prompt": "Depurar: após uma tentativa inválida, todos os envios continuam bloqueados mesmo com texto correto. O que falta?",
@@ -1283,7 +1314,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "campo.addEventListener(\"input\", () => {\n  campo.setCustomValidity(\"\");\n});",
         "explanation": "Sem limpar a mensagem, a validação nativa pode bloquear submit antes de sua lógica ter chance de corrigir o estado.",
-        "expected": "Editar o campo libera nova avaliação na tentativa seguinte."
+        "expected": "A edição do campo permite verificar se a tentativa seguinte é reavaliada.",
+        "criteria": ["Relato explica estado que bloqueia tentativa posterior.","Campo corrigido causa nova avaliação e pode ser aceito."]
       }
     ],
     "mistakes": [
@@ -1404,7 +1436,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "O parse retorna 42, mas valido(42) retorna false.",
         "explanation": "Sintaxe do formato e regras da aplicação são verificações diferentes.",
-        "expected": "O fluxo rejeita o dado por estrutura, não por JSON malformado."
+        "expected": "A análise separa leitura de JSON da validação da estrutura recuperada.",
+        "criteria": ["Previsão registrada antes de parse e validação.","Distingue JSON sintaticamente válido de formato não aceito."]
       },
       {
         "prompt": "Modificar: reduza o limite para 200 caracteres em todos os pontos que definem essa regra.",
@@ -1414,7 +1447,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "// No HTML: maxlength=\"200\" e label coerente.\n// Em valido: dado.texto.length \u003c= 200\n// Ao salvar: texto: campo.value.slice(0, 200)",
         "explanation": "Uma regra precisa ser coerente na entrada, recuperação e gravação. Um rascunho antigo maior será rejeitado, o que deve ser comunicado.",
-        "expected": "Novas entradas respeitam 200 caracteres e dados recuperados seguem o mesmo contrato."
+        "expected": "Novas entradas respeitam 200 caracteres e dados recuperados seguem o mesmo contrato.",
+        "criteria": ["Limite 200 aplicado na entrada e na recuperação.","Dados antigos fora do contrato não são aceitos como válidos."]
       },
       {
         "prompt": "Construir: acrescente um campo titulo de até 80 caracteres ao rascunho. Salve e recupere os dois campos.",
@@ -1424,7 +1458,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "// Use uma chave nova laboratorio-js:rascunho:v2.\nconst titulo = document.querySelector(\"#titulo\");\n// Objeto ao salvar:\nconst dado = {versao:2,titulo:titulo.value.slice(0,80),texto:campo.value.slice(0,500)};\n// Em valido, exija versao === 2 e:\n// typeof dado.titulo === \"string\" && dado.titulo.length \u003c= 80\n// Ao recuperar: titulo.value = dado.titulo;\n// Ao apagar: titulo.value = \"\";",
         "explanation": "Crie o input antes de executar o script. A chave v2 separa formatos e deixa o rascunho v1 intacto. Uma aplicação real poderia migrá-lo explicitamente.",
-        "expected": "Título e resumo retornam após recarregar; apagar limpa ambos no formato v2."
+        "expected": "Título e resumo retornam após recarregar; apagar limpa ambos no formato v2.",
+        "criteria": ["Formato v2 recupera título e resumo após recarga.","Limpeza remove os dois sem afetar outras chaves."]
       },
       {
         "prompt": "Depurar: um colega usou localStorage.clear() para apagar só o resumo. Corrija e explique a consequência.",
@@ -1434,7 +1469,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "localStorage.removeItem(CHAVE);",
         "explanation": "clear remove todas as entradas de localStorage dessa origem. removeItem limita a ação ao recurso selecionado.",
-        "expected": "Outras chaves permanecem intactas."
+        "expected": "A verificação confirma a remoção do dado solicitado sem apagar outros valores.",
+        "criteria": ["Diagnóstico separa remover item de limpar todo armazenamento.","Verifica a chave afetada e preservação das demais."]
       }
     ],
     "mistakes": [
@@ -1555,7 +1591,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "A, C, B.",
         "explanation": "O callback de then entra como microtarefa para depois da execução síncrona atual.",
-        "expected": "O Console imprime A, depois C e por último B."
+        "expected": "A previsão é registrada antes de executar; a sequência permite comparar a ordem observada.",
+        "criteria": ["Previsão da sequência anotada antes de rodar.","Execução permite separar log síncrono e tarefa da Promise."]
       },
       {
         "prompt": "Modificar: faça a simulação retornar três assuntos e exiba também a quantidade recebida.",
@@ -1565,7 +1602,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "// Na simulação:\nresolve([\"DOM\", \"Eventos\", \"Promises\"]);\n// Após await:\nstatus.textContent = `${assuntos.length} assuntos: ${assuntos.join(\", \")}.`;",
         "explanation": "A interface usa o valor resolvido; não precisa conhecer antecipadamente seu tamanho.",
-        "expected": "No sucesso: 3 assuntos: DOM, Eventos, Promises."
+        "expected": "No sucesso: 3 assuntos: DOM, Eventos, Promises.",
+        "criteria": ["Simulação resolve três assuntos e interface exibe quantidade.","Sucesso mantém tratamento dos erros."]
       },
       {
         "prompt": "Construir: escreva uma função async carregarDupla que inicie duas simulações independentes e retorne um único array com os resultados.",
@@ -1575,7 +1613,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "async function carregarDupla() {\n  const [primeira, segunda] = await Promise.all([simularPedido(false), simularPedido(false)]);\n  return [...primeira, ...segunda];\n}\ncarregarDupla().then(console.log).catch(console.error);",
         "explanation": "As duas chamadas são iniciadas antes do await concluir. O retorno continua sendo uma Promise; o consumidor trata também uma possível falha.",
-        "expected": "Com a versão original: [\"DOM\", \"Eventos\", \"DOM\", \"Eventos\"]."
+        "expected": "Com a versão original: [\"DOM\", \"Eventos\", \"DOM\", \"Eventos\"].",
+        "criteria": ["Duas operações começam sem aguardar uma à outra.","Resultado é um array combinado em ordem estável."]
       },
       {
         "prompt": "Depurar: o botão só é reabilitado dentro de try após await. Quando há erro ele permanece desativado. Corrija a estrutura.",
@@ -1585,7 +1624,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "try {\n  const dados = await simularPedido(falhar.checked);\n  status.textContent = dados.join(\", \");\n} catch (erro) {\n  status.textContent = erro.message;\n} finally {\n  botao.disabled = false;\n}",
         "explanation": "O encerramento não depende de sucesso; finally expressa essa obrigação e evita duplicar a restauração.",
-        "expected": "Após falha, o botão permite nova tentativa."
+        "expected": "Após falha, o botão permite nova tentativa.",
+        "criteria": ["Botão é reabilitado após sucesso ou rejeição.","Falha aparece e nova tentativa fica possível."]
       }
     ],
     "mistakes": [
@@ -1706,7 +1746,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Não. O código verifica resposta.ok e lança Error para encaminhar esse caso ao catch.",
         "explanation": "Sem essa verificação, a aplicação poderia tentar interpretar uma página de erro como seu resultado esperado.",
-        "expected": "Com a checagem, o erro HTTP é tratado antes da renderização."
+        "expected": "Resposta HTTP e estado da aplicação são conferidos separadamente antes da renderização.",
+        "criteria": ["Previsão sobre HTTP anotada antes do teste.","Resposta não aceita interrompe renderização e entra no fluxo de erro."]
       },
       {
         "prompt": "Modificar: exija ids inteiros positivos no catálogo.",
@@ -1716,7 +1757,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Number.isInteger(item.id) && item.id > 0",
         "explanation": "Substitua a condição equivalente dentro de every. O tipo e a regra de domínio precisam ser satisfeitos juntos.",
-        "expected": "id 1 passa; 0, -1, 1.5 e \"1\" falham."
+        "expected": "id 1 passa; 0, -1, 1.5 e \"1\" falham.",
+        "criteria": ["Validação aceita somente inteiro positivo.","Zero, negativos, fração e texto são recusados individualmente."]
       },
       {
         "prompt": "Construir: use catalogo.json local com dois assuntos próprios, mantendo todos os estados e a validação.",
@@ -1726,7 +1768,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "// catalogo.json:\n[{\"id\":1,\"nome\":\"Arrays\"},{\"id\":2,\"nome\":\"Funções\"}]\n// No JavaScript, substitua a criação de url por:\nconst url = \"./catalogo.json\";\n// Remova URL.revokeObjectURL(url) do finally.",
         "explanation": "Abra pela URL HTTP local. Se o arquivo não existe, o servidor responde 404, permitindo testar um erro HTTP real. O contrato dos dados continua igual.",
-        "expected": "Arrays e Funções aparecem; renomear o JSON provoca mensagem de erro HTTP."
+        "expected": "Arrays e Funções aparecem; renomear o JSON provoca mensagem de erro HTTP.",
+        "criteria": ["Catálogo próprio mantém estados de carga, sucesso e erro.","JSON ausente gera erro visível sem interface travada."]
       },
       {
         "prompt": "Depurar: o segundo carregamento é cancelado imediatamente porque um único AbortController, já abortado, foi reutilizado. Corrija.",
@@ -1736,7 +1779,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "controlador = new AbortController();\nconst sinal = controlador.signal;\nconst resposta = await fetch(url, {signal:sinal});",
         "explanation": "O controlador representa a vida de uma operação. Um novo pedido precisa de um novo sinal utilizável.",
-        "expected": "Cancelar uma busca não cancela automaticamente todas as futuras."
+        "expected": "Cancelar uma busca não cancela automaticamente todas as futuras.",
+        "criteria": ["Identifica reuso do controlador abortado.","Cada busca cria controlador e cancelamento atual não bloqueia a próxima."]
       }
     ],
     "mistakes": [
@@ -1863,7 +1907,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Não. É necessário exportar deliberadamente um valor que faça parte da interface pública.",
         "explanation": "Encapsular detalhes reduz dependências acidentais. Nem toda variável interna deve ser exposta.",
-        "expected": "app.js utiliza as funções exportadas sem acessar seus detalhes internos."
+        "expected": "A importação é inspecionada para verificar quais nomes estão disponíveis no módulo.",
+        "criteria": ["Previsão registrada antes de carregar arquivos.","Confere nomes exportados versus detalhes locais."]
       },
       {
         "prompt": "Alterar: na função resumir do exemplo, acrescente percentual inteiro ao objeto retornado, definindo zero para lista vazia. Preserve total, concluidas e pendentes.",
@@ -1873,7 +1918,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "return {total, concluidas, pendentes:total-concluidas, percentual:total === 0 ? 0 : Math.round(concluidas / total * 100)};",
         "explanation": "A regra do caso vazio é explícita. Para duas de três, o valor inteiro é 67; isso é apresentação arredondada, não uma contagem exata.",
-        "expected": "Três casos: vazio 0, metade 50, tudo concluído 100."
+        "expected": "Três casos: vazio 0, metade 50, tudo concluído 100.",
+        "criteria": ["Retorno mantém contadores e acrescenta percentual inteiro.","Lista vazia, metade e conclusão total são verificadas."]
       },
       {
         "prompt": "Construir: crie testes de nenhuma concluída, todas concluídas e entrada inválida. Mostre uma mensagem ao final e confira também o Console.",
@@ -1883,7 +1929,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "console.assert(resumir([{concluida:false}]).pendentes === 1, \"Pendente\");\nconsole.assert(resumir([{concluida:true}]).concluidas === 1, \"Concluída\");\nlet rejeitou = false;\ntry { resumir([{concluida:\"sim\"}]); } catch (erro) { rejeitou = erro instanceof TypeError; }\nconsole.assert(rejeitou, \"Deveria rejeitar texto no lugar de booleano\");\nconsole.log(\"Verificações executadas; confira possíveis falhas acima.\");",
         "explanation": "Insira após obter as exportações no exemplo ou em um módulo de testes que as importe. A mensagem final informa execução, não certifica sucesso automaticamente.",
-        "expected": "Nenhuma asserção falha; o caso inválido é rejeitado deliberadamente."
+        "expected": "Nenhuma asserção falha; o caso inválido é rejeitado deliberadamente.",
+        "criteria": ["Testes cobrem vazio, concluído e inválido.","Caso inválido é intencional; nenhuma asserção falha."]
       },
       {
         "prompt": "Investigar erro: app.js usa import { resumo } from \"tarefas.js\", mas o arquivo exporta resumir. No navegador servido por HTTP local, registre o primeiro erro do Console e confira a URL antes de corrigir o nome e o caminho.",
@@ -1893,7 +1940,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "import { resumir } from \"./tarefas.js\";",
         "explanation": "O nome pedido deve existir entre as exportações. O prefixo ./ resolve o arquivo ao lado de app.js sem depender de um mapa de importações.",
-        "expected": "O módulo carrega por HTTP local e a função pode ser chamada."
+        "expected": "O módulo carrega por HTTP local e a função pode ser chamada.",
+        "criteria": ["Erro inicial e URL são registrados antes da correção.","Módulo carrega via HTTP local e função exportada é chamada."]
       }
     ],
     "mistakes": [

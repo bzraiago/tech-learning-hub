@@ -39,9 +39,26 @@ $base = 'https://<dominio-do-projeto>'
 
 Saída esperada para ambas as chamadas: `200`. O segundo valor depende da disponibilidade do fornecedor; em caso de indisponibilidade, a rota responde com erro controlado. Não copie para relatórios o conteúdo de `api/public-config.mjs`, pois esse endpoint mostra configuração pública de Clerk e Supabase do curso.
 
-## Voltar à implantação anterior
+## Fazer rollback de uma implantação
 
-Se a demonstração causar uma regressão no site, no painel da Vercel abra **Deployments**, escolha a implantação anterior conhecida como válida e use a ação de promoção para produção disponível no projeto. Depois, repita os passos de verificação do domínio. O rollback da implantação restaura arquivos e funções daquela versão; ele não reverte dados de banco. Esta demonstração não grava dados.
+Use o **Instant Rollback** quando uma implantação de produção causar uma regressão e houver uma implantação anterior conhecida como válida. O rollback troca a implantação atendida pelos domínios de produção sem reconstruir o projeto. No plano Hobby, só é possível voltar à implantação de produção imediatamente anterior; nos planos Pro e Enterprise, outras implantações anteriormente associadas a um domínio de produção também podem ser elegíveis. Consulte a [documentação atual de Instant Rollback](https://vercel.com/docs/instant-rollback) antes de executar o procedimento.
+
+### Procedimento pelo painel
+
+1. Abra o projeto na Vercel e confira qual implantação está em produção e qual é a última versão conhecida como válida.
+2. Na página **Overview**, escolha **Instant Rollback** no cartão da implantação de produção. Também é possível abrir **Deployments** e selecionar essa ação no menu da implantação elegível.
+3. Selecione a versão anterior e avance. Confira os domínios que serão alterados e confirme **Confirm Rollback** somente se a implantação selecionada for a esperada.
+4. Aguarde a confirmação da Vercel e abra o domínio de produção em uma janela sem sessão Vercel. Confira a página principal e a rota da demonstração seguindo a seção de verificação acima.
+
+**Resultado esperado:** o painel confirma o rollback e o domínio de produção serve os arquivos e funções da implantação anterior escolhida.
+
+### Depois do rollback
+
+O Instant Rollback desativa a atribuição automática de domínios de produção. Assim, novos pushes para a branch de produção não substituem automaticamente a versão restaurada. Depois de corrigir e verificar a regressão, use **Undo Rollback** no cartão de produção, selecione a implantação corrigida e confirme para promover a versão e reativar a atribuição automática. Os nomes dos controles podem mudar; confira a documentação da Vercel se o painel mostrar um fluxo diferente.
+
+O rollback recupera a implantação, mas não desfaz mudanças de dados, migrations ou operações executadas no banco externo. Variáveis de ambiente também não são reconstruídas pelo rollback. Avalie compatibilidade da versão antiga com o esquema atual antes de reverter uma aplicação que grava dados. Esta demonstração meteorológica não grava dados; a regra continua importante para o curso principal, que usa Supabase.
+
+O comando equivalente da CLI é `vercel rollback`; ele exige a CLI instalada, o projeto vinculado e uma sessão autenticada. Para este primeiro procedimento, use o painel e não execute o rollback em produção como exercício sem planejar a janela e verificar o alvo.
 
 ## Limites observáveis
 

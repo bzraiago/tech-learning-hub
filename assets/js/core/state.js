@@ -72,6 +72,10 @@ function sanitizeState(candidate) {
       const key = `${lesson.id}:retry`;
       if (typeof candidate.notes?.[key] === 'string') clean.notes[key] = candidate.notes[key].slice(0, 2000);
     }
+    const requirementChangeKey = `${lesson.id}:requirement-change`;
+    if (typeof candidate.notes?.[requirementChangeKey] === 'string') {
+      clean.notes[requirementChangeKey] = candidate.notes[requirementChangeKey].slice(0, 2000);
+    }
     if (track.modules.indexOf(module) > 0 && module.lessons[0].id === lesson.id) {
       const key = `${lesson.id}:cumulative`;
       if (typeof candidate.notes?.[key] === 'string') clean.notes[key] = candidate.notes[key].slice(0, 2000);

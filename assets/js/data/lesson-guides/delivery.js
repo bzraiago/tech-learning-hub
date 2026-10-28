@@ -84,7 +84,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "if (req.method === 'GET' && req.url === '/api/saude') { res.writeHead(200); res.end(JSON.stringify({ok:true})); return; }",
         "explanation": "Este trecho deve entrar no callback do servidor antes da resposta padrão.",
-        "expected": "Previsão registrada: inicialmente 404; após a alteração, /api/saude responde 200 com ok verdadeiro."
+        "expected": "A previsão é registrada antes da mudança; o teste permite comparar o comportamento antes e depois de adicionar a rota.",
+        "criteria": ["Previsão do status é anotada antes de editar.","Teste compara resposta inicial e resposta após a rota ser adicionada."]
       },
       {
         "prompt": "Alterar: na tabela de contrato do laboratório, documente /api/estudos com método, status, tipo de resposta e nomes/tipos de campos. Depois mude temporariamente titulo para name no servidor e indique qual linha da tabela precisa mudar.",
@@ -94,7 +95,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "GET /api/estudos; 200; Content-Type: application/json; corpo: [{id:number, titulo:string}].",
         "explanation": "Especificar tipos permite detectar mudanças incompatíveis.",
-        "expected": "Contrato tem rota, status, mídia e campos; a mudança temporária troca titulo:string por name:string e exige ajuste no cliente e nos testes."
+        "expected": "Contrato tem rota, status, mídia e campos; a mudança temporária troca titulo:string por name:string e exige ajuste no cliente e nos testes.",
+        "criteria": ["Contrato registra método, status, mídia e schema dos campos.","Mudança de nome reflete-se em cliente e testes."]
       },
       {
         "prompt": "Construir: crie GET /api/estudos/1 que devolva apenas o primeiro item; id ausente devolve 404.",
@@ -104,7 +106,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const match = req.url.match(/^\\/api\\/estudos\\/(\\d+)$/);\nif (req.method === 'GET' && match) {\n  const id = Number(match[1]);\n  const item = estudos.find(e => e.id === id);\n  res.writeHead(item ? 200 : 404);\n  res.end(JSON.stringify(item || { erro: 'Não encontrado' }));\n  return;\n}",
         "explanation": "Coloque antes da rota padrão 404. Use uma condição de caminho explícita para não aceitar entradas arbitrárias.",
-        "expected": "/1 → 200 com HTML; /9 → 404."
+        "expected": "/1 → 200 com HTML; /9 → 404.",
+        "criteria": ["Rota por id devolve apenas um item ou erro apropriado.","Testes conferem recurso existente e ausente pelo contrato HTTP."]
       },
       {
         "prompt": "Investigar erro: a interface espera dados[0].titulo, mas a API passa a enviar {items:[...]}. Observe a forma real na aba Rede, descreva a divergência e proponha duas correções verificáveis.",
@@ -114,7 +117,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Correção A: servidor volta a entregar o array contratado. Correção B: contrato passa a declarar {items:Array} e cliente usa dados.items[0].titulo; atualize testes e documentação.",
         "explanation": "Uma mudança de forma pode quebrar o consumidor com status 200; alinhe as duas pontas.",
-        "expected": "Explicação identifica divergência estrutural e impacto."
+        "expected": "Explicação identifica divergência estrutural e impacto.",
+        "criteria": ["Inspeciona resposta real da Rede e compara com a forma esperada pela interface.","Apresenta duas correções verificáveis para a incompatibilidade."]
       },
       {
         "prompt": "Extensão opcional com serviço real: em Node.js 18+, consulte GET https://api.github.com/repos/mdn/content sem token. Mostre full_name e o tipo de stargazers_count. Se houver falha de rede ou limite de requisições, registre o status e continue com o mock local.",
@@ -124,7 +128,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "async function consultar(){ const r=await fetch('https://api.github.com/repos/mdn/content',{headers:{Accept:'application/vnd.github+json'}}); if(!r.ok) throw new Error('HTTP '+r.status); const d=await r.json(); console.log(d.full_name,typeof d.stargazers_count); } consultar().catch(e=>console.error('Consulta indisponível:',e.message));",
         "explanation": "Este exercício requer internet e o serviço de terceiros. Não há garantia de disponibilidade ou quantidade fixa de estrelas; requisições não autenticadas têm limite documentado. O mock local é suficiente para a aula.",
-        "expected": "Quando disponível, imprime mdn/content e number; em falha, informa motivo sem quebrar o laboratório."
+        "expected": "Quando disponível, imprime mdn/content e number; em falha, informa motivo sem quebrar o laboratório.",
+        "criteria": ["Chamada sem token depende do serviço real somente na extensão opcional.","Em falha registra evidência e continua com mock; tipo retornado é conferido."]
       }
     ],
     "mistakes": [
@@ -252,7 +257,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const botao = document.querySelector('#salvar'); botao.disabled = true; try { /* envio existente */ } catch (erro) { /* mensagem existente */ } finally { botao.disabled = false; }",
         "explanation": "Coloque a desabilitação antes do try e preserve o conteúdo original do envio dentro dele.",
-        "expected": "Enquanto aguarda, botão indisponível; ao terminar, disponível."
+        "expected": "Enquanto aguarda, botão indisponível; ao terminar, disponível.",
+        "criteria": ["Botão bloqueia reenvio enquanto POST está pendente.","Sucesso e falha reabilitam o controle e um clique repetido não duplica a ação."]
       },
       {
         "prompt": "Alterar: consulte GET /api/estudos ao abrir a página e mostre uma mensagem para a lista vazia. Diferencie [] de falha da requisição. Aceite: entrada [] → Nenhum estudo cadastrado; erro HTTP → Falha ao carregar.",
@@ -262,7 +268,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "(async () => { try { const resposta = await fetch('/api/estudos'); if (!resposta.ok) throw new Error('Falha ao carregar'); const itens = await resposta.json(); estado.textContent = itens.length ? 'Estudos carregados.' : 'Nenhum estudo cadastrado.'; } catch { estado.textContent = 'Falha ao carregar.'; } })();",
         "explanation": "Uma resposta válida com zero itens não é erro de rede.",
-        "expected": "[] mostra mensagem de vazio, não falha."
+        "expected": "[] mostra mensagem de vazio, não falha.",
+        "criteria": ["Lista vazia e falha HTTP têm estados distintos.","Teste usa [] e erro sem tratar ambos como conteúdo vazio."]
       },
       {
         "prompt": "Construir: no Console da página, escreva uma verificação que envie {titulo:123} à API e compare a quantidade de estudos antes e depois. Aceite: POST retorna 400 com erro e a lista não cresce; entrada: título numérico 123; saída: erro Título inválido.",
@@ -272,7 +279,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "(async () => { const antes = await (await fetch('/api/estudos')).json(); const resposta = await fetch('/api/estudos', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({titulo:123})}); const erro = await resposta.json(); const depois = await (await fetch('/api/estudos')).json(); console.assert(resposta.status === 400 && depois.length === antes.length, 'Recusa ou lista divergente'); console.log(resposta.status, erro); })().catch(console.error);",
         "explanation": "Execute no Console da página local; a proteção está no servidor.",
-        "expected": "400 e {erro:\"Título inválido\"}; nada é adicionado."
+        "expected": "400 e {erro:\"Título inválido\"}; nada é adicionado.",
+        "criteria": ["Pedido direto inválido retorna 400 e mensagem de erro coerente.","Quantidade da lista é comparada antes e depois e não cresce."]
       },
       {
         "prompt": "Investigar erro: o servidor retorna 400 com JSON, mas a UI diz sucesso. Localize a verificação ausente, corrija e confirme que a lista não muda. Aceite: entrada {titulo:123} → mensagem de erro e nenhum item novo.",
@@ -282,7 +290,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const dados = await resposta.json(); if (!resposta.ok) throw new Error(dados.erro || 'Falha ao salvar'); estado.textContent = 'Salvo com sucesso.';",
         "explanation": "O teste deve afirmar que a lista não muda em 400.",
-        "expected": "Mensagem de falha e nenhum item novo."
+        "expected": "Mensagem de falha e nenhum item novo.",
+        "criteria": ["Interface verifica status/erro antes de anunciar sucesso.","Estado da lista permanece igual após a recusa do servidor."]
       }
     ],
     "mistakes": [
@@ -407,7 +416,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "function podeEditar(usuario, registro) { return Number.isInteger(usuario?.id) && Number.isInteger(registro?.donoId) && usuario.id === registro.donoId; }",
         "explanation": "A regra continua sendo autorização demonstrativa, não autenticação.",
-        "expected": "Dados ausentes ou ids inválidos resultam false."
+        "expected": "A previsão para null é registrada primeiro; depois, a validação de existência e tipo é conferida com entradas válidas e inválidas.",
+        "criteria": ["Previsão da chamada com null anotada antes da mudança.","Regra valida existência e id inteiro antes de permitir edição."]
       },
       {
         "prompt": "Alterar: crie uma tabela com token ausente, usuário autenticado sem permissão e rota inexistente; associe 401, 403 e 404 e explique qual verificação do servidor levou a cada decisão. Aceite: três situações classificadas; entrada: rota inexistente → 404.",
@@ -417,7 +427,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Token ausente: 401; autenticado sem permissão: 403; rota inexistente: 404.",
         "explanation": "A escolha precisa refletir o motivo da falha, sujeito ao contrato da API.",
-        "expected": "Três códigos associados às condições."
+        "expected": "A tabela associa cada resposta à condição verificada no servidor e documenta a decisão sem depender do navegador.",
+        "criteria": ["Tabela diferencia 401, 403 e 404 pela autenticação, autorização e existência.","Explica a decisão aplicada no servidor, não pelo CORS."]
       },
       {
         "prompt": "Construir: desenhe o fluxo de uma chamada a serviço externo com chave privada, marcando onde a chave fica e qual resposta chega ao navegador. Aceite: chave só no servidor e retorno limitado aos dados autorizados; entrada: pedido de relatório → saída: relatório sem segredo.",
@@ -427,7 +438,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Guardar chave no ambiente do servidor; o backend verifica usuário e permissão, chama o provedor e devolve somente dados autorizados. Nunca enviar a chave ao navegador.",
         "explanation": "Evite registrar ou retornar o segredo em mensagens de erro.",
-        "expected": "Plano separa segredo privado e resposta pública."
+        "expected": "Plano separa segredo privado e resposta pública.",
+        "criteria": ["Chave fica no servidor e não aparece no código/resposta pública.","Resposta contém somente dados autorizados para o pedido."]
       },
       {
         "prompt": "Investigar erro: CORS bloqueia no navegador, mas um cliente de terminal obtém dados privados sem credencial. Identifique a falha e proponha uma segunda verificação pelo servidor. Aceite: resposta distingue CORS de autorização; entrada: pedido sem credencial → saída esperada: acesso negado.",
@@ -437,7 +449,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "A API não exige autenticação/autorização; configurar CORS não protege contra outros clientes. Corrigir verificação de identidade e permissão no servidor.",
         "explanation": "A causa de exposição é a falta de controle de acesso, não o cabeçalho de CORS.",
-        "expected": "Explicação distingue mecanismo de browser e segurança da API."
+        "expected": "Explicação distingue mecanismo de browser e segurança da API.",
+        "criteria": ["Reprodução compara navegador e cliente de terminal.","Proposta inclui autorização no servidor mesmo quando CORS está configurado."]
       }
     ],
     "mistakes": [
@@ -502,6 +515,9 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "Desenvolvimento é o ambiente em que você altera e depura; prévia permite revisar uma versão candidata; produção serve pessoas reais. As URLs, permissões e dados devem ser configurados para cada ambiente. O código demonstrativo mostra um mapeamento explícito de origem de API. Ele não envia requisições; o domínio .invalid marca uma URL fictícia que precisa ser substituída em uma entrega real.",
           "Uma configuração pública como a URL da API pode estar no frontend. Chave privada e senha não podem. No servidor, variáveis de ambiente ajudam a fornecer configuração sem gravar segredo no código. Ainda assim é preciso cuidar de logs, permissões e acesso ao ambiente. Documente quais valores são obrigatórios, seus nomes e o que fazer se faltarem; não publique valores verdadeiros no README.",
+          "Na Vercel, os ambientes padrão são Local, Preview e Production. Uma matriz de configuração deve registrar, para cada valor, se o navegador pode recebê-lo, onde o servidor o lê e qual serviço de teste ou produção ele usa. Arquivos locais como `.env.local` devem ficar fora do Git; configure também o escopo correspondente no painel da hospedagem.",
+          "Uma variável alterada no painel passa a valer em deployments novos; crie um novo deploy para conferir a mudança. Em um projeto Vercel recém-criado, a primeira publicação é classificada como Production, então não presuma que uma branch torna esse primeiro deploy uma prévia. Use dados e credenciais fictícios ou de teste ao aprender.",
+          "Se `main` estiver definida como Production Branch, commits nela geram deployments Production e usam as variáveis de Production. Para um Preview, publique um commit de uma branch diferente, como `testes`; essa branch recebe as variáveis de Preview. O botão de redeploy serve para gerar outra implantação do deployment selecionado, não para transformar a publicação de `main` em Preview.",
           "Pausa: preveja o resultado de obterApi('producao') e de obterApi('teste') antes de executar. A URL .invalid é apenas um marcador."
         ]
       },
@@ -562,7 +578,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "O caminho relativo aponta para /tech-learning-hub/assets/css/global.css. 1. Abrir URL final em janela limpa e verificar assets/Console. 2. Testar navegação, formulário local e largura móvel. 3. Conferir foco e nomes acessíveis nos controles.",
         "explanation": "O checklist observa o produto no destino real.",
-        "expected": "Três verificações concretas, com resultado registrado."
+        "expected": "Três verificações concretas, com resultado registrado.",
+        "criteria": ["Caminho de assets considera publicação em subpasta.","Checklist registra URL final, resposta dos arquivos e operação por teclado."]
       },
       {
         "prompt": "Alterar: no plano de entrega, o frontend está no GitHub Pages e a API apenas em 127.0.0.1 do desenvolvedor. Ajuste o plano para não prometer gravação compartilhada. Aceite: explicar o destino de 127.0.0.1 e escolher API hospedada ou demonstração rotulada; entrada: visitante envia formulário → saída: comportamento descrito sem promessa falsa.",
@@ -572,17 +589,20 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Não. É preciso publicar a API em hospedagem de backend ou trocar por demonstração sem gravação remota, identificada como tal.",
         "explanation": "A arquitetura deve corresponder à promessa de comportamento.",
-        "expected": "Resposta explica por que URL local não funciona para visitantes."
+        "expected": "Resposta explica por que URL local não funciona para visitantes.",
+        "criteria": ["Plano não promete compartilhamento por localhost.","Seleciona API hospedada ou demonstração com limite explícito."]
       },
       {
-        "prompt": "Construir: faça uma configuração pública que retorne a URL local para desenvolvimento e recuse ambiente desconhecido. Aceite: entrada desenvolvimento → http://127.0.0.1:4178/api; entrada teste → erro Ambiente inválido.",
+        "prompt": "Construir: monte uma matriz Local, Preview e Production para frontend, API e Supabase. Use somente nomes de configuração e marcadores fictícios; indique quais valores podem chegar ao navegador e quais ficam no servidor. Inclua uma forma de manter `.env.local` fora do Git e um passo para aplicar uma alteração feita no painel Vercel.",
         "hints": [
-          "Use um objeto de opções.",
-          "Valide antes de retornar."
+          "Separe URL e chave publicável de senha, token e chave secreta.",
+          "Preview deve apontar para serviço e dados de teste; Production usa os valores do ambiente real.",
+          "Alterar uma variável no painel exige um novo deployment para testar o valor."
         ],
-        "solution": "const opcoes={desenvolvimento:'http://127.0.0.1:4178/api'}; function apiPara(ambiente){ if(!Object.hasOwn(opcoes,ambiente)) throw new Error('Ambiente inválido'); return opcoes[ambiente]; }",
-        "explanation": "Separar configuração pública deixa o destino visível.",
-        "expected": "desenvolvimento retorna URL local; outro valor gera erro."
+        "solution": "A matriz pode listar `API_URL` por ambiente; configuração publicável do navegador em cada ambiente; e segredos de servidor separados por ambiente, sem valores colados no documento. Local usa `.env.local` ignorado pelo Git; Preview usa uma branch e recursos de teste; Production recebe os valores reais apenas no painel. Depois de mudar uma variável na Vercel, crie um novo deployment e confira o comportamento na URL correspondente.",
+        "explanation": "A mesma aplicação pode acessar serviços e dados diferentes conforme o ambiente; uma matriz ajuda a revisar escopo e exposição antes de publicar.",
+        "expected": "Uma tabela com os três ambientes, classificação pública/servidor, separação de serviços de teste e produção e novo deploy após alterar variável.",
+        "criteria": ["Local, Preview e Production têm propósitos distintos e valores identificados por escopo.","Segredos permanecem no servidor e não aparecem em HTML, JavaScript público ou documentação.","Preview usa valores de teste e a alteração de variável é validada em deployment novo."]
       },
       {
         "prompt": "Investigar erro: o CSS deste projeto retorna 404 quando index.html é publicado em /tech-learning-hub/. O link foi alterado para /assets/css/global.css. Escreva hipótese, correção e verificação na aba Rede. Aceite: entrada caminho absoluto → 404; saída com caminho relativo → CSS 200.",
@@ -592,14 +612,16 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Hipótese: href=\"/assets/css/global.css\" procura na raiz do domínio. Se index.html está em /tech-learning-hub/, usar href=\"assets/css/global.css\" e confirmar 200 em Rede no endereço publicado.",
         "explanation": "Teste antes e depois no endereço publicado; avalie também outros assets.",
-        "expected": "CSS carrega 200 e a aparência volta."
+        "expected": "CSS carrega 200 e a aparência volta.",
+        "criteria": ["Hipótese de caminho absoluto é comparada com caminho relativo.","Aba Rede confirma CSS 200 na subpasta e aparência restaurada."]
       }
     ],
     "mistakes": [
       "Achar que hospedagem estática executa servidor Node.",
       "Manter URL localhost na configuração publicada.",
       "Publicar sem abrir o endereço final e testar fluxo completo.",
-      "Gravar segredos no frontend por serem chamados de variáveis de ambiente."
+      "Gravar segredos no frontend por serem chamados de variáveis de ambiente.",
+      "Usar recursos de produção como se fossem dados descartáveis numa prévia ou no primeiro deployment Vercel."
     ],
     "quiz": [
       {
@@ -635,7 +657,8 @@ Object.assign(LESSON_GUIDES, {
     ],
     "summary": [
       "Inventarie arquivos, API e dados antes de escolher hospedagem.",
-      "Ambientes usam configuração explícita; segredos não entram no frontend.",
+      "Local, Preview e Production podem usar valores e serviços diferentes; segredos não entram no frontend.",
+      "Depois de alterar variáveis na Vercel, crie um deployment novo para observar a configuração aplicada.",
       "Teste o comportamento na URL final e prepare uma versão recuperável."
     ]
   },
@@ -717,7 +740,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "test('recusa null', () => assert.throws(() => normalizarTitulo(null), TypeError));",
         "explanation": "Acrescente ao mesmo arquivo após os testes existentes.",
-        "expected": "Três testes aprovados."
+        "expected": "Três testes aprovados.",
+        "criteria": ["Teste cobre entrada null e suíte executa o total indicado.","Resultado de teste e código de saída ficam registrados."]
       },
       {
         "prompt": "Alterar: amplie a matriz do laboratório delivery-forms com POST válido, título vazio e servidor desligado. Aceite: para cada entrada, anote resposta HTTP ou falha de rede, estado da interface e se o título permanece; entrada servidor desligado → erro de rede, sem status HTTP.",
@@ -727,7 +751,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Válido → 201 e registro; vazio → 400 e mensagem, sem registro; servidor parado → erro de rede mostrado pela interface, título preservado.",
         "explanation": "A matriz une contrato do servidor e estado do cliente.",
-        "expected": "Três casos com resultado verificável."
+        "expected": "Três casos com resultado verificável.",
+        "criteria": ["Matriz cobre POST válido, vazio e rede indisponível.","Cada caso anota resposta, UI e preservação do campo."]
       },
       {
         "prompt": "Construir: implemente uma função que remove títulos duplicados sem alterar a entrada e escreva teste independente para saída e entrada. Aceite: entrada ['HTML','HTML','CSS'] → saída ['HTML','CSS']; array original mantém três elementos.",
@@ -737,7 +762,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "function unicos(valores){return [...new Set(valores)];} test('remove duplicatas sem mutar',()=>{const entrada=['HTML','HTML','CSS'];assert.deepEqual(unicos(entrada),['HTML','CSS']);assert.deepEqual(entrada,['HTML','HTML','CSS']);});",
         "explanation": "Use node:test e assert/strict do exemplo; mutação da entrada seria defeito adicional.",
-        "expected": "Teste passa e entrada mantém três elementos."
+        "expected": "Teste passa e entrada mantém três elementos.",
+        "criteria": ["Função remove títulos duplicados sem alterar argumento original.","Testes conferem saída deduplicada e tamanho/estado da entrada."]
       },
       {
         "prompt": "Investigar erro: após uma nova versão, POST /api/estudos retorna 500. Registre evidências, proponha contenção, reproduza com entrada mínima e descreva teste de regressão e verificação final. Aceite: informe versão, rota, resultado observado, ação de recuperação e nova prova; entrada título HTML → resposta esperada 201 após a correção.",
@@ -747,7 +773,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Registrar versão, horário, POST e 500; avaliar impacto; restaurar versão estável se necessário; reproduzir com entrada mínima; corrigir; adicionar regressão; rodar testes e verificar URL final.",
         "explanation": "O fluxo cobre diagnóstico e redução de impacto, não só alteração do código.",
-        "expected": "Relato tem observação, contenção e prova posterior."
+        "expected": "Relato tem observação, contenção e prova posterior.",
+        "criteria": ["Relato contém versão, rota, entrada mínima e resposta observada.","Contenção, regressão e prova final são verificáveis após recuperação."]
       }
     ],
     "mistakes": [
@@ -872,7 +899,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "console.assert(podeAdicionar([{titulo:'HTML'}], ' html ') === false); console.assert(podeAdicionar([{titulo:'HTML'}], 'CSS') === true);",
         "explanation": "Testes fazem os exemplos de aceitação executáveis.",
-        "expected": "Nenhuma falha no Console."
+        "expected": "Nenhuma falha no Console.",
+        "criteria": ["Testes independentes cobrem HTML normalizado e CSS novo.","Resultados são comparados com os critérios sem erro no Console."]
       },
       {
         "prompt": "Alterar: amplie os critérios de aceitação para lista vazia e título só de espaços. Aceite: cada critério traz contexto, ação e resultado visível; entrada lista vazia e HTML → um registro; entrada '   ' → mensagem e lista inalterada.",
@@ -882,7 +910,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Dada lista vazia, quando adiciono HTML, então um registro HTML aparece. Dado título “   ”, quando tento salvar, então vejo mensagem de validação e a lista não muda.",
         "explanation": "Critérios usam contexto, ação e resultado observável.",
-        "expected": "Dois critérios verificáveis."
+        "expected": "Dois critérios verificáveis.",
+        "criteria": ["Cada requisito inclui contexto, ação e resultado visível.","Espaços não criam registro e lista vazia mantém o comportamento definido."]
       },
       {
         "prompt": "Construir: acrescente à regra isolada um limite de 60 caracteres após trim, preservando recusa de duplicados. Aceite: entrada de 60 caracteres únicos → true; 61 caracteres ou título duplicado → false. Explique que a API ainda precisa da mesma validação.",
@@ -892,7 +921,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "function podeAdicionarComLimite(lista,titulo){const limpo=titulo.trim();return limpo.length>0 && limpo.length\u003c=60 && podeAdicionar(lista,limpo);}",
         "explanation": "Pressupõe string, como o contrato do formulário; a API deve validar tipo e limite também.",
-        "expected": "61 caracteres rejeitados, 60 aceitos se únicos."
+        "expected": "61 caracteres rejeitados, 60 aceitos se únicos.",
+        "criteria": ["Limite é aplicado após trim e junto com duplicidade.","Testes cobrem limites, entrada duplicada e a validação ainda ausente na API."]
       },
       {
         "prompt": "Investigar erro: o README diz que o servidor já recusa duplicados, mas server.js da aula delivery-forms ainda aceita. Revise o README para separar comportamento comprovado e regra planejada. Aceite: comandos existentes, persistência em memória e pendência da API explícitos; entrada dois POSTs com HTML → duplicata ainda possível no servidor anterior.",
@@ -902,7 +932,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "# Lista de estudos\nExecute: node server.js; abra http://127.0.0.1:4178/.\nVerifique a regra isolada: node requisito.js imprime false e true.\nDados: memória do servidor; reiniciar apaga os registros.\nPendente: integrar a recusa de duplicados ao server.js e testá-la pela API. O servidor anterior ainda aceita títulos repetidos.\nLimite: sem autenticação ou banco; projeto demonstrativo.",
         "explanation": "Comandos e afirmações devem corresponder aos arquivos realmente executados; revise o README após integrar e testar a API.",
-        "expected": "Outra pessoa consegue executar e sabe que a regra de duplicados ainda não protege o servidor."
+        "expected": "Outra pessoa consegue executar e sabe que a regra de duplicados ainda não protege o servidor.",
+        "criteria": ["README distingue comportamento implementado de requisito planejado.","Comandos, persistência em memória e lacuna de duplicidade podem ser reproduzidos."]
       }
     ],
     "mistakes": [
@@ -948,6 +979,543 @@ Object.assign(LESSON_GUIDES, {
       "Preserve comportamento antigo com testes e revisão do impacto.",
       "Documente execução, evidência e limites para o portfólio."
     ]
+  },
+  "delivery-web-foundations": {
+    "prerequisites": "Saber abrir uma URL no navegador. Não exige conta, compra de domínio ou instalação.",
+    "setup": "Nenhuma ferramenta nova. Use os diagramas e cenários fictícios desta aula; não altere um domínio real.",
+    "why": "Quando um site falha, é preciso separar registro do domínio, resolução DNS, hospedagem e aplicação para investigar o ponto certo sem mudar configurações ao acaso.",
+    "example": {
+      "language": "text",
+      "code": "Pessoa → navegador → DNS → endereço do serviço → hospedagem → resposta HTTP\n\nDomínio: exemplo.test\nRegistrador: mantém o registro do nome\nProvedor DNS: publica os registros do domínio\nHospedagem: entrega arquivos e/ou executa a aplicação\nCDN: distribui cópias de conteúdo por pontos de presença",
+      "expected": "O DNS ajuda o navegador a localizar um destino; depois o navegador faz uma requisição HTTP. Registrar o nome, hospedar a zona DNS e servir o site são papéis diferentes, mesmo quando uma empresa oferece mais de um deles.",
+      "explanation": [
+        "O navegador começa com um nome legível, mas precisa localizar o destino de rede antes de pedir a página.",
+        "Registrador, provedor DNS e hospedagem podem pertencer a empresas diferentes. A pessoa que registra o domínio é chamada registrante.",
+        "Uma região descreve uma localização de processamento ou dados. Uma CDN pode servir conteúdo de pontos distribuídos; isso não significa que toda regra ou banco esteja duplicado neles.",
+        "Se o DNS resolve, mas a hospedagem não tem o domínio associado ao projeto, a resolução pode funcionar enquanto a aplicação ainda mostra erro."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Da URL ao pedido HTTP",
+        "paragraphs": [
+          "Uma URL reúne partes como esquema (http ou https), nome do host, caminho e, às vezes, porta e consulta. Antes de pedir /aulas, o navegador precisa descobrir como alcançar o host. DNS resolve nomes; HTTP transporta o pedido e a resposta da aplicação. Resolver o nome não garante que o serviço esteja funcionando.",
+          "Pausa: olhando o diagrama, preveja qual etapa acontece primeiro: consultar DNS ou pedir o HTML por HTTP. Depois explique o que ainda pode falhar mesmo quando há resposta DNS."
+        ],
+        "diagramTitle": "Duas etapas distintas ao abrir uma página",
+        "diagram": "1. navegador ── consulta do nome ──▶ DNS\n2. navegador ◀─ endereço/resposta ── DNS\n3. navegador ── pedido HTTP para o host ──▶ hospedagem\n4. navegador ◀─ status + conteúdo ── hospedagem\nDNS localiza; HTTP conversa com o serviço."
+      },
+      {
+        "title": "Domínio, registrador e provedor DNS",
+        "paragraphs": [
+          "O domínio é o nome registrado, por exemplo, um nome fictício terminado em .test. O registrador administra o registro com o operador da extensão. A pessoa ou organização que o registra é a registrante. O provedor DNS hospeda os registros que dizem como aquele domínio deve ser localizado. Esses papéis podem ser comprados juntos, mas são operações distintas.",
+          "Não confunda painel do registrador com painel de DNS: mudar os servidores autoritativos delegados pelo domínio pode trocar quem responde pela zona. Antes de alterar nameservers, inventarie registros existentes, inclusive os usados por e-mail."
+        ],
+        "terms": [
+          { "term": "Registrador", "meaning": "Empresa credenciada ou revendedora que intermedeia o registro de um nome de domínio." },
+          { "term": "Provedor DNS", "meaning": "Serviço que hospeda e responde pelos registros DNS autoritativos de uma zona." },
+          { "term": "Hospedagem", "meaning": "Serviço que entrega arquivos ou executa código para responder às requisições da aplicação." }
+        ]
+      },
+      {
+        "title": "Hospedagem, região e CDN",
+        "paragraphs": [
+          "Hospedagem é onde os arquivos do site ou o código do servidor ficam disponíveis. Uma região indica onde certa computação ou dados são processados. Uma CDN distribui conteúdo por uma rede de pontos de presença; arquivos estáticos podem ser entregues perto da pessoa visitante. Isso não move automaticamente o banco para a mesma região nem torna cada requisição instantânea.",
+          "Pausa: uma página está lenta e o HTML vem de uma CDN, mas a API consulta um banco distante. Preveja qual trecho ainda pode dominar a demora e desenhe a chamada separadamente."
+        ]
+      },
+      {
+        "title": "Investigar por camada",
+        "paragraphs": [
+          "Ao diagnosticar, separe: o nome foi digitado certo? o DNS responde com o destino esperado? o projeto de hospedagem conhece esse domínio? o servidor responde? a aplicação consegue acessar seus dados? Anote a observação e o resultado esperado antes de mudar uma configuração.",
+          "Uma página de erro não prova por si só que o DNS falhou. Da mesma forma, um nome que resolve não prova que a aplicação, a API ou o banco estejam saudáveis. A evidência de cada camada aponta para o próximo teste."
+        ]
+      }
+    ],
+    "guided": [
+      { "instruction": "Marque no exemplo o domínio, a etapa DNS, a hospedagem e a resposta HTTP.", "result": "O mapa mostra a resolução do nome antes da requisição à hospedagem." },
+      { "instruction": "Troque apenas o registrador no cenário e mantenha o provedor DNS e a hospedagem. Diga que relação mudou e quais continuam iguais.", "result": "O registro do nome muda de administradora; os registros DNS e o destino do site permanecem configurados no cenário." },
+      { "instruction": "Para uma falha fictícia, escreva uma observação por camada antes de propor uma mudança.", "result": "A hipótese fica vinculada a evidência observável em vez de alterar tudo ao mesmo tempo." }
+    ],
+    "mistakes": [
+      "Achar que comprar um domínio também publica os arquivos do site.",
+      "Tratar registrador e provedor DNS como necessariamente a mesma empresa.",
+      "Concluir que a aplicação funciona porque o nome já resolve.",
+      "Afirmar que uma CDN replica automaticamente o banco e o estado da aplicação."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: indique a ordem das etapas ao abrir https://portal.example.test/aulas: DNS, pedido HTTP e resposta da hospedagem. Cite uma falha que ainda pode ocorrer depois de o DNS responder.",
+        "expected": "O navegador resolve o host antes de enviar o pedido HTTP ao serviço; a hospedagem ou aplicação ainda pode não reconhecer o domínio ou retornar erro.",
+        "criteria": ["A ordem distingue DNS de HTTP.", "A falha citada pertence a uma etapa posterior à resolução do nome."],
+        "solution": "DNS resolve portal.example.test; o navegador envia o pedido HTTP para o endereço indicado; a hospedagem devolve uma resposta. O servidor pode não associar aquele host ao projeto.",
+        "explanation": "A resolução fornece um destino; não valida a configuração nem o estado da aplicação.",
+        "hints": ["Observe a seta entre o navegador e DNS.", "Pense no serviço que recebe o pedido depois que o navegador conhece o endereço."]
+      },
+      {
+        "prompt": "Alterar: um site mantém o registrador atual, muda o provedor DNS e continua hospedado no mesmo serviço. Liste qual configuração deve ser copiada antes da troca e quais papéis não mudaram.",
+        "expected": "A zona e seus registros necessários são inventariados antes da delegação; o nome continua registrado no mesmo registrador e os arquivos continuam na mesma hospedagem.",
+        "criteria": ["O inventário precede a troca de nameservers.", "Registrador e hospedagem são identificados como inalterados."],
+        "solution": "Registrar os registros existentes, inclusive e-mail e verificações; depois migrar a zona e validar a delegação. O registrador e a hospedagem permanecem os mesmos.",
+        "explanation": "Ao trocar o DNS autoritativo, registros omitidos deixam de ser respondidos pelo provedor novo.",
+        "hints": ["Uma zona DNS pode conter mais que o endereço do site.", "Separar as três empresas ajuda a localizar o impacto."]
+      },
+      {
+        "prompt": "Construir: desenhe um mapa de responsáveis para um projeto fictício com o domínio aula.example.test, arquivos na Vercel e e-mail em outro serviço. Registre registrador, DNS, hospedagem e os registros que precisam ser preservados.",
+        "expected": "O mapa aponta cada responsabilidade e lembra que registros de e-mail precisam continuar publicados no DNS autoritativo após uma mudança.",
+        "criteria": ["Os quatro papéis são mapeados sem presumir que pertencem ao mesmo fornecedor.", "O e-mail aparece como dependência DNS a preservar."],
+        "solution": "Registrador: empresa fictícia A; DNS: provedor B; hospedagem web: Vercel; e-mail: provedor C. Inventariar MX e os TXT de autenticação de e-mail antes de trocar a zona.",
+        "explanation": "A escolha dos nomes é livre no cenário; a tarefa é explicitar responsabilidade e dependências.",
+        "hints": ["Associe cada ação ao serviço que a executa.", "Liste os registros do e-mail antes de planejar a mudança DNS."]
+      },
+      {
+        "prompt": "Investigar erro: `nslookup` retorna um endereço, mas o navegador mostra página de domínio não configurado. Escreva a observação, a hipótese mais próxima e o próximo teste sem mudar DNS.",
+        "expected": "A evidência indica que houve resolução; o próximo teste verifica se o domínio está associado ao projeto de hospedagem e qual resposta HTTP ele retorna.",
+        "criteria": ["Não atribui automaticamente a falha à ausência de DNS.", "Propõe testar associação do domínio e resposta do host."],
+        "solution": "Registro: o resolvedor retornou um endereço. Hipótese: domínio não associado ao projeto ou implantação esperada. Conferir o painel do host e a resposta/status HTTP antes de alterar registros.",
+        "explanation": "A camada DNS pode responder corretamente e ainda apontar para um serviço que não reconhece aquele host.",
+        "hints": ["Separe o resultado de `nslookup` do conteúdo da página.", "Que sistema escolhe o projeto depois que a requisição chega ao endereço?"]
+      }
+    ],
+    "quiz": [
+      { "question": "O que o DNS faz primeiro ao visitar um domínio?", "options": ["Executa o JavaScript do site.", "Ajuda a localizar o destino associado ao nome.", "Registra o domínio em nome da pessoa."], "correctIndex": 1, "explanation": "A resolução de nomes localiza o destino; a aplicação é acessada em seguida." },
+      { "question": "Qual afirmação sobre registrador e hospedagem é correta?", "options": ["São papéis distintos, mesmo quando a mesma empresa oferece ambos.", "Hospedagem sempre inclui registro de domínio.", "O registrador é o servidor que executa a API."], "correctIndex": 0, "explanation": "Registro do nome e entrega/execução do site são responsabilidades diferentes." }
+    ],
+    "summary": [
+      "DNS localiza um destino; HTTP troca pedidos e respostas com um serviço.",
+      "Registrador, provedor DNS e hospedagem são papéis separados.",
+      "CDN, região e banco têm funções distintas; diagnostique cada camada com evidência."
+    ]
+  },
+  "delivery-dns": {
+    "prerequisites": "Concluir delivery-web-foundations. Não é necessário comprar um domínio ou alterar DNS real.",
+    "setup": "Use a tabela de endereços reservados para documentação e o domínio example.test. O bloco IPv4 192.0.2.0/24 e o prefixo IPv6 2001:db8::/32 são reservados para exemplos; .test é reservado para testes. Nada disso é um destino público: não copie os valores para um projeto publicado.",
+    "why": "Uma configuração DNS incorreta pode tirar um site ou e-mail do ar. Entender tipos de registro, cache e diagnóstico permite verificar instruções do provedor antes de aplicar mudanças.",
+    "example": {
+      "language": "text",
+      "code": "A      @       192.0.2.10          TTL 300\nAAAA   @       2001:db8::10        TTL 300\nCNAME  www     site.example.test   TTL 300\nTXT    _prove  \"codigo-ficticio\"     TTL 300\n\nEXEMPLO DIDÁTICO: não é configuração de produção.",
+      "expected": "A aponta para IPv4; AAAA, para IPv6; CNAME cria um alias para outro nome; TXT armazena texto usado, entre outros fins, em verificações. TTL 300 significa que caches podem manter a resposta pelo período definido antes de revalidar.",
+      "explanation": [
+        "A e AAAA guardam endereços IP nas famílias IPv4 e IPv6, respectivamente.",
+        "CNAME aponta um nome para outro nome. O alvo precisa ter uma resolução própria.",
+        "TXT publica um valor textual. Um provedor pode pedir um TXT de verificação, mas o conteúdo exato deve vir do painel atual.",
+        "TTL orienta por quanto tempo uma resposta pode ficar em cache. Após uma mudança, diferentes resolvedores podem ter respostas antigas por tempos diferentes; não existe uma única barra de progresso global chamada propagação."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Quatro tipos de registro",
+        "paragraphs": [
+          "A associa um nome a um endereço IPv4; AAAA faz isso com IPv6. CNAME associa um nome a outro nome canônico. TXT publica texto, frequentemente usado para provar controle de domínio ou publicar políticas de e-mail. O campo nome pode aparecer como @ para o domínio raiz, mas a interface do provedor decide como representar cada campo.",
+          "Pausa: antes de ler a explicação do exemplo, associe cada tipo ao seu destino: endereço IPv4, endereço IPv6, outro nome ou texto."
+        ],
+        "terms": [
+          { "term": "Registro A", "meaning": "Registro DNS que associa um nome a um endereço IPv4." },
+          { "term": "Registro AAAA", "meaning": "Registro DNS que associa um nome a um endereço IPv6." },
+          { "term": "CNAME", "meaning": "Alias DNS que aponta um nome para outro nome, cuja resolução continua sendo necessária." },
+          { "term": "TXT", "meaning": "Registro de texto, usado por exemplo em verificações de domínio e políticas de e-mail." }
+        ]
+      },
+      {
+        "title": "TTL é tempo de cache",
+        "paragraphs": [
+          "TTL (time to live, tempo de vida) indica por quanto tempo um resolvedor pode guardar uma resposta DNS antes de consultá-la novamente. Um TTL maior pode reduzir consultas repetidas, mas também pode prolongar o uso de um valor anterior depois de uma alteração. O TTL é configurado em segundos nos exemplos comuns, embora os painéis possam formatá-lo de outra maneira.",
+          "O TTL não é uma promessa de que a mudança estará visível exatamente após esse número em todos os lugares. O resolvedor pode ter consultado a resposta antiga em outro momento, e respostas negativas também podem ser guardadas."
+        ]
+      },
+      {
+        "title": "Entender a chamada propagação",
+        "paragraphs": [
+          "Quando alguém diz que um registro está propagando, normalmente quer dizer que caches e resolvedores ainda não observam o mesmo valor. Servidores autoritativos, resolvedores públicos, cache do sistema e cache do navegador são pontos diferentes. Limpar o cache de um dispositivo não limpa os caches de todos os outros.",
+          "Pausa: preveja o que verá em dois resolvedores quando um consultou o valor antigo há pouco e outro consulta depois da alteração. Uma resposta diferente pode ser temporária; compare consulta, servidor consultado e TTL restante antes de concluir."
+        ]
+      },
+      {
+        "title": "Verificar antes de editar",
+        "paragraphs": [
+          "Em uma mudança real, confirme no painel do serviço qual tipo, nome e alvo ele recomenda para aquele projeto. Valores de Vercel podem variar conforme domínio e projeto; não copie um IP ou CNAME genérico de uma aula antiga. Confira também se já existem registros A, AAAA, CNAME, MX e TXT importantes.",
+          "A resolução pode ser consultada por ferramentas como nslookup ou dig, quando disponíveis, mas um resultado DNS não comprova que a aplicação responde. Registre a consulta e depois verifique domínio, HTTPS e resposta HTTP. Nesta aula todos os registros são exemplos reservados, então a prática consiste em ler e diagnosticar, sem alterar a internet."
+        ]
+      }
+    ],
+    "guided": [
+      { "instruction": "Classifique os quatro registros pelo tipo de valor que guardam.", "result": "A e AAAA apontam para famílias de IP; CNAME, para um nome; TXT, para texto." },
+      { "instruction": "Diga por quantos segundos o TTL 300 autoriza um resolvedor a usar uma resposta em cache antes de revalidar.", "result": "O valor é 300 segundos no exemplo; isso não promete atualização global instantânea." },
+      { "instruction": "Compare dois resultados de consulta que retornam valores diferentes e anote o servidor e o TTL restante em cada um.", "result": "A divergência pode ser explicada por caches diferentes e deve ser investigada sem trocar registros às cegas." }
+    ],
+    "mistakes": [
+      "Usar A para um endereço IPv6 ou AAAA para IPv4.",
+      "Tratar CNAME como um endereço IP ou supor que ele contém o site.",
+      "Achar que TTL é o tempo exato de propagação global.",
+      "Trocar nameservers sem preservar registros MX e TXT usados por e-mail ou verificações."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: indique se cada valor fictício do exemplo é endereço IPv4, IPv6, nome de destino ou texto. Associe cada um ao tipo de registro correto.",
+        "expected": "192.0.2.10 corresponde a A; 2001:db8::10 a AAAA; site.example.test a CNAME; codigo-ficticio a TXT.",
+        "criteria": ["Os quatro tipos são associados ao formato do valor.", "O domínio .test e os endereços são reconhecidos como exemplos, não destinos publicados."],
+        "solution": "A → IPv4; AAAA → IPv6; CNAME → outro nome; TXT → conteúdo textual.",
+        "explanation": "Os formatos revelam o papel mais provável de cada registro no cenário didático.",
+        "hints": ["A e AAAA diferem pela família de endereços.", "CNAME aponta para nome; TXT guarda texto."]
+      },
+      {
+        "prompt": "Alterar: ajuste a tabela fictícia em que o site usa www.example.test, mas o CNAME de www aponta para site-antigo.example.test. Descreva a correção como proposta a conferir no painel do provedor.",
+        "expected": "A hipótese identifica o alvo antigo; a proposta atualiza o CNAME para o destino recomendado pelo host, após confirmar o valor específico daquele projeto.",
+        "criteria": ["O tipo continua CNAME para o subdomínio do cenário.", "A pessoa não inventa um destino de produção e registra a necessidade de confirmar o valor."],
+        "solution": "Consultar as instruções atuais do projeto de hospedagem e substituir somente o alvo incorreto do CNAME de www, preservando os demais registros necessários.",
+        "explanation": "O alvo real depende do fornecedor e da configuração do domínio.",
+        "hints": ["Compare nome, tipo e alvo separadamente.", "Não use um destino lembrado de outro projeto; confirme o atual no painel."]
+      },
+      {
+        "prompt": "Construir: crie uma tabela para o domínio fictício de uma aplicação com A, AAAA, CNAME e TXT. Marque cada valor como ilustrativo e escreva qual fonte consultaria antes de configurar um domínio real.",
+        "expected": "A tabela contém os quatro tipos e a observação explícita de que os valores precisam vir do provedor autoritativo e da hospedagem configurada.",
+        "criteria": ["A tabela diferencia nomes e valores.", "A configuração de produção não é inventada nem copiada do exemplo."],
+        "solution": "Qualquer tabela com A/IPv4, AAAA/IPv6, CNAME/nome e TXT/texto atende, se rotulada como fictícia e vinculada à verificação nas instruções atuais do host.",
+        "explanation": "A tarefa mede classificação e procedimento seguro, não memorização de endereços.",
+        "hints": ["Use endereços de documentação ou marcadores claramente fictícios.", "O painel do projeto fornece os alvos específicos de verificação."]
+      },
+      {
+        "prompt": "Investigar erro: depois de reduzir TTL, um visitante ainda recebe o endereço antigo, mas outro recebe o novo. Registre duas hipóteses relacionadas a cache e indique uma consulta adicional para comparar.",
+        "expected": "A explicação considera que resolvedores consultaram em momentos diferentes ou retêm cache local/negativo; a comparação identifica resolvedor, resposta e TTL restante.",
+        "criteria": ["Não afirma que o TTL menor apaga imediatamente respostas já armazenadas.", "Propõe comparar qual resolvedor respondeu e o TTL observado."],
+        "solution": "Diferentes resolvedores podem ter consultado antes/depois da alteração; um cache de sistema ou resposta negativa também pode persistir. Consultar os mesmos nomes em resolvedores identificados e registrar resposta/TTL.",
+        "explanation": "TTL controla cache; mudar o campo não sincroniza todos os caches ao mesmo tempo.",
+        "hints": ["Pergunte quando cada resolvedor consultou o autoritativo.", "Compare o TTL que acompanha cada resposta."]
+      }
+    ],
+    "quiz": [
+      { "question": "Qual registro associa um nome diretamente a um IPv6?", "options": ["A", "AAAA", "TXT"], "correctIndex": 1, "explanation": "AAAA é usado para endereços IPv6." },
+      { "question": "O que o TTL controla principalmente?", "options": ["O tempo que um domínio fica registrado.", "O tempo de cache de uma resposta DNS antes de revalidar.", "O tempo de validade de um certificado TLS."], "correctIndex": 1, "explanation": "TTL é uma instrução de cache DNS, não validade do domínio ou certificado." },
+      { "question": "Dois resolvedores mostram valores diferentes após uma mudança. Qual é a próxima ação mais útil?", "options": ["Apagar todos os registros.", "Comparar o servidor consultado, resposta e TTL restante.", "Concluir que o domínio foi roubado."], "correctIndex": 1, "explanation": "A divergência pede diagnóstico de caches e servidores consultados antes de uma alteração adicional." }
+    ],
+    "summary": [
+      "A e AAAA guardam endereços; CNAME aponta para outro nome; TXT publica texto.",
+      "TTL orienta cache e não promete uma hora única de propagação global.",
+      "Confirme os valores atuais no painel do projeto e preserve os registros existentes.",
+      "Use intervalos IP de documentação e nomes .test apenas como exemplos; eles não servem como endereços de produção."
+    ]
+  },
+  "delivery-https": {
+    "prerequisites": "Concluir delivery-web-foundations e delivery-dns. Não é necessário instalar certificado ou alterar um domínio.",
+    "setup": "Use os fluxos ilustrativos da aula; não envie dados pessoais nem credenciais por HTTP.",
+    "why": "Um domínio que resolve não garante uma conexão autenticada e protegida. Separar DNS e TLS evita considerar uma página publicada segura apenas porque abre no navegador.",
+    "example": {
+      "language": "text",
+      "code": "DNS: nome.example.test → destino configurado\nTLS: certificado válido para nome.example.test\nHTTPS: navegador estabelece conexão protegida\nHTTP: se habilitado, deve redirecionar para a mesma URL HTTPS\n\nCertificado inválido ou ausente → alerta; não prossiga com dados sensíveis.",
+      "expected": "DNS localiza o destino, enquanto TLS ajuda a autenticar o servidor e protege a comunicação. HTTPS combina HTTP com TLS; um redirecionamento não torna segura a requisição HTTP que o precedeu.",
+      "explanation": [
+        "TLS protege a comunicação contra leitura e alteração em trânsito e permite verificar a identidade apresentada pelo servidor por meio do certificado.",
+        "O nome do certificado precisa corresponder ao host acessado e a cadeia deve ser aceita pelo navegador.",
+        "A aplicação deve ser acessada por HTTPS e carregar recursos ativos, como scripts, também por HTTPS.",
+        "A configuração e a emissão do certificado variam por provedor. A documentação atual do projeto é a fonte para verificar estado e instruções."
+      ]
+    },
+    "sections": [
+      {
+        "title": "O que HTTPS protege",
+        "paragraphs": [
+          "HTTPS usa HTTP sobre TLS (Transport Layer Security, segurança da camada de transporte). TLS protege a confidencialidade e a integridade da conexão e ajuda o navegador a autenticar o servidor pelo certificado apresentado. Isso protege os dados em trânsito; não prova que o conteúdo do site é honesto nem substitui autorização e segurança da aplicação.",
+          "Pausa: preveja o que HTTPS protege entre navegador e servidor e cite uma coisa que continua sendo responsabilidade do código da aplicação."
+        ],
+        "terms": [
+          { "term": "TLS", "meaning": "Protocolo que protege a comunicação e permite validar a identidade do servidor durante a conexão." },
+          { "term": "Certificado", "meaning": "Credencial digital apresentada pelo servidor para associar uma identidade de host a uma chave pública, validada por uma cadeia de confiança." },
+          { "term": "Conteúdo misto", "meaning": "Página HTTPS que tenta carregar recursos por HTTP; navegadores bloqueiam recursos ativos inseguros." }
+        ]
+      },
+      {
+        "title": "DNS e certificado resolvem problemas diferentes",
+        "paragraphs": [
+          "DNS ajuda a localizar o destino do domínio. O certificado TLS trata da identidade do host e da conexão segura. Um registro DNS correto não cria por si só um certificado válido; um certificado válido também não corrige um registro que aponta para outro serviço.",
+          "Em Vercel, por exemplo, a documentação descreve emissão automática de certificado depois da verificação DNS. Esse comportamento é específico do serviço e depende da configuração correta do domínio; em outro host, consulte as instruções próprias."
+        ]
+      },
+      {
+        "title": "Redirecionar HTTP sem confundir a proteção",
+        "paragraphs": [
+          "Um servidor pode responder a uma visita HTTP com redirecionamento para o mesmo caminho em HTTPS. A primeira conexão ainda começou sem TLS; por isso o redirecionamento não protege o conteúdo que eventualmente fosse enviado nessa requisição inicial. Não envie credenciais por HTTP. Após verificar o redirecionamento, confira a URL final e o certificado no navegador.",
+          "Se o HTML seguro tenta carregar JavaScript por HTTP, o navegador pode bloquear esse recurso como conteúdo misto. Antes de publicar, revise links de scripts, estilos, chamadas de API e imagens, especialmente os recursos ativos."
+        ]
+      },
+      {
+        "title": "Verificação em navegador e provedor",
+        "paragraphs": [
+          "Abra diretamente a URL https:// e confira ausência de alerta de certificado, nome do host e conteúdo carregado. Depois solicite http:// em ambiente público e confirme que a resposta leva ao mesmo caminho HTTPS. No painel do provedor, confira o status de domínio e certificado. Uma página que abriu uma vez não comprova todos os caminhos ou recursos.",
+          "Não desative avisos do navegador nem copie um certificado ou um redirecionamento de outra plataforma. Registre URL testada, resultado, data e uma falha observada, sem incluir token ou informação pessoal."
+        ]
+      }
+    ],
+    "guided": [
+      { "instruction": "Marque no exemplo o papel de DNS e o papel de TLS.", "result": "DNS localiza o destino; TLS protege e ajuda a autenticar a conexão com o host." },
+      { "instruction": "Simule um alerta de certificado expirado e escreva qual decisão protege a pessoa visitante.", "result": "Não inserir credenciais e corrigir/confirmar certificado antes de usar o serviço." },
+      { "instruction": "Inspecione os endereços de scripts e chamadas da página fictícia e marque qualquer recurso ativo em HTTP.", "result": "A auditoria identifica recursos que podem ser bloqueados como conteúdo misto." }
+    ],
+    "mistakes": [
+      "Dizer que DNS fornece criptografia ou autentica o conteúdo do site.",
+      "Achar que HTTPS torna a aplicação livre de falhas de autorização ou vazamento de dados.",
+      "Tratar um redirecionamento HTTP como proteção dos dados enviados antes dele.",
+      "Ignorar script ou API por HTTP dentro de uma página HTTPS."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: liste quais propriedades TLS ajuda a proteger no caminho navegador-servidor e quais decisões continuam sendo responsabilidade da aplicação.",
+        "expected": "TLS protege confidencialidade e integridade do tráfego e autentica o host conforme a validação do certificado; autorização, validação de entrada e correção das regras continuam na aplicação.",
+        "criteria": ["Cita pelo menos duas proteções da conexão.", "Não atribui autorização de usuário ao TLS."],
+        "solution": "TLS protege comunicação contra leitura e alteração e permite validar a identidade do servidor; a aplicação ainda precisa autorizar cada ação e validar cada pedido.",
+        "explanation": "A conexão segura e as regras de negócio são camadas diferentes.",
+        "hints": ["Pense no que acontece durante o transporte dos bytes.", "Depois pergunte quem decide se este usuário pode editar um registro."]
+      },
+      {
+        "prompt": "Alterar: a página principal abre por HTTPS, mas o JavaScript do formulário vem de http://scripts.example.test/app.js. Explique o comportamento esperado e corrija o endereço na proposta.",
+        "expected": "O navegador pode bloquear o script ativo como conteúdo misto; a proposta troca o recurso por HTTPS e confirma que o host oferece esse recurso com conexão válida.",
+        "criteria": ["Identifica conteúdo misto ativo.", "Corrige para HTTPS e inclui verificação do host."],
+        "solution": "Usar https://scripts.example.test/app.js somente se o recurso realmente estiver disponível e com certificado válido; idealmente carregar script da mesma origem quando apropriado.",
+        "explanation": "Uma página segura não deve depender de código ativo carregado sem TLS.",
+        "hints": ["Compare o esquema do documento e do script.", "Trocar o texto da URL não basta se o destino não servir HTTPS válido."]
+      },
+      {
+        "prompt": "Construir: escreva uma lista de verificação para uma URL HTTPS pública: domínio apontado, certificado, caminho HTTP e recursos ativos. Defina o resultado esperado de cada checagem.",
+        "expected": "A lista verifica configuração do host, certificado correspondente, redirecionamento e ausência de recursos ativos em HTTP.",
+        "criteria": ["Inclui quatro verificações independentes.", "O resultado esperado é observável no navegador ou painel."],
+        "solution": "Conferir domínio no painel; abrir URL HTTPS sem alerta; abrir HTTP e observar redirecionamento ao mesmo caminho HTTPS; inspecionar recursos de script e API e confirmar HTTPS.",
+        "explanation": "Cada checagem cobre uma camada diferente; nenhuma sozinha valida toda a entrega.",
+        "hints": ["Inclua um teste iniciado em HTTP e outro iniciado diretamente em HTTPS.", "Olhe para os recursos carregados além do documento principal."]
+      },
+      {
+        "prompt": "Investigar erro: um navegador alerta que o certificado não corresponde a api.example.test, embora app.example.test abra em HTTPS. Registre a observação, uma hipótese e o próximo teste seguro.",
+        "expected": "A hipótese verifica se o certificado cobre o host da API e se o DNS/provedor apontam para o serviço esperado; a pessoa não ignora o alerta nem envia dados.",
+        "criteria": ["Distingue certificados por hostname.", "O próximo passo consulta domínio/certificado no provedor e evita contornar o aviso."],
+        "solution": "Abrir api.example.test diretamente sem enviar dados, registrar o alerta e conferir no host a associação desse domínio e a cobertura do certificado. Não aceitar o certificado inválido como correção.",
+        "explanation": "Um certificado que funciona para um host pode não ser válido para outro.",
+        "hints": ["Compare exatamente os dois nomes de host.", "O navegador está apontando para identidade, não para o status do banco de dados."]
+      }
+    ],
+    "quiz": [
+      { "question": "Qual frase descreve HTTPS corretamente?", "options": ["TLS protege a conexão, mas a aplicação ainda precisa autorizar ações.", "DNS criptografa a página.", "HTTPS garante que todo conteúdo do site é verdadeiro."], "correctIndex": 0, "explanation": "HTTPS protege a conexão; segurança e autorização da aplicação continuam necessárias." },
+      { "question": "Uma página HTTPS tenta carregar um script por HTTP. O que pode acontecer?", "options": ["O DNS converte o script automaticamente para HTTPS.", "O navegador pode bloquear o recurso ativo como conteúdo misto.", "O certificado passa a valer para qualquer domínio."], "correctIndex": 1, "explanation": "Recursos ativos inseguros podem ser bloqueados dentro de uma página segura." },
+      { "question": "Um redirecionamento de HTTP para HTTPS protege dados enviados na requisição HTTP inicial?", "options": ["Sim, sempre.", "Não; a requisição inicial começou sem TLS.", "Só quando DNS tem um registro TXT."], "correctIndex": 1, "explanation": "O redirecionamento posterior não protege a conexão inicial não criptografada." }
+    ],
+    "summary": [
+      "HTTPS usa TLS para proteger a conexão e validar a identidade do host.",
+      "DNS, certificado e autorização da aplicação são responsabilidades diferentes.",
+      "Confira URL HTTPS, certificado, redirecionamento e recursos ativos antes de publicar."
+    ]
+  },
+  "delivery-hosting-models": {
+    "prerequisites": "Concluir delivery-http, delivery-web-foundations e delivery-https; saber distinguir interface, API e banco de dados.",
+    "setup": "Nenhuma conta ou instalação. Compare os modelos conceitualmente; preços, limites e recursos dos fornecedores mudam e devem ser consultados antes de uma decisão real.",
+    "why": "Escolher uma hospedagem sem considerar o que precisa executar pode deixar a API sem ambiente, usar banco efêmero por engano ou acrescentar complexidade que o projeto não precisa.",
+    "example": {
+      "language": "text",
+      "code": "HTML/CSS/JS → hospedagem estática/CDN\n/api        → função sob demanda OU servidor persistente\nPostgreSQL  → banco gerenciado ou servidor de banco operado pela equipe\n\nUma página estática pode consumir uma API remota; os arquivos não guardam por si só o estado compartilhado.",
+      "expected": "Arquivos estáticos podem ser servidos sem um processo de aplicação persistente. Uma função executa código em resposta a chamadas; um servidor persistente mantém um processo em execução. O banco precisa de persistência e acesso configurados independentemente da hospedagem da página.",
+      "explanation": [
+        "Hospedagem estática entrega arquivos prontos como HTML, CSS, JavaScript e imagens.",
+        "Funções sob demanda executam código quando chegam requisições e têm limites definidos pela plataforma.",
+        "Um servidor persistente mantém um processo que a equipe precisa operar, monitorar e atualizar.",
+        "Serviço gerenciado transfere parte da operação ao fornecedor; responsabilidades, limites e custo continuam existindo e variam por serviço e plano."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Arquivos estáticos",
+        "paragraphs": [
+          "Um site estático entrega arquivos existentes sem executar um processo próprio para cada página. Isso não significa que o site não tenha JavaScript: o navegador ainda executa scripts. A página pode chamar uma API remota por HTTP, mas autenticação, regra de negócio e persistência precisam existir em algum serviço acessível.",
+          "Pausa: preveja se uma lista mantida somente em uma variável JavaScript compartilharia dados entre dois dispositivos. Depois indique onde a persistência deveria ocorrer."
+        ]
+      },
+      {
+        "title": "Funções sob demanda e servidor persistente",
+        "paragraphs": [
+          "Uma função sob demanda executa uma unidade de código em resposta a requisições; a plataforma gerencia parte do escalonamento e define limites de tempo, memória, região e custo. Um servidor persistente mantém um processo em execução e permite outros modelos de conexão, mas a equipe assume mais trabalho operacional. As duas opções podem acessar APIs e bancos; nenhuma implica persistência automática.",
+          "A palavra serverless não significa que não exista servidor: descreve que a equipe não administra diretamente um processo de servidor tradicional. Consulte a plataforma atual para detalhes de ambiente, limites e disponibilidade."
+        ],
+        "terms": [
+          { "term": "Função sob demanda", "meaning": "Código executado pelo serviço em resposta a uma chamada, dentro dos limites configurados pela plataforma." },
+          { "term": "Serverless", "meaning": "Modelo em que o provedor administra a infraestrutura de execução; ainda existem servidores e limites operacionais." },
+          { "term": "Processo persistente", "meaning": "Programa que permanece em execução e precisa de monitoramento, atualizações e operação." }
+        ]
+      },
+      {
+        "title": "Serviços gerenciados e dados duráveis",
+        "paragraphs": [
+          "Um banco gerenciado deixa parte da instalação, atualização e disponibilidade a cargo do fornecedor, conforme produto e plano. A aplicação ainda precisa autenticar, controlar acesso, escolher região, proteger segredos, medir custos e planejar exportação/restauração. Uma base em memória dentro de uma função ou reinicializada com o processo não é armazenamento durável.",
+          "Mantenha clara a fonte de verdade. Se a regra exige registros compartilhados entre contas e dispositivos, escolha persistência adequada e teste uma gravação após reinício; não conclua que uma hospedagem gerenciada guarda os dados sem examinar a configuração."
+        ]
+      },
+      {
+        "title": "Escolher pelo requisito e medir",
+        "paragraphs": [
+          "Desenhe cada componente, seus dados, disponibilidade, região e forma de comunicação. Escolha o menor ambiente que atende ao requisito, depois verifique limites, custo e recuperação no fornecedor atual. Uma CDN pode distribuir arquivos estáticos; a função e o banco podem continuar em regiões específicas e afetar a latência.",
+          "O desenho abaixo é uma possibilidade, não a única arquitetura: interface estática → API sob demanda → PostgreSQL gerenciado. Um backend persistente ou outro serviço podem ser apropriados quando o projeto tiver requisitos diferentes."
+        ],
+        "diagramTitle": "Um mapa possível para uma aplicação de estudos",
+        "diagram": "Navegador\n   │ HTTPS\n   ▼\nArquivos HTML/CSS/JS ── CDN / hospedagem estática\n   │ Fetch / HTTPS\n   ▼\nAPI ── função sob demanda OU servidor persistente\n   │ conexão protegida\n   ▼\nPostgreSQL ── serviço gerenciado OU operação própria"
+      }
+    ],
+    "guided": [
+      { "instruction": "Marque no exemplo quais componentes servem arquivos, executam regras e mantêm dados duráveis.", "result": "Interface serve os arquivos; API executa regras; banco é a fonte de dados duráveis." },
+      { "instruction": "Troque o backend sob demanda por um servidor persistente e liste uma responsabilidade operacional que passa a ser explícita.", "result": "O plano inclui monitorar e atualizar o processo, além de manter sua disponibilidade." },
+      { "instruction": "Compare duas regiões hipotéticas e localize quais saltos da requisição devem ser medidos antes de escolher.", "result": "A análise considera usuário, função/API e banco, sem presumir que CDN distribui todos os componentes." }
+    ],
+    "mistakes": [
+      "Achar que um site estático não pode ter JavaScript ou consumir API.",
+      "Achar que serverless significa ausência de servidor ou de limites.",
+      "Guardar estado compartilhado apenas na memória de uma função ou processo temporário.",
+      "Escolher região ou plano sem verificar latência, custo, limites e recuperação atuais."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: identifique quais partes do diagrama executam regras de negócio e quais guardam dados duráveis. A hospedagem estática sozinha consegue compartilhar uma lista entre dispositivos?",
+        "expected": "A API executa regras; um banco durável guarda os dados compartilhados. A hospedagem estática pode servir a interface e chamar uma API, mas não compartilha estado sozinha.",
+        "criteria": ["Distingue interface, API e banco.", "Não atribui persistência durável aos arquivos estáticos."],
+        "solution": "HTML/CSS/JS servidos estaticamente; API processa operações; PostgreSQL ou serviço de dados apropriado persiste a lista. A interface acessa a API para sincronizar dispositivos.",
+        "explanation": "O navegador pode mostrar dados locais, mas armazenamento compartilhado requer um serviço de dados acessível.",
+        "hints": ["Siga o percurso de uma operação de escrita.", "Pergunte onde os dados sobrevivem quando o processo reinicia."]
+      },
+      {
+        "prompt": "Alterar: adapte a arquitetura do exemplo para uma API que precisa manter uma conexão de longa duração com outro sistema. Indique qual modelo pode atender melhor e duas verificações antes da decisão.",
+        "expected": "A pessoa compara servidor persistente e suporte real do modelo de funções à duração/conexão necessária; verifica limites atuais, disponibilidade, custo e comportamento de reconexão.",
+        "criteria": ["A escolha é justificada pelo requisito de conexão.", "A decisão depende da documentação atual do fornecedor e de teste do comportamento."],
+        "solution": "Um processo persistente pode ser mais adequado, mas é preciso confirmar requisitos de protocolo, limites de duração e custo, plano de operação e testes de reconexão. Algumas plataformas podem atender de outro modo.",
+        "explanation": "A recomendação depende do serviço específico e do padrão de tráfego.",
+        "hints": ["Funções têm ciclo de execução administrado pela plataforma.", "Verifique primeiro a duração e o protocolo exigido pelo sistema externo."]
+      },
+      {
+        "prompt": "Construir: desenhe um mapa de publicação para um app de estudos com interface web, criação de tarefas via API e persistência PostgreSQL. Para cada parte, escolha uma opção inicial entre estática, função, servidor persistente ou serviço gerenciado e escreva um motivo verificável.",
+        "expected": "O mapa separa os três componentes, inclui comunicação e origem de verdade e registra requisitos que ainda precisam ser verificados no fornecedor escolhido.",
+        "criteria": ["Interface, API e dados têm responsabilidades distintas.", "Há uma justificativa ligada a requisito, não apenas preferência por marca.", "A fonte de verdade e o teste de persistência são explícitos."],
+        "solution": "Exemplo: interface estática/CDN; API sob demanda para operações simples; PostgreSQL gerenciado para dados duráveis. Verificar região, limites, custo, segurança, backup/restauração e acesso da API ao banco.",
+        "explanation": "Este é um ponto de partida; volume, conexões e requisitos de operação podem mudar a escolha.",
+        "hints": ["Desenhe uma caixa por responsabilidade e seta por comunicação.", "Inclua o que precisa continuar existindo após reiniciar a API."]
+      },
+      {
+        "prompt": "Investigar erro: após redeploy, os arquivos da interface atualizam, mas os estudos criados desapareceram. Formule uma hipótese sobre armazenamento e um teste reversível para localizar a falha.",
+        "expected": "A hipótese considera dados guardados em memória ou disco efêmero da instância; o teste verifica repositório de dados e executa uma gravação/leitura após reiniciar sem apagar a base de origem.",
+        "criteria": ["Distingue deploy de persistência de dados.", "Propõe testar reinício com dados fictícios em ambiente isolado."],
+        "solution": "Inspecionar onde a API grava e se a instância preserva esse armazenamento. Criar registro fictício em ambiente de teste, reiniciar/reimplantar e consultar novamente; se desaparece, mover a fonte de verdade para banco durável e repetir teste.",
+        "explanation": "Uma publicação de arquivos e o ciclo de vida da computação não garantem permanência do armazenamento local.",
+        "hints": ["Descubra se o dado foi gravado em banco externo, arquivo local ou variável em memória.", "Use dados de teste e confirme que a origem não será alterada."]
+      }
+    ],
+    "quiz": [
+      { "question": "Qual afirmação descreve uma hospedagem estática?", "options": ["Entrega arquivos e ainda pode chamar uma API remota.", "Não pode conter JavaScript.", "Sempre guarda os dados em PostgreSQL."], "correctIndex": 0, "explanation": "Arquivos estáticos podem executar JavaScript no navegador e consumir serviços remotos." },
+      { "question": "O que serverless significa neste contexto?", "options": ["A aplicação não usa servidores.", "O provedor administra a infraestrutura de execução, com limites e responsabilidades próprios.", "Todo dado é persistido automaticamente."], "correctIndex": 1, "explanation": "O provedor administra a infraestrutura, mas serviços continuam tendo servidores, limites e operação." },
+      { "question": "Como verificar se a persistência é durável?", "options": ["Abrir a página uma vez.", "Criar dados fictícios, reiniciar em ambiente isolado e confirmar a leitura depois.", "Ver se o nome do projeto contém database."], "correctIndex": 1, "explanation": "A persistência precisa ser observada após um ciclo de reinício controlado." }
+    ],
+    "summary": [
+      "Estático entrega arquivos; API executa regras; banco durável mantém dados compartilhados.",
+      "Funções e servidores persistentes têm ciclos operacionais e limites diferentes.",
+      "Compare requisitos, região, latência, custo, limites e recuperação antes de escolher um fornecedor."
+    ]
+  },
+  "delivery-static-deploy": {
+    "prerequisites": "Concluir delivery-hosting-models e conseguir abrir uma pasta do projeto no computador. Você precisa de acesso autorizado ao repositório GitHub e à sua conta Vercel para concluir o deploy; não é necessário ter domínio próprio.",
+    "setup": "Abra `labs/deployment-static/README.md` no editor e siga as etapas por navegador ou terminal. A pasta tem somente `index.html` e `styles.css`; não usa Node, pacote, formulário, API, banco, chave ou dado pessoal. Crie um projeto Vercel separado, com a raiz exatamente `labs/deployment-static`; não modifique as configurações do projeto principal.",
+    "why": "Uma publicação estática permite conferir o percurso repositório → configuração → arquivos publicados → URL pública antes de introduzir funções de servidor, banco de dados, domínio personalizado ou segredos.",
+    "example": {
+      "language": "text",
+      "code": "Repositório GitHub\n└── labs/deployment-static/\n    ├── index.html\n    └── styles.css\n\nProjeto Vercel separado\nRoot Directory: labs/deployment-static\nFramework Preset: Other\nBuild Command: vazio\nURL pública: https://<dominio-atribuido>.vercel.app/",
+      "expected": "O deploy serve `index.html` e `styles.css` a partir da pasta configurada; a URL HTTPS mostra a página sem pedir login Vercel. O comando de build fica vazio porque o laboratório não transforma arquivos.",
+      "explanation": [
+        "O diretório-raiz limita quais arquivos o projeto de deploy consegue acessar. A pasta `labs/deployment-static` contém todo o necessário.",
+        "O preset Other e o build vazio atendem a uma página que consiste em arquivos HTML/CSS prontos. Se o painel apresentar configurações diferentes, confira a documentação oficial atual antes de salvar.",
+        "A URL atribuída é evidência do deploy. A aba Rede do navegador ajuda a verificar o status de `/` e `/styles.css` separadamente.",
+        "O projeto do laboratório é isolado para não mudar raiz, domínio ou ambiente do site principal."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Conferir o artefato antes da plataforma",
+        "paragraphs": [
+          "Um deploy publica uma versão dos arquivos. Antes de abrir a Vercel, confirme que a pasta escolhida contém `index.html` e `styles.css`, que a referência ao CSS é relativa (`styles.css`) e que a página abre localmente. Isso separa defeito de conteúdo de erro de configuração de hospedagem.",
+          "Pausa: preveja o que acontece se você definir `labs/` como raiz do projeto. O arquivo de entrada está diretamente nessa pasta ou dentro da subpasta `deployment-static`?"
+        ],
+        "terms": [
+          { "term": "Diretório-raiz do projeto", "meaning": "Pasta que a plataforma considera como início daquele projeto no repositório." },
+          { "term": "Build", "meaning": "Etapa que transforma ou organiza arquivos antes de publicá-los; esta página HTML/CSS pode ser servida sem build." },
+          { "term": "Deploy", "meaning": "Publicação de uma versão do projeto em um ambiente hospedado." }
+        ]
+      },
+      {
+        "title": "Configurar a Vercel sem tocar no projeto principal",
+        "paragraphs": [
+          "Crie um projeto novo importando o repositório existente. Defina o diretório-raiz como `labs/deployment-static`, preset Other e nenhum comando de build. A documentação da Vercel informa que projetos estáticos sem etapa de build podem servir a raiz do projeto; ajuste o diretório de saída apenas conforme a interface atual indicar.",
+          "Não adicione variáveis de ambiente, domínio personalizado nem segredo. Como esta pasta não contém pasta `public`, o conteúdo servido está no diretório selecionado. Um segundo projeto no mesmo repositório permite aprender sem alterar as configurações de produção do Tech Learning Hub."
+        ]
+      },
+      {
+        "title": "Verificar URL, status e HTTPS",
+        "paragraphs": [
+          "Quando o deploy terminar, abra a URL de produção atribuída. Confira `/` e `/styles.css` na aba Rede e registre os status reais. O resultado esperado para os dois arquivos é uma resposta final de sucesso. Se começar em HTTP, observe a cadeia de respostas e anote se o endereço termina em HTTPS; não considere um redirecionamento como prova do status dos demais arquivos.",
+          "A configuração de certificado e acesso é do provedor. Para domínio personalizado, a Vercel informa que tenta emitir certificado após adicionar o domínio e validar DNS. Neste laboratório não há domínio próprio; use a URL padrão indicada no painel e não invente registros DNS."
+        ],
+        "diagramTitle": "Publicação estática observável",
+        "diagram": "git commit\n   │ repositório + raiz correta\n   ▼\nVercel seleciona os arquivos estáticos\n   │ cria deploy e URL\n   ▼\nnavegador ── GET / ──▶ index.html\n          └ GET /styles.css ──▶ styles.css\nVerifique status, URL final, HTTPS e acesso público."
+      },
+      {
+        "title": "Diagnosticar 404 ou acesso protegido",
+        "paragraphs": [
+          "Um 404 costuma apontar para uma raiz ou diretório de saída que não contém `index.html`, mas confirme os logs e o commit implantado. Se o CSS falha enquanto o HTML abre, confira o caminho relativo e o status de `/styles.css`. Um deploy marcado como pronto não garante que o arquivo esperado foi incluído.",
+          "Se a URL pede login Vercel, pode haver proteção de acesso; isso não é falha DNS. O laboratório não contém dados privados, mas a proteção deve ser avaliada somente neste projeto separado. Registre o que observou; não remova proteção do projeto principal para fazer o teste passar."
+        ]
+      }
+    ],
+    "guided": [
+      { "instruction": "Abra `index.html` localmente e confira a folha `styles.css` na pasta. Antes de publicar, anote a URL relativa usada pelo link de estilos.", "result": "Os arquivos estão juntos e o caminho `styles.css` pode ser resolvido a partir do documento." },
+      { "instruction": "Na configuração do projeto novo, confira o repositório, diretório-raiz e preset antes de iniciar o deploy.", "result": "A raiz é `labs/deployment-static`, o preset é Other e nenhuma variável secreta é necessária." },
+      { "instruction": "Depois do deploy, abra a URL pública e verifique separadamente os pedidos de `/` e `/styles.css`.", "result": "A página e o CSS retornam respostas de sucesso; o endereço HTTPS e a política de acesso são anotados." }
+    ],
+    "mistakes": [
+      "Criar o projeto com raiz no repositório inteiro em vez da pasta didática indicada.",
+      "Configurar um comando de build inexistente e esperar que ele gere arquivos.",
+      "Tratar deploy marcado como pronto como prova de que todos os caminhos funcionam.",
+      "Interpretar tela de login Vercel como falha DNS ou retirar proteção do projeto principal."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: a raiz do projeto está em `labs/`, e o arquivo inicial está em `labs/deployment-static/index.html`. Preveja se `/` encontra a página e explique que diretório a raiz deveria apontar.",
+        "expected": "A raiz atual não corresponde ao conteúdo completo esperado; `labs/deployment-static` é a pasta que contém `index.html` e `styles.css`.",
+        "criteria": ["Identifica o caminho do arquivo de entrada.", "Prevê 404 ou arquivo ausente sem afirmar que DNS está errado."],
+        "solution": "Usar `labs/deployment-static` como diretório-raiz do projeto e fazer novo deploy; depois verificar `/` e `/styles.css`.",
+        "explanation": "A raiz determina quais arquivos entram no contexto de publicação.",
+        "hints": ["Percorra a árvore de diretórios a partir da raiz configurada.", "Localize exatamente onde está `index.html`." ]
+      },
+      {
+        "prompt": "Alterar: alguém selecionou o preset de um framework que executa `npm run build`, mas a pasta não tem `package.json`. Proponha a menor mudança coerente com o laboratório e diga o que deve continuar funcionando.",
+        "expected": "O projeto usa preset Other e não executa build; depois, os arquivos `index.html` e `styles.css` continuam servidos.",
+        "criteria": ["Remove a dependência de pacote/comando ausente.", "Preserva a publicação dos dois arquivos estáticos."],
+        "solution": "Selecionar Other, deixar Build Command vazio e publicar a raiz contendo os arquivos. Confirmar novamente a página e o CSS.",
+        "explanation": "Uma página pronta em HTML/CSS não precisa de compilação nem instalação de dependências.",
+        "hints": ["O laboratório não possui etapas de compilação.", "Depois da configuração, verifique tanto a entrada quanto a folha de estilos." ]
+      },
+      {
+        "prompt": "Construir: publique o laboratório em um projeto Vercel separado. Registre a raiz, preset, URL pública, status final de `/` e `/styles.css`, protocolo inicial/final e resultado da navegação por teclado.",
+        "expected": "A evidência permite repetir a configuração e inclui os dois status reais, a URL HTTPS e o teste de teclado; não contém chave, cookie nem dado pessoal.",
+        "criteria": ["O projeto separado usa a raiz `labs/deployment-static` e não altera o principal.", "Registra respostas observadas para HTML e CSS.", "Registra HTTPS e navegação por teclado."],
+        "solution": "Siga `labs/deployment-static/README.md`, copie os resultados observados e a URL fornecida pelo painel. Status, URL e proteção variam por deploy; não os invente.",
+        "explanation": "O valor deste exercício é produzir evidência de uma publicação real, não copiar um hostname ou status de exemplo.",
+        "hints": ["Abra a aba Rede antes de recarregar a página.", "A URL não é a única evidência: examine também os dois pedidos de arquivo." ]
+      },
+      {
+        "prompt": "Investigar erro: a URL da Vercel retorna 404 e `/styles.css` não carrega. Registre a evidência, formule uma hipótese de raiz/diretório e proponha um teste após corrigir somente essa configuração.",
+        "expected": "A investigação compara a raiz configurada com os caminhos reais, verifica logs/commit e faz novo deploy; depois confirma status de `/` e `/styles.css`.",
+        "criteria": ["A hipótese menciona raiz ou saída com evidência de arquivo ausente.", "A correção não altera o projeto principal nem troca DNS sem necessidade.", "O teste final verifica os dois arquivos."],
+        "solution": "Confirmar que a raiz é `labs/deployment-static`; corrigir a raiz se necessário, publicar e verificar `/` e `/styles.css` na aba Rede.",
+        "explanation": "A ausência dos arquivos publicados é compatível com diretório incorreto; o painel e o status das rotas ajudam a confirmar.",
+        "hints": ["Compare o caminho do arquivo no Git com Root Directory.", "Uma resposta 404 de arquivo não é, por si só, erro de resolução DNS." ]
+      }
+    ],
+    "quiz": [
+      { "question": "Qual diretório deve ser a raiz deste projeto Vercel?", "options": ["A raiz do repositório inteiro.", "`labs/deployment-static`, onde estão `index.html` e `styles.css`.", "A pasta `assets/js` do curso."], "correctIndex": 1, "explanation": "A raiz selecionada deve conter todos os arquivos necessários para a página publicada." },
+      { "question": "O que comprova que o CSS foi publicado?", "options": ["O deploy aparece como pronto.", "O pedido de `/styles.css` retorna uma resposta de sucesso.", "A URL contém a palavra Vercel."], "correctIndex": 1, "explanation": "É preciso conferir o recurso individual, além do documento principal." },
+      { "question": "Uma tela de login Vercel na URL didática prova falha DNS?", "options": ["Sim, sempre.", "Não; pode indicar proteção de acesso do deploy.", "Sim, se o HTML usa CSS."], "correctIndex": 1, "explanation": "A política de acesso e a resolução do domínio são verificações distintas." }
+    ],
+    "summary": [
+      "Uma página HTML/CSS pronta pode ser publicada sem instalar pacote nem executar build.",
+      "A raiz do projeto precisa conter `index.html` e os caminhos de seus recursos.",
+      "Verifique separadamente a URL, status dos arquivos, HTTPS, acesso e teclado; não confunda essa prática com uma API ou banco persistente."
+    ]
   }
 });
 
@@ -983,6 +1551,31 @@ Object.assign(LESSON_GUIDES, {
       prompt: "O cliente pede prioridade para sessões de estudo já cadastradas. Escreva critérios de aceite para valor padrão, valores permitidos, edição e registros antigos; depois proponha testes e uma atualização honesta do README.",
       expected: "Cada critério informa entrada, ação e resultado visível; os testes incluem dados antigos sem prioridade e valor inválido; o README separa o que foi implementado do que ainda está planejado.",
       hint: "Trate a mudança como alteração de contrato e avalie interface, API, dados e documentação."
+    },
+    "delivery-web-foundations": {
+      prompt: "Uma pessoa transfere o domínio de registrador, mantém a hospedagem da aplicação e escolhe um terceiro provedor DNS. Esboce a sequência de preparação e um teste para cada camada antes de trocar a delegação.",
+      expected: "O plano preserva e confere os registros DNS existentes, identifica o nameserver autoritativo e testa resolução, associação do domínio ao host e resposta HTTP sem presumir que as três empresas são a mesma.",
+      hint: "Inventarie os serviços e registros antes da transferência; valide do DNS até a resposta do site em etapas separadas."
+    },
+    "delivery-dns": {
+      prompt: "Um serviço pede que você adicione um TXT para verificar example.test. Escreva um plano que confirma nome e valor atuais, preserva registros existentes e verifica a resposta sem publicar um token real neste rascunho.",
+      expected: "O plano usa o valor fornecido pelo painel atual, registra o nome exato e TTL, evita remover outros registros e consulta o DNS autoritativo/resolvedor depois de salvar.",
+      hint: "Valores TXT de verificação são específicos; mantenha um marcador fictício neste exercício e procure a instrução vigente no serviço."
+    },
+    "delivery-https": {
+      prompt: "Uma equipe recebe alerta de certificado ao acessar app.example.test, embora http:// redirecione para https://. Registre evidência, hipótese sobre hostname ou estado do certificado e próximo teste sem contornar o aviso.",
+      expected: "O procedimento abre HTTPS diretamente sem enviar dados, compara o hostname solicitado com a cobertura do certificado e consulta estado/associação no provedor antes de corrigir.",
+      hint: "O redirecionamento não prova que o certificado do destino é válido. Compare os nomes e o estado da emissão."
+    },
+    "delivery-hosting-models": {
+      prompt: "Um relatório local funciona, mas desaparece depois de o processo ser reiniciado. Desenhe uma alteração para manter os relatórios e inclua um teste de recuperação em ambiente isolado.",
+      expected: "A proposta coloca os dados em armazenamento durável apropriado e comprova escrita, reinício e leitura, mantendo backup/restauração e limites do serviço no plano.",
+      hint: "Identifique primeiro se o dado estava em memória, no sistema de arquivos efêmero ou em um banco durável."
+    },
+    "delivery-static-deploy": {
+      prompt: "O HTML abre após publicar em um projeto separado, mas a folha de estilos retorna 404. Confira a raiz, o caminho relativo e o status de cada arquivo; proponha um ajuste e uma confirmação sem alterar o projeto principal.",
+      expected: "A correção mantém a raiz `labs/deployment-static`, confirma que `styles.css` está incluído e referenciado relativamente e verifica novamente `/` e `/styles.css` no deploy novo.",
+      hint: "A página pode aparecer sem CSS se o HTML foi encontrado, mas o caminho relativo ou a pasta servida do arquivo CSS está incorreta."
     }
   };
 

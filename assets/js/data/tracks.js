@@ -839,7 +839,7 @@
             "concept": "Grid coordena linhas e colunas de uma composição. Você vai construir uma coleção de cartões e entender trilhas, espaço disponível e limites, escolhendo entre uma grade fixa, responsiva e automática de acordo com o conteúdo.",
             "objectives": [
               "Criar um contêiner grid e dimensionar trilhas com fr, repeat e minmax.",
-              "Entender colocação automática e linhas da grade.",
+              "Prever em que linha e coluna cada item será colocado automaticamente e explicar as linhas explícitas e implícitas da grade.",
               "Usar auto-fit em grades que se ajustam ao contêiner.",
               "Combinar Grid e Flexbox preservando a ordem do documento."
             ],
@@ -919,7 +919,7 @@
             "concept": "Uma identidade visual consistente exige escolhas reutilizáveis. Propriedades personalizadas permitem nomear cores e espaços pela função, mudar regiões da interface e manter componentes compreensíveis sem espalhar valores repetidos.",
             "objectives": [
               "Declarar custom properties e consumi-las com var.",
-              "Entender escopo, herança e fallback sem confundir com validação de qualquer valor.",
+              "Inspecionar como escopo e herança distribuem tokens e distinguir valor ausente de valor inválido para a propriedade.",
               "Organizar tokens e componentes com nomes pela função.",
               "Revisar contraste, foco e responsividade após mudanças de tema."
             ],
@@ -3385,7 +3385,7 @@
             "concept": "Construa uma base recuperável com conteúdo rastreável, atualizado e acessível apenas a quem tem permissão.",
             "objectives": [
               "Definir documentos, metadados e unidades de recuperação.",
-              "Entender chunking, sobreposição, deduplicação e atualização.",
+              "Criar blocos com sobreposição definida, detectar duplicatas e planejar ativação e remoção segura de versões.",
               "Manter permissões desde a ingestão até a busca."
             ],
             "exercise": "Planeje substituir manual-v1 por manual-v2 sem deixar resultados antigos ativos.",
@@ -3684,7 +3684,7 @@
             "objectives": [
               "Distinguir host, cliente, servidor, ferramenta, recurso e prompt.",
               "Explicar descoberta, chamada e transporte sem confundir versões do protocolo.",
-              "Construir uma simulação verificável e conhecer o caminho opcional para um servidor SDK real."
+              "Construir uma simulação verificável e descrever as etapas e evidências necessárias para testar opcionalmente um servidor MCP real com SDK."
             ],
             "exercise": "Escreva um plano de interoperabilidade que detecte incompatibilidade de versão e falta de permissão.",
             "code": "# Simulação local parcial; não implementa transporte ou protocolo MCP completo.\ncatalogo = {\"PY\": \"Python básico\"}\nschema = {\"type\": \"object\", \"properties\": {\"codigo\": {\"type\": \"string\"}},\n          \"required\": [\"codigo\"], \"additionalProperties\": False}\n\ndef despachar(metodo, params):\n    if metodo == \"tools/list\":\n        return {\"tools\": [{\"name\": \"consultar_curso\", \"description\": \"Consulta local, sem alteração\",\n                           \"inputSchema\": schema}]}\n    if metodo != \"tools/call\":\n        raise ValueError(\"Método não implementado nesta simulação\")\n    if not isinstance(params, dict) or params.get(\"name\") != \"consultar_curso\":\n        raise ValueError(\"Ferramenta desconhecida\")\n    args = params.get(\"arguments\")\n    if not isinstance(args, dict) or set(args) != {\"codigo\"} or type(args[\"codigo\"]) is not str:\n        return {\"isError\": True, \"content\": [{\"type\": \"text\", \"text\": \"Argumentos inválidos\"}]}\n    texto = catalogo.get(args[\"codigo\"])\n    return {\"isError\": texto is None,\n            \"content\": [{\"type\": \"text\", \"text\": texto or \"Curso inexistente\"}]}\n\nprint(despachar(\"tools/list\", {})[\"tools\"][0][\"name\"])\nfor codigo in (\"PY\", \"XX\"):\n    resultado = despachar(\"tools/call\", {\"name\": \"consultar_curso\", \"arguments\": {\"codigo\": codigo}})\n    print(resultado[\"isError\"], resultado[\"content\"][0][\"text\"])\nassert catalogo == {\"PY\": \"Python básico\"}",
@@ -4427,7 +4427,7 @@
             "concept": "Transforme um comando de teste local em verificação repetível a cada mudança e interprete seu resultado.",
             "objectives": [
               "Rodar uma suíte local com comando único e código de saída.",
-              "Ler um workflow simples de GitHub Actions sem depender dele para aprender a regra.",
+              "Identificar em um workflow de GitHub Actions o gatilho, o comando de teste e o resultado esperado, separando isso da execução local.",
               "Distinguir falha de teste, falha de configuração e limite do relatório."
             ],
             "exercise": "Transferência: adicione novo requisito: 10 ou mais pontos devolvem urgente; escreva testes para 9 e 10 e atualize a função.",
@@ -4794,13 +4794,172 @@
         ],
         "lessons": [
           {
+            "id": "delivery-web-foundations",
+            "title": "Da URL à hospedagem: quem faz o quê",
+            "minutes": 65,
+            "concept": "Mapeie o caminho de uma visita e diferencie o registro do domínio, o DNS e a hospedagem dos arquivos e serviços.",
+            "objectives": [
+              "Desenhar navegador → DNS → hospedagem → resposta e separar a busca DNS do pedido HTTP.",
+              "Distinguir registrador, provedor DNS, hospedagem, região e CDN em um cenário simples.",
+              "Identificar qual fornecedor procurar quando o domínio, o DNS ou o site falha."
+            ],
+            "exercise": "Classifique os papéis de um site fictício e trace o caminho entre a URL digitada e o HTML recebido.",
+            "code": "Navegador → resolvedor DNS → registro autoritativo → endereço do site → hospedagem → HTML/CSS/JavaScript\nO registro do domínio, o DNS e a hospedagem podem ser serviços separados.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "ICANN · O processo de registro de domínios",
+                "url": "https://www.icann.org/resources/pages/domain-name-registration-process-2023-11-02-en",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Vercel · Visão geral de domínios e DNS",
+                "url": "https://vercel.com/docs/domains",
+                "language": "EN"
+              }
+            ]
+          },
+          {
+            "id": "delivery-dns",
+            "title": "DNS: registros, TTL e diagnóstico",
+            "minutes": 80,
+            "concept": "Leia registros DNS comuns e investigue por que uma alteração pode demorar a aparecer em diferentes resolvedores.",
+            "objectives": [
+              "Diferenciar os usos de A, AAAA, CNAME e TXT em um conjunto de registros fictício.",
+              "Explicar como TTL controla cache e por que a chamada propagação pode variar entre resolvedores.",
+              "Localizar uma inconsistência sem alterar registros de produção às cegas."
+            ],
+            "exercise": "Leia um conjunto DNS de laboratório, encontre o registro incorreto e descreva como verificar a correção com segurança.",
+            "code": "A      @       192.0.2.10          TTL 300\nAAAA   @       2001:db8::10        TTL 300\nCNAME  www     site.example.test   TTL 300\nTXT    _prove  \"codigo-ficticio\"     TTL 300\n\nExemplo didático: endereços e domínio reservados para documentação.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "Cloudflare · Tipos de registros DNS",
+                "url": "https://developers.cloudflare.com/dns/manage-dns-records/reference/dns-record-types/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Cloudflare · TTL e cache DNS",
+                "url": "https://developers.cloudflare.com/dns/manage-dns-records/reference/ttl/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "IETF · RFC 5737 — endereços IPv4 de documentação",
+                "url": "https://www.rfc-editor.org/rfc/rfc5737.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "IETF · RFC 3849 — prefixo IPv6 de documentação",
+                "url": "https://www.rfc-editor.org/rfc/rfc3849.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "IETF · RFC 6761 — nomes de domínio de uso especial",
+                "url": "https://www.rfc-editor.org/rfc/rfc6761.html",
+                "language": "EN"
+              }
+            ]
+          },
+          {
+            "id": "delivery-https",
+            "title": "HTTPS, TLS e certificado",
+            "minutes": 65,
+            "concept": "Entenda o que a conexão HTTPS protege, o papel do certificado TLS e como revisar redirecionamentos e conteúdo misto.",
+            "objectives": [
+              "Explicar, em linguagem simples, a confidencialidade, a integridade e a autenticação oferecidas por TLS.",
+              "Distinguir DNS de TLS: apontar um domínio ao serviço não emite por si só um certificado válido.",
+              "Verificar se HTTP redireciona para HTTPS e se os recursos ativos também usam HTTPS."
+            ],
+            "exercise": "Analise um roteiro de publicação e identifique evidências de DNS correto, certificado válido e redirecionamento seguro.",
+            "code": "http://site.example.test/   ── redirecionamento ──▶   https://site.example.test/\n                                             TLS verifica o certificado e protege a conexão\n\nA seta representa um comportamento a verificar, não uma configuração automática do navegador.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "MDN · Guia prático de TLS",
+                "url": "https://developer.mozilla.org/en-US/docs/Web/Security/Practical_implementation_guides/TLS",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Vercel · Configurar domínio personalizado e verificar o certificado",
+                "url": "https://vercel.com/docs/domains/set-up-custom-domain",
+                "language": "EN"
+              }
+            ]
+          },
+          {
+            "id": "delivery-hosting-models",
+            "title": "Hospedagem estática, funções e servidores",
+            "minutes": 75,
+            "concept": "Escolha onde executar cada parte de uma aplicação conforme seus requisitos, sem confundir arquivos estáticos, computação e armazenamento de dados.",
+            "objectives": [
+              "Comparar hospedagem estática, funções sob demanda, servidor persistente e serviço gerenciado.",
+              "Distribuir interface, API e banco entre serviços e justificar a escolha com requisitos concretos.",
+              "Identificar limites de região, latência, disponibilidade e dependência do fornecedor no plano de publicação."
+            ],
+            "exercise": "Desenhe a arquitetura de uma aplicação de estudos e indique quais partes precisam executar código ou guardar dados.",
+            "code": "Interface HTML/CSS/JS  →  hospedagem estática + CDN\nRequisição /api          →  função sob demanda OU servidor persistente\nDados da aplicação      →  PostgreSQL gerenciado\n\nDesenho ilustrativo: cada seta precisa de um contrato e um destino configurado.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "Vercel · Deployments e ambientes",
+                "url": "https://vercel.com/docs/deployments",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Vercel · Functions",
+                "url": "https://vercel.com/docs/functions",
+                "language": "EN"
+              }
+            ]
+          },
+          {
+            "id": "delivery-static-deploy",
+            "title": "Primeira publicação estática na Vercel",
+            "minutes": 75,
+            "concept": "Publique uma página HTML/CSS independente da aplicação principal e confira sua URL, a resposta HTTP e a conexão HTTPS.",
+            "objectives": [
+              "Configurar um projeto Vercel separado com raiz em `labs/deployment-static` e sem etapa de build.",
+              "Verificar a página publicada, o status final e a URL HTTPS com navegador ou cliente HTTP.",
+              "Diagnosticar uma página 404 distinguindo raiz do projeto, diretório publicado e arquivo de entrada."
+            ],
+            "exercise": "Publique o laboratório estático em um projeto separado e registre evidências de HTTP, HTTPS e resolução de uma falha simulada de diretório.",
+            "code": "Repositório GitHub\n└── labs/deployment-static/   ← raiz do projeto Vercel\n    ├── index.html            ← página inicial\n    └── styles.css            ← apresentação\n\nPreset: Other · Build Command: vazio · sem dependências",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "Vercel · Implantar repositórios Git",
+                "url": "https://vercel.com/docs/git",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Vercel · Configurar builds estáticos e diretório-raiz",
+                "url": "https://vercel.com/docs/builds/configure-a-build",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Vercel · Certificados SSL",
+                "url": "https://vercel.com/docs/domains/working-with-ssl",
+                "language": "EN"
+              }
+            ]
+          },
+          {
             "id": "delivery-environments",
             "title": "Ambientes, configuração e publicação",
             "minutes": 125,
-            "concept": "Prepare uma entrega reproduzível e escolha a hospedagem conforme o que precisa executar: arquivos estáticos ou processos de servidor.",
+            "concept": "Prepare uma entrega reproduzível com configurações distintas por ambiente e escolha a hospedagem conforme o que precisa executar: arquivos estáticos ou processos de servidor.",
             "objectives": [
               "Distinguir desenvolvimento, prévia e produção.",
-              "Separar configuração pública de segredo e usar variáveis no servidor.",
+              "Separar configuração pública de segredo e definir o escopo das variáveis por ambiente.",
               "Publicar um site estático e justificar onde uma API ou banco podem rodar."
             ],
             "exercise": "Crie um plano de publicação do projeto: URL pública, base de API, comandos de teste, configuração, verificação após a entrega e recuperação.",
@@ -4820,6 +4979,24 @@
               },
               {
                 "kind": "doc",
+                "title": "Vercel · Variáveis de ambiente",
+                "url": "https://vercel.com/docs/environment-variables",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Vercel · Ambientes de deploy",
+                "url": "https://vercel.com/docs/deployments/environments",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Vercel · Gerenciar e redeployar deployments",
+                "url": "https://vercel.com/docs/deployments/managing-deployments",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
                 "title": "MDN · Usando Fetch",
                 "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch",
                 "language": "EN"
@@ -4833,7 +5010,7 @@
             "concept": "Transforme um roteiro manual em verificações repetíveis, leia falhas após uma entrega e tenha uma forma concreta de voltar à última versão estável.",
             "objectives": [
               "Usar testes unitários, integração local e um roteiro de navegação para cobrir riscos distintos.",
-              "Entender gatilhos e resultado de uma rotina de integração contínua.",
+              "Identificar o gatilho e os testes de uma rotina de integração contínua e interpretar evidências de sucesso ou falha.",
               "Registrar sintomas, reproduzir, corrigir, verificar e preparar rollback."
             ],
             "exercise": "Rode os testes com node --test; provoque uma regressão, localize a falha e descreva como impedir a publicação.",

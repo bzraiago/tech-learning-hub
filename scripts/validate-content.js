@@ -33,6 +33,24 @@ function assertUnique(label, values) {
   if (repeated.length) fail(`${label} duplicado(s): ${repeated.join(', ')}`);
 }
 
+function validateJavaScriptExample(lessonId, example) {
+  const language = example.language?.toLowerCase() || '';
+  const inlineScripts = [...example.code.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)]
+    .map((match) => match[1]);
+  const isJavaScript = /\b(?:javascript|js)\b/.test(language);
+
+  if (!isJavaScript && inlineScripts.length === 0) return;
+
+  const sources = inlineScripts.length ? inlineScripts : [example.code];
+  sources.forEach((source, index) => {
+    try {
+      new vm.Script(source, { filename: `exemplo ${lessonId} (${index + 1})` });
+    } catch (error) {
+      fail(`Sintaxe inválida no exemplo JavaScript de ${lessonId}: ${error.message}`);
+    }
+  });
+}
+
 function localAssetsFrom(html, tag, attribute) {
   const expression = new RegExp(`<${tag}\\b[^>]*\\b${attribute}="([^"]+)"`, 'gi');
   return [...html.matchAll(expression)]
@@ -80,13 +98,23 @@ for (const source of dataSources) {
 
 let catalog;
 try {
-  catalog = vm.runInContext('({ R, tracks, LESSON_GUIDES, PROJECTS })', context);
+  catalog = vm.runInContext('({ R, tracks, LESSON_GUIDES, PROJECTS, EXERCISE_STAGES })', context);
 } catch (error) {
   fail(`Catálogo não pôde ser lido: ${error.message}`);
-  catalog = { R: {}, tracks: [], LESSON_GUIDES: {}, PROJECTS: [] };
+  catalog = { R: {}, tracks: [], LESSON_GUIDES: {}, PROJECTS: [], EXERCISE_STAGES: [] };
 }
 
-const { R, tracks, LESSON_GUIDES, PROJECTS } = catalog;
+const { R, tracks, LESSON_GUIDES, PROJECTS, EXERCISE_STAGES } = catalog;
+const requiredActivityTypes = ['predict', 'alter', 'build', 'investigate'];
+if (!Array.isArray(EXERCISE_STAGES) || EXERCISE_STAGES.length !== requiredActivityTypes.length) {
+  fail('A sequência global de exercícios deve conter quatro etapas.');
+} else {
+  EXERCISE_STAGES.forEach((stage, index) => {
+    if (stage.activityType !== requiredActivityTypes[index] || !stage.label?.trim() || !stage.instruction?.trim() || !stage.criterion?.trim()) {
+      fail(`Etapa global de exercício inválida: ${requiredActivityTypes[index]}`);
+    }
+  });
+}
 const modules = tracks.flatMap((track) => track.modules || []);
 const lessons = modules.flatMap((module) => module.lessons || []);
 const guideIds = Object.keys(LESSON_GUIDES);
@@ -120,6 +148,9 @@ for (const lesson of lessons) {
   if (!Array.isArray(lesson.objectives) || lesson.objectives.length === 0) {
     fail(`Aula sem objetivos observáveis: ${lesson.id}`);
   }
+  if (lesson.objectives?.some((objective) => /^(compreender|entender|conhecer|saber|aprender|familiarizar-se|ter noção)\b/i.test(objective))) {
+    fail(`Objetivo começa com verbo abstrato: ${lesson.id}`);
+  }
   for (const field of ['prerequisites', 'setup', 'why']) {
     if (!guide[field]?.trim()) fail(`Aula sem ${field}: ${lesson.id}`);
   }
@@ -128,20 +159,29 @@ for (const lesson of lessons) {
       fail(`Aula sem ${field}: ${lesson.id}`);
     }
   }
+  if (!Array.isArray(guide.mistakes) || guide.mistakes.length < 3 || guide.mistakes.some((item) => typeof item !== 'string' || !item.trim())) {
+    fail(`Aula precisa de pelo menos três erros comuns descritos: ${lesson.id}`);
+  }
   if (!guide.example?.code?.trim() || !guide.example?.expected?.trim() || !Array.isArray(guide.example?.explanation) || guide.example.explanation.length === 0) {
     fail(`Aula sem exemplo completo: ${lesson.id}`);
+  } else {
+    validateJavaScriptExample(lesson.id, guide.example);
   }
   if (!Array.isArray(guide.exercises) || guide.exercises.length === 0) {
     fail(`Aula sem exercícios: ${lesson.id}`);
   } else {
+    if (guide.exercises.length < 4) fail(`Aula sem a sequência de quatro exercícios: ${lesson.id}`);
     guide.exercises.forEach((exercise, index) => {
       if (!exercise.prompt?.trim()) fail(`Exercício sem enunciado: ${lesson.id}:${index}`);
       if (!exercise.expected?.trim()) fail(`Exercício sem resultado esperado: ${lesson.id}:${index}`);
       if (!exercise.solution?.trim()) fail(`Exercício sem solução: ${lesson.id}:${index}`);
+      if (!Array.isArray(exercise.hints) || exercise.hints.length === 0 || exercise.hints.some((hint) => typeof hint !== 'string' || !hint.trim())) {
+        fail(`Exercício sem dica utilizável: ${lesson.id}:${index}`);
+      }
       if (exercise.criteria !== undefined && (!Array.isArray(exercise.criteria) || !exercise.criteria.length || exercise.criteria.some((item) => typeof item !== 'string' || !item.trim()))) {
         fail(`Critérios de aceite inválidos: ${lesson.id}:${index}`);
       }
-      if (['prep-tools', 'prep-files', 'prep-workspace', 'prep-cycle', 'prep-errors', 'setup-editor', 'setup-python', 'setup-git', 'setup-node', 'setup-docker', 'setup-docker-alternative', 'setup-postgresql', 'setup-mariadb', 'setup-firebird', 'setup-mongodb', 'db-mariadb', 'db-firebird', 'db-mongo-crud', 'db-mongo-pipelines', 'db-nosql-models', 'db-performance', 'db-security', 'db-recovery', 'db-project', 'db-modeling', 'db-normalization', 'db-ddl-constraints', 'db-ddl-crud', 'db-select', 'db-aggregation', 'db-joins', 'db-subqueries-ctes', 'db-transactions', 'db-concurrency-boundaries', 'db-docker-basics', 'db-docker-compose', 'db-docker-operations', 'db-postgres', 'db-sqlite'].includes(lesson.id) && !exercise.criteria?.length) fail(`Exercício sem critérios de aceite: ${lesson.id}:${index}`);
+      if (['prep-tools', 'prep-files', 'prep-workspace', 'prep-cycle', 'prep-errors', 'setup-editor', 'setup-python', 'setup-git', 'setup-node', 'setup-docker', 'setup-docker-alternative', 'setup-postgresql', 'setup-mariadb', 'setup-firebird', 'setup-mongodb', 'db-mariadb', 'db-firebird', 'db-mongo-crud', 'db-mongo-pipelines', 'db-nosql-models', 'db-performance', 'db-security', 'db-recovery', 'db-project', 'db-modeling', 'db-normalization', 'db-ddl-constraints', 'db-ddl-crud', 'db-select', 'db-aggregation', 'db-joins', 'db-subqueries-ctes', 'db-transactions', 'db-concurrency-boundaries', 'db-docker-basics', 'db-docker-compose', 'db-docker-operations', 'db-postgres', 'db-sqlite', 'html-semantic', 'html-links-media', 'html-forms', 'html-tables', 'html-accessibility', 'css-cascade', 'css-box', 'css-typography', 'css-states', 'css-flex', 'css-grid', 'css-responsive', 'css-variables', 'js-values', 'js-flow', 'js-functions', 'js-scope-pure', 'js-callbacks-closures', 'js-arrays', 'js-es6', 'js-debug', 'js-dom', 'js-events', 'js-storage', 'js-promises', 'js-fetch', 'js-modules', 'py-syntax', 'py-control', 'py-data', 'py-functions', 'py-files', 'py-debug', 'py-oop', 'py-errors', 'py-modules', 'py-venv', 'py-requests', 'py-tests', 'ai-llms', 'ai-prompts', 'ai-system', 'ai-data', 'ai-embeddings', 'ai-rag', 'ai-api', 'ai-tools', 'ai-libraries', 'ai-mcp', 'ai-skills', 'ai-workflows', 'ai-evals', 'ai-safety', 'ai-operations', 'ai-adaptation', 'ai-multimodal', 'ai-capstone', 'git-start', 'git-history', 'git-branches', 'git-remote', 'git-requirements', 'git-review', 'quality-cases', 'quality-ui', 'quality-ci', 'quality-debug', 'quality-refactor', 'quality-review', 'delivery-web-foundations', 'delivery-dns', 'delivery-https', 'delivery-hosting-models', 'delivery-static-deploy', 'delivery-http', 'delivery-forms', 'delivery-security', 'delivery-environments', 'delivery-ci', 'delivery-requirements'].includes(lesson.id) && !exercise.criteria?.length) fail(`Exercício sem critérios de aceite: ${lesson.id}:${index}`);
     });
   }
   if (!guide.retry) {
@@ -287,7 +327,7 @@ for (const lessonId of progressiveBrowserLessonIds) {
   }
 }
 
-const reviewedDeliveryLessonIds = ['delivery-http', 'delivery-forms', 'delivery-security', 'delivery-environments', 'delivery-ci', 'delivery-requirements'];
+const reviewedDeliveryLessonIds = ['delivery-http', 'delivery-forms', 'delivery-security', 'delivery-web-foundations', 'delivery-dns', 'delivery-https', 'delivery-hosting-models', 'delivery-static-deploy', 'delivery-environments', 'delivery-ci', 'delivery-requirements'];
 for (const lessonId of reviewedDeliveryLessonIds) {
   const guide = LESSON_GUIDES[lessonId];
   if (!guide) {

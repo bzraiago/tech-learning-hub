@@ -139,7 +139,7 @@ Os scripts são clássicos e compartilham o mesmo escopo global, carregados na o
 
 Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workflow`, `quality`, `delivery`.
 
-> Os números de referência (9 trilhas, 28 módulos, 114 aulas, 458 exercícios, 341 questões, 24 projetos) foram conferidos no código em 25/10/2026. **Confira no código antes de citá-los** e atualize `ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
+> Os números atuais (9 trilhas, 28 módulos, 119 aulas, 478 exercícios, 355 questões, 24 projetos) foram conferidos no código em 27/10/2026. **Confira no código antes de citá-los** e atualize `contexto/ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
 
 ### 5.2 Persistência e compatibilidade (cuidado máximo)
 - O curso exige login Clerk antes de mostrar o conteúdo. O progresso persistente fica somente em `public.learning_state` no Supabase, protegido por RLS e vinculado ao ID Clerk. `state` permanece em memória durante a sessão. Ao trocar de conta, a interface aguarda a leitura da nova conta antes de aceitar edição.
@@ -150,6 +150,7 @@ Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workf
   - Se mudar o formato de modo incompatível, incremente `version` e documente a migração.
   - Mantenha os campos de revisão (`htmlCssRevision`, `javascriptRevision`, `pythonRevision`, `databaseRevision`, `aiRevision`) coerentes quando reescrever conteúdo de uma trilha.
 - Falhas de leitura impedem editar o progresso da conta até nova tentativa. Falhas de escrita mantêm mudanças em memória, mostram o erro e tentam novamente; antes de fechar a página, o usuário deve ver a confirmação de salvamento.
+- O desafio de mudança de requisito usa a estrutura existente `notes`, na chave `${lessonId}:requirement-change`, com limite de 2.000 caracteres. Preserve essa chave no `sanitizeState()`; ela não altera a versão do estado.
 
 ### 5.3 Segurança e robustez
 - Todo texto vindo do aluno (anotações, projetos colados) deve ser **escapado** antes de entrar em `innerHTML`. Prefira `textContent`.
@@ -179,6 +180,8 @@ Rode o que estiver disponível e **relate o resultado real** (inclusive falhas):
 node scripts/validate-content.js
 ```
 
+O validador também compila os exemplos rotulados como JavaScript e os scripts embutidos nos exemplos HTML, sem executá-los nem acessar serviços externos.
+
 Checklist manual: seguir `docs/CHECKLIST_REGRESSAO.md`. No mínimo, abrir uma aula de cada trilha alterada, marcar/desmarcar conclusão, recarregar e confirmar persistência, navegar só pelo teclado e testar em largura de celular (≈ 375 px).
 
 Se não conseguir executar uma verificação, **diga que não executou**. Nunca afirme que testou o que não testou.
@@ -195,7 +198,7 @@ Toda aula deve ter, nesta ordem:
 4. **Conceito em blocos curtos**, cada um com exemplo executável.
 5. **Resultado esperado visível** (saída, captura descrita ou comportamento) **antes** da solução.
 6. **Prática com apoio decrescente** (ver 6.3).
-7. **Erros comuns** e como reconhecê-los.
+7. **Erros comuns** e como reconhecê-los. Antes de corrigir, registre a mensagem completa ou o comportamento observado, a ação que veio antes e o resultado esperado; reproduza em cópia isolada e mude uma coisa por vez.
 8. **Verificação** (quiz curto + exercício de transferência).
 9. **Revisão:** o que lembrar e onde isso volta a aparecer.
 
@@ -212,7 +215,7 @@ Regras:
 ### 6.3 Progressão de exercícios
 Em cada módulo, alterne e aumente a dificuldade:
 **Guiado → com pistas → enunciado novo → mudança inesperada de requisito.**
-Tipos obrigatórios por aula: *prever*, *alterar*, *construir*, *investigar erro*. Todo exercício informa **critérios de aceite** e **exemplo de entrada/saída** visíveis, separados da solução.
+Tipos obrigatórios por aula: *prever*, *alterar*, *construir*, *investigar erro*. `EXERCISE_STAGES` em `assets/js/data/lesson-guides.js` define instrução e critério observáveis para cada uma das quatro etapas; o validador exige essas etapas e pelo menos quatro exercícios com dicas por aula. A prática termina com uma mudança inesperada de requisito. Todo exercício informa **critérios de aceite** e **exemplo de entrada/saída** visíveis, separados da solução; o desafio final compara um comportamento preservado com outro alterado.
 
 ### 6.4 Projetos
 Todo projeto tem: objetivo, pré-requisitos, entrega observável, `checks` verificáveis (preferir `mode: "auto"` quando possível), critérios de qualidade, e **uma mudança de requisito** ao final. Projetos devem **reutilizar** conhecimentos de módulos anteriores (revisão acumulativa).
@@ -253,13 +256,20 @@ A fase 7 (backend com persistência) é a **maior lacuna atual** do curso; prior
 
 ## 8. Backlog de melhorias (prioridade de execução)
 
-Vem da análise em `ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima para baixo e marque aqui o que for concluído.
+Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima para baixo e marque aqui o que for concluído.
 
 1. [x] **Etapa 0** de computador, arquivos, editor e terminal, disponível antes do primeiro exercício que dependa deles.
 2. [x] **Mapa de pré-requisitos** e instruções de instalação por sistema (Python, Git, Node.js + npm, Docker/WSL, PostgreSQL, MariaDB, Firebird, MongoDB/`mongosh`), seguindo o padrão 6.2.
-3. [ ] **Resultado esperado visível** separado da solução em todos os exercícios; checkpoints distintos para *li / pratiquei / revisão / resolvi sozinho*.
-   - [x] Os resultados esperados existentes são exibidos antes das dicas e soluções nas 114 aulas; critérios específicos e checkpoints seguem pendentes.
-   - [x] As aulas `prep-tools`, `prep-files`, `prep-workspace`, `prep-cycle`, `prep-errors`, as quatro instalações iniciais, `setup-docker`, `setup-docker-alternative`, `setup-postgresql`, as preparações opcionais de MariaDB, Firebird e MongoDB, `db-mariadb`, `db-firebird`, `db-mongo-crud`, `db-mongo-pipelines`, `db-nosql-models`, `db-performance`, `db-security`, `db-recovery`, `db-project`, `db-modeling`, `db-normalization`, `db-ddl-constraints`, `db-ddl-crud`, `db-select`, `db-aggregation`, `db-joins`, `db-subqueries-ctes`, `db-transactions`, `db-concurrency-boundaries`, `db-docker-basics`, `db-docker-compose`, `db-docker-operations`, `db-postgres` e `db-sqlite` iniciam os critérios específicos; revisar as demais aulas e evitar que o resultado visível revele respostas.
+3. [x] **Resultado esperado visível** separado da solução em todos os exercícios; checkpoints distintos para *li / pratiquei / revisão / resolvi sozinho*.
+   - [x] Os 478 exercícios exibem resultado esperado e critérios específicos; o validador exige critérios nas aulas revisadas.
+   - [x] As aulas `prep-tools`, `prep-files`, `prep-workspace`, `prep-cycle`, `prep-errors`, as quatro instalações iniciais, `setup-docker`, `setup-docker-alternative`, `setup-postgresql`, as preparações opcionais de MariaDB, Firebird e MongoDB, `db-mariadb`, `db-firebird`, `db-mongo-crud`, `db-mongo-pipelines`, `db-nosql-models`, `db-performance`, `db-security`, `db-recovery`, `db-project`, `db-modeling`, `db-normalization`, `db-ddl-constraints`, `db-ddl-crud`, `db-select`, `db-aggregation`, `db-joins`, `db-subqueries-ctes`, `db-transactions`, `db-concurrency-boundaries`, `db-docker-basics`, `db-docker-compose`, `db-docker-operations`, `db-postgres` e `db-sqlite` iniciam os critérios específicos.
+   - [x] As 13 aulas HTML/CSS contêm critérios nos 52 exercícios; 14 resultados foram revisados para que previsão, investigação e comparação não mostrem a conclusão antes da tentativa.
+   - [x] As 14 aulas JavaScript contêm critérios nos 56 exercícios; 22 resultados foram revisados para preservar a previsão, investigação e diagnóstico antes da conclusão.
+   - [x] As 12 aulas Python contêm critérios nos 48 exercícios; sete resultados foram revisados para preservar previsões e diagnósticos.
+   - [x] As 18 aulas de IA contêm critérios nos 73 exercícios; 17 resultados foram revisados para preservar previsões, métricas e validações antes da conclusão.
+   - [x] As seis aulas Git contêm critérios nos 24 exercícios; o resultado da busca no histórico não antecipa mais a linha literal.
+   - [x] As seis aulas de Qualidade contêm critérios nos 24 exercícios; o resultado de diagnóstico evita antecipar qual valor demonstra coerção.
+   - [x] As 11 aulas de Entrega contêm critérios nos 45 exercícios; previsões, validação, DNS/HTTPS, publicação estática, chamadas reais opcionais e limites do deploy ficam verificáveis.
 4. [x] **Projetos de fechamento** para as trilhas Git, Qualidade e Integração (entregas de laboratório; publicação real permanece nas fases posteriores).
 5. [ ] **Sequência de backend com persistência**: interface → API → validação → regra de negócio → banco → resposta → testes → publicação.
    - [x] Laboratório `labs/backend-validation` demonstra validação no servidor com Node.js nativo, pedidos diretos inválidos e ausência de escrita após rejeição.
@@ -269,16 +279,21 @@ Vem da análise em `ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima para baixo e
    - [x] Conectar `pg` apenas em `labs/backend-layers`, com consultas parametrizadas, `.env.example` local e PostgreSQL Compose isolado na porta 55433.
    - [x] Criar aplicador de migrations numeradas, segunda migration de sessões e transação estudo + sessão com rollback demonstrável.
    - [x] Criar teste de integração PostgreSQL e testes unitários para migrations, repositório transacional e respostas HTTP.
+   - [x] Confirmar que uma conexão PostgreSQL recusada retorna `500` genérico sem detalhes internos e que `start:memory` sinaliza dados temporários.
    - [x] Executar migrations e teste de integração em PostgreSQL real descartável; criação, unicidade, transação e persistência após reinício foram verificadas. O caminho específico de Docker Compose segue pendente.
 6. [ ] **CI, publicação e integração externa** como práticas guiadas e verificáveis (observar falha, corrigir, conferir URL final, voltar versão).
+   - [x] Criar aulas sobre domínio, DNS, HTTPS/TLS e opções de hospedagem, com fontes oficiais, exemplos fictícios e práticas diagnósticas.
+   - [ ] Verificar a publicação anônima na Vercel e executar o laboratório de domínio; o acesso autenticado à conta e um domínio de laboratório continuam necessários.
    - [x] Criar `labs/bug-investigation` com teste de regressão que falha antes e passa depois da correção; a execução red/green foi verificada em ambiente temporário.
    - [x] Automatizar um fluxo do navegador em Chromium headless, isolado ao laboratório de backend e sem depender de banco.
    - [x] Criar workflow real de GitHub Actions com validação, testes, PostgreSQL efêmero e Playwright; execução `40605904963` passou em `main`.
    - [x] Observar uma falha de asserção na branch temporária (`40606364491`), corrigi-la (`92fb73d`) e confirmar execução verde (`40606768881`); `main` permaneceu intacta.
    - [x] Integrar Open-Meteo no laboratório com contrato documentado, smoke real sem credenciais e testes simulados de rede, timeout, autenticação e resposta inválida.
    - [x] Publicar a página e a função da demonstração na Vercel (`43decdc`; deploy concluído).
-   - [ ] Conferir a URL pública final; os aliases conhecidos pedem sessão Vercel, então falta identificar o domínio de produção ou decidir a política de proteção.
-   - [ ] Ensinar e verificar rollback da aplicação e backup/restauração.
+   - [ ] Conferir a URL pública final; o dono autorizou previews públicos, mas o ajuste e a validação anônima aguardam acesso autenticado à conta Vercel.
+   - [x] Documentar o Instant Rollback da Vercel, seus limites por plano, o efeito na atribuição automática de domínios e a separação em relação aos dados do banco.
+   - [x] Criar roteiro local de `pg_dump`/`pg_restore` para restaurar em uma base separada, sem alterar a origem; backups ficam ignorados pelo Git.
+   - [ ] Executar e verificar rollback real e backup/restauração; a conta Vercel aguarda conexão e o daemon Docker não está ativo nesta sessão.
 7. [ ] Atividades gerais de conclusão (prova básica disponível no curso; intermediária pendente) — ver seção 9.
 8. [x] Corrigir a inconsistência da porta do PostgreSQL (55432) entre laboratório Docker e projeto relacional.
 9. [ ] Dividir aulas com excesso de conceitos (a aula de funções em JavaScript já foi dividida; mapear as demais).
@@ -353,4 +368,5 @@ Extensão de IA (opcional): responder perguntas sobre um pequeno conjunto de mat
 - 2026-10-26 — A página passou a exigir autenticação Clerk e carregamento do progresso antes de liberar o conteúdo.
 - 2026-10-26 — Troca de conta passa a carregar automaticamente o progresso remoto da nova conta, preservando cache local por usuário e exigindo escolha em caso de divergência.
 - 2026-10-26 — A cópia remota passa a ser exibida mesmo com cache divergente; a versão local anterior permanece recuperável no navegador, sem baixar arquivo automaticamente.
+- 2026-10-27 — Autorizado tornar os previews da Vercel públicos para testar a demonstração anonimamente; ajuste pendente de conexão autenticada à conta.
 - 2026-10-27 — Aprovado `@playwright/test` somente em `labs/backend-layers` para automação de um fluxo de interface; o modo memória mantém o E2E separado da persistência PostgreSQL.

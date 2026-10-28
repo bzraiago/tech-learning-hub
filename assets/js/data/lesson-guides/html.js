@@ -80,7 +80,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003cmeta name=\"description\" content=\"Encontros gratuitos para aprender desenvolvimento web com prática.\">",
         "explanation": "A descrição é metadado: não deve criar um texto no conteúdo principal.",
-        "expected": "Previsão registrada antes do teste; a tag aparece dentro de head e a página mantém a mesma apresentação."
+        "expected": "A previsão é registrada primeiro; a inspeção de head e da página permite comparar metadados com o conteúdo visível.",
+        "criteria": ["A previsão fica registrada antes da alteração.","A descrição está no head e a inspeção permite comparar metadados com o conteúdo visível."]
       },
       {
         "prompt": "Alterar: no exemplo, adicione a main uma segunda seção chamada Regras, com uma lista não ordenada de duas regras. Preserve a primeira seção e seus títulos.",
@@ -90,7 +91,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003csection>\n  \u003ch2>Regras\u003c/h2>\n  \u003cul>\u003cli>Respeite o ritmo dos colegas.\u003c/li>\u003cli>Compartilhe suas dúvidas.\u003c/li>\u003c/ul>\n\u003c/section>",
         "explanation": "Assuntos equivalentes usam títulos equivalentes; os itens pertencem à lista.",
-        "expected": "Dois h2 identificam as duas seções e a lista tem dois itens."
+        "expected": "Dois h2 identificam as duas seções e a lista tem dois itens.",
+        "criteria": ["A nova seção é irmã da seção existente dentro de main.","Os títulos mantêm níveis equivalentes e a lista contém duas regras."]
       },
       {
         "prompt": "Construir: em outro arquivo completo, apresente sua rotina de estudos com título de aba, h1, duas seções h2, um parágrafo em cada e três passos em ol. Não copie o corpo do exemplo.",
@@ -100,7 +102,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\">\n\u003chead>\n  \u003cmeta charset=\"UTF-8\">\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  \u003ctitle>Minha rotina\u003c/title>\n\u003c/head>\n\u003cbody>\n\u003cheader>\u003ch1>Minha rotina de estudos\u003c/h1>\u003c/header>\n\u003cmain>\u003csection>\u003ch2>Objetivo\u003c/h2>\u003cp>Aprender a estruturar páginas.\u003c/p>\u003c/section>\n\u003csection>\u003ch2>Prática diária\u003c/h2>\u003cp>Uma atividade curta por dia.\u003c/p>\u003col>\u003cli>Ler o conceito.\u003c/li>\u003cli>Executar o exemplo.\u003c/li>\u003cli>Resolver um exercício.\u003c/li>\u003c/ol>\u003c/section>\u003c/main>\n\u003cfooter>\u003cp>Plano pessoal.\u003c/p>\u003c/footer>\n\u003c/body>\n\u003c/html>",
         "explanation": "Os textos podem variar; avalie metadados, hierarquia e coerência, não igualdade literal com a solução.",
-        "expected": "O arquivo abre sozinho, tem acentos corretos e cada passo aparece como item numerado."
+        "expected": "O arquivo abre sozinho, tem acentos corretos e cada passo aparece como item numerado.",
+        "criteria": ["O arquivo completo abre no navegador e contém title, h1, duas seções com h2 e parágrafo.","Os três passos usam uma lista ordenada e o texto permanece legível com acentos."]
       },
       {
         "prompt": "Investigar erro: observe \u003cp>Bem-vindo \u003cstrong>ao clube\u003c/p>\u003c/strong>\u003ch3>Objetivo\u003c/h3> quando Objetivo é a primeira seção abaixo de um h1. Compare a ordem das tags no arquivo com a árvore interpretada e identifique os dois problemas antes de corrigir.",
@@ -110,7 +113,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003cp>Bem-vindo \u003cstrong>ao clube\u003c/strong>\u003c/p>\n\u003ch2>Objetivo\u003c/h2>",
         "explanation": "São dois problemas independentes: aninhamento cruzado e salto injustificado de nível. Corrigir só a aparência não resolve a estrutura.",
-        "expected": "A árvore mostra strong dentro de p e Objetivo como título de nível 2."
+        "expected": "A árvore permite conferir o aninhamento corrigido e uma hierarquia de títulos coerente, após registrar os dois defeitos observados.",
+        "criteria": ["A investigação registra separadamente os dois defeitos observados no código e na árvore.","Após a correção, strong permanece dentro do parágrafo e a hierarquia de títulos é coerente."]
       }
     ],
     "mistakes": [
@@ -230,7 +234,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003ca href=\"#contato\">Ir ao contato\u003c/a>\n\u003c!-- Modifique o rodapé existente: -->\n\u003cfooter id=\"contato\">\u003cp>Contato do clube.\u003c/p>\u003c/footer>",
         "explanation": "O alvo e o fragmento devem ter exatamente o mesmo nome; acrescente o link à nav e modifique o rodapé, sem duplicá-lo.",
-        "expected": "Previsão registrada antes do teste; o endereço recebe #contato e existe exatamente um alvo correspondente."
+        "expected": "A previsão é registrada antes do teste; a navegação pode ser conferida no endereço e no documento.",
+        "criteria": ["A previsão é anotada antes de testar a navegação.","O teste confere o endereço e se existe um destino correspondente no documento."]
       },
       {
         "prompt": "Alterar: mova sala.svg para uma pasta imagens e atualize apenas o atributo necessário no exemplo, preservando a alternativa textual e as dimensões.",
@@ -240,7 +245,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003cimg src=\"imagens/sala.svg\" width=\"320\" height=\"180\" alt=\"Mesa central com quatro cadeiras para trabalho em grupo\">",
         "explanation": "Não é preciso mudar a alternativa, porque a função da imagem continua igual.",
-        "expected": "A imagem carrega depois de mover o arquivo e atualizar a página."
+        "expected": "A imagem carrega depois de mover o arquivo e atualizar a página.",
+        "criteria": ["O caminho relativo aponta para a nova pasta e a imagem carrega após atualizar.","O texto alternativo e as dimensões existentes são preservados."]
       },
       {
         "prompt": "Construir: crie duas páginas, início e encontros, com links de ida e volta. Na página encontros coloque uma figura local, legenda e uma seção com id para um link interno.",
@@ -250,7 +256,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\">\n\u003chead>\n  \u003cmeta charset=\"UTF-8\">\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  \u003ctitle>Encontros\u003c/title>\n\u003c/head>\n\u003cbody>\n\u003cheader>\u003ch1>Encontros do clube\u003c/h1>\u003cnav>\u003ca href=\"index.html\">Início\u003c/a> · \u003ca href=\"#horario\">Horário\u003c/a>\u003c/nav>\u003c/header>\u003cmain>\u003cfigure>\u003cimg src=\"sala.svg\" width=\"320\" height=\"180\" alt=\"Mesa central com quatro cadeiras\">\u003cfigcaption>Espaço para trabalhar em grupo.\u003c/figcaption>\u003c/figure>\u003csection id=\"horario\">\u003ch2>Horário\u003c/h2>\u003cp>Sábado, 10h.\u003c/p>\u003c/section>\u003c/main>\n\u003c/body>\n\u003c/html>\n\u003c!-- Na nav de index.html acrescente: \u003ca href=\"encontros.html\">Encontros\u003c/a> -->",
         "explanation": "Confira o conjunto de arquivos, não só a página principal. Se moveu a imagem no exercício anterior, ajuste src para imagens/sala.svg.",
-        "expected": "Ambas as páginas abrem, os links retornam ao destino correto e a imagem tem descrição e legenda."
+        "expected": "Ambas as páginas abrem, os links retornam ao destino correto e a imagem tem descrição e legenda.",
+        "criteria": ["As duas páginas têm links que chegam ao destino correto e permitem voltar.","A página de encontros contém imagem local com alternativa, legenda e alvo interno identificável."]
       },
       {
         "prompt": "Investigar erro: uma página usa href=\"#horarios\", mas o alvo tem id=\"horario\"; sua imagem usa src=\"Sala.svg\", enquanto o arquivo se chama sala.svg. Compare cada destino com o arquivo ou id real, depois corrija e explique os dois erros.",
@@ -260,7 +267,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003ca href=\"#horario\">Ver horário\u003c/a>\n\u003cimg src=\"sala.svg\" width=\"320\" height=\"180\" alt=\"Mesa central com quatro cadeiras\">",
         "explanation": "São referências a destinos diferentes. Um computador que ignora maiúsculas pode esconder o segundo erro até a publicação.",
-        "expected": "O fragmento corresponde a um alvo real e o caminho corresponde ao arquivo."
+        "expected": "O fragmento corresponde a um alvo real e o caminho corresponde ao arquivo.",
+        "criteria": ["O diagnóstico aponta separadamente a diferença no id do fragmento e no nome/caminho da imagem.","Depois dos ajustes, o link e o recurso são conferidos no navegador."]
       }
     ],
     "mistakes": [
@@ -382,7 +390,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003cp>\u003clabel for=\"inicio\">Data de início desejada (opcional)\u003c/label>\u003cinput id=\"inicio\" name=\"inicio\" type=\"date\">\u003c/p>",
         "explanation": "Insira dentro de form. O seletor varia visualmente, mas continua representando uma data.",
-        "expected": "Previsão registrada antes do teste; o rótulo foca o campo e o formulário permite deixá-lo vazio."
+        "expected": "A previsão é anotada primeiro; o rótulo, o dado enviado e a tentativa sem data permitem conferir a hipótese.",
+        "criteria": ["A previsão é registrada antes de testar o formulário.","O novo campo tem rótulo associado e name; o teste vazio registra se a data é realmente opcional."]
       },
       {
         "prompt": "Alterar: no formulário do exemplo, faça o select de turno exigir uma escolha explícita, começando com Selecione um turno. Preserve as opções Manhã e Tarde.",
@@ -392,7 +401,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003clabel for=\"turno\">Turno (obrigatório)\u003c/label>\n\u003cselect id=\"turno\" name=\"turno\" required>\u003coption value=\"\">Selecione um turno\u003c/option>\u003coption value=\"manha\">Manhã\u003c/option>\u003coption value=\"tarde\">Tarde\u003c/option>\u003c/select>",
         "explanation": "O valor vazio não satisfaz required; uma opção já escolhida automaticamente não faria o mesmo teste.",
-        "expected": "Enviar sem selecionar um turno é impedido; escolher Manhã permite avançar."
+        "expected": "Enviar sem selecionar um turno é impedido; escolher Manhã permite avançar.",
+        "criteria": ["A opção inicial não representa uma escolha válida e o select exige seleção.","Manhã e Tarde continuam disponíveis e a validação nativa é conferida com ambos os cenários."]
       },
       {
         "prompt": "Construir: crie um formulário de pedido de ajuda com assunto obrigatório, e-mail obrigatório e mensagem de pelo menos 20 caracteres. Avise que é uma demonstração e use dados fictícios.",
@@ -402,7 +412,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\">\n\u003chead>\n  \u003cmeta charset=\"UTF-8\">\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  \u003ctitle>Pedido de ajuda\u003c/title>\n\u003c/head>\n\u003cbody>\n\u003cmain>\u003ch1>Pedido de ajuda\u003c/h1>\u003cp>Demonstração local; nenhuma mensagem é enviada. Todos os campos são obrigatórios.\u003c/p>\u003cform action=\"#aviso\" method=\"get\">\u003cp>\u003clabel for=\"assunto\">Assunto\u003c/label>\u003cinput id=\"assunto\" name=\"assunto\" required>\u003c/p>\u003cp>\u003clabel for=\"contato\">E-mail\u003c/label>\u003cinput id=\"contato\" name=\"contato\" type=\"email\" required>\u003c/p>\u003cp>\u003clabel for=\"mensagem\">Mensagem (mínimo de 20 caracteres)\u003c/label>\u003ctextarea id=\"mensagem\" name=\"mensagem\" minlength=\"20\" required>\u003c/textarea>\u003c/p>\u003cbutton type=\"submit\">Testar validação\u003c/button>\u003c/form>\u003cp id=\"aviso\">Nenhum serviço de envio está conectado.\u003c/p>\u003c/main>\n\u003c/body>\n\u003c/html>",
         "explanation": "Teste cada restrição separadamente, mantendo os outros campos válidos para localizar a causa.",
-        "expected": "Campos vazios, e-mail inválido e mensagem curta são recusados; os rótulos funcionam por clique."
+        "expected": "Campos vazios, e-mail inválido e mensagem curta são recusados; os rótulos funcionam por clique.",
+        "criteria": ["Assunto e e-mail são obrigatórios e a mensagem respeita o mínimo de caracteres pedido.","Cada campo tem rótulo funcional, usa dados fictícios e informa que o envio é demonstrativo."]
       },
       {
         "prompt": "Investigar erro: em \u003clabel for=\"mail\">E-mail\u003c/label>\u003cinput id=\"email\" type=\"email\" required=\"false\">, identifique por que o rótulo não foca o campo, por que vazio é recusado e por que o dado não é enviado. Depois corrija para um e-mail opcional que participe do envio.",
@@ -412,7 +423,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003clabel for=\"email\">E-mail (opcional)\u003c/label>\u003cinput id=\"email\" name=\"email\" type=\"email\">",
         "explanation": "O campo pode ficar vazio, mas se preenchido ainda deve satisfazer o formato de email. São três correções diferentes.",
-        "expected": "Clique no rótulo foca o campo, vazio é permitido e o dado preenchido tem nome no envio."
+        "expected": "O rótulo alcança o campo correto; vazio pode ser enviado e um valor preenchido participa dos dados do formulário.",
+        "criteria": ["O rótulo alcança o controle certo e o campo opcional aceita vazio.","Quando preenchido, o campo tem name e participa dos dados enviados; a validação é testada no navegador."]
       }
     ],
     "mistakes": [
@@ -534,7 +546,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003ctr>\u003cth scope=\"row\">JavaScript\u003c/th>\u003ctd>1\u003c/td>\u003ctd>2\u003c/td>\u003c/tr>\n\u003c!-- No tfoot: -->\n\u003ctr>\u003cth scope=\"row\">Total\u003c/th>\u003ctd>5\u003c/td>\u003ctd>9\u003c/td>\u003c/tr>",
         "explanation": "Somamos 1 a 4 e 2 a 7, partindo da tabela original. A nova linha não deve ficar fora de tbody.",
-        "expected": "Previsão registrada antes da edição; existem três temas e os totais escritos manualmente são 5 h e 9 h."
+        "expected": "A previsão é registrada antes da edição; depois, confira a nova linha e avalie separadamente os totais escritos manualmente.",
+        "criteria": ["A previsão de novos dados e totais é anotada antes de editar.","A linha nova é inserida e a verificação separa o número de temas do recálculo manual do tfoot."]
       },
       {
         "prompt": "Alterar: uma tabela de Item e Quantidade tem \u003ctr>\u003ctd>Caderno\u003c/td>\u003ctd>2\u003c/td>\u003c/tr>. Transforme Caderno em cabeçalho da linha e acrescente o cabeçalho das colunas, preservando a quantidade 2.",
@@ -544,7 +557,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003cthead>\u003ctr>\u003cth scope=\"col\">Item\u003c/th>\u003cth scope=\"col\">Quantidade\u003c/th>\u003c/tr>\u003c/thead>\n\u003ctbody>\u003ctr>\u003cth scope=\"row\">Caderno\u003c/th>\u003ctd>2\u003c/td>\u003c/tr>\u003c/tbody>",
         "explanation": "O trecho deve ficar dentro de table, depois de um caption apropriado. Não troque simplesmente todos os td por th.",
-        "expected": "Os nomes das colunas e do item têm escopos explícitos."
+        "expected": "Os nomes das colunas e do item têm escopos explícitos.",
+        "criteria": ["Cada coluna possui cabeçalho semântico e o item é identificado como cabeçalho de linha.","A quantidade original permanece associada ao item correto."]
       },
       {
         "prompt": "Construir: crie uma página completa com uma tabela de três encontros, contendo dia, tema e duração em minutos. Inclua caption, cabeçalhos e uma nota dizendo se os horários são fictícios.",
@@ -554,7 +568,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\">\n\u003chead>\n  \u003cmeta charset=\"UTF-8\">\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  \u003ctitle>Agenda de encontros\u003c/title>\n\u003c/head>\n\u003cbody>\n\u003cmain>\u003ch1>Agenda de encontros\u003c/h1>\u003cp>Dados fictícios para estudo.\u003c/p>\u003ctable>\u003ccaption>Encontros da primeira semana\u003c/caption>\u003cthead>\u003ctr>\u003cth scope=\"col\">Dia\u003c/th>\u003cth scope=\"col\">Tema\u003c/th>\u003cth scope=\"col\">Duração (min)\u003c/th>\u003c/tr>\u003c/thead>\u003ctbody>\u003ctr>\u003cth scope=\"row\">Segunda\u003c/th>\u003ctd>Elementos\u003c/td>\u003ctd>60\u003c/td>\u003c/tr>\u003ctr>\u003cth scope=\"row\">Quarta\u003c/th>\u003ctd>Links\u003c/td>\u003ctd>45\u003c/td>\u003c/tr>\u003ctr>\u003cth scope=\"row\">Sexta\u003c/th>\u003ctd>Formulários\u003c/td>\u003ctd>90\u003c/td>\u003c/tr>\u003c/tbody>\u003c/table>\u003c/main>\n\u003c/body>\n\u003c/html>",
         "explanation": "Os dados podem mudar, mas a unidade e as relações devem permanecer claras. Tfoot é opcional quando não há resumo.",
-        "expected": "Cada duração pode ser associada a exatamente um dia e a um tema."
+        "expected": "Cada duração pode ser associada a exatamente um dia e a um tema.",
+        "criteria": ["A tabela apresenta caption e três linhas com dia, tema e duração.","Os cabeçalhos deixam clara a associação das células e a nota identifica os horários fictícios."]
       },
       {
         "prompt": "Investigar erro: uma tabela com colunas Tema, Teoria e Prática contém \u003ctr>\u003cth scope=\"col\">HTML\u003c/th>\u003ctd>2\u003c/td>\u003c/tr>. O valor de prática deveria ser 3. Identifique a associação e a célula ausente antes de corrigir.",
@@ -564,7 +579,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003ctr>\u003cth scope=\"row\">HTML\u003c/th>\u003ctd>2\u003c/td>\u003ctd>3\u003c/td>\u003c/tr>",
         "explanation": "A correção resolve associação e quantidade de células; não basta adicionar espaços no texto.",
-        "expected": "HTML identifica a linha e as duas quantidades ficam nas colunas corretas."
+        "expected": "A linha fica alinhada aos cabeçalhos e o valor indicado aparece na coluna pretendida.",
+        "criteria": ["O diagnóstico identifica a célula de dados ausente e sua coluna pretendida.","A linha fica alinhada aos cabeçalhos e o valor indicado aparece na coluna correta."]
       }
     ],
     "mistakes": [
@@ -688,7 +704,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003cdetails>\u003csummary>Os encontros têm custo?\u003c/summary>\u003cp>Não. Os encontros deste exemplo são gratuitos.\u003c/p>\u003c/details>",
         "explanation": "Insira na seção de dúvidas. O comportamento de abrir e fechar não exige eventos manuais.",
-        "expected": "Previsão registrada antes da execução; a pergunta aparece na ordem de leitura e abre e fecha pelo teclado."
+        "expected": "A previsão é registrada antes da execução; a pergunta nova pode ser conferida na ordem de leitura e por teclado.",
+        "criteria": ["A previsão sobre interação por teclado é registrada antes da execução.","A pergunta nova fica na ordem correta e abrir/fechar é testado sem JavaScript com teclado."]
       },
       {
         "prompt": "Alterar: no formulário do exemplo, acrescente um campo com id=\"nome\" e a instrução visível Use seu nome de preferência. Escreva rótulo, controle e conexão da descrição sem remover o campo de e-mail.",
@@ -698,7 +715,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003clabel for=\"nome\">Nome de preferência\u003c/label>\n\u003cinput id=\"nome\" name=\"nome\" aria-describedby=\"ajuda-nome\">\n\u003cp id=\"ajuda-nome\">Use seu nome de preferência.\u003c/p>",
         "explanation": "O nome e a descrição têm funções distintas; a instrução não fica presa a um placeholder.",
-        "expected": "Os dois campos continuam presentes; o novo label foca o input e o id de ajuda existe uma única vez."
+        "expected": "Os dois campos continuam presentes; o novo label foca o input e o id de ajuda existe uma única vez.",
+        "criteria": ["O novo rótulo aponta para o input de nome e a instrução visível é associada como descrição.","O campo de e-mail permanece funcional e ids não são duplicados."]
       },
       {
         "prompt": "Construir: faça uma página de perguntas frequentes com h1, duas seções h2 e ao menos três detalhes expansíveis. Inclua atalho para main e navegação por fragmentos. Execute uma revisão somente com teclado.",
@@ -708,7 +726,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003c!DOCTYPE html>\n\u003chtml lang=\"pt-BR\">\n\u003chead>\n  \u003cmeta charset=\"UTF-8\">\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  \u003ctitle>Perguntas frequentes\u003c/title>\n\u003c/head>\n\u003cbody>\n\u003ca href=\"#principal\">Pular para o conteúdo\u003c/a>\u003cheader>\u003ch1>Perguntas frequentes\u003c/h1>\u003cnav>\u003ca href=\"#entrada\">Participação\u003c/a> · \u003ca href=\"#materiais\">Materiais\u003c/a>\u003c/nav>\u003c/header>\u003cmain id=\"principal\" tabindex=\"-1\">\u003csection id=\"entrada\">\u003ch2>Participação\u003c/h2>\u003cdetails>\u003csummary>Preciso ter experiência?\u003c/summary>\u003cp>Não, o grupo começa pelos fundamentos.\u003c/p>\u003c/details>\u003cdetails>\u003csummary>Preciso pagar?\u003c/summary>\u003cp>Não há custo neste exemplo.\u003c/p>\u003c/details>\u003c/section>\u003csection id=\"materiais\">\u003ch2>Materiais\u003c/h2>\u003cdetails>\u003csummary>O que devo levar?\u003c/summary>\u003cp>Caderno e disposição para praticar.\u003c/p>\u003c/details>\u003c/section>\u003c/main>\n\u003c/body>\n\u003c/html>",
         "explanation": "A solução exemplifica estrutura. Seu registro precisa verificar ordem de foco, ativação, abertura e fechamento, mesmo que os textos sejam diferentes.",
-        "expected": "Todas as perguntas funcionam pelo teclado; os links chegam a ids existentes e os títulos formam um sumário coerente."
+        "expected": "Todas as perguntas funcionam pelo teclado; os links chegam a ids existentes e os títulos formam um sumário coerente.",
+        "criteria": ["A página contém h1, duas seções h2 e ao menos três perguntas expansíveis.","Atalho e fragmentos chegam a destinos existentes e a revisão por teclado cobre todos os controles."]
       },
       {
         "prompt": "Investigar erro: uma interface mostra \u003cdiv tabindex=\"0\">Abrir ajuda\u003c/div> e nenhuma resposta. Primeiro descreva o que acontece ao focar e pressionar Enter. Depois substitua por um controle nativo que revele uma orientação sem JavaScript.",
@@ -718,7 +737,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003cdetails>\u003csummary>Abrir ajuda\u003c/summary>\u003cp>Preencha os campos obrigatórios antes de testar o formulário.\u003c/p>\u003c/details>",
         "explanation": "A substituição fornece conteúdo, ativação e estado nativos. Um button sozinho também precisaria de lógica para controlar o painel.",
-        "expected": "A ajuda abre e fecha com teclado e mouse, com uma resposta efetivamente presente."
+        "expected": "A ajuda abre e fecha com teclado e mouse, com uma resposta efetivamente presente.",
+        "criteria": ["A investigação descreve o comportamento observado antes de substituir o elemento.","O controle nativo apresenta uma resposta real e funciona com teclado e mouse sem JavaScript."]
       }
     ],
     "mistakes": [
@@ -835,7 +855,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".aviso { color: #1d4ed8; }",
         "explanation": "Edite a última ocorrência existente. Criar novas regras repetidas esconderia a causa original do conflito.",
-        "expected": "Aviso azul; parágrafo da agenda mantém sua cor."
+        "expected": "Aviso azul; parágrafo da agenda mantém sua cor.",
+        "criteria": ["Somente a declaração vencedora necessária é alterada e o aviso fica azul.","O parágrafo da agenda mantém seu estilo, confirmado no inspetor."]
       },
       {
         "prompt": "Adicione uma descrição com class=\"detalhe\" dentro da seção e estilize somente ela em itálico.",
@@ -845,7 +866,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003c!-- Dentro de section: -->\n\u003cp class=\"detalhe\">Traga seu computador.\u003c/p>\n/* Em style: */\n.detalhe { font-style: italic; }",
         "explanation": "Os comentários identificam destinos diferentes: HTML na seção, CSS em style. Uma classe descreve a intenção sem depender da posição do parágrafo.",
-        "expected": "Somente o novo detalhe fica em itálico."
+        "expected": "Somente o novo detalhe fica em itálico.",
+        "criteria": ["A descrição recebe class detalhe e permanece dentro da seção solicitada.","A regra limita o itálico ao novo detalhe sem afetar outros textos."]
       },
       {
         "prompt": "Mova p { color: #334155; } para o fim do CSS e explique por que o aviso não muda de cor. Depois faça todos os parágrafos herdarem a cor de body.",
@@ -855,7 +877,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "p { color: inherit; }\n/* Remova as declarações de color das duas regras .aviso. */",
         "explanation": "Mover o tipo não vence uma classe. A solução remove as regras concorrentes e pede herança explicitamente; não usa !important.",
-        "expected": "Todos os parágrafos usam #24324a de body."
+        "expected": "A declaração ativa pode ser explicada pelo inspetor; depois da alteração, a cor dos parágrafos vem da herança de body.",
+        "criteria": ["A explicação considera a ordem e a especificidade mostradas no inspetor.","Após a mudança, os parágrafos recebem a cor por herança de body, sem regra redundante."]
       },
       {
         "prompt": "Separe os estilos em estilos.css sem mudar a aparência e diagnostique um caminho propositalmente errado.",
@@ -865,7 +888,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003clink rel=\"stylesheet\" href=\"estilos.css\">",
         "explanation": "Salve estilos.css ao lado de index.html. Com o nome errado, o navegador não carrega a folha; o console ou a aba de rede ajuda a identificar o recurso ausente. O problema não é de especificidade.",
-        "expected": "Com caminho correto a aparência se mantém; com caminho errado predominam estilos padrão."
+        "expected": "Com caminho correto a aparência se mantém; com caminho errado predominam estilos padrão.",
+        "criteria": ["O CSS é carregado por um arquivo externo no caminho correto e a aparência é preservada.","Com caminho propositalmente incorreto, a falha é localizada no navegador e explicada com evidência."]
       }
     ],
     "mistakes": [
@@ -982,7 +1006,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".cartao { padding-inline: 2rem; }",
         "explanation": "Acrescente a declaração à regra existente. Padding-block continua recebendo 1.25rem do shorthand original.",
-        "expected": "Mais folga lateral dentro da borda, sem aumentar o teto externo da caixa."
+        "expected": "Mais folga lateral dentro da borda, sem aumentar o teto externo da caixa.",
+        "criteria": ["O preenchimento horizontal do cartão passa a 2rem.","O preenchimento vertical permanece como estava e a borda não é usada para criar a folga interna."]
       },
       {
         "prompt": "Crie um segundo cartão e deixe ambos separados por espaço externo, sem inserir br entre eles.",
@@ -992,7 +1017,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003c!-- Duplique o article existente, altere o h2 para \"Próxima aula\" e mantenha class=\"cartao\". -->",
         "explanation": "A margem de blocos adjacentes pode colapsar; duas margens de 1rem não implicam necessariamente 2rem de distância. O espaçamento pertence ao CSS.",
-        "expected": "Dois cartões separados, com altura independente."
+        "expected": "Dois cartões separados, com altura independente.",
+        "criteria": ["O segundo cartão é inserido como elemento independente, sem usar br para espaçamento.","A separação visual vem do espaço externo e cada cartão conserva sua própria altura."]
       },
       {
         "prompt": "Compare content-box e border-box em uma caixa de width 240px, padding 16px e border 2px. Calcule antes de medir.",
@@ -1002,7 +1028,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "/* Experimente no cartão em uma janela larga: */\n.cartao { width: 240px; padding: 16px; border-width: 2px; box-sizing: content-box; }\n/* Depois troque apenas box-sizing por border-box. */",
         "explanation": "Content-box produz 276px externos; border-box produz 240px externos, deixando 204px para conteúdo. Restaure width automático ao terminar.",
-        "expected": "As medidas do DevTools confirmam 276px e 240px."
+        "expected": "A previsão é registrada antes da medição; o DevTools permite comparar largura declarada, conteúdo, preenchimento e borda nos dois modelos.",
+        "criteria": ["O cálculo e a previsão são registrados antes de abrir o DevTools.","A medição distingue largura declarada, conteúdo, padding e borda nos dois modelos de caixa."]
       },
       {
         "prompt": "Construa um cartão de leitura com título, etiqueta e três parágrafos. Ele deve caber numa janela de 320px, limitar-se a 36rem e não cortar texto com zoom de 200%.",
@@ -1012,7 +1039,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".cartao { width: 100%; max-width: 36rem; height: auto; margin-inline: auto; overflow-wrap: anywhere; }",
         "explanation": "Aplique ao artigo com o conteúdo pedido. Teste o caso de maior texto e o zoom; uma captura bonita em uma largura não comprova o requisito.",
-        "expected": "Todos os parágrafos continuam acessíveis sem rolagem horizontal da página."
+        "expected": "Todos os parágrafos continuam acessíveis sem rolagem horizontal da página.",
+        "criteria": ["O cartão inclui título, etiqueta e três parágrafos em uma largura fluida limitada a 36rem.","Em 320px e zoom de 200%, todo o texto continua acessível sem corte ou rolagem horizontal da página."]
       }
     ],
     "mistakes": [
@@ -1129,7 +1157,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".nota { font-size: 1.25rem; }",
         "explanation": "Na configuração padrão de raiz 16px, padding: 1em passa a 20px. O valor exato acompanha a preferência de fonte da pessoa.",
-        "expected": "A nota e sua folga interna crescem juntas."
+        "expected": "A nota recebe a fonte solicitada e o preenchimento computado pode ser comparado antes e depois.",
+        "criteria": ["A previsão sobre a unidade em em é anotada antes da alteração.","A fonte da nota é ajustada e o preenchimento computado é conferido junto com ela."]
       },
       {
         "prompt": "Crie uma linha de texto secundário que continue legível e não dependa de fonte minúscula.",
@@ -1139,7 +1168,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003c!-- Antes do link: -->\n\u003cp class=\"secundario\">Atualizado após cada sessão de estudo.\u003c/p>\n/* No CSS: */\n.secundario { color: #475569; font-size: 1rem; }",
         "explanation": "Hierarquia pode vir de peso, posição e cor. Tornar informação importante muito pequena ou clara dificulta a leitura.",
-        "expected": "A informação é discreta, mas permanece legível sobre branco."
+        "expected": "A informação é discreta, mas permanece legível sobre branco.",
+        "criteria": ["O texto secundário tem tamanho confortável e contraste legível sobre branco.","A hierarquia visual é discreta sem depender de fonte minúscula."]
       },
       {
         "prompt": "Compare padding: 1rem e padding: 1em na nota com font-size: 2rem. Explique a diferença sem decorar pixels.",
@@ -1149,7 +1179,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".nota { font-size: 2rem; padding: 1em; }\n/* Compare substituindo somente o padding por 1rem. */",
         "explanation": "Com em, a folga equivale à fonte ampliada da nota. Com rem, equivale à fonte raiz, independentemente da fonte local. Depois restaure uma escala confortável para a página.",
-        "expected": "A versão em em apresenta o dobro da folga da versão em rem, se a fonte local for 2rem."
+        "expected": "As medidas do navegador podem ser explicadas pela relação entre a unidade do preenchimento e a fonte considerada.",
+        "criteria": ["A comparação registra tamanho de fonte e preenchimento antes de concluir.","A explicação distingue a referência de em da referência de rem e pode ser conferida pelas medidas computadas."]
       },
       {
         "prompt": "Crie uma página de leitura com um h1, dois h2, três parágrafos e um aviso. Preserve títulos semânticos, largura controlada, links sublinhados e leitura a 200% de zoom.",
@@ -1159,7 +1190,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "main { max-width: 65ch; margin-inline: auto; }\np, li { line-height: 1.65; }\na { text-decoration: underline; }\n.aviso { padding: 1rem; border: 2px solid #92400e; background: #fffbeb; color: #78350f; }",
         "explanation": "Insira o HTML pedido dentro de main e aplique aviso a um parágrafo que comece com a palavra Atenção. A palavra comunica a função mesmo sem a cor. A solução CSS ilustra critérios, não define o conteúdo único possível.",
-        "expected": "Sem corte de texto ou rolagem horizontal da página; hierarquia compreensível e aviso identificado por texto."
+        "expected": "Sem corte de texto ou rolagem horizontal da página; hierarquia compreensível e aviso identificado por texto.",
+        "criteria": ["A página mantém um h1, dois h2, três parágrafos e um aviso com texto identificador.","Largura, links e zoom de 200% são verificados sem corte ou rolagem horizontal."]
       }
     ],
     "mistakes": [
@@ -1276,7 +1308,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".acao:focus-visible { outline: 4px solid #a16207; outline-offset: 4px; }",
         "explanation": "Outline evita deslocar os vizinhos ao receber foco. Teste com Tab; clique do mouse pode produzir comportamento de foco diferente.",
-        "expected": "O contorno aparece no teclado sem mudar o espaço ocupado pelo link."
+        "expected": "O contorno aparece no teclado sem mudar o espaço ocupado pelo link.",
+        "criteria": ["O foco de teclado mostra contorno de 4px no link.","O afastamento solicitado é preservado e o contorno não altera o espaço ocupado no fluxo."]
       },
       {
         "prompt": "Mova o selo do canto superior direito para o superior esquerdo sem alterar o fluxo do título.",
@@ -1286,7 +1319,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".selo { right: auto; left: .5rem; }",
         "explanation": "O cartão permanece relative, mantendo a referência. O padding superior já reserva espaço para o selo.",
-        "expected": "O selo fica à esquerda e não cobre o título."
+        "expected": "O selo fica à esquerda e não cobre o título.",
+        "criteria": ["O selo fica posicionado no canto superior esquerdo do cartão.","O título permanece no fluxo e não fica coberto pelo selo."]
       },
       {
         "prompt": "Adicione um segundo link de ação e teste hover, teclado e movimento reduzido.",
@@ -1296,7 +1330,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003ca class=\"acao\" href=\"#agenda\">Consultar encontros\u003c/a>",
         "explanation": "Insira o link dentro do cartão. Não é necessário JavaScript para navegação por âncora. A media query existente cobre ambos os links e deve remover a transição quando a preferência estiver ativa.",
-        "expected": "Os dois links oferecem foco visível e continuam funcionando com a transição desativada."
+        "expected": "Os dois links oferecem foco visível e continuam funcionando com a transição desativada.",
+        "criteria": ["O segundo link de ação mantém estados visíveis para mouse e teclado.","Com movimento reduzido ativo, a transição é desativada sem impedir a ação."]
       },
       {
         "prompt": "Monte um cartão de evento com selo, ação de navegação e aviso de indisponibilidade. Teste a 320px e 200% de zoom e elimine qualquer sobreposição.",
@@ -1306,7 +1341,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "@media (max-width: 30rem) {\n  .selo { position: static; display: inline-block; }\n  .cartao { padding: 1rem; }\n}",
         "explanation": "O requisito de legibilidade é mais importante que manter o selo no canto a qualquer custo. A solução remove a sobreposição potencial na largura estreita e permite que o conteúdo cresça.",
-        "expected": "Selo, título, ações e aviso permanecem inteiros, com teclado e leitura preservados."
+        "expected": "Selo, título, ações e aviso permanecem inteiros, com teclado e leitura preservados.",
+        "criteria": ["O cartão contém selo, ação de navegação e aviso de indisponibilidade com semântica coerente.","Em 320px e zoom de 200%, não há sobreposição e todos os elementos permanecem legíveis e operáveis."]
       }
     ],
     "mistakes": [
@@ -1423,7 +1459,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "nav { flex: 1 1 20rem; }\nnav ul { justify-content: center; }",
         "explanation": "Nav recebe uma base e pode crescer; a lista passa a ocupar sua largura disponível, tornando a distribuição observável.",
-        "expected": "Os links formam um grupo centralizado na região da navegação."
+        "expected": "Os links formam um grupo centralizado na região da navegação.",
+        "criteria": ["A lista de links usa alinhamento flexível para centralizar o grupo quando há espaço.","A ordem visual e a ordem de leitura permanecem iguais."]
       },
       {
         "prompt": "Faça um cartão crescer duas vezes mais que os demais na distribuição de espaço livre.",
@@ -1433,7 +1470,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "/* Acrescente destaque à classe do primeiro article. */\n.cartao.destaque { flex-grow: 2; }",
         "explanation": "As bases e limites continuam participando do cálculo. Dois fatores de crescimento não significam largura final exatamente dobrada.",
-        "expected": "Em uma linha com sobra, o destaque recebe uma parcela maior dessa sobra."
+        "expected": "Em uma linha com sobra, o destaque recebe uma parcela maior dessa sobra.",
+        "criteria": ["O cartão destacado recebe flex-grow 2 e os demais conservam a proporção de crescimento definida.","A diferença é observada apenas no espaço livre da linha, sem depender de largura fixa."]
       },
       {
         "prompt": "Insira um título com uma palavra muito longa e resolva qualquer transbordamento sem cortar o texto.",
@@ -1443,7 +1481,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".cartao { min-width: 0; overflow-wrap: anywhere; }",
         "explanation": "As regras já estão no exemplo. Remova-as uma de cada vez para observar o efeito e depois restaure. Aprender a diagnosticar inclui reconhecer quando a proteção já existe.",
-        "expected": "O título quebra e permanece legível dentro do cartão."
+        "expected": "O título quebra e permanece legível dentro do cartão.",
+        "criteria": ["O título longo quebra dentro do cartão sem ser cortado.","A correção é conferida em uma largura estreita e não cria rolagem horizontal na página."]
       },
       {
         "prompt": "Crie uma barra com marca, quatro links e uma mensagem de contato. Ela deve quebrar naturalmente, manter a ordem de leitura e funcionar com Tab em 320px.",
@@ -1453,7 +1492,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".barra { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }\n.barra nav { flex: 1 1 18rem; }\n.barra nav ul { display: flex; flex-wrap: wrap; gap: .75rem; }",
         "explanation": "Crie header class=\"barra\" contendo marca, nav com lista e um parágrafo de contato. Use destinos existentes nos links. Não use order para reordenar o conteúdo visualmente.",
-        "expected": "Nada se sobrepõe e a sequência de Tab acompanha a apresentação."
+        "expected": "Nada se sobrepõe e a sequência de Tab acompanha a apresentação.",
+        "criteria": ["A barra inclui marca, quatro links e mensagem de contato na ordem semântica solicitada.","Em 320px, os itens quebram sem sobreposição e a sequência de Tab acompanha o HTML."]
       }
     ],
     "mistakes": [
@@ -1570,7 +1610,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }",
         "explanation": "Essa regra define duas colunas mesmo quando a tela fica estreita; ela serve para experimentar. Restaure a grade automática depois de comparar.",
-        "expected": "Quatro cartões formam duas linhas de duas colunas."
+        "expected": "Quatro cartões formam duas linhas de duas colunas.",
+        "criteria": ["A grade explícita usa duas colunas iguais em janela larga.","Os quatro cartões ocupam duas linhas sem sair da grade."]
       },
       {
         "prompt": "Faça o primeiro cartão ocupar as duas colunas da grade explícita do exercício anterior.",
@@ -1580,7 +1621,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".cartao:first-child { grid-column: 1 / -1; }",
         "explanation": "A regra depende do contexto da grade e não deve ser usada só para aumentar destaque sem verificar a ordem e o efeito em telas menores.",
-        "expected": "O primeiro cartão ocupa a primeira linha inteira; os demais são colocados a seguir."
+        "expected": "O primeiro cartão ocupa a primeira linha inteira; os demais são colocados a seguir.",
+        "criteria": ["O primeiro cartão ocupa as duas colunas da grade.","Os cartões restantes são posicionados nas células seguintes sem sobreposição."]
       },
       {
         "prompt": "Crie uma grade de proporção 2 para 1 para duas regiões de conteúdo e explique por que 66% e 34% com gap podem transbordar.",
@@ -1590,7 +1632,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".regioes { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 1rem; }",
         "explanation": "Crie uma div regioes com dois filhos e coloque conteúdo em cada um. A divisão em fr considera a disponibilidade após o intervalo; porcentagens que somam 100% mais gap excedem o contêiner.",
-        "expected": "A região principal recebe aproximadamente o dobro do espaço da lateral, sem somar um gap por fora."
+        "expected": "A região principal recebe aproximadamente o dobro do espaço da lateral, sem somar um gap por fora.",
+        "criteria": ["A proporção entre região principal e lateral é definida pela grade.","O gap é contabilizado sem somar uma largura percentual que provoque transbordamento."]
       },
       {
         "prompt": "Monte seis cartões com textos variados. A coleção precisa funcionar entre 320px e uma janela larga, sem cortes ou rolagem lateral da página.",
@@ -1600,7 +1643,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1rem; }\n.cartao { min-width: 0; overflow-wrap: anywhere; }",
         "explanation": "Escreva os seis article e links com destinos existentes. Compare larguras intermediárias; não valide apenas os extremos. Os critérios permitem aparências diferentes desde que conteúdo e ordem permaneçam corretos.",
-        "expected": "A quantidade de colunas muda com o espaço; nenhum cartão fica maior que a área disponível."
+        "expected": "A quantidade de colunas muda com o espaço; nenhum cartão fica maior que a área disponível.",
+        "criteria": ["Seis cartões com comprimentos variados se adaptam da largura de 320px a uma janela larga.","A quantidade de colunas acompanha o espaço disponível e nenhum conteúdo provoca overflow horizontal."]
       }
     ],
     "mistakes": [
@@ -1717,7 +1761,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "@media (min-width: 56rem) { .conteudo { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: start; } }",
         "explanation": "Substitua a consulta existente; não deixe duas regras contraditórias por acidente. Avalie se ambas as colunas têm conteúdo confortável antes de escolher o limite.",
-        "expected": "As duas colunas aparecem mais tarde, conforme a nova condição."
+        "expected": "As duas larguras próximas ao limite permitem observar em qual condição o layout muda.",
+        "criteria": ["O breakpoint passa a 56rem e as duas larguras testadas ficam registradas.","A mudança de layout corresponde à condição definida na media query, conferida em lados opostos do limite."]
       },
       {
         "prompt": "Substitua a ilustração por uma imagem local mantendo proporção e texto alternativo adequado.",
@@ -1727,7 +1772,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003cimg src=\"meu-projeto.png\" width=\"800\" height=\"400\" alt=\"Descrição específica do conteúdo do seu projeto\">",
         "explanation": "O exemplo presume um arquivo local 800 por 400; se o seu for diferente, altere os atributos. Se for puramente decorativa, alt vazio pode ser apropriado. O caminho precisa corresponder ao nome e extensão reais.",
-        "expected": "A imagem local aparece sem distorção e encolhe dentro do artigo."
+        "expected": "A imagem local aparece sem distorção e encolhe dentro do artigo.",
+        "criteria": ["A imagem local carrega e mantém proporção dentro do artigo.","O texto alternativo descreve a imagem de forma adequada e não repete texto decorativo."]
       },
       {
         "prompt": "Encontre e corrija o problema causado por width: 900px no aside em tela estreita.",
@@ -1737,7 +1783,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "/* Para reproduzir: aside { width: 900px; } */\n/* Correção: remova essa declaração; a grade dimensiona o item. */",
         "explanation": "A causa é uma caixa que exige mais largura que a viewport. Esconder overflow do body não resolve a perda de acesso ao conteúdo.",
-        "expected": "Após remover a largura fixa, o checklist volta a caber no fluxo da grade."
+        "expected": "Após remover a largura fixa, o checklist volta a caber no fluxo da grade.",
+        "criteria": ["A largura fixa de 900px é localizada como causa do transbordamento.","Após a correção, o checklist cabe no fluxo estreito e volta à posição prevista em tela larga."]
       },
       {
         "prompt": "Adapte uma página com apresentação, imagem, três cartões e área de apoio. Registre testes em 320, 600, 768 e 1280px, mais zoom 200% e teclado.",
@@ -1747,7 +1794,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".cartoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 1rem; }\nimg { max-width: 100%; height: auto; }\n/* Registre: 320px | sem rolagem lateral | resultado observado | correção, se necessária. */",
         "explanation": "Crie os três cartões no artigo e aplique a regra. A validação inclui conteúdo longo e foco visível; não é suficiente entregar somente uma captura de desktop.",
-        "expected": "Todos os cenários preservam conteúdo, imagem proporcional e navegação por teclado."
+        "expected": "Todos os cenários preservam conteúdo, imagem proporcional e navegação por teclado.",
+        "criteria": ["Os testes registram 320, 600, 768 e 1280px, além de zoom 200% e teclado.","Em cada cenário, conteúdo, imagem proporcional e controles continuam acessíveis sem overflow lateral."]
       }
     ],
     "mistakes": [
@@ -1864,7 +1912,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ":root { --espaco: 1.25rem; }",
         "explanation": "A declaração deve substituir o valor existente. O padding do cartão usa 1.5 vezes o token, enquanto o gap e o padding de body usam o valor diretamente.",
-        "expected": "Margens internas e intervalos crescem de forma coordenada."
+        "expected": "Margens internas e intervalos crescem de forma coordenada.",
+        "criteria": ["O token de espaçamento global recebe 1.25rem.","Os usos ligados ao token são conferidos para identificar quais margens e intervalos mudaram."]
       },
       {
         "prompt": "Crie uma região de tema suave com fundo #ecfdf5, texto #064e3b e link #065f46 sem duplicar a regra .card.",
@@ -1874,7 +1923,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".tema-suave { --cor-painel: #ecfdf5; --cor-texto: #064e3b; --cor-link: #065f46; --cor-borda: #047857; --cor-foco: #92400e; }",
         "explanation": "Duplique um article e use class=\"card tema-suave\". Confira os pares de contraste e o foco; a reutilização funciona porque .card consome os nomes sem conhecer o tema específico.",
-        "expected": "Três cartões compartilham estrutura, mas o novo tem sua própria combinação visual."
+        "expected": "Três cartões compartilham estrutura, mas o novo tem sua própria combinação visual.",
+        "criteria": ["A nova região usa a combinação de fundo, texto e link pedida.","Os cartões compartilham a regra estrutural existente e mantêm contraste e foco distinguíveis."]
       },
       {
         "prompt": "Compare --cor-link ausente com --cor-link: 20px usando um fallback de cor. Explique por que não são o mesmo caso.",
@@ -1884,7 +1934,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ".card a { color: var(--cor-teste, #7c2d12); }\n/* Observe sem definir --cor-teste. Depois acrescente: */\n.card { --cor-teste: 20px; }",
         "explanation": "Sem a variável, o fallback fornece uma cor. Com 20px definido, a substituição torna color inválido no cálculo e o fallback de var não resolve o tipo; color pode acabar herdando. Remova o teste e restaure --cor-link ao terminar.",
-        "expected": "Você distingue ausência de variável de valor incompatível com a propriedade consumidora."
+        "expected": "O valor computado permite comparar os dois casos e explicar como a propriedade consumidora os interpreta.",
+        "criteria": ["O teste registra separadamente a variável ausente e a variável com valor incompatível.","A explicação é apoiada pelo valor computado no navegador e distingue fallback de declaração inválida para a propriedade consumidora."]
       },
       {
         "prompt": "Extraia os valores recorrentes de seu portfólio para tokens e crie uma variação de tema. Faça uma revisão funcional completa após a troca.",
@@ -1894,7 +1945,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": ":root { --cor-fundo: #fff; --cor-texto: #172033; --cor-link: #1d4ed8; --cor-borda: #64748b; --cor-foco: #a16207; --espaco: 1rem; --raio: .75rem; }\n/* Substitua valores repetidos pelas chamadas var correspondentes. */",
         "explanation": "Liste cada token e os componentes que o consomem. Confirme que uma alteração tem o alcance esperado e que nenhum texto perde contraste. A solução final depende do portfólio, mas os critérios são verificáveis.",
-        "expected": "Tema coerente, foco visível, conteúdo legível e layout funcional com zoom e tela estreita."
+        "expected": "Tema coerente, foco visível, conteúdo legível e layout funcional com zoom e tela estreita.",
+        "criteria": ["Os valores recorrentes do portfólio são extraídos para tokens e uma variação de tema é implementada.","A revisão verifica aparência, foco, legibilidade, zoom e largura estreita após a troca."]
       }
     ],
     "mistakes": [

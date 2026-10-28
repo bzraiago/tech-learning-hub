@@ -11,16 +11,27 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 
 ## Carregamento e navegação
 
-- [ ] A página inicial mostra 9 trilhas e 114 aulas no total.
+- [ ] A página inicial mostra 9 trilhas e 119 aulas no total.
 - [ ] A trilha ativa, os módulos e os cards de progresso aparecem corretamente.
 - [ ] Busca encontra uma aula de outra trilha e permite limpar o resultado.
 - [ ] Filtros “Todas”, “Pendentes” e “Concluídas” atualizam a listagem.
 - [ ] “Começar/Continuar minha jornada” abre a aula esperada.
 - [ ] Uma aula de cada trilha alterada abre sem conteúdo ausente.
+- [ ] As aulas `delivery-web-foundations`, `delivery-dns`, `delivery-https`, `delivery-hosting-models` e `delivery-static-deploy` mostram exemplos, termos contextuais e os quatro tipos de exercício.
+- [ ] Na aula DNS, a pessoa distingue A, AAAA, CNAME e TXT, explica TTL como cache e não trata isso como propagação global garantida.
+- [ ] Na aula HTTPS, o checklist verifica certificado, redirecionamento e recursos ativos sem afirmar que TLS substitui autorização da aplicação.
+- [ ] O laboratório `labs/deployment-static` abre localmente, publica `/` e `/styles.css`, suporta largura de 375 px e permite usar o link para pular o conteúdo com teclado.
 
 ## Aula, quiz e anotações
 
 - [ ] Abas Conceitos, Exemplo, Prática, Revisão e Fontes funcionam.
+- [ ] Na aba Prática, cada aula mostra previsão guiada, alteração com pistas, construção para um caso novo, investigação de erro segura e desafio de mudança de requisito, nessa ordem.
+- [ ] Em uma aula de cada trilha alterada, os critérios específicos da atividade aparecem junto dos critérios próprios do exercício e antes da solução recolhida.
+- [ ] Na aba Revisão, instruções de diagnóstico pedem mensagem ou comportamento observado, passo causador e resultado esperado antes de aplicar correção; erros comuns permanecem legíveis por teclado e em 375 px.
+- [ ] O desafio de mudança de requisito mostra critérios observáveis, não revela uma solução pronta e permite registrar comportamento antigo/novo e evidências.
+- [ ] A anotação da mudança de requisito continua salva após confirmação na nuvem, recarga e login na mesma conta.
+- [ ] O desafio final pode ser alcançado, lido e preenchido só com teclado; em 375 px o campo não causa corte nem rolagem horizontal.
+- [ ] Em uma aula de cada trilha, o objetivo observável aparece antes de pré-requisitos, ambiente e conceitos; a sequência das abas segue conceitos, exemplo, prática, revisão e fontes.
 - [ ] Em `prep-tools`, cada exercício mostra resultado esperado e critérios antes do rascunho; dicas e solução continuam recolhidas.
 - [ ] Em `prep-files`, os quatro critérios aparecem antes da dica e a tarefa de investigar erro não antecipa as duas hipóteses.
 - [ ] Em `prep-workspace`, os quatro critérios verificam contexto de pasta, navegação, registro da sessão real e diagnóstico sem antecipar a solução.
@@ -55,6 +66,13 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Em `db-docker-operations`, a restauração ocorre em banco novo, com consulta à origem e ao destino; mudança de senha não remove o volume.
 - [ ] Em `db-postgres`, criar uma base nova no Compose, verificar banco e usuário, executar os quatro exercícios e confirmar a transação após reconectar.
 - [ ] Em `db-sqlite`, executar o arquivo Python, verificar parâmetros e reversão, e comparar a cópia em memória com a origem.
+- [ ] Nos 52 exercícios HTML/CSS, critérios aparecem antes das dicas; resultados de previsão e investigação não antecipam a conclusão; requisitos de layout, semântica e teclado são conferíveis.
+- [ ] Nos 56 exercícios JavaScript, critérios aparecem antes das dicas; previsão e diagnóstico ficam registrados antes da execução e os resultados distinguem valor retornado de saída no Console.
+- [ ] Nos 48 exercícios Python, critérios aparecem antes das dicas; previsões, exceções, isolamento de arquivos e testes usam evidências verificáveis.
+- [ ] Nos 73 exercícios de IA, critérios separam estrutura, evidência, autorização e execução real; previsões e métricas ficam registradas antes de conferir resultados.
+- [ ] Nos 24 exercícios Git, critérios verificam estado do índice, histórico, branch e remoto; a sequência segura evita perder alterações ou forçar atualização compartilhada.
+- [ ] Nos 24 exercícios de Qualidade, critérios cobrem limites, estado da interface, falhas locais/CI, regressão, módulos e revisão sem afirmar resultados não observados.
+- [ ] Nos 45 exercícios de Entrega, critérios verificam contratos HTTP, estados de formulário, autorização, DNS/HTTPS, publicação estática, caminhos e recuperação.
 - [ ] Em `labs/backend-validation`, formulário válido cria um estudo; pedidos diretos inválidos retornam erro e não alteram a lista.
 - [x] Em `labs/backend-layers`, `npm test` aprova os dezessete testes sem depender do PostgreSQL.
 - [ ] Em `labs/backend-layers`, a base isolada `backend_camadas` na porta `55433` fica healthy, e as migrations criam estudos, sessões e suas restrições.
@@ -62,7 +80,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [x] Em `labs/backend-layers`, `npm run test:db` com `RUN_PG_INTEGRATION=1` confirmou leitura após reconectar, sessão persistida, rollback e unicidade em PostgreSQL real.
 - [x] Em `labs/backend-layers`, API retorna 201 ao criar estudo/sessão, 400 para minutos inválidos, 409 para título repetido e preserva a persistência após reiniciar Node.
 - [x] Em `labs/backend-layers`, `npm run demo:rollback` comprova que a falha da sessão desfaz o estudo criado dentro da transação.
-- [ ] Em `labs/backend-layers`, falha de banco retorna 500 sem incluir detalhes internos; `npm run start:memory` identifica que os dados são temporários.
+- [x] Em `labs/backend-layers`, PostgreSQL indisponível retornou `500` genérico sem vazar detalhes; `npm.cmd run start:memory` anunciou `memória (temporário)` e a API retornou `200` com dois registros fictícios.
 - [x] Em `labs/bug-investigation`, o teste de preservação da lista reproduz a falha inicial; a suíte passa após corrigir a função numa cópia de verificação.
 - [x] Em `labs/backend-layers`, `npm run test:e2e` abre Chromium headless, cria um estudo pela interface, confirma `201`, rejeita duplicidade com `409` e encerra a API em memória.
 - [x] Em GitHub Actions, run `40605904963` passou na validação de conteúdo, testes unitários, migrations, integração PostgreSQL 17 e fluxo Playwright.
@@ -70,6 +88,10 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [x] `labs/backend-layers`: `npm run smoke:open-meteo` consulta serviço real sem chave e confere campos; testes automatizados simulam rede, timeout, `401` e JSON inválido sem enviar credenciais.
 - [x] Interface do laboratório identifica e vincula Open-Meteo como fonte dos dados meteorológicos.
 - [ ] Demonstração Vercel: verificar página e JSON público sem sessão Vercel; o alias conhecido `git-main` ainda apresenta “Login – Vercel”.
+- [x] `labs/backend-layers/DEPLOY_VERCEL.md` ensina o Instant Rollback atual, seus efeitos em domínios e a distinção entre implantação e banco de dados.
+- [ ] Na Vercel, executar rollback e retorno à implantação corrigida; confirmar a URL pública sem sessão Vercel.
+- [x] `labs/backend-layers/BACKUP_RESTORE.md` documenta `pg_dump -Fc`, inspeção e restauração em base separada; `.dump` fica fora do Git.
+- [ ] Executar backup e restore no Docker Compose e comparar estudos e sessões da origem com a cópia.
 - [ ] Navegação das abas funciona com setas, Home e End.
 - [ ] Exemplos de código permanecem legíveis e roláveis.
 - [ ] Quiz exige resposta, calcula o resultado e mostra feedback.
@@ -97,6 +119,7 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Recarregar mantém conclusão, quiz, notas, projetos e evidências.
 - [ ] Registrar prática agenda a aula para três dias depois; desfazer remove a aula da fila.
 - [ ] Ao chegar o dia, a revisão pede nova tentativa completa do quiz antes de permitir o registro.
+- [ ] Depois de uma resposta errada, a segunda tentativa traz cenário diferente, critério, pista e rascunho salvável em uma aula de cada trilha alterada.
 - [ ] Na primeira aula de um módulo posterior, a revisão acumulativa recupera um fundamento do módulo anterior, salva o rascunho e abre a aula de origem.
 - [ ] Após salvar em uma aba, recarregar outra aba da mesma conta mostra o estado remoto atualizado.
 - [ ] Trocar de conta carrega somente o progresso da nova conta, sem envio manual nem download de arquivo.

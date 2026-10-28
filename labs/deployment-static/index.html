@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Laboratório didático de publicação de um site estático na Vercel.">
+    <title>Laboratório de publicação estática</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+    <header class="site-header">
+      <a class="brand" href="#inicio" aria-label="Laboratório de publicação estática, início">Tech Learning Hub</a>
+      <span class="badge">Laboratório estático</span>
+    </header>
+
+    <main id="conteudo">
+      <section class="hero" id="inicio" aria-labelledby="titulo-principal">
+        <p class="eyebrow">INTEGRAÇÃO &amp; ENTREGA</p>
+        <h1 id="titulo-principal">Seu primeiro deploy sem build</h1>
+        <p class="intro">Esta página é composta por HTML e CSS. A Vercel pode publicar estes arquivos sem instalar dependências nem executar uma etapa de compilação.</p>
+        <a class="primary-link" href="#verificar">Ir para as verificações</a>
+      </section>
+
+      <section class="grid" aria-label="Partes deste laboratório">
+        <article class="card">
+          <h2>Arquivos da página</h2>
+          <p><code>index.html</code> define o conteúdo. <code>styles.css</code> define a apresentação responsiva.</p>
+        </article>
+        <article class="card">
+          <h2>Raiz do projeto</h2>
+          <p>No repositório, a pasta a selecionar como raiz é <code>labs/deployment-static</code>.</p>
+        </article>
+        <article class="card">
+          <h2>Sem dados pessoais</h2>
+          <p>O laboratório não tem login, formulário, API, banco de dados, rastreamento ou segredo.</p>
+        </article>
+      </section>
+
+      <section class="check-panel" id="verificar" aria-labelledby="titulo-verificar">
+        <p class="eyebrow">EVIDÊNCIAS DA PUBLICAÇÃO</p>
+        <h2 id="titulo-verificar">O que conferir depois do deploy</h2>
+        <ol>
+          <li>Abra a URL pública de produção e confirme que a página aparece.</li>
+          <li>Na aba Rede do navegador, confira que <code>/</code> e <code>/styles.css</code> retornam sucesso.</li>
+          <li>Abra a mesma URL começando por <code>http://</code> e observe se termina em <code>https://</code>.</li>
+          <li>Redimensione a janela e navegue pelo teclado, inclusive pelo link “Pular para o conteúdo”.</li>
+        </ol>
+        <p class="note"><strong>Limite:</strong> esta página prova a publicação de arquivos estáticos. Ela não executa uma API e não demonstra persistência de dados.</p>
+      </section>
+    </main>
+
+    <footer>
+      <p>Exemplo didático sem serviço externo, coleta de dados ou configuração de domínio.</p>
+    </footer>
+  </body>
+</html>

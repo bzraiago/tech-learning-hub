@@ -69,7 +69,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Set-Content notas.txt \"Primeira nota\"\ngit status --short",
         "explanation": "A criação do arquivo altera a pasta de trabalho; Git apenas observa até você escolher adicioná-lo.",
-        "expected": "Uma linha ?? notas.txt."
+        "expected": "Uma linha ?? notas.txt.",
+        "criteria": ["Arquivo novo aparece como não rastreado.","Status é observado sem adicionar o arquivo."]
       },
       {
         "prompt": "Aplicar: prepare somente index.html, preservando notas.txt fora do próximo commit.",
@@ -79,7 +80,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Set-Content index.html \"\u003c!doctype html>\u003ctitle>Agenda\u003c/title>\"\ngit add index.html\ngit status --short\ngit diff --staged -- index.html",
         "explanation": "A distinção entre arquivo preparado e não preparado impede enviar rascunhos por acidente.",
-        "expected": "A  index.html; ?? notas.txt. O diff staged contém o HTML."
+        "expected": "A  index.html; ?? notas.txt. O diff staged contém o HTML.",
+        "criteria": ["Somente index.html fica preparado.","Diff staged contém o arquivo solicitado e notas.txt continua fora."]
       },
       {
         "prompt": "Construir: faça um commit apenas de index.html e escreva evidências de que notas.txt continua fora do histórico.",
@@ -89,7 +91,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "git diff --staged\ngit commit -m \"feat: adiciona pagina inicial\"\ngit show --stat HEAD\ngit status --short",
         "explanation": "O commit é um conjunto selecionado de mudanças. O arquivo não rastreado continua na pasta, mas não integra esse snapshot.",
-        "expected": "git show lista index.html; status ainda lista ?? notas.txt."
+        "expected": "git show lista index.html; status ainda lista ?? notas.txt.",
+        "criteria": ["Commit inclui só index.html.","git show e status demonstram que notas.txt não entrou no histórico."]
       },
       {
         "prompt": "Diagnosticar: alguém executou git init fora da pasta esperada. Encontre a raiz antes de criar arquivos ou remover algo.",
@@ -99,7 +102,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Get-Location\ngit rev-parse --show-toplevel\ngit status --short",
         "explanation": "Confirmar contexto evita operar no projeto errado. Nesta atividade não remova .git; apenas navegue para o laboratório correto.",
-        "expected": "Você consegue registrar dois caminhos e explicar se eles pertencem ao mesmo projeto."
+        "expected": "Você consegue registrar dois caminhos e explicar se eles pertencem ao mesmo projeto.",
+        "criteria": ["Compara a pasta atual e raiz do repositório antes de criar ou remover.","Registra evidências dos dois caminhos sem operação destrutiva."]
       }
     ],
     "mistakes": [
@@ -212,7 +216,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "git diff --staged -- README.md\ngit restore --staged -- README.md\ngit diff -- README.md",
         "explanation": "Você alterou a seleção do próximo commit, não o conteúdo que digitou.",
-        "expected": "O diff não preparado mostra a edição; o diff staged do arquivo fica vazio."
+        "expected": "O diff não preparado mostra a edição; o diff staged do arquivo fica vazio.",
+        "criteria": ["Arquivo sai da área staged sem descartar a edição.","Diff comum preserva a alteração e diff staged fica vazio."]
       },
       {
         "prompt": "Aplicar: localize em qual commit entrou aviso.txt e mostre apenas sua alteração.",
@@ -222,7 +227,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "git log --oneline -- aviso.txt\ngit show HEAD~1 -- aviso.txt",
         "explanation": "Na sequência do exemplo, HEAD~1 referencia o commit provisório; se você fez mais commits, use o hash obtido no log.",
-        "expected": "Aparece uma linha adicionada com Mensagem provisoria e outra mudança posterior de revert."
+        "expected": "O histórico localiza o commit que alterou o arquivo; o diff isolado mostra a alteração e a reversão sem antecipar o texto linha a linha.",
+        "criteria": ["Histórico localiza a alteração e exibe somente o diff do arquivo.","A reversão posterior permanece visível no log."]
       },
       {
         "prompt": "Construir: faça dois commits pequenos em arquivos distintos e escreva qual deles reverteria se o segundo causasse um erro.",
@@ -232,7 +238,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Set-Content tema.txt \"claro\"\ngit add tema.txt\ngit commit -m \"feat: registra tema\"\nSet-Content rodape.txt \"temporario\"\ngit add rodape.txt\ngit commit -m \"feat: testa rodape\"\ngit show --stat HEAD\ngit revert --no-edit HEAD",
         "explanation": "O último commit é revertido por um novo registro; o anterior permanece no estado atual.",
-        "expected": "tema.txt continua, rodape.txt é removido do snapshot e o log preserva as duas mudanças."
+        "expected": "tema.txt continua, rodape.txt é removido do snapshot e o log preserva as duas mudanças.",
+        "criteria": ["Dois commits afetam arquivos distintos.","Identifica reversão do commit pretendido e verifica os snapshots restantes."]
       },
       {
         "prompt": "Diagnosticar: explique por que git reset --hard HEAD~1 seria inadequado para desfazer um commit já enviado a colegas.",
@@ -242,7 +249,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "git log --oneline -3\n# Para um commit compartilhado, escolha git revert \u003chash>; não execute reset --hard no projeto da equipe.",
         "explanation": "Reset reescreve a ponta local e a forma hard descarta alterações; um push forçado após isso pode desalinhar colegas. Revert mantém histórico e acrescenta correção.",
-        "expected": "A justificativa menciona histórico compartilhado, risco de perda local e novo commit de revert."
+        "expected": "A justificativa menciona histórico compartilhado, risco de perda local e novo commit de revert.",
+        "criteria": ["Explica diferença entre histórico publicado e local.","Justifica revert como novo commit sem apagar alteração não salva."]
       }
     ],
     "mistakes": [
@@ -355,7 +363,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "git switch -c feature/titulo\nSet-Content titulo.txt \"Agenda nova\"\ngit add titulo.txt\ngit commit -m \"feat: adiciona titulo\"\ngit diff main..feature/titulo -- titulo.txt\ngit switch main",
         "explanation": "Os commits do novo branch não passam automaticamente para main.",
-        "expected": "Em main, titulo.txt ainda não está no snapshot; o diff entre branches mostra sua adição."
+        "expected": "Em main, titulo.txt ainda não está no snapshot; o diff entre branches mostra sua adição.",
+        "criteria": ["Branch nova contém alteração isolada antes de integrar.","Em main o snapshot permanece e diff entre branches mostra mudança."]
       },
       {
         "prompt": "Aplicar: integre feature/titulo em main e verifique o resultado.",
@@ -365,7 +374,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "git status --short\ngit branch --show-current\ngit merge feature/titulo\ngit log --graph --oneline --all -5",
         "explanation": "A integração faz main alcançar o commit da funcionalidade.",
-        "expected": "titulo.txt aparece em main e status termina limpo."
+        "expected": "titulo.txt aparece em main e status termina limpo.",
+        "criteria": ["Integração coloca arquivo em main.","Status final está limpo e conteúdo é conferido."]
       },
       {
         "prompt": "Construir: produza o conflito de frase.txt descrito na aula e resolva-o com uma frase que cumpra os dois requisitos.",
@@ -375,7 +385,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "# Depois de criar e confirmar frase.txt = Curso inicial em main:\ngit switch -c feature/frase\nSet-Content frase.txt \"Curso prático\"\ngit add frase.txt\ngit commit -m \"feat: torna frase pratica\"\ngit switch main\nSet-Content frase.txt \"Curso acessível\"\ngit add frase.txt\ngit commit -m \"feat: torna frase acessivel\"\ngit merge feature/frase\n# No editor: substitua o bloco em conflito por Curso prático e acessível\ngit add frase.txt\ngit commit -m \"merge: combina frase pratica e acessivel\"",
         "explanation": "A resolução é uma decisão de conteúdo; o Git não escolhe semanticamente por você.",
-        "expected": "frase.txt contém exatamente a frase combinada, sem marcadores, e git status está limpo."
+        "expected": "frase.txt contém exatamente a frase combinada, sem marcadores, e git status está limpo.",
+        "criteria": ["Conflito é resolvido sem marcadores e atende aos dois requisitos.","Status não deixa arquivo em conflito ou edição pendente."]
       },
       {
         "prompt": "Diagnosticar: um merge terminou sem conflitos, mas quebrou a página. Explique o próximo procedimento.",
@@ -385,7 +396,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "git status\ngit log --graph --oneline -5\ngit show --stat HEAD\n# Reproduza o defeito; corrija em novo commit ou reverta o merge após analisar com a equipe.",
         "explanation": "A ausência de marcadores só indica que Git conseguiu combinar textos. A validação de comportamento ainda cabe ao desenvolvedor.",
-        "expected": "A resposta apresenta reprodução, inspeção, teste e correção comunicada."
+        "expected": "A resposta apresenta reprodução, inspeção, teste e correção comunicada.",
+        "criteria": ["Reprodução e inspeção precedem correção.","Teste/regressão e comunicação são incluídos na resposta."]
       }
     ],
     "mistakes": [
@@ -498,7 +510,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "git remote -v\ngit branch -vv",
         "explanation": "A configuração guarda endereço e rastreamento separadamente.",
-        "expected": "Você consegue apontar o caminho do remoto e o branch acompanhado."
+        "expected": "Você consegue apontar o caminho do remoto e o branch acompanhado.",
+        "criteria": ["Compara origin e branch acompanhado nas duas cópias.","Registra URLs sem incluir credenciais embutidas."]
       },
       {
         "prompt": "Aplicar: crie um commit em colega-agenda e observe apenas a chegada via fetch em agenda-lab.",
@@ -508,7 +521,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Set-Content changelog.txt \"Nova etapa\"\ngit add changelog.txt\ngit commit -m \"docs: registra nova etapa\"\ngit push origin main\n# Em agenda-lab:\ngit fetch origin\ngit log --oneline main..origin/main",
         "explanation": "Fetch atualiza a sua visão do remoto, mas preserva o branch de trabalho até você integrar.",
-        "expected": "O log da primeira cópia mostra um commit pendente de integração; changelog.txt ainda não existe no snapshot de main."
+        "expected": "O log da primeira cópia mostra um commit pendente de integração; changelog.txt ainda não existe no snapshot de main.",
+        "criteria": ["fetch atualiza referências remotas sem integrar automaticamente.","Compara log local/remoto e snapshot de main."]
       },
       {
         "prompt": "Construir: integre o commit recebido, valide o arquivo e explique o que pull --ff-only faria nesse estado.",
@@ -518,7 +532,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "git merge --ff-only origin/main\nGet-Content changelog.txt\ngit status --short\ngit log --oneline -2",
         "explanation": "A integração avança main até a referência buscada. Pull --ff-only faria busca e avanço se não houvesse divergência.",
-        "expected": "Arquivo contém Nova etapa e main está limpo."
+        "expected": "Arquivo contém Nova etapa e main está limpo.",
+        "criteria": ["Integra somente após inspeção e valida conteúdo.","Pull fast-forward é explicado conforme a relação entre os históricos."]
       },
       {
         "prompt": "Diagnosticar: um push foi rejeitado porque outra cópia enviou antes. Dê uma sequência segura, sem forçar atualização.",
@@ -528,7 +543,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "git status\ngit fetch origin\ngit log --graph --oneline --all -8\n# Integre origin/main, resolva conflitos se houver, teste e só então git push origin main.",
         "explanation": "Rejeição non-fast-forward evita perder commits remotos. A ação correta depende da divergência observada.",
-        "expected": "A resposta inclui inspeção, integração, teste e novo push, sem --force."
+        "expected": "A resposta inclui inspeção, integração, teste e novo push, sem --force.",
+        "criteria": ["Inspeciona estado remoto, integra sem force, testa e tenta push novamente.","Histórico publicado não é sobrescrito."]
       }
     ],
     "mistakes": [
@@ -641,7 +657,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Critério: ao selecionar Pendentes, aparecem somente itens não concluídos; voltar a Todos exibe novamente os concluídos.",
         "explanation": "Uma pessoa pode executar a ação e observar se a regra foi cumprida.",
-        "expected": "O critério permite uma verificação objetiva com dois itens de estados diferentes."
+        "expected": "O critério permite uma verificação objetiva com dois itens de estados diferentes.",
+        "criteria": ["Critério usa condição reproduzível e resultado observável.","Dois itens de estados diferentes são distinguidos."]
       },
       {
         "prompt": "Aplicar: escreva caso de erro para título vazio e critério de acesso por teclado.",
@@ -651,7 +668,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Critérios: enviar título com apenas espaços não cria item e mostra orientação; com foco no campo, Enter adiciona título válido; controles possuem rótulos acessíveis.",
         "explanation": "Casos fora do caminho ideal evitam aceitar uma interface que só funciona com mouse e entrada perfeita.",
-        "expected": "Os critérios podem ser testados manualmente no navegador sem consultar implementação."
+        "expected": "Os critérios podem ser testados manualmente no navegador sem consultar implementação.",
+        "criteria": ["Caso vazio define resposta e não alteração de dados.","Teclado permite executar o fluxo sem consultar implementação."]
       },
       {
         "prompt": "Construir: escreva README para a lista de estudos com propósito, execução, roteiro de teste e limite conhecido.",
@@ -661,7 +679,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "# Lista de estudos\nAplicação para registrar e filtrar sessões de estudo.\n\n## Executar\nAbra index.html no navegador (ou use o servidor local indicado pelo projeto).\n\n## Verificar\nAdicione dois itens, conclua um, escolha Pendentes e recarregue. O item concluído não aparece nesse filtro, mas reaparece em Todos.\n\n## Limites\nDados ficam apenas neste navegador; não há sincronização entre dispositivos.",
         "explanation": "README é um contrato de reprodução; a instrução de servidor deve ser específica se o código real o exigir.",
-        "expected": "Outra pessoa consegue iniciar e testar o comportamento sem perguntar ao autor."
+        "expected": "Outra pessoa consegue iniciar e testar o comportamento sem perguntar ao autor.",
+        "criteria": ["README inclui propósito, execução, teste e limite conhecido.","Outra pessoa consegue reproduzir o comportamento com os passos registrados."]
       },
       {
         "prompt": "Diagnosticar: uma issue pede “salvar para sempre” e o plano é usar localStorage. Que esclarecimento é necessário?",
@@ -671,7 +690,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Pergunte se o dado precisa sobreviver à limpeza do navegador, troca de dispositivo e acesso por múltiplos usuários. Documente a decisão e os limites; localStorage sozinho não garante essas propriedades.",
         "explanation": "Um requisito ambíguo pode exigir backend e banco, alterando escopo e prazo. Não declare atendimento total com uma solução local.",
-        "expected": "A resposta distingue persistência local, conta e sincronização remota."
+        "expected": "A resposta distingue persistência local, conta e sincronização remota.",
+        "criteria": ["Pedido é esclarecido sobre navegador, conta e sincronização.","Requisito define comportamento após trocar dispositivo ou sessão."]
       }
     ],
     "mistakes": [
@@ -784,7 +804,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Problema: a lista não separa itens pendentes. Mudança: adiciona filtros Todos, Pendentes e Concluídos sem apagar registros. Verificar: crie dois itens, conclua um, alterne filtros e recarregue. Limite: dados permanecem só neste navegador.",
         "explanation": "A descrição permite ao revisor entender a intenção e executar um teste sem investigar todo o histórico da conversa.",
-        "expected": "Há problema, resultado, roteiro e limite explícitos."
+        "expected": "Há problema, resultado, roteiro e limite explícitos.",
+        "criteria": ["Descrição registra problema, efeito, teste e limite.","Passos permitem reproduzir sem orientação oral."]
       },
       {
         "prompt": "Aplicar: faça uma revisão que encontre possível perda de dados ao filtrar.",
@@ -794,7 +815,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Comentário: com dois itens, marcar um como concluído e selecionar Pendentes remove-o de estado, pois o array original é sobrescrito. Ao voltar a Todos ele não reaparece. Mantenha a lista original e aplique filter somente ao conjunto renderizado; adicione teste de alternância.",
         "explanation": "Feedback útil traz cenário, impacto e direção de correção; não precisa impor nomes de variáveis.",
-        "expected": "Um autor consegue reproduzir a perda e comprovar que a correção a elimina."
+        "expected": "Um autor consegue reproduzir a perda e comprovar que a correção a elimina.",
+        "criteria": ["Revisão relata cenário de perda com passos e dados.","Correção vem acompanhada de teste que demonstra reteste."]
       },
       {
         "prompt": "Construir: crie PR.md e REVIEW.md, corrija um comentário e documente a nova verificação.",
@@ -804,7 +826,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "# PR.md\nProblema: filtros ausentes.\nMudança: opções Todos/Pendentes/Concluídos.\nVerificação: dois itens, alternância, recarga, teclado.\nLimite: dados locais.\n\n# REVIEW.md\nComentário: filtro não deve excluir registros.\nResposta: renderização agora filtra uma cópia; teste de retorno a Todos passou.\nDúvida: caso de título vazio foi incluído na issue e verificado.",
         "explanation": "A conversa deve levar a código e critérios melhores. Ao registrar evidência, use o estado final após o último commit.",
-        "expected": "Os dois arquivos descrevem mudança, teste, feedback e resposta verificável."
+        "expected": "Os dois arquivos descrevem mudança, teste, feedback e resposta verificável.",
+        "criteria": ["Arquivos documentam mudança, comentário e resposta.","Nova verificação está registrada depois do ajuste."]
       },
       {
         "prompt": "Diagnosticar: os testes passaram antes da revisão, mas um comentário mudou a implementação. O que falta antes de integrar?",
@@ -814,7 +837,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "git status --short\ngit diff main...feature/filtro\n# Execute novamente os testes automáticos e os critérios da issue. Atualize PR.md com os resultados finais.",
         "explanation": "Toda alteração de código após a validação pode introduzir regressão. A revisão do estado final é parte da entrega.",
-        "expected": "O PR final contém evidência de testes após o ajuste, não só antes dele."
+        "expected": "O PR final contém evidência de testes após o ajuste, não só antes dele.",
+        "criteria": ["Testes são executados novamente após comentário mudar o código.","Evidência final corresponde à implementação entregue."]
       }
     ],
     "mistakes": [

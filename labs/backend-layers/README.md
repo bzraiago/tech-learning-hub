@@ -101,6 +101,8 @@ docker compose exec -T db psql -U aluno -d backend_camadas -c "SELECT id, titulo
 
 Resultado esperado: as linhas `HTML` e `JavaScript`. Para verificar a configuração pelo próprio aplicativo, repita `npm run db:check` (`npm.cmd` no Windows).
 
+Para praticar backup lógico e restauração numa base separada, siga o [roteiro de backup e restauração](BACKUP_RESTORE.md). Use apenas os dados fictícios do laboratório; os arquivos locais de backup ficam fora do Git.
+
 ## Executar a API e observar a persistência
 
 1. No terminal em `labs/backend-layers`, execute `npm.cmd start` no Windows ou `npm start` em macOS/Linux. Saída esperada: `Abra http://127.0.0.1:4180 · armazenamento: PostgreSQL`.

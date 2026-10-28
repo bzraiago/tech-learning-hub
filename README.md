@@ -31,6 +31,8 @@ Não há build ou dependências locais. Publique na Vercel com Clerk, Supabase e
 │           ├── render.js               # Navegação, progresso e listagens
 │           └── dialogs.js              # Aulas, recursos e projetos
 ├── contexto/                           # Análises e contexto pedagógico
+├── labs/
+│   └── deployment-static/               # Página mínima para praticar deploy Vercel isolado
 ├── .agents/skills/                     # Skill local de validação didática
 ├── AGENTS.md                           # Regras para manutenção e mentoria
 └── ROADMAP.md                          # Plano de evolução e acompanhamento
@@ -63,5 +65,7 @@ node scripts/validate-content.js
 O comando checa sintaxe, assets, ids, relações entre aulas e guias, exercícios, quizzes, projetos e contagens estruturais. Depois, siga [`docs/CHECKLIST_REGRESSAO.md`](docs/CHECKLIST_REGRESSAO.md).
 
 As dependências e os atalhos entre trilhas estão documentados em [`docs/MAPA_PRE_REQUISITOS.md`](docs/MAPA_PRE_REQUISITOS.md).
+
+O laboratório [`labs/deployment-static`](labs/deployment-static) é independente do login do curso. Leia seu README antes de criar um projeto Vercel separado; ele não altera a configuração do site principal.
 
 O login com Clerk na Vercel está descrito em [`docs/CONFIGURAR_CLERK.md`](docs/CONFIGURAR_CLERK.md). O [guia do Supabase](docs/CONFIGURAR_SUPABASE.md) cobre a integração nativa Clerk ↔ Supabase, a tabela com RLS e a verificação do salvamento automático por conta.

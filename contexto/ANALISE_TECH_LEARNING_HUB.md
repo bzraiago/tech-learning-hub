@@ -9,7 +9,9 @@
 
 O Tech Learning Hub oferece um caminho de aprendizagem real, mas ainda não está totalmente preparado para conduzir uma pessoa absolutamente leiga até uma formação intermediária autônoma usando somente suas instruções. A preparação digital inicial foi implementada em 24/10/2026; as maiores lacunas restantes estão nas instalações das ferramentas, na progressão entre assuntos e na passagem dos exercícios isolados para aplicações completas.
 
-A aplicação contém **9 trilhas, 28 módulos, 114 aulas, 458 exercícios, 341 questões e 24 projetos** (contagem atualizada em 25/10/2026 com a prova básica e os projetos de fechamento de Git, Qualidade e Integração). Esses números descrevem o material disponível; não medem domínio do aluno.
+A aplicação contém **9 trilhas, 28 módulos, 119 aulas, 478 exercícios, 355 questões e 24 projetos** (contagem atualizada em 27/10/2026 após incluir cinco aulas sobre hospedagem, DNS, HTTPS/TLS e publicação estática). Esses números descrevem o material disponível; não medem domínio do aluno.
+
+**Adendo de 27/10/2026:** a trilha Integração & Entrega agora ensina a distinguir registrador, provedor DNS e hospedagem; ler registros `A`, `AAAA`, `CNAME` e `TXT`; interpretar TTL e cache sem prometer propagação instantânea; verificar HTTPS/TLS; comparar modelos de hospedagem; e preparar o primeiro deploy estático na Vercel. O laboratório inclui uma página isolada e instruções para criar um projeto Vercel separado do site principal. O conteúdo e a renderização local foram conferidos, mas ainda não comprovam a publicação pública desse laboratório nem uma configuração de domínio real. A conta Vercel não está conectada nesta sessão, e a validação anônima do preview continua pendente.
 
 ## O que já funciona bem
 

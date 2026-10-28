@@ -69,7 +69,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "test('desconto integral', () => { assert.equal(totalComDesconto(80, 100), 0); });",
         "explanation": "O limite superior pertence ao intervalo permitido e o cálculo chega a zero.",
-        "expected": "Novo teste aprovado; totalComDesconto(80, 100) === 0."
+        "expected": "Novo teste aprovado; totalComDesconto(80, 100) === 0.",
+        "criteria": ["Teste desconto total no limite permitido.","Resultado zero é conferido por asserção."]
       },
       {
         "prompt": "Aplique: teste que percentual negativo lança TypeError e que um preço decimal válido é aceito.",
@@ -79,7 +80,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "test('percentual negativo', () => { assert.throws(() => totalComDesconto(20, -1), TypeError); });\ntest('preço decimal', () => { assert.equal(totalComDesconto(20.5, 0), 20.5); });",
         "explanation": "Os testes atacam uma fronteira inválida e um preço fracionário válido.",
-        "expected": "Dois novos testes aprovados; o erro ocorre apenas no cenário inválido."
+        "expected": "Dois novos testes aprovados; o erro ocorre apenas no cenário inválido.",
+        "criteria": ["Cobertura inclui percentual negativo e preço decimal.","Apenas a entrada fora do contrato lança TypeError."]
       },
       {
         "prompt": "Diagnóstico: introduza temporariamente o defeito percentual >= 100 na validação. Qual caso deve falhar? Corrija depois.",
@@ -89,7 +91,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "// Com percentual >= 100, o teste 'desconto integral' falha.\n// Restaure percentual > 100 e execute a suíte novamente.",
         "explanation": "A alteração controlada confirma que o teste observa a fronteira correta.",
-        "expected": "Falha reproduzida antes da correção; todos os testes passam depois."
+        "expected": "Falha reproduzida antes da correção; todos os testes passam depois.",
+        "criteria": ["Defeito temporário é reproduzido por fronteira relevante.","Correção restaura validação e suíte fica verde."]
       },
       {
         "prompt": "Transferência: escreva classificarNota(nota): 0–10 finito; retorna \"aprovado\" para >= 7, \"revisar\" para \u003c 7 e lança TypeError fora do contrato. Crie ao menos quatro testes.",
@@ -99,7 +102,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "function classificarNota(nota) {\n  if (!Number.isFinite(nota) || nota \u003c 0 || nota > 10) throw new TypeError('Nota inválida');\n  return nota >= 7 ? 'aprovado' : 'revisar';\n}\ntest('limite aprovado', () => assert.equal(classificarNota(7), 'aprovado'));\ntest('abaixo', () => assert.equal(classificarNota(6.9), 'revisar'));\ntest('zero', () => assert.equal(classificarNota(0), 'revisar'));\ntest('acima de dez', () => assert.throws(() => classificarNota(11), TypeError));",
         "explanation": "O novo problema exige selecionar seus próprios limites e prever cada resultado.",
-        "expected": "Quatro casos aprovados e explicação de por que 7 e 11 importam."
+        "expected": "Quatro casos aprovados e explicação de por que 7 e 11 importam.",
+        "criteria": ["Contrato aceita finitos de 0 a 10 e distingue categorias.","Ao menos quatro casos incluem fronteiras de classificação e tipo inválido."]
       }
     ],
     "mistakes": [
@@ -217,7 +221,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Estado: página recarregada, campo vazio. Passos: clicar Adicionar. Esperado: 0 li, status “Digite uma tarefa.”, foco no input. Observado: preencher após execução.",
         "explanation": "O registro separa previsão e observação; outra pessoa consegue repetir.",
-        "expected": "Tabela com quatro colunas e todas as três observações."
+        "expected": "Tabela com quatro colunas e todas as três observações.",
+        "criteria": ["Registro inclui estado inicial, passos e três observações separadas.","Outra pessoa consegue reproduzir o fluxo vazio."]
       },
       {
         "prompt": "Aplique: adicione “  Estudar JS  ” e verifique trim, limpeza e ordem do foco.",
@@ -227,7 +232,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Passos: digitar “  Estudar JS  ”, clicar Adicionar. Esperado: li.textContent === “Estudar JS”, campo.value === “”, document.activeElement === campo.",
         "explanation": "Um fluxo inclui efeito no DOM e estado de controle, não só mensagem de sucesso.",
-        "expected": "Item Estudar JS sem espaços, campo vazio e foco devolvido."
+        "expected": "Item Estudar JS sem espaços, campo vazio e foco devolvido.",
+        "criteria": ["Texto é aparado, campo limpo e foco devolvido.","Ordem e comportamento são observados no navegador."]
       },
       {
         "prompt": "Diagnóstico: altere temporariamente item.textContent = texto para item.innerHTML = texto. Repita o caso \u003cb>teste\u003c/b>, relate a diferença e restaure.",
@@ -237,7 +243,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Com innerHTML: um b interno é criado; com textContent: os caracteres \u003cb> aparecem literalmente. Restaurar item.textContent = texto.",
         "explanation": "Uma mudança controlada mostra como o teste detecta interpretação de HTML de usuário.",
-        "expected": "Relato com passos, esperado, observado e correção; código restaurado."
+        "expected": "Relato com passos, esperado, observado e correção; código restaurado.",
+        "criteria": ["Relato compara execução segura e defeituosa com entrada HTML.","Código original é restaurado e diferença documentada."]
       },
       {
         "prompt": "Transferência: acrescente botão Limpar e roteiro para lista vazia, lista com dois itens e teclado.",
@@ -247,7 +254,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "\u003cbutton id=\"limpar\" type=\"button\">Limpar lista\u003c/button>\n\u003cscript>document.querySelector('#limpar').addEventListener('click', () => { lista.replaceChildren(); status.textContent = 'Lista limpa.'; });\u003c/script>\n// Insira o botão antes do script original ou registre o listener depois de declarar lista/status.",
         "explanation": "A solução exige integrar um novo evento e descrever cenários distintos; atenção à ordem de declaração no arquivo.",
-        "expected": "Após limpar dois itens: zero li e status atualizado; limpar vazio não cria erro; botão alcançável por Tab."
+        "expected": "Após limpar dois itens: zero li e status atualizado; limpar vazio não cria erro; botão alcançável por Tab.",
+        "criteria": ["Limpeza cobre dois itens e lista vazia.","Status muda sem erro e controle é alcançável com Tab."]
       }
     ],
     "mistakes": [
@@ -365,7 +373,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "name: Testes\non: [push]\njobs:\n  verificar:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '22'\n      - run: node --test verificacao.test.cjs",
         "explanation": "O workflow declara gatilho, ambiente, obtenção do código, runtime e comando; as versões das actions devem ser revistas quando usado de fato.",
-        "expected": "YAML estruturalmente legível; rodaria o mesmo comando local em cada push quando publicado."
+        "expected": "YAML estruturalmente legível; rodaria o mesmo comando local em cada push quando publicado.",
+        "criteria": ["Workflow válido é ativado em push e executa node --test.","YAML é estruturalmente legível e comando confere com execução local."]
       },
       {
         "prompt": "Aplique: crie um package.json com script test e rode npm test localmente.",
@@ -375,7 +384,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "{\"private\":true,\"scripts\":{\"test\":\"node --test verificacao.test.cjs\"}}",
         "explanation": "npm test apenas delega ao comando definido; permite padronizar em equipe.",
-        "expected": "npm test termina com três testes aprovados e código de saída zero."
+        "expected": "npm test termina com três testes aprovados e código de saída zero.",
+        "criteria": ["package.json declara script test e npm test é executado.","Resultado e código de saída ficam registrados."]
       },
       {
         "prompt": "Diagnóstico: mude a expectativa de prioridade(4) para alta. Classifique a falha e depois repare.",
@@ -385,7 +395,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "// A falha é da expectativa do teste, não de prioridade.\n// Restaure assert.equal(prioridade(4), 'normal');",
         "explanation": "Uma falha pode vir do teste; a regra escrita resolve a dúvida.",
-        "expected": "Uma falha antes e todos os testes verdes após restauração."
+        "expected": "Uma falha antes e todos os testes verdes após restauração.",
+        "criteria": ["Classifica falha de asserção em vez de falha de ambiente.","Restauração recupera testes verdes e evidência é anotada."]
       },
       {
         "prompt": "Transferência: adicione novo requisito: 10 ou mais pontos devolvem urgente; escreva testes para 9 e 10 e atualize a função.",
@@ -395,7 +406,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "test('nove ainda é alta', () => assert.equal(prioridade(9), 'alta'));\ntest('dez é urgente', () => assert.equal(prioridade(10), 'urgente'));\n// Na função, após validação: if (pontos >= 10) return 'urgente';",
         "explanation": "O novo requisito aparece primeiro em casos observáveis e depois na implementação.",
-        "expected": "Cinco testes aprovados, incluindo as duas novas fronteiras."
+        "expected": "Cinco testes aprovados, incluindo as duas novas fronteiras.",
+        "criteria": ["Nova fronteira de requisito atualiza regra e testes.","Casos imediatamente abaixo e no limite são exercitados."]
       }
     ],
     "mistakes": [
@@ -513,7 +525,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Entrada: [{}]. Esperado: 0 pendentes. Observado: 1. Passos: executar contarPendentes([{}]). Causa candidata: negação de undefined.",
         "explanation": "O relato separa dado, regra e hipótese.",
-        "expected": "Outra pessoa reproduz a divergência sem acesso ao código completo."
+        "expected": "Outra pessoa reproduz a divergência sem acesso ao código completo.",
+        "criteria": ["Relato registra lista, esperado e observado.","Pessoa externa reproduz sem precisar consultar código não fornecido."]
       },
       {
         "prompt": "Aplique: corrija o filtro e crie teste para concluida: null.",
@@ -523,7 +536,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "function contarPendentes(aulas) { return aulas.filter(aula => aula.concluida === false).length; }\ntest('null não é false', () => assert.equal(contarPendentes([{ concluida: null }]), 0));",
         "explanation": "A comparação estrita codifica a política e o novo teste cobre valor ausente alternativo.",
-        "expected": "Quatro testes aprovados, incluindo null."
+        "expected": "Quatro testes aprovados, incluindo null.",
+        "criteria": ["Filtro lida com null conforme contrato.","Suíte inclui caso e todas as expectativas ficam verdes."]
       },
       {
         "prompt": "Diagnóstico: substitua temporariamente === false por == false. Qual entrada nova pode falhar?",
@@ -533,7 +547,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "test('zero não é boolean false', () => assert.equal(contarPendentes([{ concluida: 0 }]), 0));\n// Com == false o caso falha; restaure === false.",
         "explanation": "A coerção da igualdade frouxa amplia entradas aceitas de modo não intencional.",
-        "expected": "Falha observada com == e suíte verde após restaurar ===."
+        "expected": "A coerção de um valor não booleano é testada; a suíte evidencia o caso e confirma o comportamento depois da restauração.",
+        "criteria": ["Teste novo verifica valor falsy não booleano que muda sob coerção.","Correção preserva comparação estrita e suíte volta a passar."]
       },
       {
         "prompt": "Transferência: escreva um pequeno relatório de correção com causa, alteração, testes e risco restante.",
@@ -543,7 +558,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Causa: !undefined retornava true. Correção: apenas concluida === false conta. Validação: node --test erro.test.cjs, casos falso, verdadeiro, ausente, null e zero passam. Risco restante: contrato de dados recebidos de API não foi validado.",
         "explanation": "A conclusão distingue evidência obtida de trabalho ainda não feito.",
-        "expected": "Relatório curto, reproduzível e sem alegação de cobertura total."
+        "expected": "Relatório curto, reproduzível e sem alegação de cobertura total.",
+        "criteria": ["Relatório relaciona causa, correção e testes executados.","Risco restante é explícito sem alegar cobertura total."]
       }
     ],
     "mistakes": [
@@ -661,7 +677,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "// classificar.cjs: module.exports = { classificar };\n// classificar.test.cjs: const { classificar } = require('./classificar.cjs');",
         "explanation": "A interface pública permite que teste e aplicativo reutilizem a mesma função.",
-        "expected": "Dois testes continuam passando após remover a função duplicada do teste."
+        "expected": "Dois testes continuam passando após remover a função duplicada do teste.",
+        "criteria": ["Módulo CommonJS exporta função e teste importa a mesma implementação.","Remoção da duplicata não quebra os casos existentes."]
       },
       {
         "prompt": "Aplique: acrescente casos de fronteira 49.9 e 99.9 antes de reorganizar condições.",
@@ -671,7 +688,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "test('fronteiras decimais', () => { assert.equal(classificar(49.9), 'pequeno'); assert.equal(classificar(99.9), 'médio'); });",
         "explanation": "Os novos casos cobrem o intervalo entre limites inteiros.",
-        "expected": "Todos os casos aprovados; saídas pequeno e médio."
+        "expected": "Todos os casos aprovados; saídas pequeno e médio.",
+        "criteria": ["Fronteiras 49.9 e 99.9 são testadas antes da reorganização.","Saídas correspondem às categorias definidas."]
       },
       {
         "prompt": "Diagnóstico: após a extração aparece “classificar is not a function”. Escreva três verificações antes de mudar a regra.",
@@ -681,7 +699,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "1. O arquivo é ./classificar.cjs? 2. Ele exporta { classificar }? 3. O teste usa const { classificar } = require(...) com a mesma grafia?",
         "explanation": "O erro é de conexão entre módulos, não uma evidência de regra incorreta.",
-        "expected": "Checklist identifica a incompatibilidade de export/import."
+        "expected": "Checklist identifica a incompatibilidade de export/import.",
+        "criteria": ["Diagnóstico confere exportação, importação e valor recebido.","Checklist verifica interface do módulo antes de alterar regra."]
       },
       {
         "prompt": "Transferência: descreva plano para adicionar biblioteca de datas a projeto existente e as evidências após a mudança.",
@@ -691,7 +710,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Plano: verificar se Date/Intl nativos bastam; se não, escolher pacote mantido e licença adequada; instalar via npm; revisar package.json e package-lock.json; executar npm ci em ambiente limpo, testes e fluxo de interface; revisar diff e documentar motivo.",
         "explanation": "Dependência é decisão de manutenção com custo, versões e validação.",
-        "expected": "Plano reproduzível que não instala pacote sem justificativa."
+        "expected": "Plano reproduzível que não instala pacote sem justificativa.",
+        "criteria": ["Plano inclui motivo, compatibilidade, teste e rollback da biblioteca.","Dependência não é instalada sem justificativa técnica."]
       }
     ],
     "mistakes": [
@@ -809,7 +829,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "1. label associa-se a busca. 2. Tab chega ao campo e botão; foco visível. 3. Termo sem resultado mostra zero. 4. Texto com tags aparece literal. 5. status anuncia número coerente.",
         "explanation": "Cada item descreve comportamento observável, não opinião vaga.",
-        "expected": "Cinco verificações com observado e ambiente anotados."
+        "expected": "Cinco verificações com observado e ambiente anotados.",
+        "criteria": ["Checklist tem cinco itens verificáveis e registra observado e ambiente.","Itens cobrem interface do exemplo sem afirmar defeito não testado."]
       },
       {
         "prompt": "Aplique: altere a busca para pesquisar também ao pressionar Enter no campo sem duplicar lógica.",
@@ -819,7 +840,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "const tarefas = ['Estudar HTML', 'Testar JavaScript', 'Revisar CSS'];\nfunction filtrarTarefas() {\n  const termo = document.querySelector('#busca').value.trim().toLocaleLowerCase('pt-BR');\n  const lista = document.querySelector('#resultados');\n  lista.replaceChildren();\n  const encontrados = tarefas.filter(t => t.toLocaleLowerCase('pt-BR').includes(termo));\n  for (const titulo of encontrados) {\n    const item = document.createElement('li');\n    item.textContent = titulo;\n    lista.append(item);\n  }\n  document.querySelector('#status').textContent = `${encontrados.length} resultado(s).`;\n}\ndocument.querySelector('#filtrar').addEventListener('click', filtrarTarefas);\ndocument.querySelector('#busca').addEventListener('keydown', evento => {\n  if (evento.key === 'Enter') filtrarTarefas();\n});",
         "explanation": "Substitua todo o script original pelo código da solução. Clique e Enter chamam a mesma função, evitando duas implementações divergentes.",
-        "expected": "Ambas as ações produzem a mesma lista e status para termo igual."
+        "expected": "Ambas as ações produzem a mesma lista e status para termo igual.",
+        "criteria": ["Enter e botão chamam o mesmo comportamento sem lógica duplicada.","Lista e status coincidem para o mesmo termo."]
       },
       {
         "prompt": "Diagnóstico: substitua temporariamente item.textContent = titulo por item.innerHTML = titulo e adicione título \u003cb>teste\u003c/b>. Relate risco e restaure.",
@@ -829,7 +851,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Relato: innerHTML interpretou marcação e criou elemento b; textContent a mantém literal. Restaurar textContent.",
         "explanation": "A observação mostra um vetor de interpretação de HTML nesse ponto, sem afirmar auditoria completa.",
-        "expected": "Antes há elemento b; depois há apenas caracteres literais no li."
+        "expected": "Antes há elemento b; depois há apenas caracteres literais no li.",
+        "criteria": ["Relato compara textContent com innerHTML usando entrada marcada.","Implementação é restaurada e risco de interpretar texto é explicado."]
       },
       {
         "prompt": "Transferência: redija comentário de revisão sobre desempenho para uma lista de 10 mil tarefas e proponha uma medição.",
@@ -839,7 +862,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "Comentário: “Com 10 mil tarefas, a busca a cada ação reconstrói milhares de li. Podemos medir tempo da ação no painel Performance em desktop e celular antes de decidir limitar resultados ou paginar? Incluirei cenário com termo amplo e tempo observado.”",
         "explanation": "Uma revisão útil relaciona risco, reprodução, medição e possível ação.",
-        "expected": "Comentário construtivo e plano de medida sem alegar lentidão já comprovada."
+        "expected": "Comentário construtivo e plano de medida sem alegar lentidão já comprovada.",
+        "criteria": ["Plano define medida em lista de 10 mil itens e controla cenário.","Comentário separa hipótese de lentidão comprovada."]
       }
     ],
     "mistakes": [

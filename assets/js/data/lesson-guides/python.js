@@ -72,7 +72,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "a = int('40')\nb = int('20')\nprint(f'{a + b} minutos')",
         "explanation": "A conversão antecede + para evitar a concatenação de textos.",
-        "expected": "60 minutos"
+        "expected": "60 minutos",
+        "criteria": ["Converte ambos os textos para números antes de somar.","Imprime o total com a unidade e sem concatenar strings."]
       },
       {
         "prompt": "2. Leia duas durações com input e imprima o total. Teste com 5 e 7.",
@@ -82,7 +83,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "a = int(input('Primeira duração: '))\nb = int(input('Segunda duração: '))\nprint(a + b)",
         "explanation": "O programa solicita dados em cada execução e mostra o inteiro calculado. As entradas 5 e 7 produzem 12.",
-        "expected": "Primeira duração: 5\nSegunda duração: 7\n12"
+        "expected": "Primeira duração: 5\nSegunda duração: 7\n12",
+        "criteria": ["Lê dois valores com input e converte cada duração.","A soma corresponde às entradas fornecidas."]
       },
       {
         "prompt": "3. Com total=130 e meta=90, imprima quanto falta sem mostrar um valor negativo.",
@@ -92,7 +94,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "total = 130\nmeta = 90\nprint(max(meta - total, 0))",
         "explanation": "max escolhe o maior valor entre o resultado negativo e zero.",
-        "expected": "0"
+        "expected": "0",
+        "criteria": ["Calcula a diferença sem apresentar resultado negativo.","A meta já alcançada retorna zero no caso indicado."]
       },
       {
         "prompt": "4. Para textos '12' e '8', imprima o total e a frase 'Meta atingida: True' quando meta=20.",
@@ -102,7 +105,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "total = int('12') + int('8')\nmeta = 20\nprint(total)\nprint(f'Meta atingida: {total >= meta}')",
         "explanation": "A solução mostra tanto o número quanto o resultado lógico da regra.",
-        "expected": "20\nMeta atingida: True"
+        "expected": "20\nMeta atingida: True",
+        "criteria": ["Converte os dois textos, soma os valores e compara com a meta.","A saída apresenta o total e um booleano calculado."]
       }
     ],
     "mistakes": [
@@ -219,7 +223,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "for numero in range(1, 4):\n    print(numero)",
         "explanation": "O limite superior exclusivo 4 gera 1 a 3.",
-        "expected": "1\n2\n3"
+        "expected": "1\n2\n3",
+        "criteria": ["Usa for com range para percorrer os três valores.","Cada valor aparece uma vez e na ordem pedida."]
       },
       {
         "prompt": "2. Some apenas valores não negativos de [4, -1, 6] e imprima 10.",
@@ -229,7 +234,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "total = 0\nfor valor in [4, -1, 6]:\n    if valor \u003c 0:\n        continue\n    total += valor\nprint(total)",
         "explanation": "A soma ignora -1 explicitamente; a decisão deve ser informada ao usuário.",
-        "expected": "10"
+        "expected": "10",
+        "criteria": ["Filtra valores negativos sem incluí-los na soma.","O resultado vem dos valores aceitos, não de uma constante."]
       },
       {
         "prompt": "3. Para notas [4, 7, 9], imprima Reprovado, Aprovado e Destaque nessa ordem.",
@@ -239,7 +245,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "for nota in [4, 7, 9]:\n    if nota >= 8:\n        print('Destaque')\n    elif nota >= 6:\n        print('Aprovado')\n    else:\n        print('Reprovado')",
         "explanation": "A ordem das condições reserva o caso de destaque antes da aprovação geral.",
-        "expected": "Reprovado\nAprovado\nDestaque"
+        "expected": "Reprovado\nAprovado\nDestaque",
+        "criteria": ["Aplica condições distintas para as três faixas.","Os rótulos aparecem na ordem das notas."]
       },
       {
         "prompt": "4. Conte com while de 3 até 1 e então imprima Fim.",
@@ -249,7 +256,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "contador = 3\nwhile contador > 0:\n    print(contador)\n    contador -= 1\nprint('Fim')",
         "explanation": "A condição de parada se torna falsa após imprimir 1.",
-        "expected": "3\n2\n1\nFim"
+        "expected": "3\n2\n1\nFim",
+        "criteria": ["while atualiza o contador a cada volta e termina.","A mensagem final surge depois da contagem decrescente."]
       }
     ],
     "mistakes": [
@@ -366,7 +374,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "valores = [10, 20, 30]\nprint(valores[0])\nprint(valores[-1])",
         "explanation": "Índices 0 e -1 apontam para as extremidades.",
-        "expected": "10\n30"
+        "expected": "10\n30",
+        "criteria": ["Acessa primeiro e último elemento pelo índice.","A lista original permanece na ordem dada."]
       },
       {
         "prompt": "2. Conte categorias distintas de ['web', 'dados', 'web'].",
@@ -376,7 +385,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "categorias = ['web', 'dados', 'web']\nprint(len(set(categorias)))",
         "explanation": "O conjunto elimina repetições para a contagem.",
-        "expected": "2"
+        "expected": "2",
+        "criteria": ["Converte categorias em estrutura sem duplicatas.","A contagem usa os elementos distintos."]
       },
       {
         "prompt": "3. A partir de {'nome':'Ana','pontos':7}, imprima Ana: 7.",
@@ -386,7 +396,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "aluno = {'nome': 'Ana', 'pontos': 7}\nprint(f\"{aluno['nome']}: {aluno['pontos']}\")",
         "explanation": "O dicionário representa um registro com campos nomeados.",
-        "expected": "Ana: 7"
+        "expected": "Ana: 7",
+        "criteria": ["Lê as duas chaves solicitadas do dicionário.","Formata os valores no padrão pedido."]
       },
       {
         "prompt": "4. Gere uma nova lista apenas com os números pares de [1, 2, 3, 4] e prove que a original mantém quatro itens.",
@@ -396,7 +407,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "originais = [1, 2, 3, 4]\npares = [valor for valor in originais if valor % 2 == 0]\nprint(pares)\nprint(originais)",
         "explanation": "A compreensão produz uma nova lista; não altera a original.",
-        "expected": "[2, 4]\n[1, 2, 3, 4]"
+        "expected": "[2, 4]\n[1, 2, 3, 4]",
+        "criteria": ["Constrói nova lista com apenas pares.","Demonstra que a lista inicial continua com quatro itens."]
       }
     ],
     "mistakes": [
@@ -514,7 +526,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def dobro(numero):\n    return numero * 2\n\nprint(dobro(4))",
         "explanation": "A função devolve 8 à chamada de print.",
-        "expected": "8"
+        "expected": "8",
+        "criteria": ["Função recebe um número e devolve valor calculado.","A chamada é impressa fora da função."]
       },
       {
         "prompt": "2. Escreva aprovado(nota, minimo=6) e teste 6 e 5.",
@@ -524,7 +537,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def aprovado(nota, minimo=6):\n    return nota >= minimo\n\nprint(aprovado(6))\nprint(aprovado(5))",
         "explanation": ">= inclui o limite; o parâmetro padrão pode ser substituído quando necessário.",
-        "expected": "True\nFalse"
+        "expected": "True\nFalse",
+        "criteria": ["Parâmetro mínimo tem padrão e pode ser substituído.","Casos de fronteira retornam booleanos corretos."]
       },
       {
         "prompt": "3. Escreva contar_concluidas(aulas) para uma lista de dicionários e teste lista vazia e uma aula concluída.",
@@ -534,7 +548,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def contar_concluidas(aulas):\n    return sum(1 for aula in aulas if aula['concluida'])\n\nprint(contar_concluidas([]))\nprint(contar_concluidas([{'concluida': True}]))",
         "explanation": "A expressão geradora produz um 1 por item concluído; sum de coleção vazia é zero.",
-        "expected": "0\n1"
+        "expected": "0\n1",
+        "criteria": ["Percorre lista de dicionários e conta concluidas.","Lista vazia e uma conclusão são testadas."]
       },
       {
         "prompt": "4. Faça resumo(numeros) devolver {'total': ..., 'quantidade': ...}. Para [2, 3, 5], mostre o dicionário e confirme que a lista continua igual.",
@@ -544,7 +559,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def resumo(numeros):\n    return {'total': sum(numeros), 'quantidade': len(numeros)}\n\nentrada = [2, 3, 5]\nprint(resumo(entrada))\nprint(entrada)",
         "explanation": "O cálculo é puro em relação à lista; o resultado tem campos estáveis.",
-        "expected": "{'total': 10, 'quantidade': 3}\n[2, 3, 5]"
+        "expected": "{'total': 10, 'quantidade': 3}\n[2, 3, 5]",
+        "criteria": ["Resumo contém total e quantidade calculados.","A função não altera a lista de entrada."]
       }
     ],
     "mistakes": [
@@ -662,7 +678,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "from pathlib import Path\npasta = Path('laboratorio_py')\npasta.mkdir(exist_ok=True)\narquivo = pasta / 'nota.txt'\narquivo.write_text('Olá', encoding='utf-8')\nprint(arquivo.read_text(encoding='utf-8'))",
         "explanation": "O exemplo só altera um arquivo próprio do laboratório e preserva o acento.",
-        "expected": "Olá"
+        "expected": "Olá",
+        "criteria": ["Grava e lê o arquivo no diretório pedido.","Usa codificação UTF-8 e confirma o texto após a leitura."]
       },
       {
         "prompt": "2. Converta {'titulo':'Git','minutos':30} para JSON e de volta; imprima o título.",
@@ -672,7 +689,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "import json\ntexto = json.dumps({'titulo': 'Git', 'minutos': 30}, ensure_ascii=False)\ndados = json.loads(texto)\nprint(dados['titulo'])",
         "explanation": "A conversão de ida e volta mantém campos compatíveis.",
-        "expected": "Git"
+        "expected": "Git",
+        "criteria": ["Serializa dicionário como JSON e recupera estrutura Python.","Acessa o título depois da conversão de volta."]
       },
       {
         "prompt": "3. Leia o CSV produzido no exemplo, converta minutos para int e imprima a soma.",
@@ -682,7 +700,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "from pathlib import Path\nimport csv\nwith (Path('laboratorio_py') / 'aulas.csv').open('r', encoding='utf-8', newline='') as arquivo:\n    linhas = list(csv.DictReader(arquivo))\nprint(sum(int(linha['minutos']) for linha in linhas))",
         "explanation": "O CSV precisa ter sido criado pelo exemplo antes deste exercício; a conversão evita concatenação de strings.",
-        "expected": "65"
+        "expected": "65",
+        "criteria": ["Lê linhas do CSV e converte minutos para inteiro.","Soma os registros lidos, sem contar cabeçalho."]
       },
       {
         "prompt": "4. Leia JSON criado no exemplo e aceite apenas uma lista; caso o arquivo contenha 42, mostre 'Formato inválido'.",
@@ -692,7 +711,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "from pathlib import Path\nimport json\ncaminho = Path('laboratorio_py') / 'aulas.json'\ndados = json.loads(caminho.read_text(encoding='utf-8'))\nif not isinstance(dados, list):\n    print('Formato inválido')\nelse:\n    print(f'Aulas: {len(dados)}')",
         "explanation": "O JSON pode ser sintaticamente correto e ainda não cumprir o esquema do programa. Com o arquivo original, a saída é Aulas: 2; com conteúdo 42, é Formato inválido.",
-        "expected": "Arquivo original: Aulas: 2\nArquivo contendo 42: Formato inválido"
+        "expected": "Arquivo original: Aulas: 2\nArquivo contendo 42: Formato inválido",
+        "criteria": ["Aceita apenas uma lista após carregar o JSON.","Arquivo numérico é recusado com mensagem, sem quebrar a execução."]
       }
     ],
     "mistakes": [
@@ -810,7 +830,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "# Depois de copiar a função percentual do exemplo:\nassert percentual(0, 0) == 0\nassert percentual(2, 4) == 50\nprint('Dois casos passaram')",
         "explanation": "Se as duas condições forem verdadeiras, os asserts não interrompem e a mensagem aparece.",
-        "expected": "Dois casos passaram"
+        "expected": "Dois casos passaram",
+        "criteria": ["Asserções cobrem entrada vazia e cálculo normal.","Saída confirma ambos os casos sem desativar assert."]
       },
       {
         "prompt": "2. Acrescente a unittest um teste para percentual(5,5)==100.",
@@ -820,7 +841,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def test_limite(self):\n    self.assertEqual(percentual(5, 5), 100)",
         "explanation": "Cole o método dentro de TestePercentual; na execução, deve aparecer um quarto teste e OK.",
-        "expected": "Quatro testes; OK"
+        "expected": "Quatro testes; OK",
+        "criteria": ["Teste adicional cobre resultado no limite superior.","unittest informa a quantidade e ausência de falhas."]
       },
       {
         "prompt": "3. Verifique que percentual('2',4) lança TypeError.",
@@ -830,7 +852,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def test_tipo(self):\n    with self.assertRaises(TypeError):\n        percentual('2', 4)",
         "explanation": "Cole dentro da classe; o tipo de exceção faz parte do contrato. Cinco testes após os anteriores.",
-        "expected": "Teste passa quando TypeError é lançado"
+        "expected": "Teste passa quando TypeError é lançado",
+        "criteria": ["Teste verifica a exceção para tipo incompatível.","Passa apenas quando TypeError é lançado."]
       },
       {
         "prompt": "4. Crie uma tabela de casos para a função: (0,5)->0, (5,5)->100 e (6,5)->ValueError; implemente em unittest com subTest.",
@@ -840,7 +863,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def test_fronteiras(self):\n    for concluidas, total, esperado in [(0, 5, 0), (5, 5, 100)]:\n        with self.subTest(concluidas=concluidas, total=total):\n            self.assertEqual(percentual(concluidas, total), esperado)\n    with self.assertRaises(ValueError):\n        percentual(6, 5)",
         "explanation": "Cole dentro da classe; os subtests documentam fronteiras independentes e a exceção cobre o valor acima do total.",
-        "expected": "Teste passa para 0%, 100% e entrada inválida"
+        "expected": "Teste passa para 0%, 100% e entrada inválida",
+        "criteria": ["subTest cobre três entradas, inclusive valor além da meta.","Implementação retorna os valores válidos e rejeita o caso inválido."]
       }
     ],
     "mistakes": [
@@ -960,7 +984,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "print(Plano('A').total_minutos(), Plano('B').total_minutos())",
         "explanation": "Ambos começam com listas próprias vazias; com uma lista de classe compartilhada, mudanças feitas em um poderiam aparecer no outro.",
-        "expected": "0 0"
+        "expected": "A previsão é registrada antes de criar os objetos; o teste permite verificar isolamento entre instâncias e o risco de estado mutável compartilhado.",
+        "criteria": ["Registra previsão para objetos independentes antes de instanciá-los.","Explica o risco de uma lista mutável compartilhada pela classe."]
       },
       {
         "prompt": "Modifique Plano para expor quantidade_sessoes() e teste planos independentes.",
@@ -970,7 +995,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def quantidade_sessoes(self):\n    return len(self._sessoes)",
         "explanation": "Um método de consulta usa o estado interno sem devolver a lista mutável; confira 2 para Ana e 0 para Bia no exemplo.",
-        "expected": "2 para Ana e 0 para Bia."
+        "expected": "2 para Ana e 0 para Bia.",
+        "criteria": ["Método calcula quantidade por instância.","Plano de Ana e de Bia permanece independente."]
       },
       {
         "prompt": "Crie remover_ultima() que rejeita plano vazio com ValueError e devolve a Sessao removida.",
@@ -980,7 +1006,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def remover_ultima(self):\n    if not self._sessoes:\n        raise ValueError('Plano vazio')\n    return self._sessoes.pop()",
         "explanation": "A operação expressa uma regra do plano; o chamador decide como apresentar a falha ao usuário.",
-        "expected": "Remover de Ana devolve Testes; novo total é 40. Remover de plano vazio lança ValueError."
+        "expected": "Remover de Ana devolve Testes; novo total é 40. Remover de plano vazio lança ValueError.",
+        "criteria": ["Remoção devolve a sessão retirada e atualiza o total.","Plano vazio gera ValueError sem estado inconsistente."]
       },
       {
         "prompt": "Modele um resumo(nome, total, quantidade) sem permitir que o chamador altere _sessoes pelo retorno. Justifique por que não precisa de herança.",
@@ -990,7 +1017,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def resumo(self):\n    return {'nome': self.nome, 'total': self.total_minutos(), 'quantidade': len(self._sessoes)}",
         "explanation": "O dicionário é uma nova estrutura de relatório. Alterá-lo não altera automaticamente a lista de sessões do plano.",
-        "expected": "Para Ana antes da remoção: {'nome': 'Ana', 'total': 60, 'quantidade': 2}."
+        "expected": "Para Ana antes da remoção: {'nome': 'Ana', 'total': 60, 'quantidade': 2}.",
+        "criteria": ["Resumo expõe somente valores derivados e não dá acesso mutável à lista interna.","A solução usa composição e justifica por que herança não acrescenta valor."]
       }
     ],
     "mistakes": [
@@ -1111,7 +1139,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "for x in ('0', '100', '-1', '101'):\n    try:\n        print(x, ler_pontuacao(x))\n    except PontuacaoInvalida as erro:\n        print(x, type(erro).__name__)",
         "explanation": "Os valores dos extremos pertencem ao contrato, os imediatamente exteriores não.",
-        "expected": "0 e 100 aceitos; -1 e 101 geram PontuacaoInvalida."
+        "expected": "A previsão para cada entrada é anotada antes da execução; o resultado observado permite avaliar a regra de domínio.",
+        "criteria": ["Previsões para os quatro limites são registradas antes de executar.","Resultado observado diferencia entradas aceitas das exceções de domínio."]
       },
       {
         "prompt": "Escreva ler_percentual(texto), aceitando inteiro de 0 a 100 com mensagem específica para formato inválido.",
@@ -1121,7 +1150,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def ler_percentual(texto):\n    try:\n        valor = int(texto)\n    except ValueError as erro:\n        raise ValueError('Percentual deve ser inteiro') from erro\n    if not 0 \u003c= valor \u003c= 100:\n        raise ValueError('Percentual fora do intervalo')\n    return valor",
         "explanation": "A camada chamadora pode distinguir sucesso de falha sem confundir texto inválido com zero.",
-        "expected": "ler_percentual('35') == 35; 'x' e '101' lançam ValueError com mensagens diferentes."
+        "expected": "ler_percentual('35') == 35; 'x' e '101' lançam ValueError com mensagens diferentes.",
+        "criteria": ["Converte texto para inteiro e valida intervalo.","Formato inválido e faixa inválida comunicam motivos distintos."]
       },
       {
         "prompt": "Leia um arquivo de texto de forma que ele seja fechado mesmo se a conversão de uma linha falhar. Explique onde tratar FileNotFoundError.",
@@ -1131,7 +1161,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def somar_linhas(caminho):\n    with open(caminho, encoding='utf-8') as arquivo:\n        return sum(int(linha.strip()) for linha in arquivo if linha.strip())",
         "explanation": "with cuida da limpeza. Uma tela ou comando pode capturar FileNotFoundError para mostrar o caminho; não substitua todo erro por zero.",
-        "expected": "Arquivo com linhas 3 e 4 produz 7; arquivo ausente propaga FileNotFoundError."
+        "expected": "Arquivo com linhas 3 e 4 produz 7; arquivo ausente propaga FileNotFoundError.",
+        "criteria": ["Gerenciador de contexto fecha arquivo mesmo se conversão falhar.","FileNotFoundError é tratado no limite apropriado, sem ocultar causa."]
       },
       {
         "prompt": "Crie uma falha de domínio para duração negativa e um teste que confirme a causa original de uma conversão inválida.",
@@ -1141,7 +1172,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "class DuracaoInvalida(ValueError):\n    pass\n\ndef duracao(texto):\n    try:\n        valor = int(texto)\n    except ValueError as erro:\n        raise DuracaoInvalida('Duração precisa ser inteira') from erro\n    if valor \u003c 0:\n        raise DuracaoInvalida('Duração negativa')\n    return valor",
         "explanation": "O contrato distingue formato e intervalo e conserva a causa da conversão. Teste int válido, texto e número negativo.",
-        "expected": "duracao('4') == 4; duracao('x').__cause__ é ValueError em uma captura; '-2' gera DuracaoInvalida."
+        "expected": "duracao('4') == 4; duracao('x').__cause__ é ValueError em uma captura; '-2' gera DuracaoInvalida.",
+        "criteria": ["Converte entrada válida e lança erro de domínio para duração negativa.","Exceção de conversão mantém ValueError como causa encadeada."]
       }
     ],
     "mistakes": [
@@ -1262,7 +1294,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "python app.py\npython -c \"import regras\"",
         "explanation": "A primeira ação chama main; a segunda somente carrega definições de regras.",
-        "expected": "Primeira imprime Progresso: 75%; segunda é silenciosa."
+        "expected": "A execução direta e a importação isolada permitem comparar os efeitos observados de cada modo.",
+        "criteria": ["Registra previsão de efeitos de execução e de import antes do teste.","Import isolado não dispara apresentação nem ação principal."]
       },
       {
         "prompt": "Crie status.py com a função rotulo(concluidas,total) que usa regras.percentual e devolve texto. Não imprima durante import.",
@@ -1272,7 +1305,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "# status.py\nfrom regras import percentual\n\ndef rotulo(concluidas, total):\n    return f'{percentual(concluidas, total)}% concluído'",
         "explanation": "O módulo reutiliza a regra e tem contrato simples; chamar rotulo(1, 4) devolve texto sem saída automática no import.",
-        "expected": "rotulo(1, 4) == '25% concluído'."
+        "expected": "rotulo(1, 4) == '25% concluído'.",
+        "criteria": ["rotulo usa a função de percentual e retorna texto.","Importar status.py não imprime conteúdo."]
       },
       {
         "prompt": "Organize estudos/regras.py e estudos/app.py como pacote, usando import relativo e comando de execução correto.",
@@ -1282,7 +1316,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "# estudos/app.py\nfrom .regras import percentual\n\ndef main():\n    print(percentual(3, 4))\n\nif __name__ == '__main__':\n    main()\n# no terminal: python -m estudos.app",
         "explanation": "O contexto de pacote fornece o pai necessário para resolver .regras.",
-        "expected": "python -m estudos.app imprime 75."
+        "expected": "python -m estudos.app imprime 75.",
+        "criteria": ["Regras e aplicação formam pacote com import relativo.","O comando de módulo executa o ponto de entrada uma vez."]
       },
       {
         "prompt": "Desenhe a correção para dependência circular entre app.py e regras.py, em que regras importou uma função de apresentação do app.",
@@ -1292,7 +1327,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "# regras.py: def percentual(...): return resultado\n# app.py: from regras import percentual; print(f'{percentual(3, 4)}%')",
         "explanation": "A dependência segue em uma direção: apresentação depende da regra, não o contrário. Isso resolve o ciclo sem manipular sys.path.",
-        "expected": "Importar regras não importa app; importar app não executa main."
+        "expected": "Importar regras não importa app; importar app não executa main.",
+        "criteria": ["Dependência circular é removida ao separar regra e apresentação.","Importar qualquer módulo não executa main nem cria ciclo."]
       }
     ],
     "mistakes": [
@@ -1413,7 +1449,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "python -m pip --version\npython -c \"import sys; print(sys.executable)\"",
         "explanation": "Compare os caminhos de saída e prefira o executável de .venv para ambos.",
-        "expected": "Os dois comandos apontam para a mesma .venv quando o mesmo executável é usado."
+        "expected": "O diagnóstico compara os caminhos escolhidos por pip e pelo interpretador e explica a diferença observada.",
+        "criteria": ["Compara caminho do pip e do interpretador usado na execução.","Explicação relaciona a diferença ao ambiente selecionado."]
       },
       {
         "prompt": "Escreva comandos de criação e verificação para Windows e macOS/Linux, sem exigir ativação.",
@@ -1423,7 +1460,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "# Windows\npy -3 -m venv .venv\n.venv\\Scripts\\python.exe -m pip --version\n# macOS/Linux\npython3 -m venv .venv\n.venv/bin/python -m pip --version",
         "explanation": "Ao indicar o caminho diretamente, o aluno sabe onde instalará pacotes.",
-        "expected": "pip informa caminho dentro de .venv em cada sistema."
+        "expected": "pip informa caminho dentro de .venv em cada sistema.",
+        "criteria": ["Apresenta criação e verificação nos dois sistemas operacionais.","Caminho observado pertence à .venv sem exigir ativação."]
       },
       {
         "prompt": "Monte requirements.txt e README para um projeto que usa requests, sem fixar uma versão inventada.",
@@ -1433,7 +1471,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "# comandos com o python da .venv:\npython -m pip install requests\npython -m pip show requests\n# requirements.txt: requests==VERSAO_OBSERVADA\n# README: criar venv; instalar -r requirements.txt; executar app.py",
         "explanation": "A versão é observada, registrada e depois recriada; VERSAO_OBSERVADA é um marcador a substituir pelo número real, não uma linha pronta para instalar.",
-        "expected": "Uma segunda instalação limpa consegue instalar a versão registrada."
+        "expected": "Uma segunda instalação limpa consegue instalar a versão registrada.",
+        "criteria": ["requirements e README permitem repetir a instalação em ambiente limpo.","Nenhuma versão é inventada ou fixada sem evidência."]
       },
       {
         "prompt": "Classifique quatro arquivos: app.py, .venv/, requirements.txt e arquivo com token pessoal. Quais entram no Git?",
@@ -1443,7 +1482,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "# versionar: app.py, requirements.txt, README.md, testes\n# ignorar: .venv/, __pycache__/, configuração local com token",
         "explanation": "O ambiente é reconstruído; um token enviado a repositório deve ser revogado, mesmo se depois removido.",
-        "expected": "Git contém instruções e código, mas não a pasta .venv nem valor secreto."
+        "expected": "A classificação explica como reproduzir o projeto sem versionar ambiente local nem expor credenciais.",
+        "criteria": ["Classifica cada arquivo com motivo de versionamento.","Justificativa considera reprodução, ambiente local e proteção de credenciais."]
       }
     ],
     "mistakes": [
@@ -1564,7 +1604,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "print(carregar_titulos(lambda url, timeout: RespostaFalsa([])))\ncarregar_titulos(lambda url, timeout: RespostaFalsa([], 404))",
         "explanation": "O primeiro caso é sucesso sem itens. O segundo falha por status antes de produzir catálogo.",
-        "expected": "Primeira linha imprime []; segunda lança RuntimeError: HTTP 404."
+        "expected": "A previsão é registrada antes das respostas simuladas; compare o retorno e o tratamento da falha HTTP.",
+        "criteria": ["Previsão é registrada antes das duas respostas simuladas.","Caso de erro HTTP é distinguido de retorno bem-sucedido."]
       },
       {
         "prompt": "Exija que titulo seja string não vazia após strip e devolva títulos sem espaços nas pontas.",
@@ -1574,7 +1615,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "for item in dados:\n    if not isinstance(item, dict) or not isinstance(item.get('titulo'), str) or not item['titulo'].strip():\n        raise ValueError('Item sem título')\n    titulos.append(item['titulo'].strip())",
         "explanation": "A validação protege a interface de nomes invisíveis e a normalização evita espaços acidentais.",
-        "expected": "'  Python  ' vira 'Python'; '   ' gera ValueError."
+        "expected": "'  Python  ' vira 'Python'; '   ' gera ValueError.",
+        "criteria": ["Aceita string não vazia depois de remover espaços periféricos.","Texto retornado é normalizado e entrada vazia é recusada."]
       },
       {
         "prompt": "Simule um timeout e capture-o na camada de apresentação sem converter em lista vazia.",
@@ -1584,7 +1626,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def busca_lenta(url, timeout):\n    raise TimeoutError('demorou')\n\ntry:\n    print(carregar_titulos(busca_lenta))\nexcept TimeoutError:\n    print('Serviço indisponível; tente novamente')",
         "explanation": "O consumidor distingue erro de rede de resultado vazio e pode oferecer nova tentativa.",
-        "expected": "Mostra Serviço indisponível; tente novamente."
+        "expected": "Mostra Serviço indisponível; tente novamente.",
+        "criteria": ["Timeout é capturado na apresentação sem produzir lista vazia.","Mensagem permite tentar novamente e serviço permanece separado."]
       },
       {
         "prompt": "Escreva um adaptador opcional para requests.get com timeout e status, mantendo o teste offline obrigatório.",
@@ -1594,7 +1637,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "# Após instalar requests:\nimport requests\n\ndef buscar_http(url, timeout):\n    return requests.get(url, timeout=timeout)\n\n# Use somente com URL real cujo JSON seja lista de {'titulo': str}.\n# Para APIs com outro esquema, escreva um adaptador de dados.",
         "explanation": "A função de domínio continua recebendo um transporte. O exemplo de URL .invalid não deve ser chamado; escolha um serviço real e documentado para a extensão.",
-        "expected": "Chamada real usa timeout, verifica status e valida o JSON; se contrato difere, adaptação explícita."
+        "expected": "Chamada real usa timeout, verifica status e valida o JSON; se contrato difere, adaptação explícita.",
+        "criteria": ["Adaptador define timeout, verifica status e valida JSON.","Teste offline obrigatório não depende de chamada real."]
       }
     ],
     "mistakes": [
@@ -1715,7 +1759,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "python -m unittest -v",
         "explanation": "Os casos cobrem comportamento comum, limite que causaria divisão por zero e entrada inválida. A saída detalha três testes.",
-        "expected": "Ran 3 tests; OK."
+        "expected": "A previsão do relatório e a função de cada teste são registradas antes da execução.",
+        "criteria": ["Previsão dos testes originais registrada antes de executá-los.","Cada teste tem uma razão observável e o relatório é conferido."]
       },
       {
         "prompt": "Acrescente testes para extremos (0,4), (4,4) e arredondamento (2,3).",
@@ -1725,7 +1770,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def test_extremos_e_arredondamento(self):\n    self.assertEqual(percentual(0, 4), 0)\n    self.assertEqual(percentual(4, 4), 100)\n    self.assertEqual(percentual(2, 3), 67)",
         "explanation": "Esses casos encontram erros que 3/4 sozinho não identifica; método deve ficar dentro de PercentualTest.",
-        "expected": "Mais um teste; todas as assertivas passam."
+        "expected": "Mais um teste; todas as assertivas passam.",
+        "criteria": ["Casos de extremo e arredondamento têm expectativas explícitas.","Suíte ampliada termina sem falhas."]
       },
       {
         "prompt": "Teste que a função carregar_titulos passa timeout=5 a um transporte falso e retorna os títulos esperados.",
@@ -1735,7 +1781,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "chamadas = []\ndef buscar(url, timeout):\n    chamadas.append((url, timeout))\n    return RespostaFalsa([{'titulo': 'Python'}])\nassert carregar_titulos(buscar) == ['Python']\nassert len(chamadas) == 1 and chamadas[0][1] == 5",
         "explanation": "O double verifica o contrato observável do transporte sem depender de requests ou internet. Importe/carregue as definições da aula anterior.",
-        "expected": "Um título retornado e uma chamada com timeout 5."
+        "expected": "Um título retornado e uma chamada com timeout 5.",
+        "criteria": ["Transporte falso recebe timeout=5 e devolve títulos controlados.","Teste não abre conexão externa."]
       },
       {
         "prompt": "Faça um teste de regressão: crie caso para (2,3)==67, provoque truncamento, confirme falha e restaure.",
@@ -1745,7 +1792,8 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "def test_arredondamento(self):\n    self.assertEqual(percentual(2, 3), 67)\n# com int(2/3*100): teste falha (66)\n# com round(2/3*100): teste passa (67)",
         "explanation": "Um teste útil precisa falhar diante do defeito que afirma prevenir. Essa sequência fornece evidência de que ele detecta a regressão.",
-        "expected": "Falha controlada com 66; após restaurar, OK."
+        "expected": "Falha controlada com 66; após restaurar, OK.",
+        "criteria": ["Regressão falha de forma controlada antes da restauração.","Implementação correta faz o caso de arredondamento passar e suíte terminar verde."]
       }
     ],
     "mistakes": [
