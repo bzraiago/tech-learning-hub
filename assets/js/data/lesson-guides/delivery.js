@@ -2556,6 +2556,1079 @@ Object.assign(LESSON_GUIDES, {
       "Recuperação confirma chave nova, rejeição da antiga e funcionamento dos fluxos; impacto e obrigações devem ser escalados às pessoas responsáveis."
     ]
   },
+  "delivery-lgpd-foundations": {
+    "prerequisites": "Concluir delivery-threat-model, delivery-secret-lifecycle e delivery-audit-response; saber o que é uma conta e quem usa uma aplicação. Use dados inventados, nunca dados de colegas, familiares, clientes ou da sua conta.",
+    "setup": "Use o cenário em papel ou editor. Não precisa instalar ferramentas, acessar painel ou banco de usuários. Marque cada linha como fato do cenário, hipótese ou pergunta para responsável. Sem computador, faça no papel.",
+    "why": "Uma aplicação não precisa conhecer tudo sobre alguém para oferecer função útil. Primeiro descrevemos a finalidade; depois os dados necessários, quem decide seu uso, por onde circulam e quando deixam de ser úteis. Assim uma pessoa iniciante identifica riscos sem fingir que pode decidir sozinha a interpretação jurídica de um caso real. As fontes oficiais são opcionais; conceitos, prática e respostas estão nesta aula.",
+    "example": {
+      "language": "text",
+      "code": "FUNÇÃO: guardar progresso de estudo\nProposta: nome, e-mail, CPF, nascimento, localização, disciplina, conclusão\nPergunta: o que a função precisa fazer?\nHipótese didática: associar conta fictícia a itens e mostrar progresso\nCandidatos a manter: id técnico, item, estado, horário útil\nCandidatos a remover: CPF, localização e nascimento sem necessidade\nAntes de implementar: confirmar agentes, acessos, compartilhamentos, prazo e direitos.",
+      "expected": "O mapa mantém campos plausivelmente necessários e marca finalidade, hipótese e dúvidas. Não afirma que esse seria o conjunto correto para organização real.",
+      "explanation": ["A ausência de um nome visível não basta para provar que ninguém pode identificar a pessoa.","Mapear operação, papéis e cópias torna a finalidade verificável.","O conjunto de campos é hipótese pedagógica e precisa de revisão para qualquer tratamento real."]
+    },
+    "guided": [
+      {
+        "instruction": "Marque campos que identificam direta ou indiretamente. Por que id aleatório não é automaticamente anônimo?",
+        "result": "Nome e e-mail identificam diretamente; id e progresso podem identificar se houver tabela ou contexto que faça a ligação. Código pode ser pseudônimo, não anônimo."
+      },
+      {
+        "instruction": "Desenhe o ciclo de um registro fictício e quem pode agir em cada etapa.",
+        "result": "Mostre coleta, uso, compartilhamento, armazenamento, correção, término e eliminação ou conservação justificada. Papéis incertos ficam como “confirmar”."
+      },
+      {
+        "instruction": "Revise campos por finalidade, necessidade, transparência e segurança; registre perguntas.",
+        "result": "CPF, localização e nascimento saem sem finalidade demonstrada. Responsável confirma campos remanescentes, agentes, acessos, destinatários e regra de encerramento."
+      }
+    ],
+    "sections": [
+      {
+        "title": "Identifique dado pessoal e tratamento",
+        "paragraphs": [
+          "Dado pessoal é informação relacionada a pessoa natural identificada ou identificável. Nome e e-mail são exemplos diretos; id de conta, IP, horário ou progresso podem ser pessoais se o contexto permitir relacioná-los a alguém. Pergunte não só “há nome?”, mas “alguém consegue reconhecer a pessoa combinando esta informação com outra disponível?”.",
+          "A lei define como sensíveis dados sobre origem racial ou étnica, religião, opinião política, filiação sindical ou a organização religiosa, filosófica ou política, saúde, vida sexual, genética ou biometria vinculada a pessoa natural. O tratamento de dados de crianças e adolescentes deve observar seu melhor interesse; dados de crianças têm exigências específicas na lei e as pessoas responsáveis devem revisar o caso antes de coletá-los. Nenhum desses dados é necessário nesta aula.",
+          "Tratamento abrange coletar, receber, classificar, consultar, usar, copiar, transmitir, armazenar, alterar, compartilhar e eliminar. Planilhas, logs, exportações, fornecedores e backups também podem participar. Um código que substitui nome continua pessoal se a relação puder ser refeita por meios razoáveis; pseudonimização não é anonimização."
+        ],
+        "terms": [
+          {
+            "term": "Titular",
+            "meaning": "Pessoa natural a quem os dados pessoais se referem."
+          },
+          {
+            "term": "Dado sensível",
+            "meaning": "Categoria do art. 5º, II, com hipóteses próprias no art. 11."
+          },
+          {
+            "term": "Tratamento",
+            "meaning": "Operações realizadas com dados pessoais, da coleta à eliminação."
+          },
+          {
+            "term": "Pseudonimização",
+            "meaning": "Troca de identificador direto por código quando ainda existe relação com pessoa."
+          },
+          {
+            "term": "Anonimização",
+            "meaning": "Processo que impede associação direta ou indireta por meios razoáveis disponíveis."
+          }
+        ]
+      },
+      {
+        "title": "Descubra os papéis pelas decisões e atividades",
+        "paragraphs": [
+          "O controlador decide o tratamento; o operador trata dados em nome do controlador. O titular é a pessoa a quem se referem. O encarregado é canal de comunicação entre agente, titulares e ANPD, segundo as regras aplicáveis. Hospedar servidor, vender software ou aparecer no contrato não determina sozinho o papel de uma atividade.",
+          "Uma organização pode controlar um uso e operar outro. Um fornecedor pode operar uma finalidade e controlar dados usados para finalidade própria. Registre “papel provável” e pergunte quem decide finalidade, categorias, acesso, compartilhamento e conservação. Compare contrato com operação real e inclua suboperadores quando existirem.",
+          "A exigência ou dispensa do encarregado depende das regras atuais aplicáveis ao agente. Não invente contato nem suponha estrutura igual para todos. A pessoa iniciante documenta dúvidas e encaminha."
+        ],
+        "terms": [
+          {
+            "term": "Controlador",
+            "meaning": "Agente a quem competem decisões sobre tratamento."
+          },
+          {
+            "term": "Operador",
+            "meaning": "Agente que realiza tratamento em nome do controlador."
+          },
+          {
+            "term": "Agentes de tratamento",
+            "meaning": "Controlador e operador."
+          },
+          {
+            "term": "Encarregado",
+            "meaning": "Canal de comunicação relacionado ao controlador, titulares e ANPD."
+          },
+          {
+            "term": "Suboperador",
+            "meaning": "Agente envolvido pelo operador em parte do tratamento conforme a relação aplicável."
+          }
+        ]
+      },
+      {
+        "title": "Use finalidade e minimização antes de escolher campos",
+        "paragraphs": [
+          "Escreva finalidade concreta: “mostrar à pessoa o progresso dos itens que marcou como estudados”. “Melhorar a experiência” não explica quais dados são usados, por quem ou para qual efeito. Ter dado disponível não autoriza uso posterior incompatível com o que foi informado.",
+          "Necessidade limita tratamento ao mínimo pertinente, proporcional e não excessivo para finalidade. Para cada campo, pergunte qual função depende dele, se existe alternativa menos identificadora e o que deixa de funcionar sem ele. Facilidade de coleta e possível utilidade futura não provam necessidade. Qualidade pede exatidão e atualização adequadas ao propósito.",
+          "Registre destinatários, acessos, ambiente, proteção e revisão. Mais cópias criam lugares para proteger, corrigir e eliminar. Se necessidade não está demonstrada, deixe campo fora do protótipo e anote a dúvida."
+        ],
+        "terms": [
+          {
+            "term": "Finalidade",
+            "meaning": "Propósito legítimo, específico, explícito e informado."
+          },
+          {
+            "term": "Necessidade",
+            "meaning": "Limitação aos dados pertinentes, proporcionais e não excessivos."
+          },
+          {
+            "term": "Minimização",
+            "meaning": "Escolher e conservar somente o necessário para finalidade definida."
+          },
+          {
+            "term": "Destinatário",
+            "meaning": "Pessoa ou agente que recebe ou acessa dados numa etapa."
+          }
+        ]
+      },
+      {
+        "title": "Aplique os dez princípios como perguntas",
+        "paragraphs": [
+          "Finalidade: propósito específico e informado? Adequação: uso combina com propósito e contexto? Necessidade: dados são mínimos? Livre acesso: pessoa consulta forma, duração e dados? Qualidade: informação exata e atual? Transparência: explicação clara e acessível?",
+          "Segurança: medidas contra acesso, perda, alteração e divulgação indevidos? Prevenção: que dano se evita? Não discriminação: uso pode causar efeito ilícito ou abusivo? Responsabilização e prestação de contas: que evidência mostra medidas e eficácia? Esses princípios continuam valendo quando a hipótese legal não é consentimento.",
+          "Converta revisão em ação: remover campo sem uso, limitar acesso, corrigir dado, explicar finalidade, rever prazo ou guardar evidência. A lista ajuda a investigar, mas não substitui avaliação jurídica, de segurança ou impacto quando necessária."
+        ],
+        "terms": [
+          {
+            "term": "Adequação",
+            "meaning": "Compatibilidade entre tratamento, finalidade informada e contexto."
+          },
+          {
+            "term": "Livre acesso",
+            "meaning": "Consulta facilitada e gratuita sobre forma, duração e integralidade dos dados."
+          },
+          {
+            "term": "Transparência",
+            "meaning": "Informação clara, precisa e acessível sobre tratamento e agentes."
+          },
+          {
+            "term": "Prestação de contas",
+            "meaning": "Demonstração de medidas eficazes e evidências de observância."
+          }
+        ]
+      }
+    ],
+    "mistakes": [
+      "Achar que dado pessoal precisa conter nome ou CPF.",
+      "Chamar dado pseudonimizado de anônimo sem avaliar reidentificação.",
+      "Classificar papel pelo nome do fornecedor ou hospedagem.",
+      "Usar “melhorar a experiência” como finalidade completa ou coletar por utilidade futura.",
+      "Achar que consentimento ou ferramenta elimina princípios e direitos."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: tabela guarda conta_demo_27, item e horário, sem nome. É possível afirmar que não há dado pessoal? Que fatos faltam?",
+        "expected": "Não. Id e horário podem ser relacionados a alguém por tabela ou contexto. Falta saber se há relação e quem pode refazê-la.",
+        "criteria": [
+          "Não equipara ausência de nome a anonimização.",
+          "Identifica associação por dados auxiliares.",
+          "Registra fatos pendentes."
+        ],
+        "solution": "Marque como potencial dado pessoal. Verifique se conta_demo_27 aponta para outro registro e se a relação pode ser refeita por meios razoáveis. Não conclua anonimização pela aparência.",
+        "explanation": "Identificabilidade pode ser indireta no contexto.",
+        "hints": [
+          "O que o identificador representa?",
+          "Pode combinar horário com outra informação?"
+        ]
+      },
+      {
+        "prompt": "Alterar: formulário pede nome, e-mail, CPF, nascimento e localização para salvar progresso. Remova o que não tem necessidade e registre perguntas.",
+        "expected": "CPF, nascimento e localização saem sem finalidade. Nome/e-mail também precisam justificativa. A função usa só campos necessários.",
+        "criteria": [
+          "Relaciona campo à função.",
+          "Remove itens sem justificativa.",
+          "Marca necessidade como hipótese."
+        ],
+        "solution": "Mantenha id de conta, item e estado como hipótese; confirme se outro campo é necessário. Pergunte qual comportamento depende dele e se existe alternativa menos identificadora.",
+        "explanation": "Minimização parte da função, não da disponibilidade.",
+        "hints": [
+          "A função funciona sem localização?",
+          "Nome é necessário para associar estado?"
+        ]
+      },
+      {
+        "prompt": "Construir: mapeie finalidade, dado, operação, papel provável, destinatário, proteção, revisão e dúvida para salvar, exibir e encerrar progresso fictício.",
+        "expected": "Mapa inclui ciclo e acesso, distingue fatos de hipóteses e lista perguntas sobre papéis, cópias e término.",
+        "criteria": [
+          "Inclui etapas do ciclo.",
+          "Distingue observação de hipótese.",
+          "Aponta acesso, destinatário e proteção."
+        ],
+        "solution": "Salvar: id fictício, item e estado; finalidade: mostrar progresso; papel/armazenamento: confirmar por decisões e contrato; acesso: titular e serviço autorizado; revisão: fim da finalidade; pendências: cópias e prazo. Não invente fornecedor.",
+        "explanation": "Mapa expõe lacunas verificáveis.",
+        "hints": [
+          "Quem decide finalidade?",
+          "Onde há cópia?"
+        ]
+      },
+      {
+        "prompt": "Investigar erro: “fornecedor de nuvem é sempre operador e aplicação sempre controladora”. Quais evidências confirmarão os papéis?",
+        "expected": "Investigar decisões por atividade, contrato, instruções, uso próprio e cadeia. Rótulo não basta.",
+        "criteria": [
+          "Examina atividade e decisões.",
+          "Considera usos próprios e suboperadores.",
+          "Pede evidência a pessoa autorizada."
+        ],
+        "solution": "Separe finalidades; pergunte quem decide por que e como, quem segue instruções, se há uso próprio e quais contratos descrevem isso. Marque papéis provisórios e encaminhe validação.",
+        "explanation": "Um agente pode exercer funções diferentes conforme atividade.",
+        "hints": [
+          "Quem escolheu finalidade?",
+          "Fornecedor usa dados para si?"
+        ]
+      },
+      {
+        "prompt": "Mudança inesperada: ranking pede nascimento e localização para personalizar progresso. O que precisa ocorrer antes? Proponha alternativa.",
+        "expected": "Não adicionar automaticamente. Analisar finalidade, necessidade, acesso e impacto. Prototipar ordenando itens fictícios.",
+        "criteria": [
+          "Pausa coleta.",
+          "Propõe alternativa mínima.",
+          "Escala menores, sensíveis ou perfilamento."
+        ],
+        "solution": "Peça justificativa e alternativa para cada campo, identifique quem vê ranking, prazo e efeitos. Encaminhe revisão e teste com itens fictícios, sem decidir sobre pessoas.",
+        "explanation": "Mudança pode criar finalidade e risco diferentes.",
+        "hints": [
+          "Qual resultado depende da localização?",
+          "Dados fictícios atendem ao teste?"
+        ]
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Dado pessoal é:",
+        "options": [
+          "Somente nome e CPF.",
+          "Informação relacionada a pessoa identificada ou identificável.",
+          "Qualquer dado em banco."
+        ],
+        "correctIndex": 1,
+        "explanation": "Identificabilidade pode ser indireta."
+      },
+      {
+        "question": "Operador é quem:",
+        "options": [
+          "Trata dados em nome do controlador.",
+          "Fornece qualquer software.",
+          "É o titular."
+        ],
+        "correctIndex": 0,
+        "explanation": "Papel decorre da atividade."
+      },
+      {
+        "question": "Necessidade significa:",
+        "options": [
+          "Guardar para uso futuro.",
+          "Limitar aos dados pertinentes, proporcionais e não excessivos.",
+          "Consentimento sempre."
+        ],
+        "correctIndex": 1,
+        "explanation": "Princípio aplicável a todo tratamento."
+      },
+      {
+        "question": "Id aleatório prova anonimização?",
+        "options": [
+          "Sim, sem nome.",
+          "Não; avaliar possibilidade de associação.",
+          "Sim, se em outro banco."
+        ],
+        "correctIndex": 1,
+        "explanation": "Código pode ser pseudônimo."
+      }
+    ],
+    "summary": [
+      "Identificabilidade depende do contexto; dado sensível é categoria legal específica.",
+      "Tratamento inclui logs, exportações, fornecedores e backups.",
+      "Papéis decorrem de decisões e atividades.",
+      "Finalidade e necessidade ajudam a decidir o que não coletar; os dez princípios seguem aplicáveis.",
+      "O mapa é triagem; casos reais são escalados."
+    ]
+  },
+  "delivery-lgpd-legal-bases": {
+    "prerequisites": "Concluir delivery-lgpd-foundations. Distinguir finalidade, dado pessoal e sensível. Cenários são fictícios; não escolha base legal para organização real nem colete consentimento.",
+    "setup": "Use a matriz: finalidade → dados → hipótese candidata → requisito → fatos necessários → responsável. Não precisa acessar lei ou serviço externo. Fontes oficiais são opcionais; conceitos e respostas estão incluídos.",
+    "why": "A LGPD prevê hipóteses além de consentimento, mas cada uma tem requisitos próprios. Uma base não serve para todo uso, não dispensa minimização, transparência, segurança ou direitos e não pode ser escolhida pelo nome mais conveniente. Esta aula ensina vocabulário e limites para formular perguntas, não emitir parecer jurídico.",
+    "example": {
+      "language": "text",
+      "code": "TRÊS FINALIDADES FICTÍCIAS\n1. Criar conta e salvar progresso pedido: verificar necessidade para executar serviço.\n2. Enviar divulgação opcional: verificar consentimento específico ou hipótese comprovável.\n3. Usar biometria: dado sensível; avaliar art. 11 e alternativa menos invasiva.\nNão se conclui base sem fatos e revisão responsável.",
+      "expected": "Cada finalidade tem análise separada. Biometria não recebe hipótese do art. 7º por analogia.",
+      "explanation": ["Bases legais têm requisitos próprios e devem ser relacionadas a cada finalidade.","Dados sensíveis seguem hipóteses do art. 11, diferentes do art. 7º.","A atividade prepara perguntas e evidências, não decide um caso real."]
+    },
+    "guided": [
+      {
+        "instruction": "Explique as dez hipóteses do art. 7º, cobrindo a tabela.",
+        "result": "Distingue consentimento, obrigação, política pública, pesquisa, contrato, exercício de direitos, proteção da vida, tutela da saúde, legítimo interesse e proteção do crédito."
+      },
+      {
+        "instruction": "Compare serviço de conta solicitado e divulgação opcional. Anote hipótese e fato faltante.",
+        "result": "Necessidade contratual pode ser examinada se fatos corresponderem. Divulgação é finalidade separada e não herda automaticamente a mesma base."
+      },
+      {
+        "instruction": "Inclua biometria fictícia e refaça avaliação pelo art. 11.",
+        "result": "Identifica dado sensível, aplica hipóteses próprias e escala caso real."
+      }
+    ],
+    "sections": [
+      {
+        "title": "A base legal acompanha cada finalidade",
+        "paragraphs": [
+          "Antes de selecionar hipótese, descreva a operação: finalidade, dados, titular, agentes, destinatários e duração. Uma aplicação pode manter conta e enviar mensagens opcionais; não se escolhe uma base “para o sistema inteiro” nem se renomeia finalidade depois da coleta.",
+          "A base é hipótese legal que pode permitir operação quando requisitos estão presentes. Não é selo de conformidade. Continuam valendo finalidade, adequação, necessidade, transparência, segurança, prevenção, não discriminação, livre acesso e prestação de contas, mesmo sem consentimento.",
+          "Em caso real, documente fatos e evidências e encaminhe decisão para pessoa com atribuição jurídica ou de privacidade. Pessoa iniciante pode marcar candidata e apontar dúvidas; não deve afirmar conformidade porque marcou opção em planilha."
+        ],
+        "terms": [
+          {
+            "term": "Base legal",
+            "meaning": "Hipótese prevista na LGPD que pode autorizar finalidade quando requisitos se aplicam."
+          },
+          {
+            "term": "Hipótese candidata",
+            "meaning": "Possibilidade a investigar antes de concluir que requisitos de caso real foram atendidos."
+          },
+          {
+            "term": "Prestação de contas",
+            "meaning": "Evidência de decisões e medidas, não apenas caixa marcada."
+          }
+        ]
+      },
+      {
+        "title": "Conheça as dez hipóteses do art. 7º",
+        "paragraphs": [
+          "O art. 7º prevê: (1) consentimento; (2) obrigação legal ou regulatória; (3) política pública executada pela administração pública nos termos legais; (4) estudos por órgão de pesquisa, com anonimização sempre que possível; (5) contrato ou providência preliminar a pedido do titular; e (6) exercício regular de direitos em processo judicial, administrativo ou arbitral.",
+          "A lista continua: (7) proteção da vida ou incolumidade física; (8) tutela da saúde em procedimento realizado por profissional, serviço de saúde ou autoridade sanitária; (9) legítimo interesse do controlador ou terceiro nos limites do art. 10; e (10) proteção do crédito. São hipóteses distintas: mencionar saúde não transforma qualquer app em serviço de saúde.",
+          "Para cada hipótese, anote fato que poderia sustentá-la e o que falta provar. Contrato não prova necessidade de todo campo; “útil ao negócio” não prova legítimo interesse; dado público não elimina princípios e direitos. A lei prevê condições específicas para dado manifestamente público."
+        ],
+        "terms": [
+          {
+            "term": "Obrigação legal ou regulatória",
+            "meaning": "Dever previsto em norma aplicável e confirmado para a operação."
+          },
+          {
+            "term": "Contrato",
+            "meaning": "Hipótese para dados necessários à execução ou etapa preliminar pedida pelo titular."
+          },
+          {
+            "term": "Órgão de pesquisa",
+            "meaning": "Entidade que atende definição legal; chamar atividade de pesquisa não basta."
+          },
+          {
+            "term": "Tutela da saúde",
+            "meaning": "Hipótese delimitada a profissionais, serviços ou autoridade sanitária."
+          },
+          {
+            "term": "Proteção do crédito",
+            "meaning": "Hipótese específica sujeita também à legislação pertinente."
+          }
+        ]
+      },
+      {
+        "title": "Consentimento e legítimo interesse têm limites",
+        "paragraphs": [
+          "Consentimento é manifestação livre, informada e inequívoca para finalidade determinada. Informação deve ser clara; autorização genérica não vale. Se escrito, fica destacada. Controlador demonstra como foi obtido. Pessoa pode revogá-lo por procedimento gratuito e facilitado. Não condicione função básica a autorização opcional sem explicar consequência.",
+          "Legítimo interesse não significa conveniência comercial. O art. 10 exige finalidade legítima em situação concreta, respeito a expectativas e direitos fundamentais, dados estritamente necessários e transparência. É análise contextual com contrapesos; iniciante não resolve sozinho caso controverso.",
+          "A hipótese do art. 7º, IX, para dado comum não aparece na lista do art. 11 para dado sensível. Não transporte conclusão entre categorias. Se houver dúvida sobre sensibilidade, finalidade ou impacto, pause coleta e encaminhe decisão."
+        ],
+        "terms": [
+          {
+            "term": "Consentimento",
+            "meaning": "Manifestação livre, informada e inequívoca para finalidade determinada."
+          },
+          {
+            "term": "Revogação",
+            "meaning": "Retirada do consentimento para tratamento apoiado nessa manifestação."
+          },
+          {
+            "term": "Legítimo interesse",
+            "meaning": "Hipótese contextual com requisitos do art. 10, incluindo necessidade e transparência."
+          },
+          {
+            "term": "Expectativa legítima",
+            "meaning": "O que a pessoa poderia razoavelmente esperar no contexto informado."
+          }
+        ]
+      },
+      {
+        "title": "Dados sensíveis têm hipóteses próprias no art. 11",
+        "paragraphs": [
+          "Para dado sensível, art. 11 admite consentimento específico e destacado para finalidade específica ou, sem consentimento, tratamento indispensável a: obrigação legal/regulatória; política pública; pesquisa por órgão de pesquisa; exercício de direitos; proteção da vida; tutela da saúde nos atores delimitados; ou prevenção à fraude e segurança do titular em identificação/autenticação eletrônica, respeitados direitos e limites da lei.",
+          "Dado sensível não herda hipótese escolhida para conta. O art. 11, §1º, também alcança tratamento que revele dado sensível e possa causar dano; combinar campos aparentemente comuns pode revelar essa categoria. Necessidade, finalidade, transparência e segurança continuam fundamentais. A lei também traz regras específicas para certos compartilhamentos econômicos de dados de saúde.",
+          "A tabela é mapa de estudo, não árvore automática de decisão. Em caso real, confirme categoria, hipótese, normas adicionais e alternativa menos invasiva com responsável. Não colete biometria, saúde, religião ou outros dados sensíveis para testar formulário."
+        ],
+        "terms": [
+          {
+            "term": "Art. 11",
+            "meaning": "Requisitos e hipóteses específicas para dados sensíveis."
+          },
+          {
+            "term": "Específico e destacado",
+            "meaning": "Consentimento que identifica separadamente finalidade sensível, sem autorização genérica."
+          },
+          {
+            "term": "Indispensável",
+            "meaning": "Necessário para hipótese invocada, não apenas conveniente."
+          }
+        ]
+      }
+    ],
+    "mistakes": [
+      "Usar consentimento como padrão universal.",
+      "Supor que contrato torna necessário todo campo.",
+      "Tratar legítimo interesse como permissão genérica.",
+      "Aplicar hipótese do art. 7º a dado sensível sem analisar art. 11.",
+      "Afirmar conformidade só por listar uma base."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: caixa única “aceito tudo” cobre login, progresso e promoções. O que separar e o que a caixa não prova?",
+        "expected": "Serviço e divulgação são finalidades distintas. Caixa não prova liberdade, informação, especificidade ou necessidade nem outra hipótese aplicável.",
+        "criteria": [
+          "Separa finalidades.",
+          "Explica requisitos do consentimento.",
+          "Não escolhe base real."
+        ],
+        "solution": "Crie linhas para conta/progresso e promoção. Descreva dados e hipótese candidata. Se consentimento for avaliado para promoção, use opção específica e revogável e encaminhe decisão real.",
+        "explanation": "Consentimento é ligado a finalidade determinada.",
+        "hints": [
+          "Login precisa de marketing?",
+          "A pessoa sabe o que aceita?"
+        ]
+      },
+      {
+        "prompt": "Alterar: linhas dizem “interesse da empresa”: manter conta, cumprir obrigação e divulgar oferta. Reescreva finalidades e fatos necessários.",
+        "expected": "Conta: serviço e necessidade; obrigação: norma e dado necessário; oferta: avaliar consentimento ou hipótese própria. Nenhuma usa automaticamente legítimo interesse.",
+        "criteria": [
+          "Finalidades concretas.",
+          "Requisitos próprios.",
+          "Fonte da obrigação identificada."
+        ],
+        "solution": "Conta: permitir acesso e salvar progresso; validar necessidade. Obrigação: registrar norma e prazo confirmados. Oferta: descrever divulgação opcional e avaliar hipótese. Marque pendente de revisão.",
+        "explanation": "Rótulo genérico não comprova requisito.",
+        "hints": [
+          "Qual norma foi identificada?",
+          "Oferta é necessária ao serviço?"
+        ]
+      },
+      {
+        "prompt": "Construir: preencha ficha com finalidade, dados, hipótese candidata, requisito, alternativa, transparência e revisor.",
+        "expected": "Ficha liga finalidade a hipótese/evidência, identifica sensível e deixa lacunas explícitas.",
+        "criteria": [
+          "Análise por finalidade.",
+          "Categoria e necessidade.",
+          "Evidência e responsável."
+        ],
+        "solution": "Finalidade: mostrar progresso pedido; dados: id fictício, item, estado; hipótese contratual a avaliar conforme necessidade; alternativa: não coletar campos extras; explicar uso; revisor: jurídico/privacidade; pendências: contrato, destinatários e prazo.",
+        "explanation": "A matriz mostra caminho e lacunas.",
+        "hints": [
+          "Finalidade concreta?",
+          "Quem valida?"
+        ]
+      },
+      {
+        "prompt": "Investigar erro: equipe escolhe legítimo interesse para guardar impressão digital por conveniência. O que deve rever?",
+        "expected": "Biometria vinculada a pessoa é sensível. Art. 11 tem hipóteses próprias; necessidade e alternativa devem ser avaliadas e escaladas.",
+        "criteria": [
+          "Classifica biometria como sensível.",
+          "Diferencia arts. 7º e 11.",
+          "Escala antes da coleta."
+        ],
+        "solution": "Suspenda. Verifique vínculo com pessoa, necessidade, alternativa, hipótese do art. 11, transparência e segurança. Encaminhe revisão; não colete para teste.",
+        "explanation": "Conveniência não prova hipótese ou indispensabilidade.",
+        "hints": [
+          "Está vinculada à pessoa?",
+          "A lista do art. 11 é igual?"
+        ]
+      },
+      {
+        "prompt": "Mudança inesperada: histórico será usado para inferir “baixa capacidade” e restringir vagas. Quais análises precedem o perfil?",
+        "expected": "Pausar e avaliar finalidade, inferências, discriminação, transparência, impacto, revisão e regras automatizadas. Testar com dados sintéticos.",
+        "criteria": [
+          "Reconhece finalidade/efeito novo.",
+          "Avalia perfilamento e discriminação.",
+          "Escala antes de dados reais."
+        ],
+        "solution": "Não implemente. Documente objetivo, dados/inferências, destinatários, efeitos, contestação e base por finalidade. Encaminhe a jurídico/privacidade e produto; protótipo usa dados sintéticos.",
+        "explanation": "Uso secundário pode afetar direitos.",
+        "hints": [
+          "Mostrar progresso equivale a restringir oportunidade?",
+          "A decisão é exclusivamente automatizada?"
+        ]
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Art. 7º lista:",
+        "options": [
+          "Só consentimento.",
+          "Dez hipóteses com requisitos distintos.",
+          "Só contrato e obrigação."
+        ],
+        "correctIndex": 1,
+        "explanation": "Base depende de contexto e finalidade."
+      },
+      {
+        "question": "Legítimo interesse autoriza automaticamente dado sensível?",
+        "options": [
+          "Sim.",
+          "Não; sensíveis seguem art. 11.",
+          "Sim, se avisado."
+        ],
+        "correctIndex": 1,
+        "explanation": "Art. 11 tem lista própria."
+      },
+      {
+        "question": "Consentimento deve ser:",
+        "options": [
+          "Genérico e permanente.",
+          "Livre, informado e ligado a finalidade determinada.",
+          "Oculto."
+        ],
+        "correctIndex": 1,
+        "explanation": "Lei exige especificidade e admite revogação."
+      },
+      {
+        "question": "Dispensa de consentimento:",
+        "options": [
+          "Dispensa princípios.",
+          "Remove direitos.",
+          "Não dispensa outras obrigações."
+        ],
+        "correctIndex": 2,
+        "explanation": "Princípios e direitos continuam aplicáveis."
+      }
+    ],
+    "summary": [
+      "A base é analisada por finalidade e operação.",
+      "Art. 7º lista dez hipóteses, cada uma com requisitos.",
+      "Dados sensíveis seguem art. 11.",
+      "Consentimento e legítimo interesse não são atalhos.",
+      "A matriz registra candidatas; responsáveis validam casos reais."
+    ]
+  },
+  "delivery-lgpd-rights-lifecycle": {
+    "prerequisites": "Concluir delivery-lgpd-foundations e delivery-lgpd-legal-bases. Usar somente REQ-DEMO-14; nunca testar com conta, exportação ou dado real.",
+    "setup": "Use pedidos fictícios em papel ou editor. Liste sistemas, cópias e responsáveis. Não entre em conta, envie pedido real ou execute exclusão. Marque evidência e escale conflitos de conservação.",
+    "why": "Titulares precisam exercer direitos com segurança, e a equipe precisa saber onde dados estão e o que encerra cada uso. Excluir da tela pode deixar cópias; apagar tudo imediatamente também pode ignorar conservação legal. A aula ensina a rastrear e responder por etapas. Fontes oficiais são opcionais; conceitos e soluções estão aqui.",
+    "example": {
+      "language": "text",
+      "code": "Ciclo: mostrar histórico de estudo da própria conta\nTérmino: finalidade cumprida, dado desnecessário ou período encerrado\nLocais: serviço principal, logs, exportações, fornecedores, backups\nAo encerrar: interromper uso; eliminar nos limites técnicos; analisar art. 16; propagar quando aplicável; registrar resultado mínimo\nAcesso não autoriza envio a endereço não verificado.",
+      "expected": "Validar solicitante, buscar por escopo, conferir retenção, responder pelo canal apropriado e registrar pendências.",
+      "explanation": ["Pedido de direito precisa de resposta segura, escopo e verificação de identidade.","Término do tratamento e conservação após o término são decisões diferentes.","Uma tela atualizada não comprova mudança em todas as cópias."]
+    },
+    "guided": [
+      {
+        "instruction": "Leia pedido fictício de acesso, liste cópias e confirme a pessoa pelo canal seguro antes de revelar dados.",
+        "result": "Busca perfil, atividade, exportações e compartilhamentos conhecidos. Usa verificação proporcional definida pela equipe."
+      },
+      {
+        "instruction": "Receba correção fictícia e indique fonte autoritativa e cópias a atualizar.",
+        "result": "Atualiza origem após validação, propaga a agentes relevantes quando aplicável e registra conclusão mínima."
+      },
+      {
+        "instruction": "Receba pedido de eliminação. Verifique término, conservação e comportamento das cópias.",
+        "result": "Interrompe usos encerrados, elimina no escopo técnico, avalia exceções e verifica cópias; não afirma que backups sumiram sem prova."
+      }
+    ],
+    "sections": [
+      {
+        "title": "Modele retenção por finalidade e término",
+        "paragraphs": [
+          "A LGPD não define prazo universal de retenção. Duração depende de finalidade, necessidade, normas aplicáveis e contexto. Tabela registra categoria, finalidade, início, condição de término, prazo validado, local, responsável e forma de eliminar ou justificar conservação. “Guardar para sempre” e “apagar tudo imediatamente” não são padrões automáticos.",
+          "O art. 15 encerra tratamento quando finalidade foi alcançada ou dado deixou de ser necessário, termina período, titular comunica término inclusive ao revogar consentimento (resguardado interesse público), ou ANPD determina diante de violação. Depois, art. 16 prevê eliminação nos limites técnicos e permite conservação para obrigação legal/regulatória; estudo por órgão de pesquisa com anonimização sempre que possível; transferência a terceiro conforme lei; ou uso exclusivo do controlador com anonimização e acesso vedado a terceiros.",
+          "Registre exceção e fundamento. Logs, backups e sistemas externos precisam de regra: expurgo, isolamento contra uso, restauração que reaplica exclusões e evidência. “Talvez seja útil” não é justificativa. Em caso real, responsável confirma se exceção existe."
+        ],
+        "terms": [
+          {
+            "term": "Retenção",
+            "meaning": "Período e condições para manter dados por finalidade ou conservação autorizada."
+          },
+          {
+            "term": "Término",
+            "meaning": "Condição do art. 15 que encerra tratamento para uma finalidade."
+          },
+          {
+            "term": "Conservação",
+            "meaning": "Manutenção após término somente em hipótese permitida e dentro de limites."
+          },
+          {
+            "term": "Expurgo",
+            "meaning": "Remoção programada após a condição de término."
+          }
+        ]
+      },
+      {
+        "title": "Entenda os direitos e efeitos diferentes",
+        "paragraphs": [
+          "O art. 18 permite confirmação, acesso, correção, anonimização/bloqueio/eliminação de dados desnecessários, excessivos ou tratados em desconformidade, portabilidade conforme regulamentação, eliminação de dados tratados com consentimento salvo art. 16, informação sobre compartilhamentos, sobre não fornecer consentimento e consequências, e revogação. Também há petição à ANPD e oposição em condições legais.",
+          "Acesso, portabilidade e eliminação não são a mesma operação. Acesso apresenta dados próprios com segurança; portabilidade depende de formato e regras e não inclui dados já anonimizados; eliminação tem hipóteses e exceções. Revogar consentimento afeta operações apoiadas nele, mas não apaga automaticamente registros nem extingue outra hipótese válida de conservação. Resposta precisa explicar escopo real.",
+          "O art. 20 permite solicitar revisão de decisão tomada unicamente por tratamento automatizado que afete interesses. Para desenvolvedores, documente decisão e caminho de revisão aplicável; não assuma que qualquer recomendação produz efeito igual."
+        ],
+        "terms": [
+          {
+            "term": "Confirmação",
+            "meaning": "Resposta sobre existência de tratamento dos dados do titular."
+          },
+          {
+            "term": "Acesso",
+            "meaning": "Disponibilização segura dos dados e informações previstas em lei."
+          },
+          {
+            "term": "Portabilidade",
+            "meaning": "Transferência a outro fornecedor conforme regras e limites."
+          },
+          {
+            "term": "Revogação",
+            "meaning": "Retirada do consentimento usado para determinadas operações."
+          },
+          {
+            "term": "Decisão automatizada",
+            "meaning": "Decisão exclusivamente automatizada que afeta interesses, sujeita ao art. 20."
+          }
+        ]
+      },
+      {
+        "title": "Receba pedidos sem criar nova exposição",
+        "paragraphs": [
+          "Defina canal oficial, protocolo, data, pedido e responsável. Antes de entregar dados, confirme identidade ou representação por método seguro e proporcional. Não envie exportação ao endereço escrito na própria mensagem sem validação. Guarde apenas evidência necessária; evite cópia de documento se checagem menos invasiva bastar.",
+          "O art. 19 prevê acesso simplificado imediatamente ou declaração completa em até 15 dias, com origem, inexistência de registro, critérios e finalidade. Há regras específicas para certos agentes pequenos e agentes públicos. A Resolução CD/ANPD nº 2 prevê prazo em dobro para situações delimitadas. Confirme enquadramento e norma atual antes de codificar prazo.",
+          "Se não puder agir imediatamente, art. 18, §4º prevê informar que não é agente e indicar outro quando possível, ou explicar razões impeditivas. Pedido é sem custo. Não prometa ação dependente de fornecedor; mantenha próximo passo responsável."
+        ],
+        "terms": [
+          {
+            "term": "Canal de direitos",
+            "meaning": "Meio oficial para receber e acompanhar solicitações."
+          },
+          {
+            "term": "Verificação proporcional",
+            "meaning": "Confirmação suficiente sem exigir dados excessivos."
+          },
+          {
+            "term": "Declaração completa",
+            "meaning": "Resposta do art. 19 com origem, critérios e finalidade conforme o caso."
+          },
+          {
+            "term": "Agente de pequeno porte",
+            "meaning": "Agente dentro da regulamentação da ANPD, com regras específicas para algumas obrigações."
+          }
+        ]
+      },
+      {
+        "title": "Faça correção, exportação e eliminação verificáveis",
+        "paragraphs": [
+          "Localize registro principal e cópias: tabelas relacionadas, arquivos, logs, exportações, cache, fornecedores e backups. Para corrigir, valide campo, atualize fonte e coordene compartilhamentos quando aplicável. Para exportar, autorize no servidor, limite aos dados da pessoa e use formato compreensível sem dados de terceiros. Para eliminar, interrompa uso encerrado, remova no escopo técnico e aplique ciclo de backup.",
+          "Registre etapas: pedido, identidade, dados localizados, ação, cópias notificadas, retenção pendente e evidência. Resposta HTTP de sucesso não prova atualização de relações, compartilhamentos e backups. Teste efeitos e falhas parciais com registros fictícios.",
+          "Se uma obrigação parecer justificar conservação, pause exclusão automática e encaminhe fonte e categoria mínima para responsável. Restrinja uso e acesso. O curso não decide se exceção existe no caso concreto."
+        ],
+        "terms": [
+          {
+            "term": "Registro autoritativo",
+            "meaning": "Fonte usada para determinar estado principal e realizar correções."
+          },
+          {
+            "term": "Compartilhamento",
+            "meaning": "Comunicação ou tratamento por outro agente que pode exigir propagação."
+          },
+          {
+            "term": "Evidência de conclusão",
+            "meaning": "Verificação de cada sistema e efeito, além da resposta positiva da API."
+          },
+          {
+            "term": "Expurgo em backup",
+            "meaning": "Regra para que dado terminado não reapareça após restauração."
+          }
+        ]
+      }
+    ],
+    "mistakes": [
+      "Inventar prazo único de retenção.",
+      "Apagar sem avaliar exceção ou negar sem explicar.",
+      "Enviar dados antes de verificar solicitante.",
+      "Confundir revogação com exclusão total.",
+      "Confirmar exclusão porque tela sumiu, sem procurar cópias."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: pedido de acesso chega de endereço diferente do canal registrado. O que consultar e o que ocorre antes de devolver dados?",
+        "expected": "Consultar procedimento sem revelar conta. Validar identidade por canal seguro e proporcional antes de buscar e entregar.",
+        "criteria": [
+          "Não divulga antes de validar.",
+          "Usa canal seguro.",
+          "Registra protocolo e escopo."
+        ],
+        "solution": "Responda com instrução do canal oficial sem confirmar detalhes. Após validação, busque sistemas inventariados e entregue dados da pessoa em canal seguro.",
+        "explanation": "Resposta pode criar exposição se destinatário não for validado.",
+        "hints": [
+          "Endereço na mensagem prova controle da conta?",
+          "Que resposta não revela dados?"
+        ]
+      },
+      {
+        "prompt": "Alterar: regra diz “guardamos tudo até pedirem exclusão”. Reescreva com finalidade, término, exceção, revisão e cópias.",
+        "expected": "Prazo ligado à finalidade; exceção só confirmada; logs, terceiros e backups inventariados.",
+        "criteria": [
+          "Evita prazo universal.",
+          "Inclui arts. 15 e 16.",
+          "Inclui cópias e revisão."
+        ],
+        "solution": "Tabela por categoria, finalidade, evento de fim, prazo validado, sistemas/terceiros, descarte, backup e fundamento. Sem norma confirmada, marque pendente e limite uso.",
+        "explanation": "Retenção depende de contexto e norma.",
+        "hints": [
+          "O que encerra finalidade?",
+          "Qual norma foi confirmada?"
+        ]
+      },
+      {
+        "prompt": "Construir: desenhe correção fictícia de e-mail com recebimento, identidade, validação, fonte principal, compartilhamentos e evidência.",
+        "expected": "Confirma pessoa, valida valor, atualiza origem e agentes relevantes, responde seguro e marca falhas pendentes.",
+        "criteria": [
+          "Verifica solicitante e dado.",
+          "Propaga quando aplicável.",
+          "Define evidência."
+        ],
+        "solution": "Protocolar; validar; confirmar dado; alterar origem; atualizar agentes relevantes; conferir cópias; responder no canal; registrar hora, sistemas e pendências sem valor completo em log.",
+        "explanation": "Correção cobre fluxo e canal.",
+        "hints": [
+          "Qual é a fonte?",
+          "Quem recebeu cópia?"
+        ]
+      },
+      {
+        "prompt": "Investigar erro: perfil sumiu, mas marcador fictício está em log e exportação. O que está provado e qual próximo passo?",
+        "expected": "Tela sem registro está provada, mas há duas cópias. Verificar finalidade, acesso, exceção, compartilhamentos e backup antes de encerrar.",
+        "criteria": [
+          "Não declara exclusão completa.",
+          "Lista escopo adicional.",
+          "Define responsável e evidência."
+        ],
+        "solution": "Registre observação. Confira finalidade/exceção de cada cópia, acesso e expurgo; escale decisão. Encerre somente quando cada destino for removido, isolado ou justificado e verificado.",
+        "explanation": "Tela cobre só parte do ciclo.",
+        "hints": [
+          "O que a tela prova?",
+          "Backup pode restaurar o dado?"
+        ]
+      },
+      {
+        "prompt": "Mudança inesperada: pedido de exportação e eliminação, mas obrigação legal e backup não estão validados. Planeje sem decidir exceção.",
+        "expected": "Valida pessoa, prepara exportação segura, termina usos sem finalidade e confirma norma com responsável. Explica impedimento e próximo passo.",
+        "criteria": [
+          "Atende acesso com segurança.",
+          "Separa término de retenção pendente.",
+          "Exige fonte e revisão."
+        ],
+        "solution": "Protocole; valide titular; exporte por canal seguro; interrompa usos terminados; confirme regra alegada e ciclo de backup com responsável. Informe o que fez, razão real de impedimento e próximo passo.",
+        "explanation": "Diligência sem presumir obrigação ou exclusão total.",
+        "hints": [
+          "Que fonte sustenta obrigação?",
+          "Qual cópia está em uso normal?"
+        ]
+      }
+    ],
+    "quiz": [
+      {
+        "question": "A LGPD define prazo universal de retenção?",
+        "options": [
+          "Sim, igual para todos.",
+          "Não; depende da finalidade e hipóteses de conservação.",
+          "Sim, cinco anos para todo dado."
+        ],
+        "correctIndex": 1,
+        "explanation": "Arts. 15 e 16 aplicam-se conforme contexto."
+      },
+      {
+        "question": "Revogar consentimento significa:",
+        "options": [
+          "Apagar sempre tudo.",
+          "Retirar consentimento das operações apoiadas nele, observadas regras de término/conservação.",
+          "Não muda nada."
+        ],
+        "correctIndex": 1,
+        "explanation": "Revogação e eliminação são direitos distintos."
+      },
+      {
+        "question": "Antes de exportar dados:",
+        "options": [
+          "Enviar ao endereço no pedido.",
+          "Validar solicitante e limitar escopo.",
+          "Exportar banco inteiro."
+        ],
+        "correctIndex": 1,
+        "explanation": "Preserve confidencialidade e escopo."
+      },
+      {
+        "question": "Pedido de titular deve ser:",
+        "options": [
+          "Sempre pago.",
+          "Sem custo, conforme prazos e regras aplicáveis.",
+          "Negado se houver cópias."
+        ],
+        "correctIndex": 1,
+        "explanation": "A lei prevê atendimento sem custo segundo regras vigentes."
+      }
+    ],
+    "summary": [
+      "Retenção depende da finalidade e condições dos arts. 15 e 16.",
+      "Acesso, correção, portabilidade, revogação e eliminação são fluxos diferentes.",
+      "Verifique identidade antes de revelar e minimize exportação/evidência.",
+      "Procure origem, cópias, compartilhamentos, logs e backups.",
+      "Confira prazos atuais para tipo de agente e solicitação."
+    ]
+  },
+  "delivery-lgpd-incident-response": {
+    "prerequisites": "Concluir delivery-audit-response, delivery-lgpd-foundations e delivery-lgpd-legal-bases. Use somente marcadores inventados. Esta aula não autoriza comunicar ANPD/titulares nem acessar painel.",
+    "setup": "Monte ficha com evento confirmado, dados, titulares, risco, contenção, papel, prazo e decisão pendente. Não instale ferramentas nem entre no SEI. A prática ensina reconhecimento e escalonamento; comunicação externa cabe a quem representa o controlador.",
+    "why": "Falha técnica não determina sozinha se houve incidente comunicável. Confirme o evento, verifique se dados pessoais foram afetados e avalie risco/dano. Não espere certeza total para alertar responsável, conter dentro da autoridade e preservar fatos. Controlador decide e conduz comunicação; operador o informa sem demora injustificada. Fontes oficiais são complementares; o conteúdo está nesta aula.",
+    "example": {
+      "language": "text",
+      "code": "1. Vulnerabilidade sem exploração confirmada → registrar, corrigir e investigar.\n2. Acesso não autorizado confirmado a dado pessoal → incidente.\n3. Verificar categorias, titulares, identificação, proteção e impacto.\n4. Conter, guardar linha do tempo e informar controlador.\n5. Controlador avalia risco e dever de comunicar.\n6. Regra geral ANPD: 3 dias úteis; confirmar prazo e enquadramento.\n7. Informação incompleta pode ser complementada conforme regulamento.",
+      "expected": "Vulnerabilidade isolada leva a investigação; acesso confirmado aciona controlador, que avalia risco, regras e comunicação.",
+      "explanation": ["Vulnerabilidade e incidente confirmado são estados diferentes.","Operador e controlador têm papéis diferentes na resposta e comunicação.","Prazos dependem de marco, enquadramento e norma aplicável."]
+    },
+    "guided": [
+      {
+        "instruction": "Marque vulnerabilidade, incidente confirmado e evento com dado pessoal. Não conclua impacto sem fatos.",
+        "result": "09:00 é vulnerabilidade sem exploração confirmada; 09:20 é acesso não autorizado confirmado a arquivo com dados fictícios. Risco precisa de avaliação."
+      },
+      {
+        "instruction": "Separe ações do operador, controlador e equipe técnica.",
+        "result": "Operador alerta controlador e fornece informação; equipe contém/preserva conforme autoridade; controlador avalia e conduz comunicação externa."
+      },
+      {
+        "instruction": "Registre prazo geral, marco e exceções a confirmar.",
+        "result": "Anote três dias úteis como regra geral, possível prazo em dobro para agente de pequeno porte elegível, legislação específica, marco e responsável pela confirmação."
+      }
+    ],
+    "sections": [
+      {
+        "title": "Confirme evento e identifique dados atingidos",
+        "paragraphs": [
+          "Incidente com dados pessoais é evento adverso confirmado que compromete confidencialidade, integridade, disponibilidade ou autenticidade. Pode ser envio errado, alteração, perda, indisponibilidade ou acesso não autorizado. Nem todo incidente de segurança envolve dados pessoais; dado efetivamente anonimizado sem relação possível a pessoa identificável não é por si incidente comunicável sob a LGPD.",
+          "Vulnerabilidade é condição que pode permitir dano; sua mera existência não constitui incidente. Exploração pode resultar em incidente. Registre observação, fonte, horário, sistema e lacuna. Não apague evidência, tente invadir para confirmar ou copie registros pessoais para aula/canal público.",
+          "Faça três perguntas: evento confirmado? Dados pessoais envolvidos? Pode haver risco ou dano relevante? Controlador avalia contexto, categorias/quantidade, titulares, danos potenciais, identificação e mitigação. O mesmo evento pode ter impacto diferente conforme os fatos."
+        ],
+        "terms": [
+          {
+            "term": "Incidente de segurança",
+            "meaning": "Evento confirmado que compromete propriedades de segurança de dados pessoais."
+          },
+          {
+            "term": "Vulnerabilidade",
+            "meaning": "Condição explorável; sem evento confirmado não é automaticamente incidente."
+          },
+          {
+            "term": "Confidencialidade",
+            "meaning": "Dado não é revelado a pessoa sem autorização."
+          },
+          {
+            "term": "Integridade",
+            "meaning": "Dado não é alterado sem autorização."
+          },
+          {
+            "term": "Disponibilidade",
+            "meaning": "Dado é acessível a quem tem autorização quando necessário."
+          },
+          {
+            "term": "Autenticidade",
+            "meaning": "Origem ou identidade declarada pode ser reconhecida."
+          }
+        ]
+      },
+      {
+        "title": "Respeite papéis: operador alerta, controlador decide",
+        "paragraphs": [
+          "A comunicação legal à ANPD e aos titulares é dever do controlador quando requisitos se aplicam. O operador tem deveres de segurança e, ao detectar incidente, informa controlador sem demora injustificada e fornece dados necessários. Contrato ou procedimento pode exigir aviso ainda mais cedo. Não espere terminar análise para escalar.",
+          "Quem não representa controlador preserva fatos, segue plano interno e aciona canal de incidente/privacidade. Não protocola em nome da organização, não decide “não houve risco” e não contata titulares sem autorização. Controlador coordena segurança, jurídico/privacidade, produto e comunicação.",
+          "Contenha dentro da autoridade concedida sem destruir prova. Restrinja acesso, proteja credenciais e preserve logs. Se ação puder apagar evidência ou afetar serviço, envolva quem responde ao incidente. Anote horário/fuso, responsáveis e mudanças."
+        ],
+        "terms": [
+          {
+            "term": "Controlador",
+            "meaning": "Agente que decide tratamento e conduz avaliação e comunicação exigida pela LGPD."
+          },
+          {
+            "term": "Operador",
+            "meaning": "Agente que trata em nome do controlador e o informa sem demora injustificada."
+          },
+          {
+            "term": "Escalonamento",
+            "meaning": "Acionamento do canal responsável com fatos suficientes para agir."
+          },
+          {
+            "term": "Contenção",
+            "meaning": "Medidas proporcionais para limitar acesso/dano e preservar investigação."
+          }
+        ]
+      },
+      {
+        "title": "Conheça prazo geral e regras especiais",
+        "paragraphs": [
+          "A página atual da ANPD informa regra geral de três dias úteis para controlador comunicar ANPD e titulares, ressalvado prazo diferente em legislação específica. Regulamento define marco e conteúdo. Registre quando controlador soube que dados pessoais foram afetados; não comece contagem por palpite de quem encontrou falha.",
+          "Agentes de pequeno porte elegíveis têm prazo em dobro em situações delimitadas pela Resolução nº 2, alterada pela Resolução nº 15/2024. Nem toda organização pequena se enquadra automaticamente; confirme elegibilidade, exceções e aplicação. Outra lei pode prever prazo diferente. Iniciante registra regra candidata e escala, sem atrasar alerta interno.",
+          "Se faltarem informações, controlador pode usar comunicação preliminar fundamentada e complementar conforme regulamento. A página atual da ANPD informa até vinte dias úteis para complemento após comunicação preliminar. Isso não encerra obrigação. Confira norma atual, marco e processo antes de ação real."
+        ],
+        "terms": [
+          {
+            "term": "Prazo regulamentar",
+            "meaning": "Prazo definido em norma; marco e agentes sujeitos precisam ser confirmados."
+          },
+          {
+            "term": "Agente de pequeno porte",
+            "meaning": "Agente que atende critérios da regulamentação ANPD."
+          },
+          {
+            "term": "Comunicação preliminar",
+            "meaning": "Etapa inicial fundamentada com informação incompleta e que exige complemento."
+          },
+          {
+            "term": "Legislação específica",
+            "meaning": "Norma que pode definir dever ou prazo diferente."
+          }
+        ]
+      },
+      {
+        "title": "Prepare fatos e comunicação compreensível",
+        "paragraphs": [
+          "Monte linha do tempo, categoria de dados, quantidade e tipos de titulares se conhecidos, sistemas, contexto, risco/impacto, medidas tomadas e previstas, data de conhecimento e canal. Separe fatos de estimativas. Não copie nomes ou dados sem necessidade.",
+          "Quando exigida, comunicação aos titulares deve ser simples e direta, individualizada quando possível, e explicar ocorrência, efeitos possíveis e mitigação. Não minimize, prometa que nada ocorrerá ou revele detalhes que ampliem vulnerabilidade. Pessoa autorizada revisa precisão, público e canal.",
+          "Mantenha registro do incidente mesmo quando não for comunicado externamente, conforme regra aplicável. Documente avaliação, decisão, justificativa, evidência e recuperação com acesso restrito. Reavalie se surgirem fatos novos. Ausência no log só vale para o sistema, período e eventos que a fonte cobre."
+        ],
+        "terms": [
+          {
+            "term": "Risco relevante",
+            "meaning": "Avaliação de potencial de dano a direitos e interesses, feita pelo controlador conforme critérios da ANPD."
+          },
+          {
+            "term": "Linha do tempo",
+            "meaning": "Fatos e decisões ordenados com horários, fontes e responsáveis."
+          },
+          {
+            "term": "Escopo",
+            "meaning": "Dados, titulares, sistemas, períodos e agentes possivelmente afetados."
+          },
+          {
+            "term": "Registro de incidente",
+            "meaning": "Documentação protegida da ocorrência, avaliação, decisão e medidas."
+          }
+        ]
+      }
+    ],
+    "mistakes": [
+      "Notificar fora com base em rumor ou ignorar evento confirmado por falta de detalhes.",
+      "Tratar vulnerabilidade como incidente automático.",
+      "Esperar análise completa antes de operador alertar controlador.",
+      "Aplicar três dias sem verificar porte e legislação específica.",
+      "Publicar lista de titulares, tokens ou detalhes de exploração como prova."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: 09:00 há configuração pública possível sem acesso observado. 09:20 aparece download confirmado de arquivo fictício. O que muda?",
+        "expected": "Às 09:00 há vulnerabilidade sem incidente confirmado conhecido. Às 09:20 há evento confirmado com dado pessoal; alertar controlador, conter e avaliar risco, escopo e comunicação.",
+        "criteria": [
+          "Distingue vulnerabilidade e evento confirmado.",
+          "Reconhece dado pessoal.",
+          "Escala sem decidir notificação sozinho."
+        ],
+        "solution": "Registre momentos separadamente. Restrinja acesso e investigue às 09:00. Após download confirmado, informe controlador, contenha, preserve escopo e avalie titulares/dados/risco. Não conclua ausência de dano sem apuração.",
+        "explanation": "Confirmação e dado pessoal mudam a triagem; controlador avalia risco.",
+        "hints": [
+          "Que evidência existe em cada hora?",
+          "Quem decide comunicação externa?"
+        ]
+      },
+      {
+        "prompt": "Alterar: operador quer concluir análise antes de avisar controlador. Reordene e liste o primeiro alerta interno.",
+        "expected": "Alertar sem demora com horário, sistema, evidência, categoria/escopo conhecido, ações e lacunas; investigar em paralelo.",
+        "criteria": [
+          "Prioriza aviso.",
+          "Separa alerta interno de comunicação externa.",
+          "Minimiza cópia de dados."
+        ],
+        "solution": "Acione contato seguro com fato, horário, serviço, categoria, mitigação e perguntas. Não espere detalhes nem inclua linhas de usuários. Atualize durante apuração.",
+        "explanation": "Operador permite que controlador avalie prontamente.",
+        "hints": [
+          "Que fatos permitem conter?",
+          "Pode descrever categoria sem copiar registro?"
+        ]
+      },
+      {
+        "prompt": "Construir: complete ficha com confirmação, dados/titulares, risco, contenção, papéis, prazo e próxima atualização.",
+        "expected": "Separa fatos/estimativas, registra alerta, lacunas e prazo geral com ressalvas. Não decide notificação sozinho.",
+        "criteria": [
+          "Cobre evento, dado, risco e contenção.",
+          "Marca incerteza.",
+          "Registra papel e prazo candidato."
+        ],
+        "solution": "Evento: acesso confirmado 09:20; dado: id fictício; titulares: em apuração; risco: avaliar; contenção: 09:35; operador avisou controlador; prazo: 3 dias úteis geral, validar porte/norma; decisão externa: controlador; evidência: referência protegida; próxima revisão: responsável e hora.",
+        "explanation": "Ficha expõe lacunas e responsável.",
+        "hints": [
+          "O que está confirmado?",
+          "Qual o marco de contagem?"
+        ]
+      },
+      {
+        "prompt": "Investigar erro: não há evento em logs e equipe afirma “não houve incidente”. Verifique cobertura e reescreva conclusão.",
+        "expected": "Dizer que nenhum evento apareceu na fonte/período consultado; verificar sistema, permissão e retenção; buscar fontes e manter investigação.",
+        "criteria": [
+          "Não afirma ausência absoluta.",
+          "Confere período/cobertura.",
+          "Define acompanhamento."
+        ],
+        "solution": "Registre “no log X, período A–B, sem evento; sistema Y ou método Z não coberto”. Confirme retenção/permissões, busque outras fontes e escale. Atualize se surgir evidência.",
+        "explanation": "Ausência num registro não prova ausência se cobertura é limitada.",
+        "hints": [
+          "Qual intervalo o log cobre?",
+          "Quem podia consultá-lo?"
+        ]
+      },
+      {
+        "prompt": "Mudança inesperada: apuração começou sexta, faltam detalhes e agente talvez seja pequeno ou sujeito a prazo setorial. O que fazer sem adiar?",
+        "expected": "Alertar controlador, registrar marco, confirmar enquadramento/norma com responsável, preparar comunicação preliminar se cabível e complemento. Não esperar investigação completa.",
+        "criteria": [
+          "Escala e registra marco.",
+          "Confirma regras em fonte oficial.",
+          "Reconhece etapas preliminar/complementar.",
+          "Não decide unilateralmente."
+        ],
+        "solution": "Marque urgente. Controlador confirma conhecimento, consulta Resoluções 15 e 2 e norma setorial com jurídico/privacidade. Se cabível, comunica preliminarmente e complementa. Estudante mantém ficha; não acessa portal nem protocola.",
+        "explanation": "Prazo depende do marco e enquadramento; escalonamento evita inação.",
+        "hints": [
+          "Organização pequena prova elegibilidade?",
+          "Quem pode protocolar?"
+        ]
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Vulnerabilidade sem exploração confirmada:",
+        "options": [
+          "É sempre notificável.",
+          "Não é por si incidente; exploração pode resultar em incidente.",
+          "Prova vazamento."
+        ],
+        "correctIndex": 1,
+        "explanation": "ANPD distingue condição de evento confirmado."
+      },
+      {
+        "question": "Quem comunica externamente quando critérios se aplicam?",
+        "options": [
+          "Operador sempre por conta própria.",
+          "Controlador; operador o informa sem demora injustificada.",
+          "Qualquer estudante."
+        ],
+        "correctIndex": 1,
+        "explanation": "Controlador conduz e operador fornece informação."
+      },
+      {
+        "question": "Qual regra geral a ANPD informa?",
+        "options": [
+          "Três dias úteis, ressalvadas regras específicas.",
+          "Trinta dias corridos para todos.",
+          "Sem prazo."
+        ],
+        "correctIndex": 0,
+        "explanation": "Há regras específicas, inclusive para certos agentes pequenos."
+      },
+      {
+        "question": "Se faltarem informações, controlador pode:",
+        "options": [
+          "Ignorar até saber tudo.",
+          "Usar etapa preliminar fundamentada e complementar conforme regra.",
+          "Publicar lista de titulares."
+        ],
+        "correctIndex": 1,
+        "explanation": "Etapas seguem procedimento e não encerram obrigação."
+      }
+    ],
+    "summary": [
+      "Separe evento confirmado, dado pessoal e risco relevante.",
+      "Vulnerabilidade sozinha não é incidente; declare limites dos logs.",
+      "Operador alerta controlador; controlador avalia e comunica quando devido.",
+      "Três dias úteis é regra geral; confirme porte, marco e norma específica.",
+      "Use evidência mínima e não envie comunicação real nesta prática."
+    ]
+  },
   "delivery-redis-foundations": {
     "prerequisites": "Concluir `setup-docker`, `setup-node`, `db-postgres` e `delivery-api-abuse`; conhecer banco relacional, API e execução de containers. A decisão arquitetural usa o PostgreSQL/Supabase existente como fonte de verdade.",
     "setup": "No editor, leia `labs/redis-fundamentals/README.md` e `compose.yaml`. No terminal, abra a pasta `labs/redis-fundamentals`, execute `docker compose config` e depois `docker compose up -d --wait`; com Compose standalone, use `docker-compose`. A saída esperada inclui um serviço `redis` saudável publicado em 127.0.0.1:56379. Execute `docker compose exec -T redis redis-cli PING`; a resposta esperada é `PONG`. A primeira execução baixa a imagem oficial. Não usa rede pública de dados, domínio, Preview ou credenciais reais. Pare com `docker compose down`; para retomar, repita `up -d --wait`. Se Docker não estiver disponível, desenhe o fluxo sem instalar nada.",
@@ -4028,6 +5101,10 @@ Object.assign(LESSON_GUIDES, {
       expected: "O relato não interpreta a ausência como prova, verifica período/serviço/permissão/retenção, contém uma credencial exposta sem aguardar histórico completo, e relaciona cada próximo passo a uma fonte e responsável.",
       hint: "Que tipo de evento aquela exportação realmente registra e que conclusão cabe a esse escopo?"
     },
+    "delivery-lgpd-foundations": {"prompt":"Segunda tentativa: uma tela registra clique, página, horário e identificador técnico para uma métrica. Revise se os campos identificam alguém, proponha minimização e liste decisões pendentes.","expected":"Considera combinação de id, evento e horário; pergunta finalidade, destinatários, retenção e acesso; remove campos sem função e marca papéis como pendentes.","hint":"Compare métrica mínima e evento detalhado; quem consegue ligar o id a uma conta?"},
+    "delivery-lgpd-legal-bases": {"prompt":"Segunda tentativa: relatório fictício mistura autenticação, suporte e mensagem opcional sob “consentimento”. Separe finalidades, dado comum/sensível, hipóteses e fatos que precisam de aprovação.","expected":"Cria análise por finalidade, usa art. 7º para dados comuns e art. 11 para sensíveis, não presume consentimento e escala hipóteses com evidências.","hint":"Decomponha cada operação antes de avaliar a base."},
+    "delivery-lgpd-rights-lifecycle": {"prompt":"Segunda tentativa: confirmação recebe resposta imediata, mas declaração completa depende de fornecedor e pedido veio por procurador. Planeje identidade, prazo, agente, resposta e atualização.","expected":"Verifica representação proporcional, identifica controlador, acompanha prazo vigente e dependência, informa próximos passos e não expõe dados antes da validação.","hint":"Confirmação e acesso completo têm respostas diferentes; verifique regra atual e representação."},
+    "delivery-lgpd-incident-response": {"prompt":"Segunda tentativa: operador encontra acesso confirmado a logs com identificadores e atividades, sem saber quantidade nem impacto. Monte alerta e perguntas sem enviar linhas pessoais.","expected":"Alerta controlador com fato, horário, sistema, categorias, contenção e lacunas. Controlador avalia escopo, risco, prazos e comunicação. Evidências usam referências protegidas.","hint":"Informação incompleta não impede escalonar; descreva categorias em vez de copiar conteúdo."},
     "delivery-redis-foundations": {
       prompt: "Uma proposta adiciona Redis para guardar progresso, cache e contadores. Faça um mapa separando fonte persistente, dados reconstruíveis, TTL, custo operacional e evidência necessária para justificar cada uso.",
       expected: "Progresso permanece no Supabase/PostgreSQL; cache/contadores podem ser reconstruíveis com TTL; qualquer sessão exige requisitos próprios; adoção depende de medida e plano de falha, não de preferência pela ferramenta.",

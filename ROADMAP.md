@@ -441,10 +441,13 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Criar `delivery-server-hardening` e `delivery-db-privileges` com cinco exercícios cada, quiz, roteiro de setup/alternativa sem Docker, limites de evidência e distinção entre grants de tabela, autorização por linha e RLS. Validador registra 134 aulas, 547 exercícios e 418 questões.
 - [x] Ensinar rotação e revogação de segredo, auditoria de acesso e resposta inicial a incidente.
   - [x] Adicionar `delivery-secret-lifecycle` e `delivery-audit-response`, com conceito em quatro blocos, glossário, resultado esperado, prática guiada, cinco exercícios com critérios/dicas/soluções, quiz e transferência. Conteúdo autossuficiente em português; fontes primárias atuais são opcionais. Usa só dados fictícios e não exige painéis, contas, plano pago, Docker ou valores reais. Validador: 136 aulas, 557 exercícios e 426 questões. Teste de aprendizagem com aluno real e inspeção visual no navegador não executados.
-- [ ] Introduzir LGPD com papéis, finalidade, base legal, minimização, retenção, direitos do titular e resposta a incidente.
+- [x] Introduzir LGPD com papéis, finalidade, bases legais, minimização, retenção, direitos do titular e resposta a incidente: `delivery-lgpd-foundations`, `delivery-lgpd-legal-bases`, `delivery-lgpd-rights-lifecycle` e `delivery-lgpd-incident-response`.
 - [ ] Criar inventário de dados e fluxo de tratamento usando somente dados fictícios.
 - [ ] Implementar exportação, correção e exclusão de dados do usuário no projeto didático.
-- [ ] Deixar explícito que o conteúdo educacional não substitui avaliação jurídica ou de segurança profissional.
+- [x] Deixar explícito que o conteúdo educacional não substitui avaliação jurídica ou de segurança profissional.
+
+
+**Conclusão desta prioridade em 28/10/2026:** as quatro aulas trazem conceitos, glossário, exemplos com resultado esperado, prática guiada e independente, cinco soluções comentadas, quiz e segunda tentativa diferente; todas ensinam a encaminhar decisões reais à pessoa responsável. A lei consolidada e fontes oficiais da ANPD foram verificadas; links são complementares. Validador: 140 aulas, 577 exercícios e 442 questões. Sintaxe e `git diff --check` passaram. Não houve teste com aluno real ou inspeção visual no navegador; inventário e fluxo de projeto didático seguem como próximas prioridades.
 
 ### Fase 7.4 — Redis, desempenho e operação
 

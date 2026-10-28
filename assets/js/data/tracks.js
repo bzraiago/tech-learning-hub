@@ -5455,6 +5455,134 @@
             ]
           },
           {
+            "id": "delivery-lgpd-foundations",
+            "title": "LGPD: dados, finalidades e papéis",
+            "minutes": 90,
+            "concept": "Reconheça dados pessoais e sensíveis, descreva o ciclo de tratamento e identifique papéis pelas decisões reais. Transforme uma funcionalidade de estudos em mapa de finalidade, dados mínimos, acessos e dúvidas a escalar.",
+            "objectives": [
+              "Classificar exemplos fictícios como dados pessoais, sensíveis ou não identificáveis no contexto.",
+              "Descrever coleta, uso, compartilhamento, armazenamento, retenção e eliminação como tratamento.",
+              "Distinguir titular, controlador, operador e encarregado pelas funções exercidas.",
+              "Aplicar os dez princípios do art. 6º a decisões de produto.",
+              "Criar mapa preliminar de fluxo de dados e perguntas para responsável."
+            ],
+            "exercise": "Use somente o cenário fictício de estudos para mapear finalidade, campos, operações, papéis, destinatários, proteção e pontos pendentes. Não consulte dados ou serviços reais.",
+            "code": "CENÁRIO FICTÍCIO — conta de estudo\nFinalidade: salvar cursos e progresso do aluno\nCandidato mínimo: identificador da conta + itens de estudo + estado\nPergunte antes de incluir: CPF, localização, saúde ou nascimento\nFluxo: coletar → usar → armazenar → permitir acesso/correção → encerrar → eliminar ou justificar retenção\nPapéis: hipótese até conferir decisões, contratos e operação.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "Câmara dos Deputados · LGPD atualizada",
+                "url": "https://www2.camara.leg.br/legin/fed/lei/2018/lei-13709-14-agosto-2018-787077-normaatualizada-pl.html",
+                "language": "PT-BR"
+              },
+              {
+                "kind": "doc",
+                "title": "ANPD · Guia dos agentes de tratamento e encarregado",
+                "url": "https://www.gov.br/anpd/pt-br/centrais-de-conteudo/materiais-educativos-e-publicacoes/guia-orientativo-para-definicoes-dos-agentes-de-tratamento-e-do-encarregado",
+                "language": "PT-BR"
+              }
+            ]
+          },
+          {
+            "id": "delivery-lgpd-legal-bases",
+            "title": "LGPD: bases legais e hipóteses de uso",
+            "minutes": 95,
+            "concept": "Relacione finalidade a hipótese legal candidata, compare as dez bases do art. 7º às hipóteses próprias para dados sensíveis do art. 11 e reconheça por que consentimento e legítimo interesse não são atalhos.",
+            "objectives": [
+              "Explicar por que a base é analisada por finalidade e operação.",
+              "Descrever as dez hipóteses do art. 7º.",
+              "Distinguir bases de dados comuns das hipóteses do art. 11 para dados sensíveis.",
+              "Explicar requisitos e limites de consentimento e legítimo interesse.",
+              "Registrar hipótese candidata, evidência faltante e responsável pela revisão."
+            ],
+            "exercise": "Para cada finalidade fictícia, escreva hipótese candidata, requisito e fatos faltantes. Não escolha base para produto ou pessoa real.",
+            "code": "MATRIZ DE ESTUDO — hipóteses, não parecer jurídico\nSalvar progresso pedido → verificar necessidade para serviço\nEnviar novidade opcional → avaliar consentimento válido ou outra hipótese\nUsar biometria → dado sensível; examinar art. 11 separadamente\nRegra: uma finalidade + hipótese + evidência + responsável + revisão.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "Câmara dos Deputados · LGPD atualizada, arts. 7º a 11",
+                "url": "https://www2.camara.leg.br/legin/fed/lei/2018/lei-13709-14-agosto-2018-787077-normaatualizada-pl.html",
+                "language": "PT-BR"
+              },
+              {
+                "kind": "doc",
+                "title": "ANPD · Perguntas frequentes",
+                "url": "https://www.gov.br/anpd/pt-br/acesso-a-informacao/perguntas-frequentes/perguntas-frequentes",
+                "language": "PT-BR"
+              }
+            ]
+          },
+          {
+            "id": "delivery-lgpd-rights-lifecycle",
+            "title": "Dados pessoais: retenção e direitos do titular",
+            "minutes": 100,
+            "concept": "Desenhe ciclo de vida e retenção por finalidade, responda a pedidos fictícios com controle de identidade e entenda por que acesso, correção, portabilidade, revogação e eliminação têm efeitos diferentes.",
+            "objectives": [
+              "Criar tabela de retenção com finalidade, término, cópias e regra de eliminação/conservação.",
+              "Explicar direitos do art. 18 e diferença entre revogar consentimento e apagar todos os dados.",
+              "Planejar busca, correção e exportação sem revelar dados à pessoa errada.",
+              "Reconhecer término do tratamento e exceções do art. 16.",
+              "Registrar resposta e lacunas sem prometer prazo ou exclusão não comprovados."
+            ],
+            "exercise": "Resolva pedidos inventados usando mapa e tabela de retenção. Não abra contas nem processe registros reais.",
+            "code": "PEDIDO FICTÍCIO REQ-DEMO-14\nPedido: acesso e correção de e-mail de teste\nCópias: perfil, atividade e exportação de demonstração\nRegra: validar pessoa; localizar escopo; conferir finalidade/exceções; executar ou explicar impedimento; verificar cópias compartilhadas\nApagar a tela não prova que backups, logs ou fornecedores foram atualizados.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "Câmara dos Deputados · LGPD atualizada, arts. 15 a 20",
+                "url": "https://www2.camara.leg.br/legin/fed/lei/2018/lei-13709-14-agosto-2018-787077-normaatualizada-pl.html",
+                "language": "PT-BR"
+              },
+              {
+                "kind": "doc",
+                "title": "ANPD · Direitos dos titulares",
+                "url": "https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados/direito-dos-titulares",
+                "language": "PT-BR"
+              },
+              {
+                "kind": "doc",
+                "title": "ANPD · Perguntas frequentes",
+                "url": "https://www.gov.br/anpd/pt-br/acesso-a-informacao/perguntas-frequentes/perguntas-frequentes",
+                "language": "PT-BR"
+              }
+            ]
+          },
+          {
+            "id": "delivery-lgpd-incident-response",
+            "title": "Incidentes com dados pessoais: triagem e comunicação",
+            "minutes": 90,
+            "concept": "Diferencie vulnerabilidade de incidente confirmado, verifique presença de dados pessoais e risco aos titulares e prepare resposta com papéis, prazos atuais, fatos e evidências.",
+            "objectives": [
+              "Reconhecer incidente e diferenciar evento confirmado de vulnerabilidade não explorada.",
+              "Investigar confirmação, dado pessoal e risco/dano relevante separadamente.",
+              "Distinguir aviso do operador da comunicação sob responsabilidade do controlador.",
+              "Aplicar prazo geral e reconhecer regras especiais de porte e atividade.",
+              "Preparar linha do tempo fictícia sem expor dados ou enviar comunicação real."
+            ],
+            "exercise": "Analise somente linha do tempo fictícia e prepare fatos, contenção e perguntas para controlador. Não acesse SEI, gov.br, clientes, usuários ou sistemas reais.",
+            "code": "LINHA DO TEMPO FICTÍCIA\n09:00 — configuração incorreta; exploração não confirmada\n09:20 — acesso confirmado a arquivo com identificadores fictícios\n09:35 — acesso restrito; operador avisa controlador sem demora injustificada\n10:10 — escopo em apuração; evidência preservada\nControlador avalia risco e comunicação. Regra geral: 3 dias úteis; confirme regras especiais.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "ANPD · Comunicação de incidente de segurança",
+                "url": "https://www.gov.br/anpd/pt-br/canais_atendimento/agente-de-tratamento/comunicado-de-incidente-de-seguranca-cis",
+                "language": "PT-BR"
+              },
+              {
+                "kind": "doc",
+                "title": "ANPD · Resolução nº 2/2022 para agentes de pequeno porte",
+                "url": "https://www.gov.br/anpd/pt-br/acesso-a-informacao/institucional/atos-normativos/regulamentacoes_anpd/resolucao-cd-anpd-no-2-de-27-de-janeiro-de-2022",
+                "language": "PT-BR"
+              },
+              {
+                "kind": "doc",
+                "title": "Câmara dos Deputados · LGPD atualizada, arts. 46 e 48",
+                "url": "https://www2.camara.leg.br/legin/fed/lei/2018/lei-13709-14-agosto-2018-787077-normaatualizada-pl.html",
+                "language": "PT-BR"
+              }
+            ]
+          },
+          {
             "id": "delivery-redis-foundations",
             "title": "Redis: quando usar e como opera",
             "minutes": 70,
