@@ -1519,6 +1519,147 @@ Object.assign(LESSON_GUIDES, {
       "A demonstração é uma cópia local com efeito inofensivo; não se executa nem valida no Preview."
     ]
   },
+  "delivery-csrf": {
+    "prerequisites": "Concluir `delivery-xss-output`, `delivery-oauth-google` e `delivery-clerk-supabase`; conhecer métodos HTTP, cookies, sessão, origem e cabeçalhos. Esta aula é análise conceitual do fluxo local do repositório. Não exige serviço remoto, navegador autenticado, domínio ou deploy.",
+    "setup": "No editor, leia `assets/js/cloud.js` (função `cloudRequest`), `assets/js/auth.js` e o diagrama de `delivery-xss-output`. No terminal aberto na raiz, você pode localizar referências com `rg -n 'credentials:|cookie|Authorization|Bearer|fetch\\(' assets/js/cloud.js assets/js/auth.js api`. A saída esperada inclui o token Clerk obtido via `session.getToken()` e enviado em `Authorization: Bearer`; o roteiro não envia pedidos nem altera configuração. Para retomar, releia a função. Se não tiver `rg`, use a busca do editor. Alternativa leve: compare os exemplos desta aula sem abrir serviços ou domínio.",
+    "why": "Uma requisição entre sites pode chegar ao servidor mesmo quando o site atacante não consegue ler a resposta. Se o navegador acrescenta automaticamente o cookie de sessão e o servidor confia somente nesse cookie, uma ação pode ocorrer sem intenção da pessoa. A defesa precisa corresponder ao modo como a aplicação autentica as chamadas.",
+    "example": {
+      "language": "text",
+      "code": "MATRIZ DE PEDIDOS (não executa requisições):\n\nSessão por cookie:\n  formulário em origem externa → POST simples → navegador pode anexar cookie\n  servidor confere só cookie → risco de ação CSRF\n\nAPI com credencial explícita:\n  `cloud.js` obtém token Clerk → adiciona `Authorization: Bearer ...`\n  navegador envia a Supabase com chave pública e corpo JSON\n  CORS/preflight e credencial explícita mudam o fluxo; RLS continua necessária\n\nCORS controla compartilhamento de resposta/origem; não é autorização do usuário nem defesa universal contra CSRF.",
+      "expected": "No modelo por cookie, o navegador pode anexar a sessão automaticamente a um pedido simples e o servidor precisa verificar que a intenção veio da aplicação. No fluxo analisado de `cloud.js`, o token Bearer é obtido e adicionado explicitamente ao cabeçalho; isso reduz a aplicabilidade do CSRF clássico baseado apenas em cookie, mas não comprova a configuração CORS, RLS, o comportamento interno do Clerk ou a segurança geral do sistema.",
+      "explanation": [
+        "CSRF (Cross-Site Request Forgery) tenta induzir o navegador autenticado a enviar uma ação ao site de destino; o atacante pode não conseguir ler a resposta para ainda assim causar a mudança.",
+        "O risco clássico depende de credencial enviada automaticamente, como cookie de sessão. Um token Bearer inserido em cabeçalho explícito por JavaScript segue outro modelo; não confunda isso com prova de que todos os endpoints estão protegidos.",
+        "CORS pode impedir que um script leia respostas ou que certas chamadas não simples sejam enviadas sem preflight. Formulários ainda podem emitir pedidos simples; a API precisa validar a própria autorização e a defesa CSRF adequada.",
+        "A aula compara padrões e lê o código do projeto. Não testa cookies reais, config de navegador, painel Vercel, Clerk, CORS do Supabase nem domínio Preview."
+      ]
+    },
+    "sections": [
+      {
+        "title": "O modelo de ameaça do CSRF",
+        "paragraphs": [
+          "Imagine que a pessoa entra numa aplicação e recebe um cookie de sessão. Enquanto esse cookie continua válido, o navegador pode anexá-lo automaticamente a chamadas destinadas ao site. Uma página externa induz a pessoa a visitar um link ou enviar um formulário para uma rota que altera dados. O servidor vê um cookie válido e, se não tiver outra prova de intenção, pode aceitar a ação.",
+          "O CSRF não exige que o atacante leia a resposta nem que descubra a senha. O impacto depende das operações disponíveis: alterar endereço, publicar conteúdo, criar uma ação ou mudar configurações. A condição central é um pedido de mudança de estado que aceita uma credencial automaticamente enviada sem confirmar a intenção da aplicação legítima.",
+          "O método HTTP precisa corresponder à semântica. `GET`, `HEAD` e `OPTIONS` devem ser seguros e não mudar estado; ações de escrita usam `POST`, `PUT`, `PATCH` ou `DELETE`, com autorização apropriada. `SameSite=Lax` não salva uma aplicação que altera estado em `GET`, pois cookies podem acompanhar navegações principais com método seguro.",
+          "Pausa: no diagrama, separe o pedido que o visitante inicia, a credencial que o browser acrescenta e a decisão que o servidor precisa tomar."
+        ],
+        "terms": [
+          { "term": "CSRF", "meaning": "Tentativa de fazer o navegador de uma pessoa autenticada enviar uma ação que ela não pretendia executar." },
+          { "term": "Credencial ambient", "meaning": "Credencial que o navegador pode anexar automaticamente conforme o destino e as regras do browser, como um cookie de sessão." },
+          { "term": "Pedido seguro", "meaning": "Método HTTP que, por semântica, não deve causar alteração de estado do servidor; GET é exemplo comum." },
+          { "term": "Intenção da requisição", "meaning": "Sinal verificável de que a ação foi iniciada pela aplicação legítima e não apenas carregada com sessão válida." }
+        ]
+      },
+      {
+        "title": "CORS não substitui defesa CSRF",
+        "paragraphs": [
+          "Same Origin Policy e CORS regulam interações entre origens no navegador, incluindo se um script pode ler uma resposta. Eles não significam que toda requisição entre origens deixa de ser enviada. Formulários HTML podem enviar pedidos simples compatíveis com a web antiga; o servidor pode receber e processar o pedido antes de o browser impedir a leitura da resposta pelo site externo.",
+          "Uma chamada `fetch()` com cabeçalho personalizado ou tipo de conteúdo não simples exige preflight CORS. O servidor decide se permite aquela origem e aqueles cabeçalhos. Se uma origem atacante for permitida com credenciais, a política pode abrir caminho para chamadas indevidas. Uma lista ampla de origens não é autorização: o servidor ainda precisa autenticar, autorizar e validar intenção.",
+          "CORS é uma política de compartilhamento de recursos entre origens; autorização responde se a identidade pode executar a ação; defesa CSRF responde se o pedido autenticado veio da aplicação/intenção esperada. São perguntas diferentes. Não use ‘CORS bloqueia’ como conclusão sem avaliar método, headers, cookies, resposta e comportamento do servidor.",
+          "Pausa: compare um POST de formulário com um `fetch` que envia `X-CSRF-Token`. Qual chega ao servidor sem preflight? O que muda se a política CORS permite a origem atacante?"
+        ],
+        "terms": [
+          { "term": "Origem (origin)", "meaning": "Combinação de esquema, host e porta usada pelo navegador para distinguir contextos de segurança." },
+          { "term": "CORS", "meaning": "Mecanismo pelo qual um servidor declara quais origens podem ler certas respostas ou enviar certas chamadas não simples pelo navegador." },
+          { "term": "Preflight", "meaning": "Pedido OPTIONS que o navegador envia para consultar se uma chamada cross-origin não simples está autorizada pela política CORS." },
+          { "term": "Pedido simples", "meaning": "Categoria de chamadas de navegador compatíveis com envio cross-origin sem preflight; submissões de formulário podem se encaixar nela." }
+        ]
+      },
+      {
+        "title": "Combinar controles por risco e sessão",
+        "paragraphs": [
+          "Token CSRF: o servidor entrega um valor imprevisível ligado à sessão e confere sua presença e validade em cada operação que muda estado. Não ponha token em URL, logs ou dados compartilhados. Um campo oculto serve para formulário; um cabeçalho personalizado pode servir para API JavaScript se a política CORS for restrita. A validação final acontece no servidor.",
+          "Cookie `SameSite` controla quando o browser envia cookies em pedidos cross-site. `Strict` restringe mais, mas pode mudar a experiência de navegação; `Lax` oferece um equilíbrio e ainda permite alguns contextos de navegação; `None` permite contexto cross-site e requer `Secure`. Considere `Secure`, `HttpOnly` e `SameSite` conforme finalidade. `HttpOnly` reduz leitura por JavaScript, mas não impede que o browser envie o cookie em CSRF.",
+          "Origin/Referer e Fetch Metadata (`Sec-Fetch-Site`) podem ajudar o servidor a identificar pedidos cross-site. Compare origem exata e defina o tratamento quando cabeçalho estiver ausente ou `null`; não permita curinga sem análise. Use-os como camada adicional ou parte de uma política explicitamente avaliada, sem confiar em valores arbitrários do corpo.",
+          "Mantenha `GET` sem efeitos de escrita, exija autorização e, quando o modelo de sessão justificar, token CSRF. Reautenticação ou confirmação explícita pode proteger ações críticas, mas não substitui o conjunto de controles. Um XSS na origem confiável pode usar o contexto da página para contornar várias defesas CSRF; trate XSS em conjunto."
+        ],
+        "terms": [
+          { "term": "Token sincronizado", "meaning": "Valor imprevisível criado/guardado pelo servidor e enviado explicitamente pela página; o servidor compara com a sessão." },
+          { "term": "SameSite", "meaning": "Atributo de cookie que limita seu envio em certos contextos cross-site; camada complementar, com efeitos de compatibilidade." },
+          { "term": "Origin/Referer", "meaning": "Cabeçalhos de navegador que podem indicar origem de um pedido; compare contra origem esperada de forma exata." },
+          { "term": "Fetch Metadata", "meaning": "Família de cabeçalhos `Sec-Fetch-*` que informa contexto de navegação, incluindo `Sec-Fetch-Site`." }
+        ]
+      },
+      {
+        "title": "Ler o modelo real do projeto sem presumir resultado",
+        "paragraphs": [
+          "Em `assets/js/cloud.js`, `cloudRequest` chama `window.Clerk.session.getToken()` e define `Authorization: Bearer ${token}` antes de enviar uma requisição REST ao Supabase. O código também envia uma chave publicável em `apikey` e, para corpo, `Content-Type: application/json`. Não configura `credentials: include`; por padrão, o navegador não anexa credenciais cross-origin como faria numa chamada de mesma origem. Isso é observação do código, não teste de rede.",
+          "Uma chamada com credencial Bearer explícita não é o mesmo cenário de um servidor que autentica só por cookie ambient. O browser não permite que um formulário HTML comum escolha esse cabeçalho. Chamadas customizadas passam por regras CORS/preflight. Mesmo assim, token exposto a XSS, configuração CORS permissiva, autorização incorreta, endpoints alternativos ou cookies em outra parte do sistema exigem análise própria. RLS continua sendo a fronteira de dados do projeto.",
+          "Não conclua ‘o projeto está imune a CSRF’ por ler um único arquivo. Nesta atividade não auditamos internals do Clerk, configuração remota do Supabase, toda a superfície HTTP ou cookies dos provedores. A conclusão permitida é mais estreita: o caminho REST observado anexa token Bearer explicitamente e não declara `credentials: include`; cada hipótese restante exige evidência no ambiente autorizado.",
+          "Pausa: no código, localize a linha que obtém o token, o cabeçalho que o envia e o serviço de destino. Marque separadamente o que está visível no repositório e o que dependeria de configuração externa."
+        ],
+        "terms": [
+          { "term": "Bearer token", "meaning": "Credencial apresentada explicitamente em um cabeçalho `Authorization`; o servidor ainda valida e autoriza cada operação." },
+          { "term": "RLS", "meaning": "Políticas no PostgreSQL que restringem linhas conforme a identidade/claims validados, mesmo quando o cliente manipula o pedido." },
+          { "term": "Evidência local", "meaning": "Conclusão limitada ao arquivo, trecho ou comando observado; não confirma configurações remotas." }
+        ]
+      }
+    ],
+    "diagramTitle": "Credencial enviada automaticamente ou explicitamente",
+    "diagram": "MODELO DE COOKIE\nSite externo → navegador da pessoa → POST simples + cookie ambient → servidor\n                                                        │\n                                  token/Origin/SameSite/política de acesso?\n\nMODELO OBSERVADO EM cloud.js\nAplicação → session.getToken() → Authorization: Bearer ... → Supabase REST\n                                                           │\n                                             validação do token + RLS\n\nCORS afeta chamadas/leitura cross-origin; não substitui autorização no servidor.",
+    "guided": [
+      { "instruction": "Classifique cada peça do primeiro fluxo: identidade da pessoa, cookie enviado pelo browser, ação POST e decisão ausente no servidor. Explique qual sinal o servidor tem e qual ainda precisa validar.", "result": "O cookie pode identificar uma sessão, mas sozinho não comprova que a aplicação legítima iniciou a ação; o servidor valida um token CSRF ou outro controle contextual além de autenticação/autorização." },
+      { "instruction": "Leia `cloudRequest` e copie somente os nomes de cabeçalho e chamadas relevantes, sem valores de token. Identifique se o valor Bearer é obtido de cookie automaticamente ou adicionado pelo código.", "result": "`session.getToken()` obtém o token Clerk; `Authorization` recebe explicitamente o valor Bearer. A leitura do repositório não revela internals do Clerk nem configuração externa." },
+      { "instruction": "Faça uma matriz para `POST` por formulário, `GET` de navegação e `fetch` com cabeçalho personalizado. Para cada um, diga se pode mudar estado, se navegador anexa cookie e que defesa o servidor deve verificar.", "result": "GET não deve alterar estado; POST simples pode levar cookie e exige proteção CSRF se usar sessão ambient; fetch com header personalizado depende de preflight/CORS e ainda requer autenticação, autorização e validação do modelo de sessão." }
+    ],
+    "mistakes": [
+      "Confundir CSRF com XSS ou achar que uma das falhas é apenas outro nome da outra.",
+      "Achar que uma resposta bloqueada por CORS significa que o servidor não recebeu/processou o pedido simples.",
+      "Usar `GET` para mudar estado porque `SameSite=Lax` parece impedir formulários cross-site.",
+      "Confiar em `SameSite` como único controle ou esquecer compatibilidade de navegação e subdomínios.",
+      "Tratar um valor CSRF em cookie como suficiente sem exigir comparação explícita conforme o padrão usado.",
+      "Permitir qualquer origem com credenciais ou comparar somente sufixos de hostname.",
+      "Afirmar que o Tech Learning Hub está imune só porque `cloud.js` usa Bearer token explicitamente.",
+      "Considerar um cabeçalho ou token da interface como substituto para autorização/RLS no servidor."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: uma página externa envia um formulário POST simples para um endpoint que usa sessão por cookie e confere apenas que o cookie existe. Diga se o atacante precisa ler a resposta e identifique o controle que está faltando.",
+        "expected": "O atacante pode tentar causar mudança sem ler a resposta; o servidor precisa validar intenção, por exemplo com token CSRF ligado à sessão e verificações contextuais apropriadas.",
+        "criteria": ["Não exige leitura da resposta para reconhecer o risco.", "Identifica envio automático do cookie como parte do modelo.", "Propõe validação de intenção no servidor."],
+        "solution": "A resposta não precisa ser legível pelo site atacante para que o servidor execute a ação. O cookie ambient identifica sessão, mas não prova origem/intenção; um token imprevisível validado no servidor e controles complementares reduzem o risco.",
+        "explanation": "CORS pode restringir leitura e ainda permitir envio de um formulário simples que chega ao servidor.",
+        "hints": ["Separe a transmissão do pedido da leitura da resposta.", "O cookie responde identidade ou intenção?", "Qual valor só a página legítima deveria conseguir apresentar e o servidor valida?"]
+      },
+      {
+        "prompt": "Alterar: uma equipe migra o endpoint de alteração de perfil de formulário-cookie para API `fetch`. Liste as condições que devem mudar na análise: cabeçalhos e token, CORS, cookies, métodos e regra do servidor. Não aplique configuração real.",
+        "expected": "A análise registra credencial explícita e token customizado, allowlist CORS restrita com preflight, tratamento necessário de cookies/credentials, métodos sem mutação para GET e validação de identidade, autorização e token/origem no servidor conforme o modelo escolhido.",
+        "criteria": ["Distingue envio de Bearer/CSRF header de cookie ambient.", "Restringe origens e cabeçalhos em vez de wildcard com credenciais.", "Mantém autorização e recusa de métodos/valores inválidos no servidor."],
+        "solution": "Escolha um padrão de sessão e documente-o; para cookie, mantenha token CSRF validado. Para API com token explícito, aplique cabeçalhos seguros, CORS estrito e autorização server-side. Não escreva estado em GET e valide cada operação. Não copie um domínio de exemplo para painel real.",
+        "explanation": "Mudar a forma da chamada altera quais mecanismos do navegador participam, mas não remove as decisões de autorização do servidor.",
+        "hints": ["Que credencial o browser anexa sem código explícito?", "Quais cabeçalhos provocam preflight?", "O CORS permite acesso ou só controla compartilhamento de origem?"]
+      },
+      {
+        "prompt": "Construir: a partir de `cloudRequest` em `assets/js/cloud.js`, monte uma tabela com: observação do código, consequência possível para CSRF clássico e hipótese que ainda precisa ser verificada remotamente. Use apenas nomes de cabeçalho, sem token.",
+        "expected": "A tabela observa obtenção de token via Clerk e envio explícito em `Authorization`, `apikey` e JSON quando há corpo; aponta que o fluxo difere da sessão cookie autoanexada, mas deixa pendentes configuração CORS, internals/auth do Clerk, RLS remota e demais endpoints.",
+        "criteria": ["Cita observações verificáveis no arquivo.", "Não classifica o app como vulnerável ou imune sem evidência.", "Separa pelo menos duas hipóteses externas pendentes.", "Não copia valor de segredo/token."],
+        "solution": "Observação: `session.getToken()` e cabeçalho `Authorization: Bearer`, `apikey`, `Content-Type: application/json`; o código não define `credentials: include`. Implicação limitada: a chamada REST analisada não usa cookie ambient explícito para autenticar a chamada. Pendências: CORS remoto, configuração Clerk/Supabase e outros caminhos não analisados. RLS segue necessária.",
+        "explanation": "Inspeção estática é evidência sobre o trecho lido, não sobre toda a configuração distribuída.",
+        "hints": ["Não copie os valores; registre só os nomes.", "O que o código mostra diretamente e o que está no painel do fornecedor?"]
+      },
+      {
+        "prompt": "Investigar erro: uma chamada legítima para de funcionar após a equipe ativar validação de `Origin` e bloqueio de cookies cross-site. Escreva um diagnóstico sem afrouxar a política: confira origem exata, métodos seguros, fluxo de login/retorno, `SameSite`, preflight e token CSRF; mantenha dados fictícios.",
+        "expected": "Compara request e origem autorizada exatos, distingue preflight de requisição efetiva e callback/login de endpoint mutável, revisa atributos de cookie e token no servidor e documenta uma exceção mínima só se houver fluxo legítimo comprovado; não usa wildcard nem desativa defesa geral.",
+        "criteria": ["Isola origem, preflight, cookie e token como hipóteses diferentes.", "Não sugere wildcard ou desativação global.", "Preserva GET sem efeitos e exige controle server-side.", "Não muda painel externo nem usa domínio real."],
+        "solution": "Reproduza com dados fictícios em ambiente autorizado, registre método, Origin, cabeçalhos preflight e resposta sem tokens; compare origem exata e a origem de retorno do login; confira SameSite/atributos e se o POST envia o token esperado. Ajuste apenas a origem/fluxo legítimo demonstrado e mantenha authorization e política do servidor.",
+        "explanation": "Uma falha de compatibilidade deve ser diagnosticada no fluxo específico; desligar controles amplos pode permitir pedidos indevidos.",
+        "hints": ["Qual etapa falha: OPTIONS, POST, cookie, token ou retorno de autenticação?", "O valor de Origin corresponde à origem completa esperada?", "A operação está usando GET para modificar estado?"]
+      }
+    ],
+    "quiz": [
+      { "question": "Qual condição central aparece no modelo clássico de CSRF?", "options": ["O browser envia automaticamente uma credencial válida e o servidor não valida a intenção da operação.", "O servidor usa sempre TLS.", "A resposta contém JSON."], "correctIndex": 0, "explanation": "A credencial ambient pode autenticar uma requisição que a pessoa não pretendia iniciar." },
+      { "question": "O que CORS faz com pedidos simples de formulário?", "options": ["Pode impedir que o site externo leia a resposta, mas não é garantia de que o servidor não receba o pedido.", "Remove os cookies em qualquer navegação.", "Substitui autorização e token CSRF."], "correctIndex": 0, "explanation": "O servidor precisa se defender de CSRF independentemente da capacidade do atacante de ler a resposta." },
+      { "question": "Qual é um papel de `SameSite`?", "options": ["Restringir quando o navegador anexa um cookie em contexto cross-site como defesa em profundidade.", "Validar autorização por linha no PostgreSQL.", "Impedir qualquer chamada cross-origin."], "correctIndex": 0, "explanation": "SameSite ajuda, mas tem regras e efeitos de compatibilidade; não substitui todo o modelo de defesa." },
+      { "question": "O que podemos concluir do `cloud.js` analisado?", "options": ["O trecho obtém token Clerk e o envia explicitamente como Bearer; isso não prova a segurança geral ou a configuração remota.", "O projeto não pode ter CSRF em nenhuma rota.", "CORS está configurado corretamente no Supabase."], "correctIndex": 0, "explanation": "A inspeção confirma o que está no arquivo e deixa explícitas as hipóteses fora do repositório." }
+    ],
+    "summary": [
+      "CSRF usa uma requisição induzida e uma credencial ambient para tentar mudar estado sem intenção.",
+      "CORS limita compartilhamento e certas chamadas; não substitui autenticação, autorização nem defesa de formulário.",
+      "Combine métodos seguros, token CSRF no servidor, política de cookie e verificações de origem conforme o modelo.",
+      "Bearer anexado explicitamente a uma API difere de cookie autoenviado; continue exigindo RLS e análise de CORS.",
+      "Esta aula lê código e não comprova comportamento de painéis ou serviços remotos."
+    ]
+  },
   "delivery-requirements": {
     "prerequisites": "Concluir setup-node, delivery-forms e delivery-ci; ter a lista de estudos do laboratório e saber alterar funções e testes. O exemplo usa apenas Node.",
     "setup": "Na pasta da aula, salve o exemplo como requisito.js no editor. No terminal aberto nessa pasta, execute node requisito.js; a saída esperada é false e true em linhas separadas. O processo termina sozinho; para retomar, execute o mesmo comando. Se node não for reconhecido, revise setup-node. Use a lista de estudos da aula delivery-forms para planejar a integração, mas este arquivo não altera server.js. Escreva critérios antes de editar o projeto.",
@@ -2516,6 +2657,11 @@ Object.assign(LESSON_GUIDES, {
       prompt: "Uma anotação simples é mostrada em cinco telas. Uma revisão encontrou `innerHTML` na busca, mas não sabe como os outros caminhos renderizam o valor. Defina como rastrear fonte e sinks e critérios de teste que mostrem texto literal após criação, leitura, busca e recarga, usando apenas o exemplo local e um marcador sem efeito externo.",
       expected: "A revisão inventaria cada tela que exibe a anotação, identifica API de parsing por destino e exige que texto simples permaneça literal sem criar nós HTML após gravação, busca ou recarga; a cópia vulnerável não é publicada.",
       hint: "Corrigir um ponto não altera automaticamente os outros lugares que leem o mesmo dado."
+    },
+    "delivery-csrf": {
+      prompt: "Uma API migrou de cookie de sessão para bearer token explícito, mas outro endpoint da mesma aplicação continua usando cookie e permite alterar dados. Desenhe a investigação sem presumir que a mudança eliminou CSRF: liste evidências de envio automático, método, Origin, política CORS, token/atributos de cookie e autorização por operação.",
+      expected: "A investigação separa endpoint por endpoint, identifica credencial ambient no caminho que usa cookie, exige método sem mutação para GET, valida token CSRF/origem conforme padrão adotado, revisa SameSite e CORS exato e mantém autorização no servidor; Bearer em outro fluxo não prova imunidade geral.",
+      hint: "Rastreie cada pedido e a credencial que o navegador envia nele, não apenas a mudança feita num endpoint."
     },
     "delivery-ci": {
       prompt: "Uma publicação altera a validação de minutos e o POST começa a aceitar -5. Defina um teste que falhe antes da correção, indique onde a CI deve executá-lo e descreva como conter a versão ruim enquanto investiga.",

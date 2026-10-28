@@ -5296,6 +5296,40 @@
             ]
           },
           {
+            "id": "delivery-csrf",
+            "title": "CSRF: cookies, intenção e defesa em camadas",
+            "minutes": 100,
+            "concept": "Entenda como navegadores podem enviar cookies automaticamente em pedidos entre sites, diferencie CSRF de XSS e CORS e compare a defesa de aplicações com sessão por cookie e APIs com bearer token explícito.",
+            "objectives": [
+              "Descrever o fluxo CSRF: sessão por cookie, ação induzida pelo atacante e mudança de estado no servidor.",
+              "Explicar por que CORS não impede todo envio de requisições e por que SameSite é defesa em profundidade.",
+              "Combinar método HTTP seguro, token CSRF ou cabeçalho validado, verificação de origem e política de cookies conforme o modelo de autenticação.",
+              "Analisar o uso explícito de bearer token em `cloud.js` sem afirmar imunidade ou validar serviço remoto."
+            ],
+            "exercise": "Analise as matrizes da aula e o pedido de `cloud.js`; identifique quando credenciais são enviadas automaticamente e quando são anexadas explicitamente.",
+            "code": "Fluxo vulnerável com sessão cookie:\n1. A pessoa entra; o navegador guarda o cookie de sessão.\n2. Um site externo induz um POST simples para a aplicação.\n3. O navegador pode anexar o cookie automaticamente.\n4. Se o servidor só valida o cookie e não a intenção, pode alterar o estado.\n\nDefesas combinadas: token CSRF validado no servidor, métodos sem efeito para GET, SameSite apropriado e verificação de Origin/Fetch Metadata.\n\nNo `cloud.js`: token Clerk é anexado explicitamente como `Authorization: Bearer ...` ao pedido Supabase; isso é um modelo de credencial diferente, não uma prova geral de segurança.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "OWASP · Cross-Site Request Forgery Prevention Cheat Sheet",
+                "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "MDN · Cross-site request forgery (CSRF)",
+                "url": "https://developer.mozilla.org/en-US/docs/Web/Security/Attacks/CSRF",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "MDN · CORS",
+                "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS",
+                "language": "EN"
+              }
+            ]
+          },
+          {
             "id": "delivery-requirements",
             "title": "Requisitos novos, colaboração e portfólio",
             "minutes": 140,
