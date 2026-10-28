@@ -6,12 +6,14 @@
   "scripts": {
     "start": "node --env-file=.env server.cjs",
     "start:memory": "node server.cjs",
+    "start:memory:clerk": "node --env-file=.env scripts/start-memory-clerk.cjs",
     "setup:app-role": "node --env-file=.env scripts/configurar-papel-aplicacao.cjs",
     "migrate": "npm run setup:app-role && node --env-file=.env scripts/aplicar-migration.cjs",
     "db:check": "node --env-file=.env scripts/verificar-conexao.cjs",
     "demo:rollback": "node --env-file=.env scripts/demonstrar-rollback.cjs",
     "test:backup-restore": "node scripts/verify-backup-restore.cjs",
-    "test": "node --test scripts/aplicar-migration.test.cjs scripts/configurar-papel-aplicacao.test.cjs src/account-rate-limit-identity.test.cjs src/cliente-open-meteo.test.cjs src/logger.test.cjs src/monitor-disponibilidade.test.cjs src/rate-limiter-memory.test.cjs src/rate-limiter-redis.test.cjs src/regra-titulo.test.cjs src/repositorio-estudos-memoria.test.cjs src/validar-estudo.test.cjs src/servico-estudos.test.cjs src/servico-estudos-cache-aside.test.cjs src/repositorio-estudos-postgres.test.cjs src/server.test.cjs src/vercel-demo.test.cjs",
+    "test": "node --test scripts/aplicar-migration.test.cjs scripts/configurar-papel-aplicacao.test.cjs src/account-rate-limit-identity.test.cjs src/clerk-session-verifier.test.cjs src/cliente-open-meteo.test.cjs src/logger.test.cjs src/monitor-disponibilidade.test.cjs src/rate-limiter-memory.test.cjs src/rate-limiter-redis.test.cjs src/regra-titulo.test.cjs src/repositorio-estudos-memoria.test.cjs src/validar-estudo.test.cjs src/servico-estudos.test.cjs src/servico-estudos-cache-aside.test.cjs src/repositorio-estudos-postgres.test.cjs src/server.test.cjs src/vercel-demo.test.cjs",
+    "test:clerk-real": "node --env-file=.env --test src/clerk-session-real.integration.test.cjs",
     "test:least-privilege": "node --env-file=.env --test src/least-privilege.integration.test.cjs",
     "test:redis": "node --test src/rate-limiter-redis.integration.test.cjs",
     "test:cache": "node --env-file=.env --test src/servico-estudos-cache-aside.integration.test.cjs",
@@ -23,10 +25,14 @@
     "smoke:open-meteo": "node scripts/testar-open-meteo.cjs"
   },
   "dependencies": {
+    "@clerk/backend": "3.26.4",
     "pg": "8.23.1",
     "redis": "6.3.0"
   },
   "devDependencies": {
     "@playwright/test": "1.64.1"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   }
 }

@@ -12,6 +12,10 @@ const { criarRotaPrevisao } = require('./src/rota-previsao.cjs');
 const { criarLimitadorRedis } = require('./src/rate-limiter-redis.cjs');
 const { criarLimitadorEmMemoria } = require('./src/rate-limiter-memory.cjs');
 const { criarIdentidadeLimitadorPorConta } = require('./src/account-rate-limit-identity.cjs');
+const {
+  criarVerificadorSessaoClerk,
+  normalizarPartesAutorizadas
+} = require('./src/clerk-session-verifier.cjs');
 const { criarServicoEstudosComCache } = require('./src/servico-estudos-cache-aside.cjs');
 const { logger } = require('./src/logger.cjs');
 const { createClient } = require('redis');
@@ -255,11 +259,53 @@ async function responder(req, res, servico, rotaPrevisao, limitador, verificarPr
   responderJson(res, 404, { erro: 'Rota não encontrada' });
 }
 
+function prepararCorsRotaConta(req, res, configuracaoConta) {
+  const rotaConta = '/api/estudos-por-conta';
+  if (!configuracaoConta || req.url.split('?')[0] !== rotaConta) return false;
+
+  const origem = req.headers.origin;
+  const origemPermitida = typeof origem === 'string' &&
+    configuracaoConta.origensAutorizadasConta?.includes(origem);
+
+  if (req.method === 'OPTIONS') {
+    const metodoPedido = req.headers['access-control-request-method'];
+    const cabecalhosPedidos = String(req.headers['access-control-request-headers'] || '')
+      .split(',')
+      .map((cabecalho) => cabecalho.trim().toLowerCase())
+      .filter(Boolean);
+    const cabecalhosPermitidos = new Set(['authorization', 'content-type']);
+    if (
+      !origemPermitida ||
+      metodoPedido !== 'POST' ||
+      cabecalhosPedidos.some((cabecalho) => !cabecalhosPermitidos.has(cabecalho))
+    ) {
+      responderJson(res, 403, { erro: 'Origem ou preflight não autorizado.' });
+      return true;
+    }
+
+    res.writeHead(204, {
+      'Access-Control-Allow-Origin': origem,
+      'Access-Control-Allow-Methods': 'POST',
+      'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+      'Vary': 'Origin'
+    });
+    res.end();
+    return true;
+  }
+
+  if (origemPermitida) {
+    res.setHeader('Access-Control-Allow-Origin', origem);
+    res.setHeader('Vary', 'Origin');
+  }
+  return false;
+}
+
 function criarServidor(servico, servicoPrevisao, limitador, {
   verificarProntidao = async () => {},
   resolverIdentidadeAutenticada,
   limitadorPorConta,
-  segredoHmacRateLimitConta
+  segredoHmacRateLimitConta,
+  origensAutorizadasConta
 } = {}) {
   if (!limitador || typeof limitador.verificar !== 'function') {
     throw new TypeError('Informe um limitador de gravações com verificar()');
@@ -281,12 +327,20 @@ function criarServidor(servico, servicoPrevisao, limitador, {
   if (segredoHmacRateLimitConta !== undefined) {
     criarIdentidadeLimitadorPorConta('configuracao-valida', segredoHmacRateLimitConta);
   }
+  if (
+    origensAutorizadasConta !== undefined &&
+    (!Array.isArray(origensAutorizadasConta) || origensAutorizadasConta.length === 0 ||
+      origensAutorizadasConta.some((origem) => typeof origem !== 'string' || !origem.trim()))
+  ) {
+    throw new TypeError('origensAutorizadasConta precisa conter ao menos uma origem');
+  }
   const rotaPrevisao = criarRotaPrevisao(servicoPrevisao);
   const configuracaoConta = configuracoesContaFornecidas
-    ? { resolverIdentidadeAutenticada, limitadorPorConta, segredoHmacRateLimitConta }
+    ? { resolverIdentidadeAutenticada, limitadorPorConta, segredoHmacRateLimitConta, origensAutorizadasConta }
     : null;
   return http.createServer((req, res) => {
     aplicarCabecalhosSeguros(res);
+    if (prepararCorsRotaConta(req, res, configuracaoConta)) return;
     responder(req, res, servico, rotaPrevisao, limitador, verificarProntidao, configuracaoConta).catch((erro) => {
       logger.error('api.request.failed', erro, { route: obterRotaSeguraParaLog(req) });
       if (!res.headersSent) {
@@ -298,9 +352,29 @@ function criarServidor(servico, servicoPrevisao, limitador, {
   });
 }
 
-if (require.main === module) {
-  async function iniciar() {
+async function iniciar() {
     const usarMemoria = process.env.BACKEND_STORAGE === 'memory';
+    const tipoAutenticacaoConta = process.env.BACKEND_ACCOUNT_AUTH || '';
+    if (tipoAutenticacaoConta && tipoAutenticacaoConta !== 'clerk') {
+      throw new TypeError('BACKEND_ACCOUNT_AUTH aceita somente clerk ou vazio');
+    }
+    const autenticacaoContaAtiva = tipoAutenticacaoConta === 'clerk';
+    const origensAutorizadasConta = autenticacaoContaAtiva
+      ? normalizarPartesAutorizadas(process.env.CLERK_AUTHORIZED_PARTIES)
+      : undefined;
+    const resolverIdentidadeAutenticada = autenticacaoContaAtiva
+      ? criarVerificadorSessaoClerk({
+        jwtKey: process.env.CLERK_JWT_KEY,
+        issuer: process.env.CLERK_ISSUER,
+        authorizedParties: origensAutorizadasConta
+      })
+      : undefined;
+    const segredoHmacRateLimitConta = autenticacaoContaAtiva
+      ? process.env.RATE_LIMIT_HMAC_SECRET
+      : undefined;
+    if (autenticacaoContaAtiva) {
+      criarIdentidadeLimitadorPorConta('configuracao-valida', segredoHmacRateLimitConta);
+    }
     const pool = usarMemoria ? undefined : criarPoolEstudos();
     const repositorio = usarMemoria
       ? criarRepositorioEstudos()
@@ -309,10 +383,17 @@ if (require.main === module) {
     const servicoPrevisao = criarClienteOpenMeteo();
     let clienteRedis;
     let limitador;
+    let limitadorPorConta;
     let servicoDaApi = servico;
 
     if (usarMemoria) {
       limitador = criarLimitadorEmMemoria();
+      if (autenticacaoContaAtiva) {
+        limitadorPorConta = criarLimitadorEmMemoria({
+          limite: Number(process.env.RATE_LIMIT_ACCOUNT_MAX_REQUESTS || 3),
+          janelaSegundos: Number(process.env.RATE_LIMIT_ACCOUNT_WINDOW_SECONDS || 60)
+        });
+      }
     } else {
       clienteRedis = createClient({
         url: process.env.REDIS_URL || 'redis://127.0.0.1:56380',
@@ -334,6 +415,13 @@ if (require.main === module) {
         limite: Number(process.env.RATE_LIMIT_MAX_REQUESTS || 3),
         janelaSegundos: Number(process.env.RATE_LIMIT_WINDOW_SECONDS || 60)
       });
+      if (autenticacaoContaAtiva) {
+        limitadorPorConta = criarLimitadorRedis(clienteRedis, {
+          limite: Number(process.env.RATE_LIMIT_ACCOUNT_MAX_REQUESTS || 3),
+          janelaSegundos: Number(process.env.RATE_LIMIT_ACCOUNT_WINDOW_SECONDS || 60),
+          escopo: 'backend-layers:account-write'
+        });
+      }
       try {
         await clienteRedis.connect();
       } catch (erro) {
@@ -347,7 +435,17 @@ if (require.main === module) {
       if (!clienteRedis?.isReady) throw new Error('Redis indisponível');
       await Promise.all([pool.query('SELECT 1'), clienteRedis.ping()]);
     };
-    const servidor = criarServidor(servicoDaApi, servicoPrevisao, limitador, { verificarProntidao });
+    const servidor = criarServidor(servicoDaApi, servicoPrevisao, limitador, {
+      verificarProntidao,
+      ...(autenticacaoContaAtiva
+        ? {
+          resolverIdentidadeAutenticada,
+          limitadorPorConta,
+          segredoHmacRateLimitConta,
+          origensAutorizadasConta
+        }
+        : {})
+    });
     servidor.listen(4180, '127.0.0.1', () => {
       logger.info('api.started', {
         address: '127.0.0.1:4180',
@@ -367,12 +465,13 @@ if (require.main === module) {
 
     process.once('SIGINT', encerrar);
     process.once('SIGTERM', encerrar);
-  }
+}
 
+if (require.main === module) {
   iniciar().catch((erro) => {
     logger.error('api.startup.failed', erro);
     process.exitCode = 1;
   });
 }
 
-module.exports = { criarServidor };
+module.exports = { criarServidor, iniciar };

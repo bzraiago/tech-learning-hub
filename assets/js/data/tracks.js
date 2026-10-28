@@ -5744,17 +5744,18 @@
           {
             "id": "delivery-api-abuse",
             "title": "Abuso de API: recursos e fluxos sensíveis",
-            "minutes": 95,
-            "concept": "Diferencie consumo irrestrito de recursos de abuso automatizado de fluxos de negócio e planeje limites no servidor que protejam capacidade, custo e acesso justo sem confundir rate limit com autorização.",
+            "minutes": 105,
+            "concept": "Diferencie consumo irrestrito de recursos de abuso automatizado de fluxos de negócio e valide a origem da identidade antes de aplicar uma quota por conta.",
             "objectives": [
               "Reconhecer API4:2023 (consumo irrestrito de recursos) e API6:2023 (acesso sem restrição a fluxos sensíveis) como riscos distintos.",
               "Definir limites de corpo, página, custo, tempo, concorrência e operações conforme o recurso e o impacto do produto.",
               "Explicar o uso de 429/Retry-After, limites por identidade/tenant/IP e por que IP isolado, CAPTCHA ou idempotência não resolvem todos os casos.",
               "Distinguir quota por IP de quota por conta e explicar por que o subject precisa vir de uma sessão validada no servidor.",
+              "Explicar como o SDK Clerk verifica assinatura, emissor, validade e origem autorizada; diferenciar fixture, chave de teste e sessão real.",
               "Planejar uma revisão controlada sem gerar carga contra Preview, serviços públicos ou contas reais."
             ],
-            "exercise": "Use a matriz de cenários com números fictícios para propor limites e sinais; compare a quota por IP com o fixture local de quota por subject e explique por que o fixture não é autenticação real.",
-            "code": "EXEMPLO DE ANÁLISE (números fictícios; os pedidos descritos ocorrem apenas no teste local):\n\nAPI normal do laboratório\nPOST /api/estudos -> IP observado pelo servidor -> contador Redis -> gravação\n\nRota de quota por conta, habilitada somente no servidor de teste\nAuthorization: Bearer fixture-session-a\n  -> adaptador injetado reconhece marcador fictício e retorna subject inventado\n  -> HMAC-SHA-256(subject, segredo privado) produz pseudônimo estável\n  -> contador Redis separado: três tentativas permitidas, a quarta recebe 429\n\nO cliente não escolhe a conta com X-Account-Id nem accountId no JSON. Sem adaptador/limitador/chave injetados, o servidor principal responde 404. O fixture não valida JWT nem login Clerk.\n\nEm um sistema real: validar token/sessão, emissor, público e validade; depois autorizar o recurso. O segredo HMAC fica fora do repositório e deve ser compartilhado pelas instâncias. Redis indisponível responde 503 sem gravar (fail-closed); token inválido recebe 401 antes do contador.",
+            "exercise": "Use a matriz de cenários com números fictícios para propor limites e sinais; trace fixture → JWT assinado com chave gerada → sessão Clerk real opcional e explique que evidência cada etapa fornece.",
+            "code": "EXEMPLO DE ANÁLISE (dados fictícios; sessão real é uma prática local opcional):\n\nAPI normal do laboratório\nPOST /api/estudos -> IP observado pelo servidor -> contador Redis -> gravação\n\nFixture unitário (não autentica)\nBearer fixture-session-a -> adaptador falso -> subject inventado -> HMAC -> contador separado\n\nVerificador Clerk opcional\nAuthorization: Bearer <JWT de sessão>\n  -> @clerk/backend verifyToken() e chave pública PEM\n  -> conferir assinatura, exp/nbf, iss esperado e azp autorizado\n  -> exigir sub (pessoa) e sid (sessão); devolver somente sub\n  -> HMAC-SHA-256(sub, segredo privado separado) -> quota da conta\n\nSem BACKEND_ACCOUNT_AUTH=clerk, o servidor continua respondendo 404. O navegador não escolhe a conta por accountId ou X-Account-Id. O fixture testa o contrato; os testes RSA locais exercitam a verificação criptográfica; somente a prática `test:clerk-real` usa uma sessão da própria pessoa. Nenhuma prova concede autorização por registro.\n\nCom limite didático 3/60s, três gravações podem responder 201 e a quarta 429 + Retry-After. Redis indisponível responde 503 sem gravar; sessão inválida recebe 401 antes do contador. A página usa contadores locais temporários, não uma implantação de produção.",
             "docs": [
               {
                 "kind": "doc",
@@ -5790,6 +5791,30 @@
                 "kind": "doc",
                 "title": "Redis · Rate limiter use case",
                 "url": "https://redis.io/docs/latest/develop/use-cases/rate-limiter/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Clerk · verifyToken() do Backend SDK",
+                "url": "https://clerk.com/docs/reference/backend/verify-token",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Clerk · Verificação manual de JWT de sessão",
+                "url": "https://clerk.com/docs/guides/sessions/manual-jwt-verification",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Clerk · Claims de token de sessão",
+                "url": "https://clerk.com/docs/guides/sessions/session-tokens",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Clerk JavaScript · Session.getToken()",
+                "url": "https://clerk.com/docs/js-frontend/reference/objects/session",
                 "language": "EN"
               }
             ]

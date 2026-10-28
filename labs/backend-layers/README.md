@@ -12,7 +12,7 @@ Para diagnosticar Preview, login e persistência na nuvem separadamente da API e
 
 1. Conclua `setup-node`, `setup-docker`, `setup-postgresql`, `delivery-http` e `labs/backend-validation/README.md`. Não é necessário concluir toda a trilha de banco.
 2. Abra esta pasta `labs/backend-layers` no editor e no terminal.
-3. Node.js `20.6.0` ou mais novo, npm e Docker Compose operacional. No terminal, confira `node --version`, `npm --version` e `docker version`.
+3. Node.js `20.9.0` ou mais novo, npm e Docker Compose operacional. No terminal, confira `node --version`, `npm --version` e `docker version`.
 4. O comando `docker version` deve mostrar as versões de cliente e servidor. Se a seção Server falhar, inicie Docker Desktop (Windows/macOS) ou o serviço Docker (Linux) antes de continuar.
 
 ## Preparar ambiente
@@ -203,18 +203,74 @@ O JSON registra versões, p50/p95 do GET HTTP completo, consultas PostgreSQL, le
 | Pedido | Limite | Resposta ao exceder | Redis indisponível |
 |---|---|---|---|
 | `POST /api/estudos` e `POST /api/estudos-com-sessao` | 3 tentativas por IP observado pelo servidor em uma janela fixa de 60 segundos | `429` com `Retry-After` em segundos; nenhuma gravação é iniciada | `503` genérico; nenhuma gravação é iniciada |
-| `POST /api/estudos-por-conta` | 3 tentativas por subject verificado pelo adaptador injetado, em uma janela fixa de 60 segundos; rota disponível apenas no servidor de teste configurado | `429` com `Retry-After`; nenhuma gravação é iniciada | `503` genérico; nenhuma gravação é iniciada |
+| `POST /api/estudos-por-conta` | 3 tentativas por subject verificado, em uma janela fixa de 60 segundos; rota fica fechada por padrão e pode ser habilitada explicitamente com Clerk | `429` com `Retry-After`; nenhuma gravação é iniciada | `503` genérico; nenhuma gravação é iniciada |
 | `GET /api/estudos` | Não limitado por este contador; tenta cache-aside Redis → PostgreSQL | `200` conforme cache/fonte | Recorre ao PostgreSQL se o cache falhar |
 
-O servidor principal continua sem autenticação: ele não injeta um verificador, um limitador por conta nem uma chave HMAC, então a rota `/api/estudos-por-conta` responde `404`. A segunda linha da tabela é um cenário de teste isolado habilitado somente quando `criarServidor` recebe essas três dependências. O teste fornece um adaptador fictício que mapeia marcadores públicos como `Bearer fixture-session-a` a subjects inventados; esses marcadores **não são credenciais**, não validam JWT e não se conectam ao Clerk nem a outro provedor.
+O servidor principal continua sem autenticação por padrão: sem `BACKEND_ACCOUNT_AUTH=clerk`, a rota `/api/estudos-por-conta` responde `404`. Os testes unitários também usam fixtures (`Bearer fixture-session-a`) para exercitar quota e isolamento sem uma conta real; esses marcadores **não são credenciais** e não validam JWT. A opção local Clerk liga um verificador real do SDK somente quando solicitada e continua limitada a esta rota de demonstração.
 
-Em um sistema real, o adaptador confiável precisaria validar a sessão ou o token recebido — incluindo assinatura e atributos esperados como emissor, público e validade — antes de retornar o `subject` estável da conta. Decodificar um JWT só revela seus campos; não prova que foi emitido por quem diz nem que continua válido. Use o SDK/verificador do provedor para conferir assinatura, emissor (quem emitiu), público (para qual aplicação foi emitido) e expiração. O `subject` vem do adaptador do servidor; o endpoint ignora `accountId` e `X-Account-Id` enviados pela pessoa. Autenticar responde quem fez o pedido; autorizar ainda decide quais dados essa identidade pode acessar. O exemplo limita frequência e não implementa autorização por registro.
+O adaptador Clerk deste laboratório aceita somente `Authorization: Bearer <JWT>`. `@clerk/backend` verifica a assinatura com a chave pública PEM e confere o emissor `iss`, a parte autorizada `azp`, os limites de tempo e as claims de sessão `sub` e `sid`; um token sem `azp` ou com sessão `sts=pending` é recusado. O servidor devolve apenas `sub` como identidade. Decodificar um JWT só revela os campos; não prova assinatura, emissor, origem autorizada ou validade. O subject vem do adaptador do servidor; o endpoint ignora `accountId` e `X-Account-Id` enviados pela pessoa. Autenticar responde quem fez o pedido; autorizar ainda decide quais dados essa identidade pode acessar. A rota de demonstração limita frequência e não implementa autorização por registro.
+
+#### Verificar uma sessão Clerk localmente
+
+Esta prática opcional usa uma sessão já autenticada no seu próprio app e envia quatro pedidos pequenos **somente para `127.0.0.1`**. Não usa credencial secreta do Clerk, não conecta ao Supabase e não grava o token em arquivo.
+
+1. No editor, copie `.env.example` para `.env`. Mantenha `.env` local: ele é ignorado pelo Git. Preencha `CLERK_JWT_KEY` com o PEM público **JWT public key** do painel Clerk; `CLERK_ISSUER` com a origem do emissor da instância (claim `iss`); `CLERK_AUTHORIZED_PARTIES` com a origem exata do app logado (claim `azp` ou URL da barra do navegador); e `RATE_LIMIT_HMAC_SECRET` com o resultado de `node -p "require('node:crypto').randomBytes(32).toString('hex')"`. O valor de `CLERK_JWT_KEY` pode ser escrito entre aspas com `\n` representando cada quebra de linha. Use somente origem, sem caminho; `http` só é aceito para `localhost`/loopback. Nunca use um decodificador de JWT online.
+2. No terminal aberto nesta pasta, inicie o modo local sem banco. Ele usa armazenamento e contador por conta temporários e abre somente em `127.0.0.1:4180`:
+
+```powershell
+# Windows PowerShell
+npm.cmd run start:memory:clerk
+```
+
+```sh
+# macOS ou Linux
+npm run start:memory:clerk
+```
+
+3. Na aba do seu app Clerk já autenticado, abra o Console do navegador. Confirme que a origem atual está na lista `CLERK_AUTHORIZED_PARTIES` e execute o bloco. O token fica numa variável local do Console, não aparece na saída e é enviado somente à API de loopback:
+
+```js
+(async () => {
+  const token = await window.Clerk.session.getToken();
+  const resultados = [];
+  for (let numero = 1; numero <= 4; numero += 1) {
+    const resposta = await fetch('http://127.0.0.1:4180/api/estudos-por-conta', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ titulo: `Estudo de teste Clerk ${numero}` })
+    });
+    resultados.push({ status: resposta.status, resposta: await resposta.json() });
+  }
+  console.table(resultados.map(({ status, resposta }) => ({ status, mensagem: resposta.erro || 'criado' })));
+})();
+```
+
+Com `RATE_LIMIT_ACCOUNT_MAX_REQUESTS=3`, a tabela deve mostrar `201, 201, 201, 429`; o quarto pedido não grava. Se o navegador bloquear o preflight, confirme que `CLERK_AUTHORIZED_PARTIES` contém a origem exata da aba e recarregue o servidor. A resposta `401` indica token ausente/inválido, emissor incorreto, token expirado, sessão pendente ou `azp` ausente/não autorizado. A rota não registra token, `sub`, `sid`, corpo nem origem. Não copie o token para o chat, terminal, issue ou log. Pare o servidor com `Ctrl+C`; memória e contador somem ao encerrar.
+
+Para testar o mesmo fluxo automatizado sem abrir a aba, use `npm run test:clerk-real`. Esse teste lê `CLERK_JWT_KEY`, `CLERK_ISSUER`, `CLERK_AUTHORIZED_PARTIES` e `RATE_LIMIT_HMAC_SECRET` de `.env`; a variável `CLERK_TEST_SESSION_TOKEN` precisa existir somente no processo. No Windows PowerShell, use uma entrada oculta para não gravar/ecoar o token:
+
+```powershell
+$tokenSeguro = Read-Host 'Token de sessão Clerk (não será exibido)' -AsSecureString
+$ponteiroToken = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($tokenSeguro)
+try {
+  $env:CLERK_TEST_SESSION_TOKEN = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($ponteiroToken)
+  npm.cmd run test:clerk-real
+} finally {
+  Remove-Item Env:CLERK_TEST_SESSION_TOKEN -ErrorAction SilentlyContinue
+  [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ponteiroToken)
+}
+```
+
+No macOS/Linux, leia sem eco com `read -s -p 'Token de sessão Clerk: ' CLERK_TEST_SESSION_TOKEN; printf '\n'; export CLERK_TEST_SESSION_TOKEN; npm run test:clerk-real; unset CLERK_TEST_SESSION_TOKEN`. Por padrão, o teste usa um contador em memória; para combinar a sessão real com Redis local, inicie o Redis e defina `CLERK_REAL_RATE_LIMITER=redis` somente durante o comando. O teste usa escopo Redis aleatório e apaga somente a key que criou. Tokens de sessão são credenciais temporárias: não os salve em `.env` e encerre a sessão/renove o token se suspeitar de exposição.
 
 Antes de formar a key Redis, a demonstração calcula HMAC-SHA-256 do subject com um segredo privado de pelo menos 32 bytes gerado com aleatoriedade criptográfica. Isso produz a mesma key para a mesma conta quando instâncias compartilham o segredo e subjects distintos produzem keys distintas. A key não revela o subject diretamente, mas é um pseudônimo correlacionável: HMAC não é criptografia nem anonimização. O segredo deve permanecer fora do repositório e estável entre instâncias; trocá-lo cria novos contadores e pode permitir novas tentativas antes de expirarem as keys anteriores. O teste usa segredo determinístico para repetir o cenário, não um segredo adequado a produção.
 
 A rota por IP continua separada: usa `req.socket.remoteAddress` observado diretamente pelo Node e ignora `X-Forwarded-For`. Como o servidor de demonstração escuta apenas em `127.0.0.1`, os pedidos locais compartilham a key de loopback; não há IP público nesta prática. Atrás de NAT, pessoas legítimas compartilham o limite; atrás de proxy, é necessário configurar confiança explícita. A rota de conta de teste não usa também esse contador por IP: numa aplicação real, combine limites globais/por IP com a quota autenticada, pois pedidos sem sessão ainda consomem trabalho de verificação. Nunca transforme um ID recebido no corpo ou num cabeçalho arbitrário em identidade autenticada.
 
-O contador reaproveita [`fixed-window.lua`](../redis-fundamentals/fixed-window.lua): `INCR`, `EXPIRE` e a decisão ocorrem atomicamente. A key contém o IP observado durante no máximo 60 segundos; Redis local não persiste keys e a API não registra o IP. A política de 3/60 é somente didática, não um valor recomendado para produção. A API falha fechada nas gravações: se o contador não responder, retorna `503` sem alterar dados.
+O contador reaproveita [`fixed-window.lua`](../redis-fundamentals/fixed-window.lua): `INCR`, `EXPIRE` e a decisão ocorrem atomicamente. A key por IP contém o endereço observado durante no máximo 60 segundos; a key por conta usa HMAC-SHA-256 de `sub` sob escopo separado. Redis local não persiste keys e a API não registra o IP. As políticas de 3/60 são didáticas, não valores recomendados para produção. A API falha fechada nas gravações: se o contador não responder, retorna `503` sem alterar dados.
 
 ### Conferir com poucos pedidos controlados
 
@@ -414,7 +470,7 @@ Se Docker não estiver disponível mas o computador já tiver PostgreSQL local, 
 | Parte | Responsabilidade | Arquivo |
 |---|---|---|
 | HTTP | Lê método, rota e JSON; escolhe status e resposta pública | `server.cjs` |
-| Rate limit | Rota principal usa IP remoto observado; rota de conta é um fixture de teste fechado por padrão e recebe subject do adaptador injetado. Ambas consultam contador Redis atômico e falham fechadas com `503` | `server.cjs`, `src/account-rate-limit-identity.cjs`, `src/rate-limiter-redis.cjs`, `src/rate-limiter-memory.cjs`, `redis-fundamentals/fixed-window.lua` |
+| Rate limit | Rota principal usa IP remoto observado; rota de conta fica fechada por padrão e recebe subject do adaptador Clerk/fixture. Redis é atômico no modo normal; o modo Clerk em memória é local e temporário | `server.cjs`, `src/clerk-session-verifier.cjs`, `src/account-rate-limit-identity.cjs`, `src/rate-limiter-redis.cjs`, `src/rate-limiter-memory.cjs`, `redis-fundamentals/fixed-window.lua` |
 | Validação | Confere o formato do pedido e limpa o título | `src/validar-estudo.cjs` |
 | Regra de negócio | Compara títulos sem considerar espaços externos e caixa | `src/regra-titulo.cjs` e `src/servico-estudos.cjs` |
 | Repositório | Executa `SELECT`/`INSERT` com parâmetros e converte o resultado | `src/repositorio-estudos-postgres.cjs` |
@@ -422,7 +478,7 @@ Se Docker não estiver disponível mas o computador já tiver PostgreSQL local, 
 | Pool administrativo | Executa migrations e ferramentas locais de manutenção por `PGUSER`/`PGPASSWORD` | `src/configuracao-banco.cjs` |
 | Esquema e permissões | Cria estudos e sessões; a 003 amplia o esquema; a 004 concede à API somente leitura/inclusão nas tabelas de negócio | `migrations/001_create_estudos.sql` a `migrations/004_privilegios_minimos.sql` |
 
-O papel `backend_app` não é superuser, não cria bancos ou papéis, não ignora RLS e não herda permissões de outros papéis. Ele acessa as duas tabelas de negócio somente para `SELECT` e `INSERT`, com `USAGE` nas sequências de identidade; a tabela `migrations_aplicadas` e o esquema ficam fora do alcance de escrita. Migrations, backup e limpeza de dados fictícios usam o usuário administrativo. Como esta API não autentica pessoas, o privilégio mínimo não separa linhas por usuário; isso requer autenticação/autorização e, no Supabase, RLS.
+O papel `backend_app` não é superuser, não cria bancos ou papéis, não ignora RLS e não herda permissões de outros papéis. Ele acessa as duas tabelas de negócio somente para `SELECT` e `INSERT`, com `USAGE` nas sequências de identidade; a tabela `migrations_aplicadas` e o esquema ficam fora do alcance de escrita. Migrations, backup e limpeza de dados fictícios usam o usuário administrativo. Sem a ativação Clerk opcional, a API não autentica pessoas; mesmo com ela, a demonstração não separa registros por usuário. Isso exige autorização por registro e, no Supabase, RLS.
 
 O Vercel recebe `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` e `Permissions-Policy` que desativa câmera, microfone e geolocalização. O servidor Node local repete os cabeçalhos em todas as respostas e valida limites do corpo, Content-Type, JSON e domínio antes da gravação; erros internos são genéricos para o cliente. CSP ainda não está ativada porque a página tem estilos inline e dependências CDN; ela precisa de inventário e verificação de compatibilidade próprios. Os testes locais confirmam arquivos e respostas do servidor local; o Preview publicado requer verificação autenticada separada.
 | Aplicador | Executa migrations numeradas em ordem e registra cada arquivo uma vez | `scripts/aplicar-migration.cjs` |
@@ -534,3 +590,7 @@ Em cada mudança, anote camada alterada, comando, status e estado dos dados ante
 - [node-postgres: pool de conexões](https://node-postgres.com/features/pooling) — reutilização e encerramento das conexões.
 - [Redis: bibliotecas clientes](https://redis.io/docs/latest/develop/clients/) — recomendação de `node-redis` para a maioria dos usos JavaScript.
 - [Redis: uso de node-redis em produção](https://redis.io/docs/latest/develop/clients/nodejs/produsage/) — eventos, timeout e fila offline; o laboratório desativa a fila para não atrasar gravações após reconexão.
+- [Clerk: `verifyToken()` do Backend SDK](https://clerk.com/docs/reference/backend/verify-token) — verificação de JWT, chave pública, emissor e origens autorizadas.
+- [Clerk: verificação manual de JWT de sessão](https://clerk.com/docs/guides/sessions/manual-jwt-verification) — assinatura e validação de sessão no servidor.
+- [Clerk: claims de tokens de sessão](https://clerk.com/docs/guides/sessions/session-tokens) — significado de `iss`, `azp`, `exp`, `sid` e `sub`.
+- [Clerk JavaScript: `Session.getToken()`](https://clerk.com/docs/js-frontend/reference/objects/session) — obter um token curto da sessão atual no cliente.
