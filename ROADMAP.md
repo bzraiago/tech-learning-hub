@@ -360,14 +360,15 @@ Toda implementação só pode ser considerada pronta quando:
 - [x] Simular falhas de rede, autenticação e resposta inválida sem expor credenciais.
   - [x] Testes controlados cobrem erro de rede, timeout, `401` simulado e contrato JSON inválido; API retorna mensagens públicas sem detalhes internos. O serviço escolhido não exige autenticação.
 - [x] Publicar a página e a função da demonstração em `main`; o deploy Vercel do commit [`43decdc`](https://github.com/bzraiago/tech-learning-hub/commit/43decdce0350ebd35645a1b3c9fa31ad55a5e99b) foi concluído.
+- [x] Publicar o commit `ea4ca2d` da branch `testes` como Preview Vercel; o status do provedor e o CI do GitHub passaram.
 - [ ] Conferir a URL final e o comportamento publicado.
-- [ ] O alias de branch `tech-learning-hub-git-main-bzraiago.vercel.app` mostra “Login – Vercel” sem sessão Vercel. O dono autorizou deixar os previews públicos; a alteração e o teste anônimo seguem pendentes de acesso autenticado à conta Vercel.
+- [ ] Os aliases de `main` e `testes` redirecionam para “Login – Vercel” sem sessão. A página da aplicação e o comportamento anônimo ainda não puderam ser conferidos; a liberação pública autorizada aguarda acesso autenticado à conta Vercel.
 - [x] Ensinar rollback para uma versão anterior.
   - [x] `labs/backend-layers/DEPLOY_VERCEL.md` documenta Instant Rollback pelo painel, limite do Hobby, reativação da atribuição automática e separação entre implantação e dados do banco.
   - [ ] Executar e verificar um rollback real; o acesso autenticado à conta Vercel ainda não está disponível nesta sessão.
 - [ ] Executar e comprovar backup e restauração.
   - [x] Documentar `pg_dump -Fc`, inspeção do arquivo e `pg_restore` numa base nova, preservando a origem; excluir os arquivos de backup do Git.
-  - [ ] Rodar o fluxo em Docker Compose e comparar as tabelas; o daemon não está acessível nesta sessão.
+  - [~] Criar `npm run test:backup-restore` e um job de CI que usa o Compose do laboratório, semeia dados fictícios, restaura em outra base e compara as duas tabelas; aguardar o primeiro resultado da CI.
 - [ ] Criar prática real ou revisão independente de colaboração.
 
 ### Fase 7.1 — Fundamentos de internet, hospedagem e DNS
@@ -389,7 +390,8 @@ Toda implementação só pode ser considerada pronta quando:
 - [ ] Criar um projeto integrador guiado usando Vercel, Clerk e Supabase, sem tratar os fornecedores como única solução possível.
 - [~] Preparar contas, projeto local e variáveis separadas para desenvolvimento, prévia e produção.
   - [x] A aula `delivery-environments` agora inclui matriz Local/Preview/Production, separação entre configuração pública e segredo, primeira publicação Vercel e uso da branch de prévia quando `main` é a Production Branch.
-  - [ ] Configurar e verificar as variáveis nos três ambientes reais; um commit na branch `testes` será usado para conferir o Preview desta aplicação.
+  - [x] O commit `ea4ca2d` enviado para `testes` criou um deployment Preview Vercel com status concluído.
+  - [ ] Conferir a aplicação e as variáveis do Preview; a proteção do projeto redireciona visitantes sem sessão Vercel para login.
 - [ ] Implementar cadastro, login, logout, sessão expirada e estado de carregamento com Clerk.
   - [x] Preparar interface de entrada/saída, função de configuração pública e guia de implantação; fluxo real pendente das chaves e do domínio Clerk.
   - [x] Exigir login e carregamento do progresso da conta antes de liberar o conteúdo; verificação no navegador publicado pendente.
@@ -635,6 +637,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 27/10/2026 | Fase 7 — recuperação de falha na CI | `92fb73d` | Na branch temporária, o run [40606364491](https://github.com/bzraiago/tech-learning-hub/actions/runs/40606364491) identificou a asserção incorreta; após restaurar `valido: true`, o run [40606768881](https://github.com/bzraiago/tech-learning-hub/actions/runs/40606768881) passou em todas as etapas. `main` não foi alterada durante a prática e o branch foi removido. |
 | 27/10/2026 | Fase 7 — serviço externo real | `9c6dab5` | Open-Meteo foi integrado ao laboratório com validação do contrato, atribuição visível e falhas simuladas. Smoke público sem chave passou; validador, 29 testes unitários e 2 fluxos locais Playwright passaram; run [40607589139](https://github.com/bzraiago/tech-learning-hub/actions/runs/40607589139) passou no GitHub Actions. |
 | 27/10/2026 | Fase 7 — demonstração Vercel | `43decdc` | Página independente e função Node.js foram publicadas; o check de deploy concluiu. Os aliases conhecidos exigem sessão Vercel e exibem a tela de login, portanto a URL pública final e o fluxo remoto ainda precisam de confirmação. A CI [40608266317](https://github.com/bzraiago/tech-learning-hub/actions/runs/40608266317) passou. |
+| 27/10/2026 | Fase 7 — Preview da branch `testes` | `ea4ca2d` | A branch criada a partir de `main` gerou um deployment Preview; status Vercel e CI passaram. A URL ainda exige sessão Vercel, então o acesso anônimo e o comportamento da aplicação não foram verificados. |
 | 27/10/2026 | Fase 6/7 — falha de banco e rollback | Commit pendente | `npm test` passou nos 32 testes; validador de conteúdo passou. API real com PostgreSQL indisponível respondeu `500` genérico sem expor detalhes; `start:memory` identificou armazenamento temporário e a API respondeu `200` com dados fictícios. O guia de rollback foi corrigido conforme a documentação atual da Vercel. Rollback remoto, acesso anônimo aos previews e backup/restore em Docker seguem pendentes. |
 | 27/10/2026 | Fase 7 — roteiro de backup e restauração | Commit pendente | `labs/backend-layers/BACKUP_RESTORE.md` descreve backup PostgreSQL 17, inspeção e restauração em base nova; arquivo `.dump` é ignorado pelo Git. Fontes oficiais foram abertas. A execução não passou porque o daemon Docker não está acessível; não marcar a cópia como comprovada até comparar as tabelas restauradas. |
 | 27/10/2026 | Fase 3 — execução de exemplos | Commit pendente | Validador passou; 32 exemplos Python, nove exemplos Node, 23 páginas HTML, seis interações HTML + JavaScript e dez scripts SQLite foram verificados em ambientes locais isolados. `quality-debug` reproduziu 2 aprovações e 1 falha planejada. Validação com PostgreSQL, MariaDB, Firebird e MongoDB real continua pendente por falta dos serviços/clientes locais. |

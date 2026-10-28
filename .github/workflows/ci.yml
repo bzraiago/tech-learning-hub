@@ -82,3 +82,61 @@ jobs:
       - name: Run browser flow
         working-directory: labs/backend-layers
         run: npm run test:e2e
+
+  backup-restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: labs/backend-layers
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: labs/backend-layers/package-lock.json
+
+      - name: Install lab dependencies
+        run: npm ci
+
+      - name: Configure disposable PostgreSQL connection
+        shell: bash
+        run: |
+          cat > .env <<'EOF'
+          PGHOST=127.0.0.1
+          PGPORT=55433
+          PGUSER=aluno
+          PGDATABASE=backend_camadas
+          PGPASSWORD=ci-only-password
+          EOF
+
+      - name: Start PostgreSQL with the lab Compose file
+        shell: bash
+        run: |
+          docker compose up -d db
+          for attempt in {1..30}; do
+            if docker compose exec -T db pg_isready -U aluno -d backend_camadas; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose logs db
+          exit 1
+
+      - name: Apply migrations
+        run: npm run migrate
+
+      - name: Add fictitious session data for the restore check
+        run: docker compose exec -T db psql -v ON_ERROR_STOP=1 -U aluno -d backend_camadas -c "INSERT INTO sessoes_estudo (estudo_id, minutos) VALUES (1, 25);"
+
+      - name: Back up, restore to a new database, and compare both tables
+        run: npm run test:backup-restore
+
+      - name: Stop the disposable Compose stack
+        if: always()
+        continue-on-error: true
+        run: docker compose down
