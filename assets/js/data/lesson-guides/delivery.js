@@ -662,7 +662,146 @@ Object.assign(LESSON_GUIDES, {
       "Teste o comportamento na URL final e prepare uma versão recuperável."
     ]
   },
-"delivery-ci": {
+  "delivery-oauth-google": {
+    "prerequisites": "Concluir delivery-environments e saber distinguir navegador, aplicação, serviço externo e variável de ambiente. Não é necessário criar credenciais Google, comprar domínio ou alterar configurações de produção.",
+    "setup": "Use como diagrama de referência o fluxo do site: Preview Vercel → Clerk → Google → callback do Clerk → retorno ao Preview. Para estudar, não copie tokens nem segredos. No ambiente de desenvolvimento do Clerk, a conexão Google compartilhada pode permitir o fluxo sem credenciais próprias; os detalhes dependem da instância atual. Se a equipe configurar credenciais próprias em outro ambiente, obtenha os valores atuais no painel Clerk e no Google Cloud Console. O URI autorizado no Google deve ser exatamente o callback informado pelo Clerk. A URL de retorno da aplicação é outra configuração. Não crie curingas nem invente URLs.",
+    "why": "Um botão “Entrar com Google” encadeia provedores e redirecionamentos. Separar autenticação, autorização, OAuth 2.0, OpenID Connect e os dois tipos de URL de retorno facilita diagnosticar falhas sem expor credenciais nem confundir a sessão da aplicação com acesso aos dados.",
+    "example": {
+      "language": "text",
+      "code": "1. Pessoa abre o Preview Vercel e escolhe entrar com Google.\n2. O navegador segue para o fluxo de autenticação do Clerk.\n3. Clerk inicia OAuth 2.0/OIDC com o Google.\n4. Google autentica a pessoa e retorna ao callback exato do Clerk.\n5. Clerk valida a resposta, associa a identidade e cria/recupera uma sessão Clerk.\n6. Clerk redireciona para uma URL permitida do Preview.\n7. A aplicação consulta a sessão Clerk; chamadas ao Supabase ainda dependem de token e políticas RLS.\n\nGoogle callback ≠ URL de retorno da aplicação.\nOAuth 2.0 trata autorização delegada; OIDC acrescenta identidade/autenticação.\nO Clerk administra state, nonce e detalhes do protocolo no fluxo integrado.",
+      "expected": "O estudante consegue narrar cada salto, nomear o callback do Clerk e a URL de retorno ao Preview como destinos diferentes, e explica que login bem-sucedido não concede automaticamente acesso a linhas do Supabase.",
+      "explanation": [
+        "OAuth 2.0 define mecanismos de autorização delegada. O OpenID Connect (OIDC) é uma camada de identidade sobre OAuth 2.0 usada para comunicar quem autenticou, além de dados básicos do fluxo.",
+        "Na integração Clerk–Google, Google devolve a resposta ao endpoint callback controlado pelo Clerk. Depois de processar o callback, Clerk volta à aplicação em um destino permitido. Esse destino não substitui o callback cadastrado no provedor.",
+        "`state` vincula a resposta ao pedido iniciado e ajuda contra falsificação de requisição; `nonce` vincula a resposta de identidade ao pedido e ajuda contra repetição. Use a integração gerenciada do Clerk em vez de reimplementar o protocolo no frontend.",
+        "O token Google, a sessão Clerk e a credencial usada pela integração com Supabase são estados/credenciais distintos, emitidos para finalidades e consumidores diferentes. Não os troque nem os registre em logs.",
+        "Um Preview Vercel já tem hostname HTTPS `vercel.app`. O hostname pode variar entre deployments; não é necessário possuir domínio próprio para estudar o fluxo."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Identidade, autorização e protocolos",
+        "paragraphs": [
+          "Autenticação responde “quem está entrando?”; autorização responde “o que esta identidade pode fazer?”. Um provedor pode confirmar uma identidade, mas a aplicação e o banco ainda precisam aplicar suas próprias regras de acesso.",
+          "OAuth 2.0 é uma estrutura para conceder acesso delegado a recursos. O OpenID Connect (OIDC) define uma camada de identidade sobre OAuth 2.0, com mensagens e um ID token para comunicar a autenticação. Na expressão comum “login social”, OIDC costuma ser a parte de identidade do fluxo.",
+          "Pausa: se o Google confirma uma pessoa, isso significa que ela pode ler qualquer linha da tabela `learning_state`? Justifique separando identidade de autorização."
+        ],
+        "terms": [
+          { "term": "Autenticação", "meaning": "Verificação da identidade apresentada por uma pessoa ou sistema." },
+          { "term": "Autorização", "meaning": "Decisão sobre quais recursos ou ações uma identidade pode acessar." },
+          { "term": "OAuth 2.0", "meaning": "Protocolo de autorização delegada; sozinho, não deve ser descrito como protocolo de identidade." },
+          { "term": "OpenID Connect (OIDC)", "meaning": "Camada de identidade construída sobre OAuth 2.0, usada para comunicar uma autenticação." }
+        ]
+      },
+      {
+        "title": "Acompanhar o caminho pelo Clerk",
+        "paragraphs": [
+          "O navegador começa no Preview e abre a experiência de login do Clerk. Clerk encaminha a pessoa ao Google; depois, o Google envia o resultado ao callback do Clerk. Clerk valida a resposta, cria ou recupera uma sessão e redireciona a pessoa de volta para a aplicação.",
+          "O Clerk administra `state`, `nonce`, validação e outros detalhes do fluxo integrado. A aplicação deve usar as APIs oficiais do Clerk e evitar montar manualmente URLs de autorização ou copiar tokens para o console.",
+          "Pausa: indique qual sistema recebe a resposta do Google e qual sistema apresenta a sessão para a aplicação."
+        ],
+        "diagramTitle": "Login social mediado pelo Clerk",
+        "diagram": "Navegador no Preview Vercel\n        │ iniciar login\n        ▼\nClerk ── redireciona ──▶ Google\n  ▲                         │\n  └── callback do Clerk ◀───┘\n        │ valida resposta e abre sessão Clerk\n        ▼\nURL permitida de retorno da aplicação no Preview\n        │ sessão autenticada; autorização ainda é verificada\n        ▼\nAplicação → Supabase com integração e RLS",
+        "terms": [
+          { "term": "Provedor de identidade (IdP)", "meaning": "Serviço que autentica a pessoa e comunica informações de identidade a outro sistema." },
+          { "term": "Callback", "meaning": "Endpoint do provedor que recebe a resposta do fluxo iniciado; neste arranjo, é fornecido pelo Clerk para cadastrar no Google." },
+          { "term": "Sessão Clerk", "meaning": "Estado de autenticação mantido pelo Clerk para a aplicação; não é a senha Google nem o token OAuth do Google." }
+        ]
+      },
+      {
+        "title": "Separar callback, origem e destino de retorno",
+        "paragraphs": [
+          "A origem do app é o endereço de onde a interface é carregada. O callback do Google é o URI ao qual o Google devolve a resposta de login, e deve ser copiado exatamente do painel Clerk quando forem usadas credenciais próprias. A URL de retorno da aplicação é o destino para o qual Clerk navega depois de processar essa resposta.",
+          "Esses endereços podem pertencer a serviços e ambientes diferentes. Não use a URL Preview como callback do Google só por ser a página aberta no navegador. Em erro `redirect_uri_mismatch`, compare o URI enviado com o URI autorizado no Google Cloud e confirme que o painel Clerk está usando o mesmo conjunto de credenciais. Não tente adivinhar host, caminho ou barra final.",
+          "Deployments Preview podem receber hostnames próprios. Para esta formação, trabalhe com o hostname Preview existente e as configurações de retorno disponíveis no Clerk; não exija domínio personalizado nem configure curingas amplos."
+        ],
+        "terms": [
+          { "term": "Origem (origin)", "meaning": "Combinação de esquema, hostname e porta usada para identificar a origem web, por exemplo uma URL HTTPS do Preview." },
+          { "term": "URI de redirecionamento (redirect URI)", "meaning": "Destino exato cadastrado para receber uma resposta de autenticação. Neste fluxo, o cadastro no Google aponta ao callback do Clerk." },
+          { "term": "URL de retorno da aplicação", "meaning": "Rota permitida para onde Clerk envia o navegador após concluir o callback." },
+          { "term": "`redirect_uri_mismatch`", "meaning": "Erro que indica diferença entre o URI efetivamente usado e os destinos autorizados no cliente OAuth." }
+        ]
+      },
+      {
+        "title": "Consentimento, escopos e fronteira com o Supabase",
+        "paragraphs": [
+          "Um escopo descreve uma categoria de acesso solicitada. Para a identidade básica, os nomes OIDC comuns são `openid`, `profile` e `email`; peça `profile` ou `email` apenas se a aplicação precisar desses dados. Não adicione permissões de Drive ou outros produtos se o curso não os usa. O conjunto efetivo depende da conexão e do que a aplicação realmente consome.",
+          "Quando o projeto controla seu próprio cliente OAuth, a tela de consentimento identifica o app e informa que dados/escopos são pedidos; configurações podem incluir nome, contato, audiência e escopos, e as exigências de teste ou revisão dependem do modo e das permissões atuais. A pessoa pode já ter consentido antes, então a tela não necessariamente aparece em cada login. Com credenciais compartilhadas do Clerk Development, a tela pode refletir a aplicação de desenvolvimento gerenciada; não é necessário criar uma tela própria para este curso.",
+          "No Clerk Development, a integração social pode usar credenciais compartilhadas gerenciadas, conforme a configuração atual do serviço. Para credenciais próprias em outro ambiente, siga o callback exato exibido pelo Clerk e guarde o segredo no local de configuração seguro do Clerk. Nunca coloque client secret em `.env.example` público, HTML, JavaScript entregue ao navegador, commit, captura de tela ou mensagem.",
+          "Entrar com Google prova que o Clerk autenticou a pessoa. Para acessar o Supabase, o cliente precisa obter a credencial prevista pela integração Clerk–Supabase e o PostgreSQL deve aplicar RLS. O token, a sessão e a regra de propriedade são camadas separadas. A aula é conceitual: não altera credenciais, produção, domínio ou política do banco."
+        ],
+        "terms": [
+          { "term": "Escopo (scope)", "meaning": "Permissão solicitada a um provedor para uma classe de informação ou ação." },
+          { "term": "Consentimento", "meaning": "Decisão da pessoa sobre os dados e permissões solicitados; a tela identifica quem pede acesso e não precisa reaparecer a cada login." },
+          { "term": "`state`", "meaning": "Valor imprevisível associado à solicitação e verificado no retorno para correlacionar o fluxo e reduzir ataques de falsificação." },
+          { "term": "`nonce`", "meaning": "Valor associado ao pedido OIDC e verificado na resposta de identidade para vincular a resposta ao início do fluxo." },
+          { "term": "RLS", "meaning": "Políticas do banco que filtram operações por identidade/contexto; login por si só não substitui essas políticas." }
+        ]
+      }
+    ],
+    "guided": [
+      { "instruction": "Leia o diagrama da aula e aponte quem inicia o fluxo, quem autentica a pessoa, quem recebe o callback e quem cria a sessão consumida pelo app.", "result": "O navegador inicia; Google autentica; o callback retorna ao Clerk; Clerk processa a resposta e fornece uma sessão à aplicação." },
+      { "instruction": "Compare os destinos hipotéticos `https://<clerk-host>/v1/oauth_callback` e `https://<preview>.vercel.app/`. Classifique callback Google, retorno da aplicação ou exemplo que precisa ser confirmado no painel.", "result": "O callback Google é o URI exato mostrado pelo Clerk; o hostname Preview é a origem e pode ser o destino da aplicação se estiver autorizado. O placeholder não deve ser cadastrado como valor real." },
+      { "instruction": "Para uma aplicação que só precisa identificar e exibir nome/e-mail, liste os escopos mínimos `openid`, `profile`, `email` conforme o uso, e indique o que uma tela de consentimento deve deixar claro.", "result": "Solicite apenas os escopos necessários; a pessoa deve ver qual app pede acesso e que dados são solicitados. Permissões de Drive ou acesso amplo não relacionado seriam excessivos." }
+    ],
+    "mistakes": [
+      "Tratar OAuth 2.0 e OIDC como sinônimos ou dizer que OAuth sozinho prova a identidade.",
+      "Cadastrar o hostname do Preview como callback Google sem consultar o callback que Clerk fornece.",
+      "Confundir callback do provedor com a rota de retorno da aplicação depois do login.",
+      "Atribuir `redirect_uri_mismatch` ao DNS antes de comparar os URIs e as credenciais selecionadas.",
+      "Supor que uma sessão Clerk autoriza automaticamente qualquer consulta ao Supabase.",
+      "Pedir escopos amplos ou publicar o segredo de cliente no código do navegador."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: o navegador está em `https://<preview>.vercel.app/`. Google retorna a resposta ao callback indicado no painel Clerk; após processar a resposta, Clerk volta ao Preview. Qual URL deve ser cadastrada como callback no cliente Google? Explique por que as duas URLs não são equivalentes.",
+        "expected": "O callback cadastrado no Google é o URI exato fornecido pelo Clerk. O Preview pode ser origem e destino de retorno da aplicação, mas não substitui o endpoint callback do Clerk.",
+        "criteria": ["Identifica Clerk como receptor da resposta do Google.", "Distingue callback de origem e destino da aplicação.", "Não transforma placeholders em URIs reais."],
+        "solution": "Copie do painel Clerk o callback referente à conexão/ambiente e cadastre esse URI exato no cliente Google correspondente. Configure separadamente no Clerk o retorno permitido para o hostname Preview atual.",
+        "explanation": "O Google devolve o resultado ao componente que iniciou e processa a integração social. Clerk então gerencia a sessão e navega de volta ao app.",
+        "hints": ["Siga a seta de retorno imediatamente após a etapa do Google.", "O navegador estar no Preview não faz o Preview receber o callback do provedor."]
+      },
+      {
+        "prompt": "Alterar: a URL Preview do deployment muda de `https://<preview-antigo>.vercel.app` para `https://<preview-novo>.vercel.app`. Explique o que revisar no Clerk e o que não deve ser trocado no cliente OAuth Google sem evidência do painel.",
+        "expected": "Revisa a origem e o destino de retorno permitidos no Clerk para o Preview novo. Mantém o callback Google informado pelo Clerk, salvo se o painel mostrar que o callback/ambiente mudou; confirma o cliente de credenciais associado.",
+        "criteria": ["Atualiza a configuração de retorno do app conforme necessário.", "Não substitui callback Google pelo hostname do Preview.", "Compara o ambiente e cliente de credenciais no Clerk."],
+        "solution": "No Clerk, confirme quais hostnames de Preview são permitidos como origem/retorno e atualize-os conforme as regras atuais do projeto. No Google Cloud, compare o callback que o Clerk mostra para a conexão usada; não invente uma URI com o hostname novo.",
+        "explanation": "URL de deployment e callback do provedor têm proprietários e funções diferentes. Um deployment novo pode mudar o destino do navegador sem necessariamente mudar o callback gerenciado pelo Clerk.",
+        "hints": ["Separe o endereço exibido na barra do navegador do endereço que recebe o retorno Google.", "Consulte o estado atual do painel antes de mudar credenciais OAuth."]
+      },
+      {
+        "prompt": "Construir: desenhe uma tabela de fluxo com as colunas etapa, emissor, destinatário, finalidade, credencial/estado e escopo consentido. Inclua Preview, Clerk, Google, callback, retorno ao app e leitura do Supabase; marque quais permissões ainda precisam ser verificadas por RLS.",
+        "expected": "A tabela separa o redirecionamento de login, callback Google→Clerk, retorno Clerk→Preview, sessão Clerk e acesso a dados via integração; registra que consentimento cobre apenas os escopos pedidos e que RLS decide acesso às linhas.",
+        "criteria": ["Representa todas as etapas e direções do fluxo.", "Não reutiliza token Google como sessão Clerk ou token Supabase.", "Registra o escopo de consentimento e que login não comprova autorização de dados."],
+        "solution": "Exemplo resumido: Preview inicia login com Clerk; Clerk redireciona ao Google; Google autentica e pede consentimento apenas para os escopos configurados; retorna ao callback exato Clerk; Clerk valida e estabelece sessão; retorna ao Preview permitido; app obtém token apropriado para a integração; Supabase avalia RLS para cada operação.",
+        "explanation": "A tabela torna explícito quem emite cada credencial e onde a decisão de autorização acontece.",
+        "hints": ["Anote uma seta por requisição ou redirecionamento.", "Inclua a política do banco como uma decisão separada da sessão de login."]
+      },
+      {
+        "prompt": "Investigar erro: o usuário vê `redirect_uri_mismatch` depois de escolher Google no Preview. Sem mudar DNS nem publicar segredos, liste evidências e uma ordem de verificação para localizar a diferença.",
+        "expected": "Compara URI enviado e autorizado byte a byte, verifica o callback atual no painel Clerk, confirma o cliente Google e ambiente que Clerk usa, e revisa separadamente a URL de retorno do app. Não altera registros DNS nem publica o segredo.",
+        "criteria": ["Começa pela comparação exata dos URIs e ambiente/cliente.", "Diferencia callback Google de URL retorno da aplicação.", "Não recomenda curinga, segredo no frontend ou mudança DNS sem evidência."],
+        "solution": "Registre apenas host e caminho não sensíveis; abra a configuração da conexão no Clerk e copie o callback exibido; confirme que o cliente OAuth Google associado autorizou exatamente esse URI e que o deployment usa a configuração esperada. Depois confira a allowlist de retorno do app. Guarde o segredo no serviço e revise logs sem tokens.",
+        "explanation": "O erro informa divergência de URI no protocolo. Uma tela de callback ou autorização não prova problema de resolução DNS.",
+        "hints": ["Compare esquema, hostname, caminho e barra final sem tentar valores aleatórios.", "Confira qual provedor entrega a mensagem e qual URL ele esperava receber."]
+      }
+    ],
+    "quiz": [
+      { "question": "No fluxo Clerk + Google, qual endereço o Google usa para devolver a resposta do login?", "options": ["O callback exato fornecido pelo Clerk.", "Sempre a raiz do Preview Vercel.", "O domínio do banco Supabase."], "correctIndex": 0, "explanation": "O callback é o URI do componente integrado que recebe e processa a resposta Google." },
+      { "question": "Qual diferença descreve melhor OAuth 2.0 e OIDC?", "options": ["São nomes diferentes para DNS.", "OAuth 2.0 trata autorização delegada; OIDC acrescenta uma camada de identidade.", "OIDC é uma política RLS do PostgreSQL."], "correctIndex": 1, "explanation": "OIDC usa OAuth 2.0 como base e padroniza informações de autenticação/identidade." },
+      { "question": "Uma sessão Clerk garante leitura de qualquer registro Supabase?", "options": ["Sim, login concede acesso total ao banco.", "Não; a integração precisa enviar a credencial adequada e o banco aplica RLS.", "Sim, desde que o usuário use Google."], "correctIndex": 1, "explanation": "Autenticação e autorização são decisões distintas; a política RLS protege os registros." },
+      { "question": "Ao mudar o Preview, qual prática é segura?", "options": ["Trocar o callback Google para qualquer hostname recém-gerado.", "Revisar a URL de retorno permitida no Clerk e confirmar o callback atual antes de alterar o cliente Google.", "Adicionar um curinga amplo e publicar o segredo no frontend."], "correctIndex": 1, "explanation": "Cada URI tem uma finalidade e uma fonte de configuração; use valores atuais dos painéis e mantenha segredos fora do navegador." },
+      { "question": "O que uma tela de consentimento OAuth deve explicar à pessoa?", "options": ["Quem pede acesso e quais dados/permissões foram solicitados.", "A senha Google e o segredo do cliente.", "Que o login concede acesso irrestrito ao banco da aplicação."], "correctIndex": 0, "explanation": "Consentimento trata da autorização para os escopos solicitados; não compartilhe credenciais nem confunda com permissões internas do banco." }
+    ],
+    "summary": [
+      "Autenticação identifica a pessoa; autorização decide quais recursos pode usar.",
+      "OAuth 2.0 é autorização delegada; OIDC acrescenta identidade/autenticação.",
+      "O Google retorna ao callback exato do Clerk; Clerk depois redireciona à URL permitida da aplicação.",
+      "`state`, `nonce` e a validação do fluxo devem ficar sob a integração gerenciada; não reimplemente nem registre tokens.",
+      "Login social não substitui token de acesso Supabase nem RLS. O hostname Preview basta para estudar; domínio próprio e validação de credenciais não são necessários nesta aula."
+    ]
+  },
+  "delivery-ci": {
     "prerequisites": "Concluir setup-node, js-debug e delivery-environments; saber executar Node no terminal e ter praticado testes de funções em JavaScript.",
     "setup": "Na pasta da aula, salve o exemplo como regra.test.js no editor. No terminal aberto nessa pasta, execute node --test regra.test.js; a saída esperada resume 2 testes aprovados e 0 falhas. Não é preciso instalar pacote. Para simular regressão, troque apenas return valor.trim() por return valor, rode novamente e observe 1 falha; restaure a linha e repita o comando. O processo termina sozinho; se node não for reconhecido, revise setup-node. Esta execução é local, sem serviço de CI remoto.",
     "why": "Publicar com confiança depende de repetir verificações e reconhecer rapidamente quando uma alteração quebrou algo. Uma rotina de integração contínua ajuda a aplicar a mesma regra a cada contribuição.",
@@ -1793,6 +1932,11 @@ Object.assign(LESSON_GUIDES, {
       prompt: "Planeje publicar uma interface estática que consome uma API e usa um banco. Liste onde cada parte rodará, quais configurações são públicas e como verificará a URL final, incluindo uma rota da API e um arquivo CSS.",
       expected: "O plano indica destinos acessíveis ao visitante, mantém segredos fora do frontend e registra respostas reais da página, CSS e API na URL publicada; há um caminho documentado para voltar à versão anterior.",
       hint: "Comece pelo inventário interface → API → banco e teste a partir do navegador de um visitante, não do localhost do desenvolvedor."
+    },
+    "delivery-oauth-google": {
+      prompt: "Um login mediado pelo Clerk termina no Preview, mas o Google informa `redirect_uri_mismatch`. Desenhe as setas do fluxo, marque o callback esperado em cada serviço e escreva três comparações exatas que podem localizar a divergência sem mostrar valores secretos.",
+      expected: "A pessoa compara o URI enviado pelo Google ao URI autorizado no cliente OAuth selecionado, confirma callback e ambiente no Clerk e verifica separadamente a URL de retorno permitida do app; não altera DNS, não inventa curingas e não compartilha segredo.",
+      hint: "Localize em qual salto a mensagem aparece e diferencie o receptor do callback Google do destino final do navegador."
     },
     "delivery-ci": {
       prompt: "Uma publicação altera a validação de minutos e o POST começa a aceitar -5. Defina um teste que falhe antes da correção, indique onde a CI deve executá-lo e descreva como conter a versão ruim enquanto investiga.",

@@ -5064,6 +5064,57 @@
             ]
           },
           {
+            "id": "delivery-oauth-google",
+            "title": "Login com Google: OAuth 2.0 e OpenID Connect",
+            "minutes": 90,
+            "concept": "Entenda como Clerk intermedeia o login social com Google, qual URL recebe o callback, como os conceitos de OAuth 2.0 e OpenID Connect se relacionam e por que escopos e redirecionamentos precisam ser explícitos.",
+            "objectives": [
+              "Distinguir autenticação, autorização, OAuth 2.0 e a camada de identidade OpenID Connect.",
+              "Desenhar o fluxo navegador → Clerk → Google → Clerk → Preview e separar callback do provedor da URL de retorno da aplicação.",
+              "Revisar origem, URI de redirecionamento e escopos mínimos sem compartilhar segredo nem exigir domínio próprio."
+            ],
+            "exercise": "Trace um login social mediado pelo Clerk e investigue um erro de redirect_uri_mismatch usando apenas as URLs autorizadas do Preview.",
+            "code": "Navegador / Preview Vercel\n  │ abre formulário de login do Clerk\n  ▼\nClerk → Google (OAuth 2.0 + OIDC)\n  │ callback exato configurado pelo Clerk\n  ▼\nClerk valida a resposta e cria/restaura a sessão\n  │ redireciona para a rota permitida do Preview\n  ▼\nAplicação lê a sessão Clerk; o banco ainda aplica sua própria autorização\n\nFluxo didático. O Clerk gerencia callback, state e demais detalhes do protocolo.",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "Clerk · Adicionar Google como conexão social",
+                "url": "https://clerk.com/docs/guides/configure/auth-strategies/social-connections/google",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Google · OAuth 2.0 para aplicações web",
+                "url": "https://developers.google.com/identity/protocols/oauth2/web-server",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Google · Como funcionam autorização e consentimento do usuário",
+                "url": "https://developers.google.com/identity/oauth2/web/guides/how-user-authz-works",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Google · Escopos OAuth 2.0",
+                "url": "https://developers.google.com/identity/protocols/oauth2/scopes",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "OpenID Foundation · OpenID Connect Core 1.0",
+                "url": "https://openid.net/specs/openid-connect-core-1_0.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Vercel · Ambientes Preview e Production",
+                "url": "https://vercel.com/docs/deployments/environments",
+                "language": "EN"
+              }
+            ]
+          },
+          {
             "id": "delivery-ci",
             "title": "Testes de entrega, observação e recuperação",
             "minutes": 130,

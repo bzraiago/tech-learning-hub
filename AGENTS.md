@@ -139,7 +139,7 @@ Os scripts são clássicos e compartilham o mesmo escopo global, carregados na o
 
 Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workflow`, `quality`, `delivery`.
 
-> Os números atuais (9 trilhas, 28 módulos, 121 aulas, 486 exercícios, 361 questões, 24 projetos) foram conferidos no código em 27/10/2026. **Confira no código antes de citá-los** e atualize `contexto/ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
+> Os números atuais (9 trilhas, 28 módulos, 122 aulas, 490 exercícios, 366 questões, 24 projetos) foram conferidos no código em 27/10/2026. **Confira no código antes de citá-los** e atualize `contexto/ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
 
 ### 5.2 Persistência e compatibilidade (cuidado máximo)
 - O curso exige login Clerk antes de mostrar o conteúdo. O progresso persistente fica somente em `public.learning_state` no Supabase, protegido por RLS e vinculado ao ID Clerk. `state` permanece em memória durante a sessão. Ao trocar de conta, a interface aguarda a leitura da nova conta antes de aceitar edição.
@@ -261,7 +261,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 1. [x] **Etapa 0** de computador, arquivos, editor e terminal, disponível antes do primeiro exercício que dependa deles.
 2. [x] **Mapa de pré-requisitos** e instruções de instalação por sistema (Python, Git, Node.js + npm, Docker/WSL, PostgreSQL, MariaDB, Firebird, MongoDB/`mongosh`), seguindo o padrão 6.2.
 3. [x] **Resultado esperado visível** separado da solução em todos os exercícios; checkpoints distintos para *li / pratiquei / revisão / resolvi sozinho*.
-   - [x] Os 486 exercícios exibem resultado esperado e critérios específicos; o validador exige critérios nas aulas revisadas.
+   - [x] Os 490 exercícios exibem resultado esperado e critérios específicos; o validador exige critérios nas aulas revisadas.
    - [x] As aulas `prep-tools`, `prep-files`, `prep-workspace`, `prep-cycle`, `prep-errors`, as quatro instalações iniciais, `setup-docker`, `setup-docker-alternative`, `setup-postgresql`, as preparações opcionais de MariaDB, Firebird e MongoDB, `db-mariadb`, `db-firebird`, `db-mongo-crud`, `db-mongo-pipelines`, `db-nosql-models`, `db-performance`, `db-security`, `db-recovery`, `db-project`, `db-modeling`, `db-normalization`, `db-ddl-constraints`, `db-ddl-crud`, `db-select`, `db-aggregation`, `db-joins`, `db-subqueries-ctes`, `db-transactions`, `db-concurrency-boundaries`, `db-docker-basics`, `db-docker-compose`, `db-docker-operations`, `db-postgres` e `db-sqlite` iniciam os critérios específicos.
    - [x] As 13 aulas HTML/CSS contêm critérios nos 52 exercícios; 14 resultados foram revisados para que previsão, investigação e comparação não mostrem a conclusão antes da tentativa.
    - [x] As 14 aulas JavaScript contêm critérios nos 56 exercícios; 22 resultados foram revisados para preservar a previsão, investigação e diagnóstico antes da conclusão.
@@ -269,7 +269,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
    - [x] As 18 aulas de IA contêm critérios nos 73 exercícios; 17 resultados foram revisados para preservar previsões, métricas e validações antes da conclusão.
    - [x] As seis aulas Git contêm critérios nos 24 exercícios; o resultado da busca no histórico não antecipa mais a linha literal.
    - [x] As seis aulas de Qualidade contêm critérios nos 24 exercícios; o resultado de diagnóstico evita antecipar qual valor demonstra coerção.
-   - [x] As 13 aulas de Entrega contêm critérios nos 53 exercícios; previsões, resolução DNS, HTTPS, Preview e plano conceitual de domínio personalizado ficam verificáveis.
+   - [x] As 14 aulas de Entrega contêm critérios nos 57 exercícios; previsões, resolução DNS, HTTPS, Preview, OAuth/OIDC e plano conceitual de domínio personalizado ficam verificáveis.
 4. [x] **Projetos de fechamento** para as trilhas Git, Qualidade e Integração (entregas de laboratório; publicação real permanece nas fases posteriores).
 5. [ ] **Sequência de backend com persistência**: interface → API → validação → regra de negócio → banco → resposta → testes → publicação.
    - [x] Laboratório `labs/backend-validation` demonstra validação no servidor com Node.js nativo, pedidos diretos inválidos e ausência de escrita após rejeição.
@@ -284,6 +284,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 6. [ ] **CI, publicação e integração externa** como práticas guiadas e verificáveis (observar falha, corrigir, conferir URL final, voltar versão).
    - [x] Criar aulas sobre domínio, DNS, HTTPS/TLS e opções de hospedagem, com fontes oficiais, exemplos fictícios e práticas diagnósticas.
    - [x] Ensinar domínio personalizado e DNS com simulação detalhada: associação do projeto, A/AAAA/CNAME/TXT/NS, preservação de MX/TXT, verificação por camada e rollback, sem comprar ou validar domínio real.
+   - [x] Ensinar OAuth 2.0/OIDC com Google via Clerk, callback versus retorno da aplicação, state/nonce, escopos mínimos e separação de sessão e RLS; o Preview `vercel.app` basta e domínio próprio não é necessário.
    - [x] Criar `labs/bug-investigation` com teste de regressão que falha antes e passa depois da correção; a execução red/green foi verificada em ambiente temporário.
    - [x] Automatizar um fluxo do navegador em Chromium headless, isolado ao laboratório de backend e sem depender de banco.
    - [x] Criar workflow real de GitHub Actions com validação, testes, PostgreSQL efêmero e Playwright; execução `40605904963` passou em `main`.
