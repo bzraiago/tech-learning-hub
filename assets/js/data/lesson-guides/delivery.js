@@ -1264,6 +1264,7 @@ Object.assign(LESSON_GUIDES, {
         "title": "O que o OWASP Top 10 mede e não mede",
         "paragraphs": [
           "O OWASP Top 10 2025 agrupa riscos de segurança de aplicações web para conscientização e conversa entre equipes. As categorias atuais são: A01 Broken Access Control; A02 Security Misconfiguration; A03 Software Supply Chain Failures; A04 Cryptographic Failures; A05 Injection; A06 Insecure Design; A07 Authentication Failures; A08 Software or Data Integrity Failures; A09 Security Logging & Alerting Failures; A10 Mishandling of Exceptional Conditions. Os nomes são mantidos em inglês para corresponder à fonte oficial; traduza e explique o significado ao aplicá-los.",
+          "A05 Injection já tem uma prática de banco em `db-security`: consultas parametrizadas com SQLite, valores separados da estrutura SQL e um teste de texto que parece SQL permanece literal. Revise essa aula em vez de copiar o mesmo exemplo para outro módulo. Parametrização reduz injeção por valores; autorização por proprietário, validação de domínio e privilégio mínimo continuam sendo decisões separadas.",
           "A lista ajuda a lembrar famílias de problemas, mas não é um inventário de todos os riscos, uma certificação nem prova de que um sistema está seguro. Um projeto pode não ter evidência suficiente para avaliar uma categoria. Registre o escopo, a versão da referência e o que foi realmente verificado.",
           "Esta aula pratica A01 e autorização por objeto com um servidor local isolado. As outras categorias exigem cenários e correções específicos; apenas nomeá-las não comprova que você saiba preveni-las. O roadmap mantém essas práticas separadas para evitar uma demonstração superficial."
         ],
@@ -1658,6 +1659,149 @@ Object.assign(LESSON_GUIDES, {
       "Combine métodos seguros, token CSRF no servidor, política de cookie e verificações de origem conforme o modelo.",
       "Bearer anexado explicitamente a uma API difere de cookie autoenviado; continue exigindo RLS e análise de CORS.",
       "Esta aula lê código e não comprova comportamento de painéis ou serviços remotos."
+    ]
+  },
+  "delivery-api-abuse": {
+    "prerequisites": "Concluir `delivery-http`, `delivery-clerk-supabase` e `delivery-threat-model`; conhecer request/response, validação no servidor, identidade e autorização. Esta aula usa cenário e números fictícios e analisa `labs/backend-validation`/`labs/backend-layers`; não exige tráfego, conta ou serviço externo.",
+    "setup": "No editor, leia `labs/backend-validation/README.md` e procure `limiteCorpo` e `413` em `labs/backend-validation/server.cjs`; depois confira limites citados no README de `labs/backend-layers`. No Windows, macOS ou Linux, a leitura dos arquivos não exige instalar nada. Se desejar observar o laboratório já existente, siga apenas os passos locais do README e use dados fictícios; não faça loop ou carga automatizada. A saída conceitual esperada é uma matriz que separa recurso, fluxo de negócio, limite, identidade, status e sinal de monitoramento. Alternativa leve: use a tabela desta aula sem iniciar servidor. Não é necessário Preview, domínio ou teste de carga.",
+    "why": "Uma API pode aceitar cada chamada isoladamente como válida e ainda assim permitir volume, custo ou sequência que prejudique outras pessoas ou o negócio. Proteção robusta limita tanto o custo de uma requisição quanto a frequência e o efeito acumulado de um fluxo.",
+    "example": {
+      "language": "text",
+      "code": "CENÁRIO FICTÍCIO — exportação de relatórios\nEndpoint: POST /relatorios/exportar\n\nRisco API4 — consumo de recursos:\n- um pedido pode solicitar dados sem limite de período ou quantidade\n- uma consulta cara pode esgotar CPU/memória\n\nRisco API6 — abuso de fluxo sensível:\n- muitas exportações válidas podem elevar custo e bloquear outras contas\n\nPLANO CONCEITUAL (não executar):\n1. Autorizar a pessoa/tenant e os campos exportados.\n2. Limitar janela de datas, tamanho da resposta, tempo e concorrência.\n3. Definir quota por conta e orçamento do fornecedor.\n4. Responder 429 + Retry-After quando a quota temporal for excedida.\n5. Medir rejeições, latência e custo com logs sem token nem dados privados.",
+      "expected": "O plano limita o tamanho/custo de uma chamada e a frequência/efeito acumulado do fluxo, aplica autorização separadamente e define como a resposta/telemetria informa limite sem revelar dados sensíveis.",
+      "explanation": [
+        "API4:2023 trata de consumo irrestrito de recursos: banda, CPU, memória, armazenamento e serviços cobrados por chamada podem ser excedidos por parâmetros, lote, upload ou ausência de timeout/limite.",
+        "API6:2023 trata de acesso irrestrito a um fluxo de negócio sensível: operações individualmente válidas, como comentar, reservar ou enviar convites, podem causar dano quando automatizadas ou repetidas sem controle adequado.",
+        "Rate limit controla taxa numa janela; quota pode limitar volume/custo acumulado; limite de corpo/página/tempo controla o peso de cada operação. Os controles se complementam, mas não substituem autorização.",
+        "O laboratório `backend-validation` já rejeita corpo acima de 1024 bytes com 413 e valida título; isso é limitação de entrada, não rate limiter. `backend-layers` trata duplicidade com 409, que também não é limite de taxa."
+      ]
+    },
+    "sections": [
+      {
+        "title": "Do pedido individual ao dano acumulado",
+        "paragraphs": [
+          "Consumo de recursos e abuso de fluxo são riscos diferentes. Um endpoint pode fazer uma consulta lenta ou devolver uma página enorme mesmo com uma única chamada; um limite de tamanho, tempo ou operações por pedido pode ser necessário. Em outro caso, cada solicitação de comentário ou relatório é barata, mas milhares de ações normais automatizadas geram spam, custo ou indisponibilidade; controlar a taxa e o fluxo ajuda.",
+          "OWASP API4:2023 descreve consumo irrestrito de recursos; exemplos de limites incluem timeout de execução, tamanho de upload, número de registros por página, quantidade de operações num pedido e orçamento de serviço terceiro. OWASP API6:2023 aborda fluxos sensíveis que podem causar dano se usados em excesso. A lista serve para comunicação e conscientização, não certifica uma API.",
+          "Não confunda abuso de fluxo com autorização quebrada. Em BOLA, uma pessoa alcança objeto alheio; em abuso de fluxo, a identidade pode ter permissão para uma operação mas a frequência ou automação causa efeito coletivo. Um sistema pode ter ambos e deve testar cada propriedade separadamente.",
+          "Pausa: classifique o cenário ‘cada exportação custa pouco, mas uma conta faz 10.000 por hora’ e ‘uma exportação aceita um intervalo de 50 anos’ como risco de fluxo, peso individual, ou ambos."
+        ],
+        "terms": [
+          { "term": "Consumo irrestrito de recursos", "meaning": "Ausência ou inadequação de limites que permite requests consumirem banda, CPU, memória, storage ou recursos faturáveis em excesso." },
+          { "term": "Fluxo sensível de negócio", "meaning": "Sequência de operações cujo uso excessivo ou automatizado pode prejudicar usuários ou objetivos legítimos do produto." },
+          { "term": "Abuso de API", "meaning": "Uso de endpoints, campos, frequência ou sequências de forma que exceda a expectativa de capacidade ou de negócio." },
+          { "term": "Rate limit", "meaning": "Regra que limita quantas operações uma identidade/cliente pode realizar em um intervalo definido." }
+        ]
+      },
+      {
+        "title": "Projetar limites independentes",
+        "paragraphs": [
+          "Comece pelo custo da operação: máximo de bytes do corpo, tamanho de página, quantidade de itens em lote, intervalo consultável, tempo de execução e concorrência. Valide esses limites no servidor porque um controle da interface pode ser contornado. Use filas e quotas para trabalho assíncrono ou serviços que cobram por chamada. Defina o que acontece quando o orçamento chega ao limite.",
+          "Depois limite volume ou impacto por conta autenticada, tenant, chave de cliente, IP ou combinação. IP pode ser compartilhado por pessoas legítimas e pode mudar/distribuir-se; sozinho é uma identidade fraca para justiça e defesa. A identidade da sessão também não impede muitas contas. Combine sinais, coloque limites globais e por recurso e documente falsos positivos e caminho de atendimento.",
+          "HTTP `429 Too Many Requests` é adequado quando a política rejeita excesso de requisições; `Retry-After` pode orientar quando tentar de novo. `503 Service Unavailable` comunica indisponibilidade temporária, não uma quota pessoal; `413` identifica corpo grande; `400` indica formato inválido; `409` pode indicar conflito de estado, como duplicidade. Use códigos que correspondam à causa e não devolva detalhes internos.",
+          "Idempotência evita que repetir a mesma operação lógica crie múltiplos efeitos por falha de rede ou retry. Uma pessoa ainda pode enviar muitas operações novas com chaves diferentes; idempotência não substitui limite de frequência, quota nem regra de negócio. CAPTCHA e fingerprinting podem ser fricção complementar, mas têm custo, acessibilidade e possibilidade de contorno; não os torne a única defesa.",
+          "Pausa: defina um limite por pedido para tamanho de página e um limite por conta para frequência. Explique por que uma política não cobre a outra."
+        ],
+        "terms": [
+          { "term": "Quota", "meaning": "Teto de volume ou custo permitido em um período ou plano de uso." },
+          { "term": "429 Too Many Requests", "meaning": "Status que informa rejeição por excesso de requests ou por política de limitação de taxa." },
+          { "term": "Retry-After", "meaning": "Cabeçalho que pode indicar quando o cliente deve tentar novamente após uma limitação temporária." },
+          { "term": "Idempotência", "meaning": "Propriedade de repetir a mesma operação lógica sem multiplicar o efeito; não impede novas operações distintas." }
+        ]
+      },
+      {
+        "title": "Ligar regra técnica a efeito de negócio",
+        "paragraphs": [
+          "Para cada fluxo, escreva quem pode iniciá-lo, qual benefício legítimo entrega, qual recurso consome, qual dano o excesso causa e que limite preserva acesso justo. Exemplos fictícios: impedir que relatórios muito grandes bloqueiem o salvamento; limitar convites repetidos; limitar reservas simultâneas; restringir criação automática de sessões; definir orçamento de SMS/e-mail.",
+          "Evite regra sem conta: ‘no máximo 5’ precisa dizer por pessoa, tenant, IP ou instalação; janela móvel ou fixa; o que conta como tentativa; quando reseta; se a operação tem custo; como tratar retry legítimo; e qual sinal alerta a equipe. Comece pelo comportamento de pessoas reais e pelos custos/contratos do provedor, não por número arbitrário copiado de uma postagem.",
+          "Proteja também leitura e CPU: não permita qualquer parâmetro de ordenação SQL, expansão ilimitada, busca sem paginação, filtros caros e formatos de relatório sem restrição. O capítulo `db-security` separa parametrização e proprietário; `backend-validation` demonstra tamanho máximo de corpo; `backend-layers` inclui queries e limites do domínio. Nenhum deles sozinho é um sistema completo de rate limiting.",
+          "Métricas devem ajudar a decidir: quantidade permitida/rejeitada por rota e classe, latência, fila, erros do fornecedor e custo. Não grave token, conteúdo de anotação nem identificador pessoal desnecessário. Agregue ou pseudonimize conforme necessidade e retenção; alerta precisa ter responsável e resposta.",
+          "Um limite centralizado em processo pode reiniciar e perder contadores ou divergirem entre réplicas. Um armazenamento compartilhado, por exemplo Redis, pode sincronizar contadores, mas traz custo, expiração, particionamento e indisponibilidade. A implementação prática e os trade-offs serão tratados na Fase 7.4; esta aula não afirma que o projeto já esteja limitado."
+        ],
+        "terms": [
+          { "term": "Limite de custo", "meaning": "Teto configurado para gasto ou consumo de um recurso pago, com ação definida quando se aproxima/atinge." },
+          { "term": "Backpressure", "meaning": "Mecanismo que reduz ou recusa novo trabalho quando a capacidade de processamento não acompanha a demanda." },
+          { "term": "Contador distribuído", "meaning": "Estado compartilhado entre múltiplas instâncias para aplicar uma política comum de volume ou frequência." },
+          { "term": "Observabilidade", "meaning": "Sinais como métricas, logs e alertas usados para entender comportamento e responder a falhas ou abuso." }
+        ]
+      },
+      {
+        "title": "Planejar validação controlada",
+        "paragraphs": [
+          "Comece com testes unitários da política, sem tráfego alto: dentro do limite a chamada é permitida; acima, recebe 429; o estado reseta conforme janela; uma conta não consome a quota de outra; um corpo/página acima do máximo recebe 413/400 conforme contrato; serviço limitador indisponível segue uma decisão de fail-open/fail-closed documentada. Teste relógio e concorrência com cenário determinístico.",
+          "Em integração local, use poucos pedidos, dados fictícios e uma API própria. Registre quantidade, janela, identidade fictícia, status, cabeçalhos e efeito; confirme que nenhum request recusado causou gravação. Teste desempenho ou carga somente em ambiente isolado, com autorização e limite operacional. Não faça flood, stress test ou simulação automatizada em Preview público, API de provedor ou serviço de outra pessoa.",
+          "Os laboratórios existentes não implementam um rate limiter: `backend-validation` protege tamanho do corpo e campos; `backend-layers` demonstra conflito, timeout de API externa e teste de integração. Use esses controles como partes do contrato. A implementação de contador com Redis, TTL, janela, retry e fallback pertence à Fase 7.4.",
+          "Pausa: para uma quota que atingiu limite, escreva um critério observável para 429 e um teste que mostre que a operação proibida não foi aplicada. Não simule carga contra endpoint remoto."
+        ],
+        "terms": [
+          { "term": "Teste de contrato", "meaning": "Verificação de status, cabeçalhos, formato e efeito conforme o acordo da API." },
+          { "term": "Fail-open / fail-closed", "meaning": "Decisão de continuar permitindo ou recusar quando o controle de limite fica indisponível; depende do impacto e deve ser explícita." },
+          { "term": "Ambiente isolado", "meaning": "Sistema de teste próprio, com capacidade e dados delimitados para que a verificação não afete terceiros." }
+        ]
+      }
+    ],
+    "diagramTitle": "Do custo por operação ao efeito acumulado",
+    "diagram": "Pedido ──► API: validar identidade e permissão\n              │\n              ├── limite por pedido: bytes, página, timeout, operações\n              ├── limite de capacidade: concorrência, fila, memória\n              ├── limite por cliente: taxa, quota, comportamento do fluxo\n              └── limite do provedor: custo e orçamento\n                         │\n            permitido ──┴── excedido\n                │               │\n          executar ação    429 + Retry-After\n                │               │\n       registrar sinais sem tokens/dados pessoais desnecessários",
+    "guided": [
+      { "instruction": "Separe API4 e API6 no cenário de exportação: uma requisição enorme e muitas exportações pequenas. Indique o limite que cada caso sugere e um dano possível.", "result": "Pedido enorme sugere limite de intervalo/tamanho/tempo e pode consumir CPU/memória; muitas exportações sugerem quota/limite por identidade e podem elevar custo ou bloquear outras pessoas. Um cenário pode combinar ambos." },
+      { "instruction": "Leia `limiteCorpo` em `labs/backend-validation/server.cjs`. Registre qual controle já existe, seu status esperado e uma categoria que esse controle não implementa.", "result": "Corpo acima de 1024 bytes recebe 413; isso limita o tamanho de cada pedido. Não controla frequência, quota por conta nem automação de um fluxo." },
+      { "instruction": "Para uma ação de reserva fictícia, identifique identidade, recurso protegido, quota, janela, resposta em excesso e métrica; separe o retry acidental do uso repetido de novas reservas.", "result": "A proposta define conta/tenant, cota de reservas por período, 429 + Retry-After, alerta de rejeições e idempotência para a mesma reserva; novas chaves não burlam a quota de negócio." }
+    ],
+    "mistakes": [
+      "Tratar todo abuso como muitas requisições por segundo e ignorar o custo de uma única chamada pesada.",
+      "Confundir BOLA/autorização com acesso repetido a uma ação que a pessoa pode executar individualmente.",
+      "Usar apenas IP como identidade ou aplicar um número sem explicar janela, operação e impacto.",
+      "Achar que idempotência impede automação de operações novas.",
+      "Usar CAPTCHA como defesa única sem considerar acessibilidade e automação distribuída.",
+      "Devolver 500 quando a política de quota foi atingida em vez de um status coerente, como 429.",
+      "Executar carga em produção/Preview ou em APIs de terceiros sem autorização.",
+      "Registrar tokens, conteúdo privado ou PII desnecessária nos logs de abuso."
+    ],
+    "exercises": [
+      {
+        "prompt": "Prever: uma API aceita 500.000 linhas por página em uma chamada; outra aceita páginas de 100 linhas mas permite 20.000 chamadas por conta por hora. Classifique os riscos e preveja o impacto principal em cada caso.",
+        "expected": "A primeira concentra consumo elevado por request (API4); a segunda permite excesso acumulado ou fluxo abusivo apesar de pedidos pequenos (API4/API6 conforme custo de negócio). Ambas podem elevar latência/custo ou prejudicar disponibilidade.",
+        "criteria": ["Distingue custo unitário de volume acumulado.", "Associa as categorias adequadas sem tratá-las como exclusivas.", "Indica um impacto observável para cada risco."],
+        "solution": "500.000 linhas concentram memória, CPU e resposta grande; imponha página e timeout. 20.000 chamadas pequenas excedem a quota por pessoa e podem elevar custo ou consumir o serviço; defina taxa/limite de negócio e monitore o efeito.",
+        "explanation": "Um rate limiter por request pode não proteger de um único pedido caro; limite de página não impede um volume de ações legítimas automatizadas.",
+        "hints": ["Quanto custa uma chamada isolada?", "Quanto custa a sequência completa ao longo de uma janela?"]
+      },
+      {
+        "prompt": "Alterar: uma exportação atual aceita intervalo de datas ilimitado. Escreva critérios para intervalo máximo, número de linhas, timeout, autorização por conta e resposta quando o limite temporal de uso é excedido. Use valores de exemplo explicitamente fictícios.",
+        "expected": "Critérios definem limite de intervalo/linhas no servidor, timeout, dono autorizado, 429 e Retry-After para taxa, 413 para corpo excessivo se aplicável, nenhuma exportação em pedidos recusados e métrica agregada sem conteúdo/token.",
+        "criteria": ["Limita custo por operação além da taxa.", "Autoriza por identidade no servidor.", "Diferencia 413 e 429 conforme causa.", "Define ausência de efeito e observabilidade sem dados sensíveis."],
+        "solution": "Por exemplo fictício: data inicial/final não excedem 90 dias; resultado máximo 5.000 itens por página; timeout 3 s; só tenant da sessão; quota temporal excedida responde 429 com Retry-After; nenhuma exportação é iniciada antes das validações. Métrica registra rota/status/contagem agregada sem token ou linhas.",
+        "explanation": "A política limita peso unitário, frequência e escopo autorizado como dimensões independentes.",
+        "hints": ["Que custo há antes de contar chamadas?", "Qual regra controla o tamanho do resultado?", "Como a pessoa legítima saberá quando tentar novamente?"]
+      },
+      {
+        "prompt": "Construir: desenhe uma matriz para quatro controles numa API de envio de convites: tamanho do pedido, frequência por conta, frequência por IP e teto mensal do provedor. Para cada um, diga camada, sinal e uma limitação conhecida.",
+        "expected": "A matriz atribui limites ao parser/API, contador por identidade, sinal de borda/IP e orçamento/provedor; sinais incluem 413/429, quota/custo e alertas. Reconhece que IP é compartilhado/rotativo, identidade pode ser múltipla e teto de gastos pode interromper serviço legítimo.",
+        "criteria": ["Inclui os quatro controles sem chamá-los de equivalentes.", "Indica camada e sinal verificável.", "Reconhece limitações de IP, identidade e orçamento."],
+        "solution": "Tamanho: parser/app, 413, bytes recusados, limite pode exigir diferenciar uploads. Conta: serviço/API, 429, excesso por sessão. IP: proxy/edge confiável, 429/bloqueio, NAT/rotação afetam legítimos. Teto provedor: painel/conta, alerta/cap, protege gasto mas pode suspender função legítima. Combine e acompanhe falsos positivos.",
+        "explanation": "Limites em camadas reduzem fraquezas de um único identificador e tornam os trade-offs explícitos.",
+        "hints": ["Quem calcula cada cota?", "Que erro apareceria para o cliente?", "Quem pode ser afetado por um limite baseado só em endereço IP?"]
+      },
+      {
+        "prompt": "Investigar erro: pessoas legítimas recebem 429 depois que o time adicionou um limite por IP atrás de um proxy. Defina uma investigação segura para distinguir NAT compartilhado, cabeçalho de proxy não confiável, janela incorreta e quota de conta; não gere carga nem altere o painel real.",
+        "expected": "Analisa métricas agregadas por rota/janela, valida que IP vem de proxy confiável e não do cliente, compara quota por conta e compartilhamento/NAT, verifica relógio/reset e permite ajuste mínimo documentado; preserva rate-limit global e registra falsos positivos sem armazenar IPs por mais tempo que necessário.",
+        "criteria": ["Não confia cegamente em X-Forwarded-For enviado pelo cliente.", "Distingue identificadores e janela como hipóteses.", "Preserva limites globais enquanto calibra política de forma controlada.", "Evita carga ou dados pessoais além do necessário."],
+        "solution": "Reúna contagens agregadas e hora/rota sem copiar tokens; valide cabeçalhos do proxy confiável, observe usuários atrás de NAT, confira escopo e janela do contador e compare com conta/tenant. Ajuste limite após justificar impacto e monitorar; não aceite um header arbitrário como IP e não desligue todo controle.",
+        "explanation": "Um 429 pode ser comportamento correto ou falsa rejeição; diagnostique a dimensão do contador e seu contexto antes de relaxar a política.",
+        "hints": ["De onde veio o valor de IP?", "O contador é por instalação, endereço, conta ou tenant?", "O relógio e a janela correspondem à mensagem Retry-After?"]
+      }
+    ],
+    "quiz": [
+      { "question": "Qual diferença descreve API4 e API6?", "options": ["API4 foca consumo de recursos; API6 foca uso excessivo de fluxo de negócio sensível.", "API4 é autenticação e API6 é DNS.", "São nomes diferentes para BOLA."], "correctIndex": 0, "explanation": "Um pedido pesado e muitas operações de negócio podem ter causas e controles diferentes." },
+      { "question": "Qual status pode indicar que uma política de taxa recusou o pedido?", "options": ["429 Too Many Requests.", "415 Unsupported Media Type.", "304 Not Modified."], "correctIndex": 0, "explanation": "429 indica excesso de requests ou rejeição por rate limiting; Retry-After pode orientar nova tentativa." },
+      { "question": "O que idempotência não faz?", "options": ["Não substitui quota de frequência para novas operações distintas.", "Pode impedir duplicar o mesmo efeito em retry.", "Pode ser útil em falhas de rede."], "correctIndex": 0, "explanation": "Chaves novas podem representar operações novas; limites de fluxo continuam necessários." },
+      { "question": "O que demonstra o limite de 1024 bytes em `backend-validation`?", "options": ["Limite do tamanho de corpo, não um rate limiter.", "Limite de requests por conta.", "Prova de capacidade de produção."], "correctIndex": 0, "explanation": "413 rejeita um request grande; o laboratório não mede frequência ou carga distribuída." }
+    ],
+    "summary": [
+      "API4 limita consumo por pedido; API6 controla excesso de fluxos de negócio sensíveis.",
+      "Combine limites de entrada, tamanho de página, tempo, concorrência, identidade, quota e custo.",
+      "Use 429/Retry-After para política de taxa e status distintos para causas distintas.",
+      "Idempotência, CAPTCHA e IP são controles parciais, não defesas universais.",
+      "O curso só faz análises com dados fictícios; rate limiting distribuído será implementado na Fase 7.4 com Redis."
     ]
   },
   "delivery-requirements": {
@@ -2662,6 +2806,11 @@ Object.assign(LESSON_GUIDES, {
       prompt: "Uma API migrou de cookie de sessão para bearer token explícito, mas outro endpoint da mesma aplicação continua usando cookie e permite alterar dados. Desenhe a investigação sem presumir que a mudança eliminou CSRF: liste evidências de envio automático, método, Origin, política CORS, token/atributos de cookie e autorização por operação.",
       expected: "A investigação separa endpoint por endpoint, identifica credencial ambient no caminho que usa cookie, exige método sem mutação para GET, valida token CSRF/origem conforme padrão adotado, revisa SameSite e CORS exato e mantém autorização no servidor; Bearer em outro fluxo não prova imunidade geral.",
       hint: "Rastreie cada pedido e a credencial que o navegador envia nele, não apenas a mudança feita num endpoint."
+    },
+    "delivery-api-abuse": {
+      prompt: "Uma rota de relatórios aceita uma página grande e também pode ser chamada muitas vezes por conta. Proponha testes locais unitários da política para limite por pedido, quota por conta, resposta 429, isolamento entre contas fictícias e nenhuma gravação após rejeição. Explique por que isso não é um teste de carga nem prova da capacidade do Preview.",
+      expected: "Os testes usam poucos casos determinísticos e estado isolado: o limite dentro da faixa permite; excesso de tamanho recebe resposta do contrato; excesso da quota recebe 429 e Retry-After; contas têm contadores separados; pedido recusado não grava. Não envia carga nem afirma comportamento remoto.",
+      hint: "Teste a regra e o efeito sobre o estado com uma quantidade pequena e conhecida de chamadas em ambiente local próprio."
     },
     "delivery-ci": {
       prompt: "Uma publicação altera a validação de minutos e o POST começa a aceitar -5. Defina um teste que falhe antes da correção, indique onde a CI deve executá-lo e descreva como conter a versão ruim enquanto investiga.",

@@ -5230,7 +5230,8 @@
               "Listar as categorias do OWASP Top 10 2025 e explicar por que a lista não certifica uma aplicação.",
               "Distinguir autenticação de autorização e reconhecer BOLA/IDOR como falha de controle de acesso a um objeto.",
               "Executar o laboratório local com contas e progresso fictícios, observar a rota vulnerável e a corrigida.",
-              "Propor testes positivos e negativos que confirmem acesso próprio e bloqueiem acesso cruzado."
+              "Propor testes positivos e negativos que confirmem acesso próprio e bloqueiem acesso cruzado.",
+              "Relacionar A05 Injection à aula `db-security`, que usa parâmetros SQLite e testa entrada de aparência SQL como dado literal."
             ],
             "exercise": "Siga `labs/security-basics/README.md`, compare a resposta das rotas vulnerável e corrigida e explique qual verificação falta em cada requisição.",
             "code": "OWASP Top 10 2025 — categorias de conscientização\nA01 Broken Access Control             A06 Insecure Design\nA02 Security Misconfiguration          A07 Authentication Failures\nA03 Software Supply Chain Failures     A08 Software or Data Integrity Failures\nA04 Cryptographic Failures              A09 Security Logging & Alerting Failures\nA05 Injection                           A10 Mishandling of Exceptional Conditions\n\nExperimento local (somente IDs e tokens fictícios):\nGET /demo/vulnerable/progress/aluno-b  → token A; resposta 200 com marcador B\nGET /demo/fixed/progress/aluno-b      → token A; resposta 404 sem dados de B\n\nA01: a sessão está autenticada, mas a autorização do objeto não foi verificada.",
@@ -5325,6 +5326,46 @@
                 "kind": "doc",
                 "title": "MDN · CORS",
                 "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS",
+                "language": "EN"
+              }
+            ]
+          },
+          {
+            "id": "delivery-api-abuse",
+            "title": "Abuso de API: recursos e fluxos sensíveis",
+            "minutes": 95,
+            "concept": "Diferencie consumo irrestrito de recursos de abuso automatizado de fluxos de negócio e planeje limites no servidor que protejam capacidade, custo e acesso justo sem confundir rate limit com autorização.",
+            "objectives": [
+              "Reconhecer API4:2023 (consumo irrestrito de recursos) e API6:2023 (acesso sem restrição a fluxos sensíveis) como riscos distintos.",
+              "Definir limites de corpo, página, custo, tempo, concorrência e operações conforme o recurso e o impacto do produto.",
+              "Explicar o uso de 429/Retry-After, limites por identidade/tenant/IP e por que IP isolado, CAPTCHA ou idempotência não resolvem todos os casos.",
+              "Planejar uma revisão controlada sem gerar carga contra Preview, serviços públicos ou contas reais."
+            ],
+            "exercise": "Use a matriz de cenários com números fictícios para propor limites, sinais de observabilidade e resposta segura; compare com limites já presentes nos laboratórios backend.",
+            "code": "EXEMPLO DE ANÁLISE (números fictícios, sem enviar pedidos):\nEndpoint: exportar um relatório de estudos\nRisco de recurso: relatório aceita 100.000 linhas em uma chamada\nRisco de fluxo: uma pessoa automatiza 5.000 exportações repetidas\n\nControles independentes:\n- validar identidade e permissão para o relatório\n- limitar página/tamanho e tempo de processamento\n- estabelecer quota e concorrência por conta/tenant\n- responder 429 com orientação de retry quando a quota temporal for atingida\n- monitorar custo e erro sem registrar tokens ou conteúdo privado",
+            "docs": [
+              {
+                "kind": "doc",
+                "title": "OWASP · API Security Top 10",
+                "url": "https://devguide.owasp.org/en/07-training-education/07-api-top-ten/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "OWASP · API4:2023 Unrestricted Resource Consumption",
+                "url": "https://api-security.owasp.org/editions/2023/en/0xa4-unrestricted-resource-consumption/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "OWASP · API6:2023 Unrestricted Access to Sensitive Business Flows",
+                "url": "https://api-security.owasp.org/editions/2023/en/0xa6-unrestricted-access-to-sensitive-business-flows/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "OWASP · REST Security Cheat Sheet",
+                "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
                 "language": "EN"
               }
             ]
