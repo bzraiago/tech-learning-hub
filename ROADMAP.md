@@ -58,8 +58,8 @@ Toda implementação só pode ser considerada pronta quando:
 | 7 | Qualidade, CI, publicação e integração real | Fase 6 | [ ] |
 | 8 | Conclusão júnior/intermediária | Fase 7 | [ ] |
 | 9 | Experiência de estudo e portabilidade | Fases 3 e 4 | [ ] |
-| 10 | Engenharia de IA conectada e avaliada | Fases 7 e 8 | [ ] |
-| 11 | Validação final com alunos | Todas as fases aplicáveis | [ ] |
+| 10 | Engenharia de IA conectada e avaliada | Fases 7 e 8 | [~] |
+| 11 | Validação final com alunos | Todas as fases aplicáveis | [~] |
 
 ---
 
@@ -585,7 +585,7 @@ Toda implementação só pode ser considerada pronta quando:
 
 **Meta:** substituir hipóteses de usabilidade e aprendizagem por evidências observadas.
 
-- [ ] Definir protocolo de teste sem induzir respostas.
+- [x] Definir protocolo em `docs/PROTOCOLO_VALIDACAO_COM_ALUNOS.md`, com roteiro neutro, proteção de dados, tarefas observáveis para Etapa 0/projetos, registro, severidade e reteste por transferência.
 - [ ] Testar a Etapa 0 com pessoa sem experiência prévia.
 - [ ] Testar instalações em Windows, macOS e Linux quando houver acesso.
 - [ ] Observar pelo menos um aluno no projeto básico.
