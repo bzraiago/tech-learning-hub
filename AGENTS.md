@@ -316,6 +316,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 14. [x] Glossário contextual no ponto de uso, renderizado por `readerTerms()` nas seções que apresentam termos novos.
 15. [ ] Laboratório de leitura de projeto alheio (achar ponto de entrada e corrigir um defeito).
 16. [ ] Ponte da IA simulada para IA conectada a um modelo real, com avaliações distintas.
+   - [x] Classificar as 18 aulas e seis projetos de IA como simulação ou atividade mista, mostrar o aviso na interface e exigir cobertura pelo validador; `ai-mcp` identifica separadamente a referência de SDK real não executada.
 
 ---
 

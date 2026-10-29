@@ -142,6 +142,21 @@ for (const guideId of guideIds) {
   if (!lessonIds.includes(guideId)) fail(`Guia sem aula correspondente: ${guideId}`);
 }
 
+const aiTrack = tracks.find((track) => track.id === 'ai');
+const aiLessons = (aiTrack?.modules || []).flatMap((module) => module.lessons || []);
+const supportedExecutionModes = new Set(['simulated', 'mixed', 'real']);
+function validateExecutionLabel(execution, itemId, itemType) {
+  if (!execution || !supportedExecutionModes.has(execution.mode) || !execution.label?.trim() || !execution.detail?.trim()) {
+    fail(`${itemType} de IA sem classificação de execução válida: ${itemId}`);
+  }
+}
+
+if (!aiTrack) fail('Trilha de IA ausente; não foi possível verificar suas modalidades de execução.');
+for (const lesson of aiLessons) validateExecutionLabel(LESSON_GUIDES[lesson.id]?.execution, lesson.id, 'Aula');
+for (const project of PROJECTS.filter((item) => item.kind === 'ai')) {
+  validateExecutionLabel(project.execution, project.id, 'Projeto');
+}
+
 for (const lesson of lessons) {
   const guide = LESSON_GUIDES[lesson.id];
   if (!guide) continue;

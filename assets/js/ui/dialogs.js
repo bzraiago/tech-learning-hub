@@ -244,6 +244,16 @@ function updateLearningEvidence(action) {
   $(target)?.focus();
 }
 
+function renderExecutionNote(execution) {
+  if (!execution?.label || !execution?.detail) return '';
+  const palette = execution.mode === 'mixed'
+    ? { panel: 'border-amber-300/20 bg-amber-300/[.04]', label: 'text-amber-200' }
+    : execution.mode === 'real'
+      ? { panel: 'border-sky-300/20 bg-sky-300/[.04]', label: 'text-sky-200' }
+      : { panel: 'border-violet-300/20 bg-violet-300/[.04]', label: 'text-violet-200' };
+  return `<aside class="execution-mode my-4 rounded-xl border ${palette.panel} p-4" role="note" aria-label="Modo de execução da atividade"><p class="text-sm font-semibold ${palette.label}">${escapeHTML(execution.label)}</p><p class="mt-2 text-sm leading-6 text-slate-300">${escapeHTML(execution.detail)}</p></aside>`;
+}
+
 function renderLessonSection(section = activeLessonSection, moveFocus = false, restoreSavedPosition = false) {
   if (dialogContext?.type !== 'lesson' || !READER_SECTIONS.some(([key]) => key === section)) return;
   if (!restoreSavedPosition) saveReadingPosition();
@@ -266,7 +276,7 @@ function renderLessonSection(section = activeLessonSection, moveFocus = false, r
   } else {
     content = `<h3 class="font-display text-2xl font-semibold">Aprofunde quando precisar</h3><p class="mt-3 text-[15px] leading-relaxed text-slate-400">A explicação, a prática e a revisão estão dentro desta aula. As referências abaixo servem para consultar detalhes e explorar aplicações adicionais. Algumas aulas em vídeo usam versões anteriores; confira a documentação para o seu ambiente.</p>${track.id === 'html' ? htmlReferenceGuide() : track.id === 'ai' ? '<div class="mt-5 rounded-xl border border-sky-300/20 p-4"><h4 class="font-semibold">Como aprofundar Engenharia de IA</h4><p class="mt-3 text-sm leading-7">Consulte primeiro o contrato da API, a versão do SDK e a especificação do protocolo usado. Exemplos locais simulam somente as partes explicitadas; conexão real, qualidade de modelo e segurança exigem avaliações próprias. As aulas fornecem a base para as atividades. Documentação, livros e cursos abertos complementam; contas, inferência e infraestrutura podem ter custos separados.</p></div>' : track.id === 'database' ? '<div class="mt-5 rounded-xl border border-sky-300/20 p-4"><h4 class="font-semibold">Como consultar bancos e Docker</h4><p class="mt-3 text-sm leading-7">Identifique primeiro o motor, a versão e o cliente. Consulte a referência de comandos SQL, tipos, funções e transações desse motor. No MongoDB, procure operadores de consulta e estágios de agregação. No Docker, diferencie comandos de terminal e opções do arquivo Compose. Compare sintaxe, resultado e limites; não trate dialetos como intercambiáveis. As fontes aprofundam as aulas, e cada prática informa onde executar.</p></div>' : track.id === 'python' ? '<div class="mt-5 rounded-xl border border-sky-300/20 p-4"><h4 class="font-semibold">Como consultar Python</h4><p class="mt-3 text-sm leading-7">No índice oficial, pesquise primeiro a estrutura da linguagem no Tutorial e depois o nome exato da função, método, exceção ou módulo na Referência da Biblioteca. Confira assinatura, tipos aceitos, valor retornado e exceções. Teste uma mudança pequena no terminal. As fontes ampliam o estudo; os exercícios e projetos são explicados aqui.</p></div>' : track.id === 'javascript' ? '<div class="mt-5 rounded-xl border border-sky-300/20 p-4"><h4 class="font-semibold">Como consultar JavaScript</h4><p class="mt-3 text-sm leading-7">Procure métodos pelo tipo: Array para map, filter e reduce; String para trim e includes; Object para chaves e valores. Operadores e estruturas de controle ficam na referência da linguagem. document, eventos, fetch e localStorage pertencem às APIs do navegador. Confira parâmetros, valor retornado, mutação da entrada e erros possíveis. Adapte um exemplo pequeno antes de integrar ao projeto. As consultas são opcionais: as atividades são explicadas nas aulas.</p></div>' : ''}${resourceCards([...(lesson.docs || []), ...module.resources])}`;
   }
-  $('#dialog-body').innerHTML = `<article id="lesson-reading-panel" role="tabpanel" aria-labelledby="reader-tab-${section}" tabindex="0" class="reader-prose">${readingControlsMarkup()}${content}</article>`;
+  $('#dialog-body').innerHTML = `<article id="lesson-reading-panel" role="tabpanel" aria-labelledby="reader-tab-${section}" tabindex="0" class="reader-prose">${readingControlsMarkup()}${renderExecutionNote(guide.execution)}${content}</article>`;
   applyReadingPreferences();
   const savedPosition = state.readingPositions[lesson.id];
   $('#dialog-body').scrollTop = savedPosition?.section === section ? savedPosition.top : 0;
@@ -321,7 +331,7 @@ const projectById = id => PROJECTS.find(project => project.id === id);
 function projectCard(module) {
   return PROJECTS.filter(item => item.module === module.id).map(project => {
     const delivered = !!state.projects[project.id]?.delivered;
-    return `<div class="m-4 rounded-xl border border-amber-300/20 bg-amber-300/5 p-4"><p class="text-[10px] font-bold uppercase tracking-wide text-amber-200">${escapeHTML(project.level)}</p><h3 class="mt-2 text-sm font-semibold">${escapeHTML(project.title)}</h3><p class="mt-2 text-xs leading-relaxed text-slate-400">${delivered ? 'Entrega registrada · critérios do projeto conferidos e testes autoavaliados.' : ['python','database','ai','workflow','javascript'].includes(project.kind) ? 'Aplique o conteúdo: contrato, verificações, resultados esperados e solução comentada.' : 'Aplique o conteúdo: enunciado, referência visual, testes e solução comentada.'}</p><button data-project="${project.id}" data-focus="project-${project.id}" class="mt-3 rounded-lg bg-amber-300/10 px-3 py-2 text-xs font-semibold text-amber-100 hover:bg-amber-300/20">${delivered ? 'Revisar projeto' : 'Abrir projeto'}</button></div>`;
+    return `<div class="m-4 rounded-xl border border-amber-300/20 bg-amber-300/5 p-4"><p class="text-[10px] font-bold uppercase tracking-wide text-amber-200">${escapeHTML(project.level)}</p><h3 class="mt-2 text-sm font-semibold">${escapeHTML(project.title)}</h3>${project.execution ? `<p class="mt-2 text-xs font-semibold text-violet-200">${escapeHTML(project.execution.label)}</p>` : ''}<p class="mt-2 text-xs leading-relaxed text-slate-400">${delivered ? 'Entrega registrada · critérios do projeto conferidos e testes autoavaliados.' : ['python','database','ai','workflow','javascript'].includes(project.kind) ? 'Aplique o conteúdo: contrato, verificações, resultados esperados e solução comentada.' : 'Aplique o conteúdo: enunciado, referência visual, testes e solução comentada.'}</p><button data-project="${project.id}" data-focus="project-${project.id}" class="mt-3 rounded-lg bg-amber-300/10 px-3 py-2 text-xs font-semibold text-amber-100 hover:bg-amber-300/20">${delivered ? 'Revisar projeto' : 'Abrir projeto'}</button></div>`;
   }).join('');
 }
 
@@ -611,7 +621,7 @@ function renderAiProjectSection(section, focus = false) {
   } else {
     body = `<h3 class="text-2xl font-semibold">Compare as decisões</h3>${readerParagraph('Tente resolver e depurar antes de abrir esta implementação. Outra solução pode atender ao mesmo contrato.')}<details class="mt-5 rounded-xl border border-white/10 p-4"><summary class="font-semibold text-amber-200">Revelar solução completa comentada</summary>${readerCode(project.solution, project.sourceLabel+' — uma solução possível')}${project.explanation.map(readerParagraph).join('')}</details><h4 class="mt-6 font-semibold">Verifique sua autonomia</h4>${readerParagraph(project.transfer)}${readerParagraph('Reimplemente a mudança sem consultar a solução e acrescente testes próprios.')}`;
   }
-  $('#dialog-body').innerHTML = `<article id="project-panel" role="tabpanel" aria-labelledby="project-tab-${section}" tabindex="0" class="reader-prose">${body}</article>`;
+  $('#dialog-body').innerHTML = `<article id="project-panel" role="tabpanel" aria-labelledby="project-tab-${section}" tabindex="0" class="reader-prose">${renderExecutionNote(project.execution)}${body}</article>`;
   $('#dialog-body').scrollTop = 0;
   projectFooter();
   if (focus) $(`#project-tab-${section}`).focus({ preventScroll: true });

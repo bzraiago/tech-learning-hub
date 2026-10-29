@@ -2897,3 +2897,34 @@ Object.assign(LESSON_GUIDES, {
 
   for (const [id, retry] of Object.entries(retries)) LESSON_GUIDES[id].retry = retry;
 })();
+
+(() => {
+  const executionNotes = {
+    'ai-llms': ['simulated', 'A tabela de pesos e o orçamento são inventados e executados em Python local; não há inferência de LLM.'],
+    'ai-prompts': ['simulated', 'O código monta e valida a estrutura do prompt, mas não envia a entrada a um modelo.'],
+    'ai-system': ['simulated', 'A conversa e a memória são dados locais fictícios; nenhum modelo ou serviço externo responde.'],
+    'ai-rag': ['simulated', 'A recuperação usa documentos fictícios e regras locais; não há modelo, embeddings ou API.'],
+    'ai-tools': ['simulated', 'As propostas de ferramentas e os resultados são fixos; o exemplo não executa ações externas nem chama modelo.'],
+    'ai-libraries': ['simulated', 'O gerador é determinístico e a busca é literal; não há LLM nem embeddings.'],
+    'ai-mcp': ['mixed', 'O fluxo principal simula descoberta e despacho. Um exercício opcional mostra um SDK MCP real, mas não executa servidor nem rede.'],
+    'ai-skills': ['simulated', 'O catálogo é local e fictício; o exemplo não carrega arquivos SKILL.md nem aciona agentes.'],
+    'ai-workflows': ['simulated', 'A máquina de estados executa com Python local e dados fictícios, sem chamar modelo ou serviço de reserva.'],
+    'ai-data': ['simulated', 'Os trechos e versões são dados locais fictícios; não há índice remoto ou modelo.'],
+    'ai-embeddings': ['simulated', 'Os vetores são inventados e calculados localmente; não há modelo de embeddings ou banco vetorial.'],
+    'ai-api': ['simulated', 'O envelope HTTP é um contrato didático local; não há conta, chave, rede ou chamada a provedor.'],
+    'ai-evals': ['simulated', 'As métricas usam respostas e rótulos controlados; não há chamadas a um modelo real.'],
+    'ai-safety': ['simulated', 'Os cenários são dados locais controlados; não há teste de segurança contra um provedor ou modelo real.'],
+    'ai-operations': ['simulated', 'Custos, tempos e falhas são cenários fictícios; não medem uma operação conectada.'],
+    'ai-adaptation': ['simulated', 'A adaptação é comparada por dados locais; nenhum ajuste ou fine-tuning real é executado.'],
+    'ai-multimodal': ['simulated', 'Entradas multimodais são descritas em exemplos locais; nenhum modelo processa imagem, áudio ou vídeo.'],
+    'ai-capstone': ['simulated', 'A busca e o gerador injetado seguem contratos locais; o projeto não chama API nem mede respostas de um modelo.']
+  };
+
+  for (const [id, [mode, detail]] of Object.entries(executionNotes)) {
+    LESSON_GUIDES[id].execution = {
+      mode,
+      label: mode === 'mixed' ? 'Misto · núcleo simulado; referência de SDK real não executada' : 'Simulação didática',
+      detail
+    };
+  }
+})();

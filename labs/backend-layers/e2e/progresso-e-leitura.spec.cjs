@@ -203,6 +203,15 @@ test('sumário, portabilidade e retomada de leitura ficam isolados por conta', a
     preferences: { fontScale: 100, lineHeight: 1.8, width: 'standard' }
   });
 
+  await page.evaluate(() => openLesson('ai-llms'));
+  await expect(page.locator('.execution-mode')).toContainText('Simulação didática');
+  await expect(page.locator('.execution-mode')).toContainText('não há inferência de LLM');
+  await page.evaluate(() => openLesson('ai-mcp'));
+  await expect(page.locator('.execution-mode')).toContainText('referência de SDK real não executada');
+  await page.evaluate(() => openProject('project-ai-capstone'));
+  await expect(page.locator('.execution-mode')).toContainText('Projeto com IA simulada');
+  await expect(page.locator('.execution-mode')).toContainText('não chama API');
+
   await page.setViewportSize({ width: 1280, height: 900 });
   const dimensoesDesktop = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }));
   expect(dimensoesDesktop.document).toBeLessThanOrEqual(dimensoesDesktop.viewport);

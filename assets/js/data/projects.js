@@ -1383,5 +1383,24 @@ const PROJECTS=[
     "rubric": "Os testes verificam contratos do software com entradas controladas. Não medem a qualidade de um modelo real nem certificam segurança. Execute os testes localmente, interprete falhas e registre evidências; a página salva sua autoavaliação e não executa Python ou APIs."
   }
 ];
+(() => {
+  const executionNotes = {
+    'project-ai-contract': 'A triagem e a validação de saída usam funções locais e dados de teste; nenhuma API de modelo é chamada.',
+    'project-ai-retrieval': 'A recuperação usa correspondência lexical e documentos fictícios; não há embeddings, banco vetorial ou geração por modelo.',
+    'project-ai-tools': 'O despachante e as ferramentas usam funções locais controladas; não há agente nem ação em serviço externo.',
+    'project-ai-workflow': 'Os estados e resultados são exercitados localmente; nenhuma inferência ou integração externa é executada.',
+    'project-ai-evals': 'As métricas usam rótulos fixos e funções determinísticas; não avaliam respostas de um modelo conectado.',
+    'project-ai-capstone': 'O gerador é injetado pelo teste e a busca é lexical; o projeto não chama API nem prova fundamentação de um LLM real.'
+  };
+
+  for (const [id, detail] of Object.entries(executionNotes)) {
+    const project = PROJECTS.find(item => item.id === id);
+    project.execution = {
+      mode: 'simulated',
+      label: 'Projeto com IA simulada',
+      detail
+    };
+  }
+})();
 for(const t of tracks)for(const m of t.modules)for(const l of m.lessons)l.guide=LESSON_GUIDES[l.id];
     // TEACHING_CONTENT_END
