@@ -585,7 +585,7 @@ Toda implementação só pode ser considerada pronta quando:
 
 **Meta:** substituir hipóteses de usabilidade e aprendizagem por evidências observadas.
 
-- [x] Definir protocolo em `docs/PROTOCOLO_VALIDACAO_COM_ALUNOS.md`, com roteiro neutro, proteção de dados, tarefas observáveis para Etapa 0/projetos, registro, severidade e reteste por transferência.
+- [x] Definir protocolo em `docs/PROTOCOLO_VALIDACAO_COM_ALUNOS.md`, com roteiro neutro, proteção de dados, tarefas observáveis para Etapa 0/projetos, registro, severidade, reteste por transferência e convite facultativo com seleção sem coleta de dados pessoais.
 - [ ] Testar a Etapa 0 com pessoa sem experiência prévia.
 - [ ] Testar instalações em Windows, macOS e Linux quando houver acesso.
 - [ ] Observar pelo menos um aluno no projeto básico.

@@ -29,6 +29,16 @@ Não é necessário que a mesma pessoa faça todos os percursos. Registre soment
 
 Os tempos são apenas para reservar a sessão; não são metas de velocidade. Se uma tarefa levar mais tempo, deixe a pessoa continuar ou registre onde a sessão foi interrompida.
 
+## Convite e seleção
+
+Use o texto abaixo como convite individual. A participação é voluntária; não envie convites em nome do projeto sem autorização do responsável.
+
+> Estou revisando um curso gratuito de programação e procuro uma pessoa para experimentar uma atividade por cerca de 30–45 minutos. Não é uma prova sobre você: quero descobrir se as instruções do material estão claras. Você pode parar a qualquer momento. Vou fazer anotações sem nome e sem gravar a sessão. Não será necessário entrar em contas pessoais, informar senhas ou usar dados reais. Você teria interesse em participar?
+
+Antes de marcar a sessão, explique qual percurso será observado e confirme que a pessoa pode interromper sem justificar. Para a Etapa 0, selecione alguém que ainda não programe e não use terminal para executar código; para outros percursos, use somente os critérios da tabela acima. Registre a categoria de seleção, nunca a resposta identificável ou dados de contato neste protocolo.
+
+Não prometa que a atividade será fácil, não ofereça a solução como condição de participação e não pressione alguém que recuse. Se houver compensação ou gravação, explique essas condições separadamente e obtenha consentimento explícito antes de combinar.
+
 ## Preparação
 
 1. Escolha uma cópia descartável do material e confirme que os passos podem ser repetidos sem apagar dados reais.
