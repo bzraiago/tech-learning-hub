@@ -315,7 +315,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 13. [~] Modo de leitura prolongada implementado; E2E headless cobre teclado, 375/1280 px, retomada após recarga, exportação/importação e isolamento entre contas fictícias via mocks. Conferência com Clerk/Supabase reais no Preview ainda pendente.
 14. [x] Glossário contextual no ponto de uso, renderizado por `readerTerms()` nas seções que apresentam termos novos.
 15. [x] Laboratório de leitura de projeto alheio: `labs/project-reading` percorre um projeto multi-arquivo do ponto de entrada ao relatório, reproduz uma falha, orienta uma correção com teste de regressão e propõe transferência. Isso prepara a competência; não substitui a avaliação final do projeto de conclusão.
-16. [ ] Ponte da IA simulada para IA conectada a um modelo real, com avaliações distintas.
+16. [~] Ponte da IA simulada para IA conectada a um modelo real, com avaliações distintas; `labs/ai-provider-connection` mantém a chave no servidor local e fornece testes de contrato falsos. A chamada real e as avaliações comparativas ainda precisam de evidência separada.
 17. [x] Trilha opcional de IA em chat web, do básico ao intermediário introdutório, com práticas independentes de IDE, código, API e fornecedor.
    - [x] Classificar as 18 aulas e seis projetos de IA como simulação ou atividade mista, mostrar o aviso na interface e exigir cobertura pelo validador; `ai-mcp` identifica separadamente a referência de SDK real não executada.
 
@@ -381,6 +381,7 @@ Extensão de IA (opcional): responder perguntas sobre um pequeno conjunto de mat
 - 2026-10-26 — Por pedido do dono do projeto, Supabase passou a ser a única fonte persistente; carga e envio são automáticos e controles de arquivo/local foram removidos.
 - 2026-10-26 — A página passou a exigir autenticação Clerk e carregamento do progresso antes de liberar o conteúdo.
 - 2026-10-26 — Troca de conta passa a carregar automaticamente o progresso remoto da nova conta, preservando cache local por usuário e exigindo escolha em caso de divergência.
+- 2026-10-28 — OpenAI Responses API é o provedor de referência para a primeira chamada real, isolada em laboratório local; a trilha de chat web continua independente de provedor e código.
 - 2026-10-26 — A cópia remota passa a ser exibida mesmo com cache divergente; a versão local anterior permanece recuperável no navegador, sem baixar arquivo automaticamente.
 - 2026-10-27 — O uso do projeto será somente por Preview, sem domínio próprio; ensinar domínio e DNS em detalhe com exemplos reservados, sem exigir configuração ou validação de domínio real.
 - 2026-10-27 — Autorizado tornar os previews da Vercel públicos para testar a demonstração anonimamente; ajuste pendente de conexão autenticada à conta.
