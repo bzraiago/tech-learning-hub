@@ -437,7 +437,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Criar `delivery-software-integrity` e `labs/security-integrity`: ensinar hash, assinatura Ed25519, chave pública confiável, frescor, replay, dados serializados e limites de proveniência; verificar um fixture fictício sem instalar/rodar pacotes. Execução CLI e 7 testes passaram; isso não autentica fornecedor nem verifica npm/CI real.
 - [~] Cobrir autenticação versus autorização, IDOR/BOLA, XSS, CSRF, SQL injection, abuso de API, rate limiting e gestão de dependências.
   - [x] Diferenciar autenticação/autorização e reproduzir BOLA/IDOR em laboratório local isolado.
-  - [~] Criar aula e cópia local não executável no Preview para explicar DOM XSS, `innerHTML` e `textContent`; verificação manual no navegador ainda pendente.
+  - [x] Criar aula e cópia local não executável no Preview para explicar DOM XSS, `innerHTML` e `textContent`; Chromium local confirmou os dois sinks, navegação por teclado e viewport de 375 px sem overflow, erro de página ou requisição externa. Isso não valida o Preview.
   - [x] Explicar CSRF por sessão cookie, limites de CORS, SameSite, token e checagem de origem; comparar com o Bearer explícito encontrado em `cloud.js`, sem declarar imunidade.
   - [x] Relacionar A05 Injection a `db-security`, que já demonstra consulta parametrizada no SQLite e entrada de aparência SQL tratada como dado literal.
   - [x] Criar `delivery-api-abuse` com conceitos detalhados de API4/API6, limites por pedido/identidade/custo, 429/Retry-After, observabilidade e plano de verificação controlada; análise usa cenários fictícios e os laboratórios locais existentes, sem tráfego de carga nem Preview.
