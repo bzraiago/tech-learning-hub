@@ -14,6 +14,10 @@
     .track-card[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 7%, #141824); }
     .nav-track[aria-selected="true"] { background: #a78bfa14; color: #c4b5fd; box-shadow: inset 3px 0 #a78bfa; }
     .filter[aria-pressed="true"] { color: #f3efff; background: #34304a; }
+    @media (max-width: 390px) {
+      .lesson-filters { box-sizing: border-box; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+      .lesson-filters .filter { min-width: 0; padding-inline: .35rem; text-align: center; white-space: normal; }
+    }
     .progress-fill { transition: width .4s ease; }
     .lesson-row:has(input:checked) .lesson-title { color: #aeb9cd; }
     dialog { padding: 0; overflow: clip; border: 1px solid #37354f; border-radius: 22px; background: #141824; color: #edf0fa; width: min(790px, calc(100vw - 24px)); max-height: calc(100dvh - 40px); margin: auto; box-shadow: 0 30px 130px #0009; }

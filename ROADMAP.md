@@ -309,6 +309,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Exigir modelo SQLite e consultas de progresso.
   - [x] Exigir mudança simples de requisito solicitada após a entrega inicial.
 - [x] Criar rubrica que avalie funcionamento, explicação e manutenção; o registro continua sendo autoavaliação, sem certificação automática.
+- [x] Manter a prova básica acessível no painel de níveis, com enunciado, evidências e mudança de requisito.
 
 **Aceite:** outra pessoa executa o projeto pelo README e o aluno implementa uma mudança simples, explica as decisões e não consulta uma solução de referência.
 
@@ -510,6 +511,8 @@ Toda implementação só pode ser considerada pronta quando:
 
 **Meta:** comprovar a capacidade de entregar, explicar e manter uma aplicação pequena completa.
 
+- [x] Disponibilizar na página a prova júnior/intermediária com requisitos, evidências separadas por nível, rubrica e mudança de requisito; o aluno ainda precisa construir e validar a própria aplicação.
+- [x] Disponibilizar na página a prova avançada de evolução da plataforma, com medição, segurança, operação, revisão e extensão opcional de IA real; nenhuma competência é certificada pelo registro no site.
 - [ ] Liberar somente após concluir ambientes, backend e entrega real.
 - [ ] Implementar “Plataforma de acompanhamento de estudos”.
   - [ ] Frontend conectado a uma API real.
