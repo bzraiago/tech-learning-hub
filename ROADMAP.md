@@ -525,6 +525,7 @@ Toda implementação só pode ser considerada pronta quando:
   - [ ] Mudança de requisito em branch, revisada e protegida por teste.
 - [ ] Criar avaliação final de funcionamento, testes, explicação e manutenção.
 - [ ] Exigir leitura e correção de um defeito em código não escrito pelo aluno.
+  - [x] Preparar a prática multi-arquivo em `labs/project-reading` e conectá-la à aula `quality-review`; a avaliação obrigatória no projeto de conclusão continua pendente.
 - [ ] Registrar claramente quais competências de nível júnior foram comprovadas.
 - [ ] Não declarar nível intermediário sem evidência de arquitetura, integração, CI, revisão e colaboração.
 
@@ -755,6 +756,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 | 28/10/2026 | Fase 10 — rotular simulações da trilha de IA | `497daa2` | As 18 aulas e seis projetos recebem metadados `execution` e um aviso acessível visível na atividade; `ai-mcp` distingue o fluxo simulado da referência de SDK real ainda não executada. O validador agora exige modalidade, rótulo e explicação em toda aula/projeto de IA. Inventário em `docs/IA_SIMULACAO_E_SERVICO_REAL.md`. E2E confirmou os três casos representativos; Playwright 4/4, validador (145/600/459/24), sintaxe e `git diff --check` passaram. Nenhuma chamada a modelo externo foi feita. |
 | 28/10/2026 | Revalidação Docker local isolada | `497daa2` | Docker Engine 29.7.2; Compose iniciou PostgreSQL 17 e Redis 8.8.4 em portas próprias e volume exclusivo. Migrations 001–004 aplicadas; `test:db` 1/1, `test:redis` 2/2, `test:cache` 1/1, `test:least-privilege` 1/1, compatibilidade de migration 1/1, backup/restauração `estudos=2`, `sessoes=0` com origem preservada, `npm test` 76/76 e Playwright 4/4 passaram. Validador 145/600/459/24. Container, rede, volume e `.env` temporários removidos; os serviços Supabase existentes permaneceram ativos. Não foi usada sessão Clerk real. |
 | 28/10/2026 | Fase 10 — IA no chat sem código | `2360c70` | `ai-chat` adiciona 7 aulas em 3 módulos e 28 exercícios no chat web, sem exigir IDE, código, API ou fornecedor específico; a interface distingue essa prática externa das simulações locais. Validador confirmou 10 trilhas, 31 módulos, 152 aulas, 628 exercícios, 480 questões e 24 projetos. Playwright 4/4 cobriu a aula, o exemplo sem bloco de código, teclado e largura de 375 px; `git diff --check` passou. Nenhuma conversa com fornecedor externo ou piloto com aluno foi realizado. |
+| 28/10/2026 | Fase 7/8 — leitura e diagnóstico em projeto multi-arquivo | `95e324d` | `labs/project-reading` pratica localizar ponto de entrada e seguir dados entre módulos. A falha foi reproduzida (37.5 observado/75 esperado), corrigida só na regra e protegida por três testes; CLI passou e transferência resultou em 3 sessões/90 minutos. `quality-review` aponta ao laboratório e inclui critérios de evidência. Node 24.15; validador manteve 152 aulas/628 exercícios/480 questões/24 projetos; Playwright E2E 4/4, sintaxe e `git diff --check` passaram. Teste com aluno, revisão visual dedicada e deploy Vercel não foram executados; a prova obrigatória no projeto final segue pendente. |
 
 ## Decisões e bloqueios
 
