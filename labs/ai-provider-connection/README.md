@@ -49,7 +49,15 @@ python -B -m unittest discover -s test -v
 
 No macOS/Linux, use `python3 -B -m unittest discover -s test -v` se o comando `python` não existir.
 
-Resultado esperado: 24 testes terminam com `OK`. Os casos usam chave e modelo explicitamente fictícios, verificam as rotas, busca, abstenção, citações, segredo fora da página, erros sanitizados, formato da requisição Responses e limite de saída. Os testes não chamam o provedor real.
+Resultado esperado: 27 testes terminam com `OK`. Os casos usam chave e modelo explicitamente fictícios, verificam as rotas, busca, abstenção, citações, segredo fora da página, erros sanitizados, formato da requisição Responses, métricas do conjunto local e limite de saída. Os testes não chamam o provedor real.
+
+Execute também o relatório reproduzível, ainda nessa pasta:
+
+```sh
+python -B evaluate.py
+```
+
+No macOS/Linux, use `python3 -B evaluate.py` se `python` não existir. O resultado esperado para a versão 1 do conjunto é Recall@2 de `3/4 (75.00%)`, detecção de consulta sem evidência `2/2`, contrato de citação `5/5` e uma afirmação com ID válido que foi rotulada como sem suporte. A consulta `retrieval-paraphrase-01` é uma falha lexical conhecida e deve permanecer visível.
 
 Para iniciar só a interface local, ainda sem configurar chave:
 
@@ -73,7 +81,9 @@ Essa busca é lexical: uma paráfrase ou sinônimo pode não encontrar um texto 
 
 Sem configuração do provedor, a interface apresenta o trecho recuperado com o ID como **simulação**, sem fingir que um modelo gerou a resposta. Com provedor configurado, o servidor envia a pergunta e somente os trechos recuperados; exige um ID citado dentre os IDs enviados e rejeita resposta sem citação ou com ID desconhecido.
 
-Essa checagem valida apenas o formato e a associação do ID ao contexto recuperado. Ela **não** demonstra que cada afirmação é sustentada pelo trecho, que a resposta é correta ou que o modelo se absteve adequadamente. Isso exige avaliação factual por afirmação e um conjunto de casos preparado separadamente.
+Essa checagem valida apenas o formato e a associação do ID ao contexto recuperado. Ela **não** demonstra que cada afirmação é sustentada pelo trecho, que a resposta é correta ou que o modelo se absteve adequadamente. Isso exige avaliação factual por afirmação e um conjunto de casos preparado separadamente. Um teste de contrato também mantém uma instrução contra prompt injection em campo separado do texto recuperado; isso confirma a montagem da requisição, não a resistência do modelo a um ataque.
+
+O conjunto versionado `evaluations/rag-v1.json` separa dois grupos: perguntas para medir Recall@2/ausência de resultados e respostas fixas para medir apenas o contrato estrutural das citações. Uma resposta com ID recuperado, mas uma afirmação contradita pelo trecho, é aceita pelo validador de propósito e aparece no relatório como limite conhecido. `evaluate.py` não lê credenciais nem chama modelos. A amostra é pequena, fictícia e demonstra o cálculo; não é um limiar de qualidade nem uma aprovação para produção.
 
 ## Configuração opcional da chamada real
 

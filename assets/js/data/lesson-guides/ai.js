@@ -1891,7 +1891,7 @@ Object.assign(LESSON_GUIDES, {
   },
 "ai-evals": {
     "prerequisites": "Python: funções, listas, dicionários, exceções e testes. Conclua fundamentos de LLMs e o módulo de RAG e ferramentas antes desta aula.",
-    "setup": "Salve o exemplo em ai_evals.py e execute python ai_evals.py (ou py no Windows). Os exemplos usam somente a biblioteca padrão de Python 3 e dados locais. Não fazem chamadas a IA real. Um serviço real exige integração, credenciais e pode gerar custos.",
+    "setup": "Salve o exemplo em ai_evals.py e execute python ai_evals.py (ou py no Windows). Os exemplos usam somente a biblioteca padrão de Python 3 e dados locais. Não fazem chamadas a IA real. Extensão opcional: siga labs/ai-provider-connection/README.md e execute python -B evaluate.py (ou python3 no macOS/Linux) para comparar recuperação, ausência de evidência e formato de citação sem configurar provedor. Um serviço real exige integração, credenciais e pode gerar custos.",
     "why": "Uma avaliação transforma “parece bom” em evidência verificável. Defina a tarefa, exemplos representativos, critérios observáveis e um conjunto reservado antes de comparar mudanças. Avalie recuperação, resposta e comportamento do sistema separadamente; uma média alta não garante desempenho nos casos mais importantes.",
     "sections": [
       {
@@ -1913,7 +1913,7 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "Na recuperação, considere relevantes os documentos que realmente ajudam a responder. Precisão é quantidade de documentos relevantes recuperados dividida por quantidade recuperada. Recall é quantidade de relevantes recuperados dividida pelo total relevante conhecido. Se os relevantes são A e C e retornamos A e B, ambos valem 0,5. Retornar todos os documentos pode melhorar recall e piorar precisão, custo e ruído do contexto. Especifique também o número máximo de resultados, como recall nos três primeiros.",
           "No exemplo, conjuntos removem duplicatas antes de contar. Definimos precisão e recall como zero quando o denominador está vazio para evitar divisão por zero; essa é uma convenção do exercício. Casos sem documento relevante devem ainda ser avaliados por sua própria rubrica de abstenção, porque zero de recall sozinho não descreve seu sucesso. Não esconda essa decisão matemática no relatório.",
-          "Groundedness significa que as afirmações da resposta são sustentadas pelo material fornecido. Uma citação que existe não prova que ela sustenta a frase. Leia cada afirmação importante e procure sua evidência. Fidelidade ao documento não garante verdade externa se o documento estiver errado ou desatualizado. Diferencie correção factual, cobertura da pergunta e fidelidade às fontes para entender onde corrigir o sistema."
+          "Groundedness significa que as afirmações da resposta são sustentadas pelo material fornecido. Uma citação que existe não prova que ela sustenta a frase. Leia cada afirmação importante e procure sua evidência. Fidelidade ao documento não garante verdade externa se o documento estiver errado ou desatualizado. Diferencie correção factual, cobertura da pergunta e fidelidade às fontes para entender onde corrigir o sistema. No conjunto local opcional labs/ai-provider-connection/evaluations/rag-v1.json, Recall@2 e validação de IDs são relatados separadamente; uma resposta com citação válida, mas contrariada pelo trecho, mostra por que groundedness ainda precisa de revisão semântica."
         ]
       },
       {

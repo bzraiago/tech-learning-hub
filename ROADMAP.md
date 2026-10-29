@@ -568,11 +568,16 @@ Toda implementação só pode ser considerada pronta quando:
 - [~] Exigir citações de fontes e reconhecimento de ausência de evidência.
   - [x] Recusar resposta conectada sem citação ou com ID fora do contexto; no modo local, mostrar a fonte recuperada ou se abster quando não houver termo correspondente.
   - [ ] Avaliar se cada afirmação é sustentada pela fonte e se um modelo real se abstém corretamente; ID válido e ausência lexical não comprovam esses comportamentos.
-- [ ] Adicionar ferramentas com permissões limitadas e validação de entrada.
-- [ ] Criar conjunto de avaliação reproduzível.
-- [ ] Avaliar separadamente simulação e versão conectada.
-- [ ] Testar falhas, conteúdo não sustentado, injeção de prompt e uso indevido de ferramentas.
-- [ ] Documentar custo, privacidade, limites e alternativa sem serviço pago.
+- [x] Adicionar ferramentas com permissões limitadas e validação de entrada em `ai-tools` e `project-ai-tools`: lista permitida, campos exatos, identidade recebida da aplicação, aprovação separada, checagem de dono, idempotência local e testes de uso indevido. O fluxo segue simulado e sem modelo conectado.
+- [x] Criar conjunto reproduzível `labs/ai-provider-connection/evaluations/rag-v1.json`; `evaluate.py` mede Recall@2, consulta sem evidência e contrato estrutural de citações, sem credencial ou rede.
+- [~] Avaliar separadamente simulação e versão conectada.
+  - [x] Relatar recuperação, ausência lexical, validação de IDs e a falha de afirmação sem suporte em dimensões separadas, com dados fixos.
+  - [ ] Executar a mesma avaliação sobre um modelo conectado e medir groundedness, qualidade, latência e custo. A chamada real foi pulada por decisão do dono, que não tem chave.
+- [~] Testar falhas, conteúdo não sustentado, injeção de prompt e uso indevido de ferramentas.
+  - [x] Cobrir citação ausente/fora do contexto, configuração parcial e uso indevido de ferramentas; o conjunto registra que uma afirmação falsa com ID válido passa pela verificação estrutural.
+  - [x] Confirmar que o contrato HTTP envia instruções contra injeção em campo separado do texto recuperado.
+  - [ ] Medir resistência de modelo a instruções maliciosas em documentos e a resposta conectada; o teste de montagem não prova comportamento do modelo.
+- [x] Documentar custo potencial, privacidade, limites locais e alternativa sem serviço pago em `labs/ai-provider-connection/README.md`.
 
 **Aceite:** o aluno executa um sistema real, mede resultados com casos definidos, identifica falhas e explica por que uma demonstração simulada não comprova operação real.
 

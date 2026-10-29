@@ -24,7 +24,7 @@ Este inventário separa exercícios locais de integrações com serviços de IA.
 | `ai-data` | Simulação didática | Trechos e versões locais; sem índice remoto. |
 | `ai-embeddings` | Simulação didática | Vetores inventados; sem modelo de embeddings ou banco vetorial. |
 | `ai-api` | Misto | O exemplo e testes padrão usam contrato local; `labs/ai-provider-connection` oferece uma chamada real opcional pelo servidor local. Testes automatizados usam provedor falso e não acessam a rede. |
-| `ai-evals` | Simulação didática | Métricas sobre respostas controladas; sem modelo real. |
+| `ai-evals` | Simulação didática | Métricas sobre rótulos controlados; o conjunto local RAG mede recuperação e contrato de citação sem chamar um modelo real. |
 | `ai-safety` | Simulação didática | Casos locais; não testa segurança de um provedor real. |
 | `ai-operations` | Simulação didática | Custos, tempos e falhas fictícios; sem medição operacional. |
 | `ai-adaptation` | Simulação didática | Comparação com dados locais; sem ajuste real de modelo. |
@@ -42,4 +42,4 @@ Este inventário separa exercícios locais de integrações com serviços de IA.
 | `project-ai-evals` | Projeto com IA simulada | Métricas determinísticas, sem respostas de modelo conectado. |
 | `project-ai-capstone` | Projeto com IA simulada | Gerador injetado e busca lexical; não comprova fundamentação de LLM real. |
 
-Nenhuma aula ou projeto está classificado como serviço real obrigatório. `ai-api` e `ai-rag` são mistos porque incluem integração opcional; a chamada exige configuração local, pode gerar custo e não é feita pelos testes automatizados. A busca RAG local compara termos e valida a presença do ID citado, mas não verifica suporte factual; avaliação separada e ferramentas com permissões limitadas continuam pendentes.
+Nenhuma aula ou projeto está classificado como serviço real obrigatório. `ai-api` e `ai-rag` são mistos porque incluem integração opcional; a chamada exige configuração local, pode gerar custo e não é feita pelos testes automatizados. A busca RAG local compara termos e valida a presença do ID citado, mas não verifica suporte factual. `ai-tools` e `project-ai-tools` ensinam um executor local com lista permitida, validação e aprovação fora da proposta; não conectam tools a um modelo real. A comparação conectada e a avaliação factual continuam pendentes.

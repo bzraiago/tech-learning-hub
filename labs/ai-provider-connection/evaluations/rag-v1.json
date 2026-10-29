@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "description": "Casos fictícios versionados para avaliar recuperação lexical e contrato de citação. Não são respostas de um modelo real.",
+  "retrieval_cases": [
+    {
+      "id": "retrieval-password-01",
+      "category": "answerable",
+      "question": "Quanto tempo o link de redefinição de senha fica válido?",
+      "expected_source_ids": ["manual-senha-v1"]
+    },
+    {
+      "id": "retrieval-cancel-01",
+      "category": "answerable",
+      "question": "Posso cancelar o pedido depois da compra?",
+      "expected_source_ids": ["manual-pedidos-v1"]
+    },
+    {
+      "id": "retrieval-delivery-01",
+      "category": "answerable",
+      "question": "Onde vejo o prazo estimado de entrega?",
+      "expected_source_ids": ["manual-entrega-v1"]
+    },
+    {
+      "id": "retrieval-paraphrase-01",
+      "category": "answerable",
+      "question": "Quando meu pacote deve chegar?",
+      "expected_source_ids": ["manual-entrega-v1"]
+    },
+    {
+      "id": "retrieval-unsupported-01",
+      "category": "no-evidence",
+      "question": "Qual telefone posso usar para ligar?",
+      "expected_source_ids": []
+    },
+    {
+      "id": "retrieval-unsupported-02",
+      "category": "no-evidence",
+      "question": "Qual é a cor do dragão azul?",
+      "expected_source_ids": []
+    }
+  ],
+  "citation_cases": [
+    {
+      "id": "citation-supported-01",
+      "answer": "O link fica válido por quinze minutos [manual-senha-v1].",
+      "context_source_ids": ["manual-senha-v1"],
+      "expected_contract_valid": true,
+      "grounding_supported": true
+    },
+    {
+      "id": "citation-unsupported-claim-01",
+      "answer": "O link fica válido por vinte e quatro horas [manual-senha-v1].",
+      "context_source_ids": ["manual-senha-v1"],
+      "expected_contract_valid": true,
+      "grounding_supported": false
+    },
+    {
+      "id": "citation-missing-01",
+      "answer": "O link fica válido por quinze minutos.",
+      "context_source_ids": ["manual-senha-v1"],
+      "expected_contract_valid": false,
+      "grounding_supported": null
+    },
+    {
+      "id": "citation-unknown-01",
+      "answer": "O link fica válido por quinze minutos [manual-pedidos-v1].",
+      "context_source_ids": ["manual-senha-v1"],
+      "expected_contract_valid": false,
+      "grounding_supported": null
+    },
+    {
+      "id": "citation-mixed-01",
+      "answer": "O link dura quinze minutos [manual-senha-v1] e o prazo é longo [manual-entrega-v1].",
+      "context_source_ids": ["manual-senha-v1"],
+      "expected_contract_valid": false,
+      "grounding_supported": null
+    }
+  ]
+}
