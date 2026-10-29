@@ -1739,7 +1739,7 @@ Object.assign(LESSON_GUIDES, {
   },
 "ai-api": {
     "prerequisites": "Funções, dicionários, exceções, JSON e testes da trilha Python. Conhecer a diferença entre gerar uma resposta e consultar um banco.",
-    "setup": "Salve como api_simulada.py e execute python api_simulada.py. Usa apenas biblioteca padrão, sem conta, chave, rede ou cobrança. O envelope status/body é contrato didático, não o formato de um provedor.",
+    "setup": "Salve como api_simulada.py e execute python api_simulada.py. O exemplo principal usa apenas biblioteca padrão, sem conta, chave, rede ou cobrança; o envelope status/body é contrato didático, não o formato de um provedor. Como extensão separada, labs/ai-provider-connection/README.md guia uma interface local e uma chamada real opcional à OpenAI Responses API. O laboratório não instala pacotes; os testes usam provedor falso e não fazem chamada externa. Não configure a chave para apenas estudar a simulação.",
     "why": "Uma central de suporte quer transformar uma mensagem em categoria e prioridade. O modelo pode sugerir esse registro, mas o sistema continua responsável por decidir se os campos existem, se os valores são aceitos e se a operação pode prosseguir. Você construirá essa fronteira antes de depender de um serviço pago.",
     "sections": [
       {
@@ -1769,9 +1769,9 @@ Object.assign(LESSON_GUIDES, {
       {
         "title": "Da simulação a uma API real, opcionalmente",
         "paragraphs": [
-          "Para uma integração real, crie um ambiente virtual, instale o SDK oficial escolhido e fixe uma versão compatível depois de testá-la. Implemente um segundo transporte que lê credencial no servidor, envia a solicitação e normaliza os estados do provedor para nosso contrato. Consulte a documentação oficial vinculada para o formato atual da chamada. Não cole o envelope didático diretamente na API: os nomes, estados e objetos reais são específicos do serviço.",
-          "Chamadas reais podem gerar cobrança. Antes de ativar, confirme preços e limites da conta, escolha um orçamento pequeno, restrinja tamanho de entrada e saída e acompanhe o consumo real. Um alerta de gasto nem sempre é um bloqueio rígido; implemente também limite na aplicação. O laboratório obrigatório não depende dessa ativação. Um modelo local pode evitar uma cobrança por chamada, mas ainda consome memória, processamento e tempo.",
-          "O critério de conclusão é conseguir provar cinco comportamentos: resposta válida aceita, categoria desconhecida rejeitada, recusa identificada, incompletude identificada e erro de transporte distinto de erro de conteúdo. Depois compare exemplos de classificação com uma resposta humana esperada. Somente essa segunda etapa começa a medir utilidade da IA; a primeira verifica a robustez da integração."
+          "O núcleo desta aula continua usando transporte falso e formato próprio. Para ver uma chamada real opcional, siga labs/ai-provider-connection/README.md: a interface envia o prompt ao servidor local, que lê a chave do ambiente e chama a Responses API por HTTPS. Esse laboratório usa a biblioteca HTTP padrão do Python; a requisição real tem campos e respostas do provedor, não o envelope status/body da simulação. A chamada só acontece depois que o aluno configura credencial e envia uma mensagem.",
+          "Uma chave jamais deve aparecer no HTML, JavaScript do navegador, repositório ou mensagem de chat. Use apenas pergunta fictícia, mantenha o servidor de demonstração em 127.0.0.1 e não o publique: ele não tem autenticação nem quota por conta. Configure a chave na sessão local do terminal, limite o texto e a saída, revise o painel e os preços antes de qualquer chamada. O uso da API é faturado separadamente da assinatura do ChatGPT; sem acesso/API habilitada, continue com os testes de transporte falso e não trate a chamada como feita.",
+          "Separe duas evidências: os testes automatizados com provedor falso verificam contrato local, validação e sanitização; uma chamada real, quando disponível, demonstra apenas que aquela configuração recebeu texto. Nenhuma dessas evidências comprova por si só que a resposta está correta ou que o sistema é seguro para produção. Avalie qualidade em um conjunto de casos separado e registre resultados variáveis, custo e limites."
         ]
       }
     ],
@@ -2911,7 +2911,7 @@ Object.assign(LESSON_GUIDES, {
     'ai-workflows': ['simulated', 'A máquina de estados executa com Python local e dados fictícios, sem chamar modelo ou serviço de reserva.'],
     'ai-data': ['simulated', 'Os trechos e versões são dados locais fictícios; não há índice remoto ou modelo.'],
     'ai-embeddings': ['simulated', 'Os vetores são inventados e calculados localmente; não há modelo de embeddings ou banco vetorial.'],
-    'ai-api': ['simulated', 'O envelope HTTP é um contrato didático local; não há conta, chave, rede ou chamada a provedor.'],
+    'ai-api': ['mixed', 'O núcleo usa transporte falso; labs/ai-provider-connection oferece chamada real opcional somente no servidor local, com chave mantida no processo. Os testes automáticos não acessam o provedor.'],
     'ai-evals': ['simulated', 'As métricas usam respostas e rótulos controlados; não há chamadas a um modelo real.'],
     'ai-safety': ['simulated', 'Os cenários são dados locais controlados; não há teste de segurança contra um provedor ou modelo real.'],
     'ai-operations': ['simulated', 'Custos, tempos e falhas são cenários fictícios; não medem uma operação conectada.'],

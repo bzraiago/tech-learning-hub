@@ -3545,6 +3545,24 @@
               },
               {
                 "kind": "doc",
+                "title": "OpenAI · Developer quickstart (Responses API)",
+                "url": "https://developers.openai.com/api/docs/quickstart",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "OpenAI Help Center · API key safety",
+                "url": "https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "OpenAI Help Center · ChatGPT and API billing",
+                "url": "https://help.openai.com/en/articles/9039756-managing-billing-for-chatgpt-and-the-api-platform",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
                 "title": "Python · json",
                 "url": "https://docs.python.org/3/library/json.html",
                 "language": "EN"

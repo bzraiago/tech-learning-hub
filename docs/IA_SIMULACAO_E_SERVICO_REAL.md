@@ -23,7 +23,7 @@ Este inventário separa exercícios locais de integrações com serviços de IA.
 | `ai-workflows` | Simulação didática | Máquina de estados local; sem modelo ou serviço externo. |
 | `ai-data` | Simulação didática | Trechos e versões locais; sem índice remoto. |
 | `ai-embeddings` | Simulação didática | Vetores inventados; sem modelo de embeddings ou banco vetorial. |
-| `ai-api` | Simulação didática | Contrato local; sem conta, chave, rede ou chamada a provedor. |
+| `ai-api` | Misto | O exemplo e testes padrão usam contrato local; `labs/ai-provider-connection` oferece uma chamada real opcional pelo servidor local. Testes automatizados usam provedor falso e não acessam a rede. |
 | `ai-evals` | Simulação didática | Métricas sobre respostas controladas; sem modelo real. |
 | `ai-safety` | Simulação didática | Casos locais; não testa segurança de um provedor real. |
 | `ai-operations` | Simulação didática | Custos, tempos e falhas fictícios; sem medição operacional. |
@@ -42,4 +42,4 @@ Este inventário separa exercícios locais de integrações com serviços de IA.
 | `project-ai-evals` | Projeto com IA simulada | Métricas determinísticas, sem respostas de modelo conectado. |
 | `project-ai-capstone` | Projeto com IA simulada | Gerador injetado e busca lexical; não comprova fundamentação de LLM real. |
 
-Nenhuma aula ou projeto listado aqui está classificado como serviço real nesta etapa do curso. As integrações reais serão adicionadas em uma etapa posterior com credencial somente no servidor, avaliação separada e instruções para custo e privacidade.
+Nenhuma aula ou projeto está classificado como serviço real obrigatório. `ai-api` é misto porque inclui um laboratório opcional de integração; a chamada exige configuração local, pode gerar custo e não é feita pelos testes automatizados. As etapas seguintes devem adicionar avaliação separada, recuperação de fontes e ferramentas com permissões limitadas.
