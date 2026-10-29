@@ -763,8 +763,8 @@ Object.assign(LESSON_GUIDES, {
     ]
   },
 "quality-review": {
-    "prerequisites": "HTML semântico, CSS de foco, eventos/DOM e roteiro de teste da trilha.",
-    "setup": "Salve como revisao.html e abra no navegador. Execute um roteiro de busca com mouse e teclado. No DevTools, use Elements/Inspector para estrutura, Console para erros e Performance para observar o fluxo quando necessário. Faça uma revisão escrita de cinco itens: nome dos controles, ordem de foco, inserção de texto, estado vazio e custo de filtros repetidos. Não é necessário instalar biblioteca.",
+    "prerequisites": "HTML semântico, CSS de foco, eventos/DOM, roteiro de teste da trilha, Etapa 0 e preparação Node.js/npm.",
+    "setup": "Salve como revisao.html e abra no navegador. Execute um roteiro de busca com mouse e teclado. No DevTools, use Elements/Inspector para estrutura, Console para erros e Performance para observar o fluxo quando necessário. Faça uma revisão escrita de cinco itens: nome dos controles, ordem de foco, inserção de texto, estado vazio e custo de filtros repetidos. Para a prática de leitura de projeto, abra labs/project-reading/README.md na raiz, siga a estrutura de arquivos e execute os comandos no terminal dentro de labs/project-reading. O laboratório não instala dependências. A preparação Node.js/npm da Etapa 0 deve estar concluída.",
     "why": "Um projeto pode estar funcional e ainda impedir uso por teclado, interpretar dados como HTML ou travar com muitos itens. O primeiro trabalho de revisão de um dev júnior é reconhecer esses riscos, reproduzir exemplos e relatar evidências. Diretrizes como WCAG ajudam a aprofundar acessibilidade, mas esta aula oferece uma triagem inicial, não uma certificação de conformidade. Segurança e desempenho também exigem análises maiores em projetos reais.",
     "sections": [
       {
@@ -792,7 +792,8 @@ Object.assign(LESSON_GUIDES, {
         "title": "Faça revisão colaborativa com evidência",
         "paragraphs": [
           "Em revisão de código, descreva risco e cenário. Em vez de “ruim”, diga “com foco no campo e entrada vazia, a busca mostra todos os itens; o requisito prevê esse comportamento?”. Se encontrar falha de teclado, registre passos, esperado e observado. Priorize correções que bloqueiam fluxo essencial ou expõem dados. Um comentário pode propor um teste específico ou referência à diretriz; não precisa impor preferência de estilo sem efeito no usuário.",
-          "Ao entregar, relate o que foi checado e o que falta: “Testei teclado e estados com e sem resultados no navegador X, conferi uso de textContent e não observei problema no conjunto pequeno. Não medi em celular real nem usei leitor de tela.” Essa frase dá contexto para outra pessoa continuar. Não confunda checklist inicial com auditoria WCAG, análise de ameaças ou teste de carga formal. Aprender a declarar limites é parte do trabalho profissional."
+          "Ao entregar, relate o que foi checado e o que falta: “Testei teclado e estados com e sem resultados no navegador X, conferi uso de textContent e não observei problema no conjunto pequeno. Não medi em celular real nem usei leitor de tela.” Essa frase dá contexto para outra pessoa continuar. Não confunda checklist inicial com auditoria WCAG, análise de ameaças ou teste de carga formal. Aprender a declarar limites é parte do trabalho profissional.",
+          "A leitura de um projeto também começa por evidências: encontre o comando de execução, localize o ponto de entrada e siga imports até a regra e os dados. Em labs/project-reading, o relatório atravessa arquivos separados e um teste registra a expectativa. O laboratório mostra um caso pequeno; projetos reais podem ter mais caminhos e exigem repetir essa investigação por partes."
         ]
       }
     ],
@@ -855,15 +856,15 @@ Object.assign(LESSON_GUIDES, {
         "criteria": ["Relato compara textContent com innerHTML usando entrada marcada.","Implementação é restaurada e risco de interpretar texto é explicado."]
       },
       {
-        "prompt": "Transferência: redija comentário de revisão sobre desempenho para uma lista de 10 mil tarefas e proponha uma medição.",
+        "prompt": "Transferência: leia labs/project-reading/README.md. Localize o ponto de entrada e siga o caminho até a regra do relatório. Execute o teste antes de alterar, corrija o defeito sem mudar os testes e depois inclua uma sessão concluída de 15 minutos nos dados fictícios.",
         "hints": [
-          "Descreva o cenário antes de sugerir otimização.",
-          "Indique ferramenta e métrica observável."
+          "Comece pelo arquivo indicado pelo comando node src/index.cjs; acompanhe os require e compare a regra com a asserção que falha.",
+          "Registre esperado, observado e hipótese antes da edição; limite a correção ao arquivo da regra e execute novamente a suíte."
         ],
-        "solution": "Comentário: “Com 10 mil tarefas, a busca a cada ação reconstrói milhares de li. Podemos medir tempo da ação no painel Performance em desktop e celular antes de decidir limitar resultados ou paginar? Incluirei cenário com termo amplo e tempo observado.”",
-        "explanation": "Uma revisão útil relaciona risco, reprodução, medição e possível ação.",
-        "expected": "Comentário construtivo e plano de medida sem alegar lentidão já comprovada.",
-        "criteria": ["Plano define medida em lista de 10 mil itens e controla cenário.","Comentário separa hipótese de lentidão comprovada."]
+        "solution": "A sequência é src/index.cjs → src/data/sessions.cjs e src/report.cjs → src/format.cjs. O teste reproduz 37.5 minutos observados frente a 75 esperados; a regra precisa acumular os minutos concluídos, preservando o caso vazio e os testes existentes. Com mais uma sessão concluída de 15 minutos, a saída passa a contar três sessões e 90 minutos; a sessão pausada continua excluída.",
+        "explanation": "A prática combina leitura do fluxo, evidência de teste antes e depois, correção concentrada e transferência para um novo dado.",
+        "expected": "A pessoa explica o caminho dos arquivos, registra o teste que falha antes da correção e confirma três testes aprovados depois. Ao adicionar a sessão, prevê e observa três sessões e 90 minutos, sem incluir a sessão pausada.",
+        "criteria": ["Localiza index.cjs como entrada e registra a sequência entrada → dados/regra → apresentação.","Compara 37.5 observado com 75 esperado antes de editar e mantém os testes intactos.","Corrige apenas report.cjs, obtém três testes aprovados e explica a causa pela evidência.","Após adicionar a sessão concluída de 15 minutos, observa três sessões e 90 minutos; a sessão pausada continua fora do relatório."]
       }
     ],
     "mistakes": [
