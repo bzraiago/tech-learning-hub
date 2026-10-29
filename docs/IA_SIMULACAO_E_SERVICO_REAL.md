@@ -15,7 +15,7 @@ Este inventário separa exercícios locais de integrações com serviços de IA.
 | `ai-llms` | Simulação didática | Pesos inventados e orçamento calculados localmente; sem inferência. |
 | `ai-prompts` | Simulação didática | Montagem e validação local de uma estrutura; sem envio a modelo. |
 | `ai-system` | Simulação didática | Conversa e memória com dados fictícios; sem resposta de serviço. |
-| `ai-rag` | Simulação didática | Recuperação local de documentos; sem LLM, embeddings ou API. |
+| `ai-rag` | Misto | A aula usa recuperação didática local. `labs/ai-provider-connection` oferece corpus lexical fictício e geração conectada opcional; sem chave, apenas simula o trecho recuperado. A chamada real não foi executada. |
 | `ai-tools` | Simulação didática | Propostas fixas; sem agente nem ação externa. |
 | `ai-libraries` | Simulação didática | Gerador determinístico e busca literal. |
 | `ai-mcp` | Misto | Descoberta e despacho simulados; exercício opcional mostra SDK real sem executar servidor ou rede. |
@@ -42,4 +42,4 @@ Este inventário separa exercícios locais de integrações com serviços de IA.
 | `project-ai-evals` | Projeto com IA simulada | Métricas determinísticas, sem respostas de modelo conectado. |
 | `project-ai-capstone` | Projeto com IA simulada | Gerador injetado e busca lexical; não comprova fundamentação de LLM real. |
 
-Nenhuma aula ou projeto está classificado como serviço real obrigatório. `ai-api` é misto porque inclui um laboratório opcional de integração; a chamada exige configuração local, pode gerar custo e não é feita pelos testes automatizados. As etapas seguintes devem adicionar avaliação separada, recuperação de fontes e ferramentas com permissões limitadas.
+Nenhuma aula ou projeto está classificado como serviço real obrigatório. `ai-api` e `ai-rag` são mistos porque incluem integração opcional; a chamada exige configuração local, pode gerar custo e não é feita pelos testes automatizados. A busca RAG local compara termos e valida a presença do ID citado, mas não verifica suporte factual; avaliação separada e ferramentas com permissões limitadas continuam pendentes.

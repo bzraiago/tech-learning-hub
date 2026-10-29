@@ -3,61 +3,138 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Conexão local com um modelo de IA</title>
+  <title>Laboratório local de IA e RAG</title>
   <style>
     :root { color-scheme: light dark; font: 1rem/1.55 system-ui, sans-serif; }
+    * { box-sizing: border-box; }
     body { max-width: 46rem; margin: 0 auto; padding: 1.5rem; }
     main { display: grid; gap: 1rem; }
-    textarea { box-sizing: border-box; width: 100%; min-height: 9rem; padding: .75rem; font: inherit; }
-    button { width: fit-content; padding: .65rem 1rem; font: inherit; cursor: pointer; }
+    form, section { display: grid; gap: .75rem; }
+    textarea { width: 100%; min-height: 7rem; padding: .75rem; font: inherit; }
+    button { width: fit-content; max-width: 100%; padding: .65rem 1rem; font: inherit; cursor: pointer; }
     :focus-visible { outline: 3px solid #70a5ff; outline-offset: 3px; }
     .notice { padding: .75rem; border-inline-start: 4px solid #e3a929; }
-    #answer { white-space: pre-wrap; overflow-wrap: anywhere; }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
+    .panel { padding: 1rem; border: 1px solid currentColor; border-radius: .5rem; }
+    .answer { white-space: pre-wrap; overflow-wrap: anywhere; }
+    #rag-sources { padding-inline-start: 1.5rem; overflow-wrap: anywhere; }
+    @media (max-width: 30rem) {
+      body { padding: 1rem; }
+      button { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; }
+    }
   </style>
 </head>
 <body>
   <main>
-    <h1>Conexão local com um modelo de IA</h1>
-    <p class="notice">Use perguntas fictícias. Não envie senha, chave, dados pessoais ou informações confidenciais. Esta demonstração funciona só nesta máquina e não está pronta para publicação.</p>
-    <form id="chat-form">
-      <label for="prompt">Mensagem para o modelo</label>
-      <textarea id="prompt" name="prompt" maxlength="1000" required></textarea>
-      <button id="send" type="submit">Enviar uma mensagem</button>
-    </form>
-    <p id="status" role="status" aria-live="polite"></p>
-    <section aria-labelledby="answer-title">
-      <h2 id="answer-title">Resposta</h2>
-      <p id="answer"></p>
+    <h1>Laboratório local de IA e RAG</h1>
+    <p class="notice">Use somente perguntas e informações fictícias. Não envie senhas, chaves, dados pessoais ou conteúdo confidencial. Este servidor foi feito para estudo local e não está pronto para publicação.</p>
+
+    <section class="panel" aria-labelledby="chat-title">
+      <h2 id="chat-title">Conversa com o modelo</h2>
+      <p>Este caminho envia sua mensagem ao provedor configurado no servidor. Cada envio pode gerar uso faturável.</p>
+      <form id="chat-form">
+        <label for="prompt">Mensagem para o modelo</label>
+        <textarea id="prompt" name="prompt" maxlength="1000" required></textarea>
+        <button id="send" type="submit">Enviar uma mensagem</button>
+      </form>
+      <p id="status" role="status" aria-live="polite"></p>
+      <div>
+        <h3>Resposta</h3>
+        <p id="answer" class="answer"></p>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="rag-title">
+      <h2 id="rag-title">Perguntar aos materiais fictícios (RAG)</h2>
+      <p>A busca lexical roda localmente sobre três trechos inventados. Sem configuração do provedor, o servidor mostra o trecho recuperado como simulação; com provedor configurado, envia somente os trechos encontrados para gerar uma resposta. A checagem de ID confirma que a citação foi recuperada, mas não prova que ela sustenta cada afirmação.</p>
+      <form id="rag-form">
+        <label for="rag-prompt">Pergunta sobre senha, pedido ou entrega</label>
+        <textarea id="rag-prompt" name="prompt" maxlength="1000" required></textarea>
+        <button id="rag-send" type="submit">Buscar e responder</button>
+      </form>
+      <p id="rag-status" role="status" aria-live="polite"></p>
+      <div>
+        <h3>Resposta e modalidade</h3>
+        <p id="rag-answer" class="answer"></p>
+      </div>
+      <div>
+        <h3>Fontes recuperadas e citadas</h3>
+        <ul id="rag-sources"></ul>
+      </div>
     </section>
   </main>
   <script>
-    const form = document.querySelector('#chat-form');
-    const promptField = document.querySelector('#prompt');
-    const sendButton = document.querySelector('#send');
-    const status = document.querySelector('#status');
-    const answer = document.querySelector('#answer');
+    const chatForm = document.querySelector('#chat-form');
+    const chatPrompt = document.querySelector('#prompt');
+    const chatSend = document.querySelector('#send');
+    const chatStatus = document.querySelector('#status');
+    const chatAnswer = document.querySelector('#answer');
+    const ragForm = document.querySelector('#rag-form');
+    const ragPrompt = document.querySelector('#rag-prompt');
+    const ragSend = document.querySelector('#rag-send');
+    const ragStatus = document.querySelector('#rag-status');
+    const ragAnswer = document.querySelector('#rag-answer');
+    const ragSources = document.querySelector('#rag-sources');
 
-    form.addEventListener('submit', async event => {
+    chatForm.addEventListener('submit', async event => {
       event.preventDefault();
-      sendButton.disabled = true;
-      status.textContent = 'Enviando uma única solicitação…';
-      answer.textContent = '';
+      chatSend.disabled = true;
+      chatStatus.textContent = 'Enviando uma única solicitação…';
+      chatAnswer.textContent = '';
 
       try {
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: promptField.value })
+          body: JSON.stringify({ prompt: chatPrompt.value })
         });
         const result = await response.json();
         if (!response.ok) throw new Error(result.error || 'Não foi possível obter resposta.');
-        answer.textContent = result.text;
-        status.textContent = 'Resposta recebida do serviço configurado.';
+        chatAnswer.textContent = result.text;
+        chatStatus.textContent = 'Resposta recebida do provedor configurado.';
       } catch (error) {
-        status.textContent = error.message;
+        chatStatus.textContent = error.message;
       } finally {
-        sendButton.disabled = false;
+        chatSend.disabled = false;
+      }
+    });
+
+    ragForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      ragSend.disabled = true;
+      ragStatus.textContent = 'Buscando nos materiais fictícios…';
+      ragAnswer.textContent = '';
+      ragSources.replaceChildren();
+
+      try {
+        const response = await fetch('/api/rag', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: ragPrompt.value })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Não foi possível consultar os materiais.');
+
+        ragAnswer.textContent = result.answer;
+        if (result.status === 'simulated') {
+          ragStatus.textContent = 'Busca e resposta simuladas localmente; nenhuma API foi chamada.';
+        } else if (result.status === 'no_evidence') {
+          ragStatus.textContent = 'Nenhum material correspondeu à busca; o provedor não foi chamado.';
+        } else {
+          ragStatus.textContent = 'Resposta do provedor configurado; confira se cada afirmação é sustentada pela fonte.';
+        }
+
+        for (const source of result.sources || []) {
+          const item = document.createElement('li');
+          item.textContent = `${source.title} [${source.id}] — ${source.source}`;
+          ragSources.append(item);
+        }
+      } catch (error) {
+        ragStatus.textContent = error.message;
+      } finally {
+        ragSend.disabled = false;
       }
     });
   </script>

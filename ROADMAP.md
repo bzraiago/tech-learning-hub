@@ -562,10 +562,12 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] E2E confirma a classificação da atividade externa, ausência de bloco de código no exemplo, roteiro de prática, teclado e largura móvel.
 - [x] Criar preparação segura para uso de um provedor/modelo real sem expor chaves: `labs/ai-provider-connection` orienta configuração transitória por sistema operacional, mantém a chave no processo do servidor local e documenta custo, privacidade e o caminho sem conta.
 - [~] Conectar um fluxo mínimo a um modelo real.
-  - [x] Implementar interface local → servidor Python → OpenAI Responses API, usando HTTP padrão, limite de entrada/saída e respostas de erro sanitizadas; dez testes usam transporte falso sem rede.
-  - [ ] Fazer uma chamada real com credencial configurada localmente e registrar modelo, resultado observado e uso/custo; nenhuma chave foi fornecida nem chamada externa foi feita nesta implementação.
-- [ ] Criar RAG simples sobre um conjunto pequeno de materiais.
-- [ ] Exigir citações de fontes e reconhecimento de ausência de evidência.
+  - [x] Implementar interface local → servidor Python → OpenAI Responses API, usando HTTP padrão, limite de entrada/saída e respostas de erro sanitizadas; testes usam transporte falso sem rede.
+  - [ ] Fazer uma chamada real com credencial configurada localmente e registrar modelo, resultado observado e uso/custo. O dono não tem chave e decidiu pular essa validação; nenhuma chamada externa foi feita e ela não bloqueia o trabalho local.
+- [x] Criar RAG simples sobre três materiais fictícios: busca lexical local, contexto limitado às fontes recuperadas, simulação funcional sem configurar o provedor e geração conectada opcional. Testes não acessam a rede.
+- [~] Exigir citações de fontes e reconhecimento de ausência de evidência.
+  - [x] Recusar resposta conectada sem citação ou com ID fora do contexto; no modo local, mostrar a fonte recuperada ou se abster quando não houver termo correspondente.
+  - [ ] Avaliar se cada afirmação é sustentada pela fonte e se um modelo real se abstém corretamente; ID válido e ausência lexical não comprovam esses comportamentos.
 - [ ] Adicionar ferramentas com permissões limitadas e validação de entrada.
 - [ ] Criar conjunto de avaliação reproduzível.
 - [ ] Avaliar separadamente simulação e versão conectada.
@@ -774,3 +776,4 @@ Registre aqui mudanças de direção e impedimentos que afetem a sequência.
 | 27/10/2026 | Escopo de DNS e domínio | O projeto será usado apenas por Preview, sem domínio próprio. | O dono pediu conceitos detalhados de DNS e publicação mesmo sem validar um domínio real. | Manter exemplos `.test` e marcadores fictícios; não comprar, configurar ou testar domínio customizado. |
 | 28/10/2026 | Escopo dos testes de publicação | O projeto será usado somente em Preview Vercel e não tem domínio próprio. | O dono confirmou que conceitos de publicação, DNS e domínio devem permanecer detalhados, mesmo sem validação que dependa de domínio. | Priorizar verificações locais e conceituais; não exigir domínio ou testes vinculados a ele. |
 | 28/10/2026 | Provedor de referência para a primeira chamada real de IA | OpenAI Responses API no laboratório local; a trilha `ai-chat` permanece independente de fornecedor. | O conteúdo existente de `ai-api` já ensina contratos de integração e referencia a documentação OpenAI; o laboratório não publica chave, não roda chamadas na CI e mantém uma rota sem serviço pago. | O aluno pode fazer a chamada opcional com sua própria conta e verificar custos; não pedir nem registrar a chave no curso. |
+| 28/10/2026 | Validação real de IA adiada | A chamada a modelo real foi pulada; o dono não tem chave de API. | A recuperação local, o modo simulado e os contratos com provedor falso podem ser validados sem serviço externo ou custo. | Continuar com avaliações locais e manter a execução real como evidência opcional, sem solicitar chave. |

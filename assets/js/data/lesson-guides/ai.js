@@ -482,7 +482,7 @@ Object.assign(LESSON_GUIDES, {
   },
 "ai-rag": {
     "prerequisites": "Concluir setup-python, ai-data e ai-embeddings; saber usar funções, listas, dicionários e testes em Python.",
-    "setup": "Na pasta ia-estudos, salve o exemplo como ai-rag.py no editor. Abra o terminal nessa pasta e execute python ai-rag.py (ou py ai-rag.py no Windows, python3 ai-rag.py no macOS/Linux, conforme setup-python). A saída esperada é ['A'] e sem evidencia, em duas linhas. O processo termina sozinho; para retomar, execute o mesmo comando. Se Python não for reconhecido, revise setup-python. Acrescente os exercícios de código ao final do arquivo; o último é respondido em texto. Usa dados fictícios e biblioteca padrão, sem LLM, embeddings ou API.",
+    "setup": "Na pasta ia-estudos, salve o exemplo como ai-rag.py no editor. Abra o terminal nessa pasta e execute python ai-rag.py (ou py ai-rag.py no Windows, python3 ai-rag.py no macOS/Linux, conforme setup-python). A saída esperada é ['A'] e sem evidencia, em duas linhas. O processo termina sozinho; para retomar, execute o mesmo comando. Se Python não for reconhecido, revise setup-python. Acrescente os exercícios de código ao final do arquivo; o último é respondido em texto. O exemplo da aula usa dados fictícios e biblioteca padrão, sem LLM, embeddings ou API. Extensão opcional: siga labs/ai-provider-connection/README.md para testar recuperação e citações localmente, sem configurar o provedor; a chamada conectada continua opcional e pode gerar custo.",
     "why": "Monte um fluxo de resposta apoiado em documentos, entendendo as falhas de cada etapa.",
     "sections": [
       {
@@ -505,7 +505,7 @@ Object.assign(LESSON_GUIDES, {
         "title": "Gerar com um contrato",
         "paragraphs": [
           "Ao conectar um modelo, envie a pergunta e os trechos, solicite resposta apoiada neles e referências aos IDs apresentados. Defina o que fazer quando não houver evidência ou quando duas fontes se contradisserem. Em uma política com datas conflitantes, não escolha silenciosamente a frase mais conveniente: use a versão vigente ou encaminhe a dúvida.",
-          "Valide a forma de saída e se as referências pertencem ao conjunto recuperado. Isso detecta IDs inventados, mas não prova que a afirmação é sustentada pelo trecho. “Fonte A” pode existir e ainda assim não dizer o que a resposta afirma. A avaliação de suporte exige comparar cada afirmação com a evidência.",
+          "Valide a forma de saída e se as referências pertencem ao conjunto recuperado. Isso detecta IDs inventados, mas não prova que a afirmação é sustentada pelo trecho. “Fonte A” pode existir e ainda assim não dizer o que a resposta afirma. A avaliação de suporte exige comparar cada afirmação com a evidência. A extensão opcional labs/ai-provider-connection executa a recuperação local e verifica IDs; sem configurar o provedor, mostra o trecho recuperado como simulação, sem chamar um modelo.",
           "Pausa: para a fonte A que diz sete dias, avalie a frase 'o prazo é trinta dias [A]'. O ID existe; qual verificação a reprova?"
         ]
       },
@@ -2903,7 +2903,7 @@ Object.assign(LESSON_GUIDES, {
     'ai-llms': ['simulated', 'A tabela de pesos e o orçamento são inventados e executados em Python local; não há inferência de LLM.'],
     'ai-prompts': ['simulated', 'O código monta e valida a estrutura do prompt, mas não envia a entrada a um modelo.'],
     'ai-system': ['simulated', 'A conversa e a memória são dados locais fictícios; nenhum modelo ou serviço externo responde.'],
-    'ai-rag': ['simulated', 'A recuperação usa documentos fictícios e regras locais; não há modelo, embeddings ou API.'],
+    'ai-rag': ['mixed', 'O exemplo da aula continua simulado. labs/ai-provider-connection oferece recuperação lexical local e geração conectada opcional; sem chave, exibe o trecho como simulação. A chamada real não foi verificada.'],
     'ai-tools': ['simulated', 'As propostas de ferramentas e os resultados são fixos; o exemplo não executa ações externas nem chama modelo.'],
     'ai-libraries': ['simulated', 'O gerador é determinístico e a busca é literal; não há LLM nem embeddings.'],
     'ai-mcp': ['mixed', 'O fluxo principal simula descoberta e despacho. Um exercício opcional mostra um SDK MCP real, mas não executa servidor nem rede.'],
