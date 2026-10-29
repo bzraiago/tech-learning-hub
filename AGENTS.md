@@ -129,7 +129,6 @@ Arquivos principais:
 | `assets/js/core/state.js` | Índices, `READINESS_EVIDENCE`, estado, sanitização e persistência |
 | `assets/js/ui/render.js` | Renderização da navegação, progresso, módulos e aulas |
 | `assets/js/ui/dialogs.js` | Leitores, diálogos, recursos e validação de projetos |
-| `assets/js/transfer.js` | Exportação JSON e importação validada do estado da conta |
 | `assets/js/app.js` | Eventos e inicialização da aplicação |
 | `assets/js/auth.js` | Login opcional com Clerk e aviso de mudança de sessão para a sincronização |
 | `assets/js/cloud.js` | Carregamento por conta Clerk e salvamento automático no Supabase |
@@ -144,6 +143,7 @@ Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `ai-chat`,
 
 ### 5.2 Persistência e compatibilidade (cuidado máximo)
 - O curso exige login Clerk antes de mostrar o conteúdo. O progresso persistente fica somente em `public.learning_state` no Supabase, protegido por RLS e vinculado ao ID Clerk. `state` permanece em memória durante a sessão. Ao trocar de conta, a interface aguarda a leitura da nova conta antes de aceitar edição.
+- A interface não oferece exportação/importação manual de progresso por arquivo. O salvamento e carregamento da conta são automáticos pelo Supabase; não reintroduza controles de arquivo sem pedido explícito do dono.
 - As antigas chaves `localStorage` podem existir em navegadores que usaram versões anteriores; o aplicativo atual não as lê, grava nem apaga automaticamente. Não confunda cache legado com autenticação ou RLS.
 - `sanitizeState()` descarta qualquer progresso cujo id de aula/trilha/exercício **não exista mais**. Portanto:
   - **Nunca renomeie ou remova ids** de aulas, módulos, trilhas, projetos ou checks sem necessidade. Se for inevitável, escreva migração em `sanitizeState()` mapeando ids antigos para novos.
@@ -309,10 +309,8 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
    - [ ] Fazer piloto das três aulas com aluno e registrar dúvidas observadas; a análise estrutural não comprova a carga real para uma pessoa iniciante.
 10. [x] Demonstrações visuais de execução (laços, referências, `JOIN`, requisições HTTP), registradas em `js-flow`, `js-arrays`, `js-es6`, `db-joins` e `delivery-http`.
 11. [x] Revisão acumulativa e recuperação de dificuldades: quiz errado aponta para conceitos da aula, oferece segunda tentativa diferente e a primeira aula de cada módulo posterior recupera conteúdo anterior com rascunho persistente.
-12. [x] Persistir progresso e anotações automaticamente por conta no Supabase, sem depender de `localStorage`.
-   - [x] Exportar e importar progresso/rascunhos com envelope JSON versionado, sanitização, confirmação de substituição e gravação apenas após autenticação/sincronização da conta.
-   - [x] Documentar o formato `tech-learning-hub-progress` versão 1 e os limites da cópia.
-13. [~] Modo de leitura prolongada implementado; E2E headless cobre teclado, 375/1280 px, retomada após recarga, exportação/importação e isolamento entre contas fictícias via mocks. Conferência com Clerk/Supabase reais no Preview ainda pendente.
+12. [x] Persistir progresso e anotações automaticamente por conta no Supabase, sem depender de `localStorage`; transferência manual por arquivo não faz parte do produto por decisão do dono.
+13. [~] Modo de leitura prolongada implementado; E2E headless cobre teclado, 375/1280 px, retomada após recarga, salvamento automático simulado e isolamento entre contas fictícias via mocks. Conferência com Clerk/Supabase reais no Preview ainda pendente. Transferência manual por arquivo foi removida por decisão do dono.
 14. [x] Glossário contextual no ponto de uso, renderizado por `readerTerms()` nas seções que apresentam termos novos.
 15. [x] Laboratório de leitura de projeto alheio: `labs/project-reading` percorre um projeto multi-arquivo do ponto de entrada ao relatório, reproduz uma falha, orienta uma correção com teste de regressão e propõe transferência. Isso prepara a competência; não substitui a avaliação final do projeto de conclusão.
 16. [~] Ponte da IA simulada para IA conectada a um modelo real, com avaliações distintas; `labs/ai-provider-connection` mantém a chave no servidor local, demonstra RAG lexical, inclui avaliação reproduzível e testes sem rede. A aula/projeto `ai-tools` cobre permissões locais, mas não conecta tools a um modelo real. A chamada real foi pulada por decisão do dono, que não tem chave; groundedness e comparação entre respostas simuladas e conectadas continuam pendentes.
@@ -381,6 +379,7 @@ Extensão de IA (opcional): responder perguntas sobre um pequeno conjunto de mat
 - 2026-10-26 — Por pedido do dono do projeto, Supabase passou a ser a única fonte persistente; carga e envio são automáticos e controles de arquivo/local foram removidos.
 - 2026-10-26 — A página passou a exigir autenticação Clerk e carregamento do progresso antes de liberar o conteúdo.
 - 2026-10-26 — Troca de conta passa a carregar automaticamente o progresso remoto da nova conta, preservando cache local por usuário e exigindo escolha em caso de divergência.
+- 2026-10-28 — Por decisão do dono, remover exportação/importação manual em JSON; manter Supabase como único fluxo persistente e automático do progresso.
 - 2026-10-28 — OpenAI Responses API é o provedor de referência para a primeira chamada real, isolada em laboratório local; a trilha de chat web continua independente de provedor e código.
 - 2026-10-26 — A cópia remota passa a ser exibida mesmo com cache divergente; a versão local anterior permanece recuperável no navegador, sem baixar arquivo automaticamente.
 - 2026-10-27 — O uso do projeto será somente por Preview, sem domínio próprio; ensinar domínio e DNS em detalhe com exemplos reservados, sem exigir configuração ou validação de domínio real.

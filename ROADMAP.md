@@ -531,23 +531,21 @@ Toda implementação só pode ser considerada pronta quando:
 
 **Aceite:** outra pessoa reconstrói o ambiente pelo README; o aluno corrige um bug e implementa uma mudança de requisito sem reescrever o sistema, justificando os trade-offs.
 
-## Fase 9 — Experiência de estudo e portabilidade
+## Fase 9 — Experiência de estudo e continuidade
 
 **Meta:** reduzir perda de progresso e tornar aulas longas confortáveis e retomáveis.
 
-- [x] Implementar exportação de progresso e anotações em arquivo JSON.
-- [x] Implementar importação validada, com confirmação antes de substituir dados.
-- [x] Documentar versão e compatibilidade do formato exportado em `docs/EXPORTAR_IMPORTAR_PROGRESSO.md`.
+- [x] Manter Supabase como fluxo persistente único e automático por conta; exportação/importação manual por arquivo JSON foi removida por decisão do dono em 28/10/2026.
 - [x] Criar modo de leitura prolongada com resumo por aula.
 - [x] Adicionar sumário navegável por teclado.
 - [x] Salvar e restaurar posição por aula e etapa de leitura na conta Supabase.
 - [x] Adicionar escala do texto, espaçamento entre linhas e largura de leitura, mantendo os controles responsivos.
 - [x] E2E em Chromium headless confirmou sumário e controles por teclado, sem overflow em 375/1280 px, posição `760` e preferências após recarga e isolamento para uma segunda conta fictícia; Clerk/Supabase foram simulados e o harness forneceu o layout flex/overflow porque o CDN Tailwind não carregou localmente.
 - [ ] Confirmar retomada e preferências no Preview com Clerk/Supabase reais; a automação não conseguiu identificar com segurança a URL atual do Chrome e não acessou a sessão do usuário.
-- [x] Garantir funcionamento quando `localStorage` está bloqueado; o E2E substitui o getter por `SecurityError` e leitura, exportação e importação continuam funcionando com estado remoto simulado.
-- [x] Testar perda, corrupção e recuperação do estado; o E2E rejeita JSON inválido e schema incompatível sem alteração e restaura um backup válido após simular a perda de progresso.
+- [x] Garantir funcionamento quando `localStorage` está bloqueado; o E2E substitui o getter por `SecurityError` e confirma leitura, salvamento automático e retomada do progresso remoto simulado.
+- [x] Confirmar no E2E o isolamento do estado entre duas contas fictícias e a restauração automática após recarga; isso não substitui o teste de Preview com Clerk/Supabase reais.
 
-**Aceite:** o aluno transfere seu progresso entre navegadores, recupera-se de dados inválidos e retoma uma aula longa no ponto salvo.
+**Aceite:** o progresso sincroniza automaticamente por conta no Supabase e a pessoa retoma uma aula longa com suas preferências, sem controles manuais de arquivo.
 
 ## Fase 10 — Engenharia de IA conectada e avaliada
 

@@ -52,7 +52,7 @@ test.afterAll(async () => {
   if (servidorCurso?.listening) await new Promise(resolve => servidorCurso.close(resolve));
 });
 
-test('sumário, portabilidade e retomada de leitura ficam isolados por conta', async ({ page }) => {
+test('sumário, salvamento automático e retomada de leitura ficam isolados por conta', async ({ page }) => {
   const estadosRemotos = new Map();
   const gravacoes = [];
   const errosDeRuntime = [];
@@ -92,6 +92,9 @@ test('sumário, portabilidade e retomada de leitura ficam isolados por conta', a
   await page.goto(urlCurso, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => !document.body.hasAttribute('data-auth-locked'));
   expect(await page.evaluate(() => { try { void localStorage; return false; } catch { return true; } })).toBe(true);
+  await expect(page.locator('#progress-export, #progress-import-trigger, #progress-import-file')).toHaveCount(0);
+  await expect(page.locator('#cloud-panel')).not.toContainText('Exportar progresso');
+  await expect(page.locator('#cloud-panel')).not.toContainText('Importar arquivo JSON');
   // A CI não depende do CDN Tailwind; este trecho fornece só o layout rolável do diálogo.
   await page.addStyleTag({ content: '#study-dialog>div{display:flex;flex-direction:column;max-height:calc(100dvh - 42px)}#dialog-body{flex:1;min-height:0;overflow-y:auto}#lesson-sections.hidden{display:none}' });
 
@@ -153,66 +156,27 @@ test('sumário, portabilidade e retomada de leitura ficam isolados por conta', a
   await page.evaluate(() => closeDialog());
   await page.evaluate(id => {
     state.completed[id] = true;
-    state.notes[`${id}:0`] = 'Rascunho fictício exportado no teste.';
+    state.notes[`${id}:0`] = 'Rascunho fictício salvo automaticamente no teste.';
     saveState();
   }, lessonId);
-  await page.waitForFunction(() => cloudCanTransfer());
-  const [download] = await Promise.all([
-    page.waitForEvent('download'),
-    page.locator('#progress-export').click()
-  ]);
-  const exportStream = await download.createReadStream();
-  const exportChunks = [];
-  for await (const chunk of exportStream) exportChunks.push(chunk);
-  const exportBuffer = Buffer.concat(exportChunks);
-  const backup = JSON.parse(exportBuffer.toString('utf8'));
-  expect(backup).toMatchObject({ format: 'tech-learning-hub-progress', schemaVersion: 1, state: { version: 1 } });
-  expect(backup.state.completed[lessonId]).toBe(true);
-  expect(backup.state.notes[`${lessonId}:0`]).toBe('Rascunho fictício exportado no teste.');
+  await expect.poll(() => estadosRemotos.get('user_test_1')?.completed?.[lessonId]).toBe(true);
+  expect(estadosRemotos.get('user_test_1').notes[`${lessonId}:0`]).toBe('Rascunho fictício salvo automaticamente no teste.');
+  await expect(page.locator('#cloud-status')).toHaveText('Progresso salvo na nuvem.');
 
-  await page.evaluate(id => {
-    delete state.completed[id];
-    delete state.notes[`${id}:0`];
-    saveState();
-  }, lessonId);
-  await page.waitForFunction(() => cloudCanTransfer());
-  await page.locator('#progress-import-file').setInputFiles({ name: 'inválido.json', mimeType: 'application/json', buffer: Buffer.from('{ inválido') });
-  await expect(page.locator('#progress-transfer-status')).toContainText('Nenhum dado foi alterado');
-  expect(await page.evaluate(id => state.completed[id], lessonId)).toBeUndefined();
-  await page.locator('#progress-import-file').setInputFiles({
-    name: 'versão-incompatível.json',
-    mimeType: 'application/json',
-    buffer: Buffer.from(JSON.stringify({ ...backup, schemaVersion: 2 }))
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => !document.body.hasAttribute('data-auth-locked'));
+  expect(await page.evaluate(id => ({ completed: state.completed[id], note: state.notes[`${id}:0`] }), lessonId)).toEqual({
+    completed: true,
+    note: 'Rascunho fictício salvo automaticamente no teste.'
   });
-  await expect(page.locator('#progress-transfer-status')).toContainText('Versão de arquivo não compatível');
-  expect(await page.evaluate(id => state.completed[id], lessonId)).toBeUndefined();
-
-  let confirmation = page.waitForEvent('dialog');
-  await page.locator('#progress-import-file').setInputFiles({ name: 'progresso.json', mimeType: 'application/json', buffer: exportBuffer });
-  const importConfirmation = await confirmation;
-  expect(importConfirmation.type()).toBe('confirm');
-  expect(importConfirmation.message()).toContain('substituirá todo o progresso atual');
-  await importConfirmation.dismiss();
-  await expect(page.locator('#progress-transfer-status')).toHaveText('Importação cancelada. O progresso atual foi mantido.');
-  expect(await page.evaluate(id => state.completed[id], lessonId)).toBeUndefined();
-  expect(estadosRemotos.get('user_test_1').completed[lessonId]).toBeUndefined();
-
-  confirmation = page.waitForEvent('dialog');
-  const fileChooserEvent = page.waitForEvent('filechooser');
-  await page.locator('#progress-import-trigger').click();
-  const fileChooser = await fileChooserEvent;
-  await fileChooser.setFiles({ name: 'progresso.json', mimeType: 'application/json', buffer: exportBuffer });
-  const confirmedImport = await confirmation;
-  await confirmedImport.accept();
-  await expect(page.locator('#progress-transfer-status')).toContainText('Importação aplicada à sessão');
-  await page.waitForFunction(() => cloudCanTransfer());
-  expect(await page.evaluate(id => ({ completed: state.completed[id], note: state.notes[`${id}:0`] }), lessonId)).toEqual({ completed: true, note: 'Rascunho fictício exportado no teste.' });
   expect(estadosRemotos.get('user_test_1').completed[lessonId]).toBe(true);
 
   await page.evaluate(() => window.Clerk.__switchUser('user_test_2'));
   await page.waitForFunction(() => !document.body.hasAttribute('data-auth-locked'));
-  expect(await page.evaluate(id => ({ user: window.Clerk.user.id, position: state.readingPositions[id], preferences: state.readingPreferences }), lessonId)).toEqual({
+  expect(await page.evaluate(id => ({ user: window.Clerk.user.id, completed: state.completed[id], note: state.notes[`${id}:0`], position: state.readingPositions[id], preferences: state.readingPreferences }), lessonId)).toEqual({
     user: 'user_test_2',
+    completed: undefined,
+    note: undefined,
     position: undefined,
     preferences: { fontScale: 100, lineHeight: 1.8, width: 'standard' }
   });
