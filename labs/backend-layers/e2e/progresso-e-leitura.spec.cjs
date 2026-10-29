@@ -190,6 +190,56 @@ test('sumário, salvamento automático e retomada de leitura ficam isolados por 
   await expect(page.locator('.execution-mode')).toContainText('Projeto com IA simulada');
   await expect(page.locator('.execution-mode')).toContainText('não chama API');
 
+  // A trilha de chat precisa funcionar isolada e suas provas não usam o roteiro de terminal.
+  // A recarga acima removeu a estrutura de layout do harness; CDN continua intencionalmente bloqueado.
+  await page.addStyleTag({ content: '#study-dialog>div{display:flex;flex-direction:column;max-height:calc(100dvh - 42px)}#dialog-body{flex:1;min-height:0;overflow-y:auto}#lesson-sections.hidden{display:none}' });
+  const percursoChat = await page.evaluate(() => {
+    const aulas = tracks.find(track => track.id === 'ai-chat').modules.flatMap(module => module.lessons);
+    const falhas = [];
+    for (const aula of aulas) {
+      openLesson(aula.id);
+      for (const section of ['learn', 'example', 'practice', 'review', 'resources']) {
+        renderLessonSection(section);
+        if (!document.querySelector('#lesson-reading-panel')?.textContent.trim()) falhas.push(`${aula.id}:${section}`);
+        if (section === 'example' && document.querySelector('#dialog-body pre code')) falhas.push(`${aula.id}:exemplo-como-codigo`);
+      }
+    }
+    return { quantidade: aulas.length, falhas };
+  });
+  expect(percursoChat).toEqual({ quantidade: 24, falhas: [] });
+  await page.evaluate(() => { openLesson('chat-ai-cloud-operations'); renderLessonSection('learn'); });
+  const atalho = page.locator('[aria-label="Aulas anteriores necessárias"] [data-lesson="chat-ai-schedules"]');
+  await atalho.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#dialog-title')).toHaveText('Agendamentos: configurar, conferir e pausar');
+  await page.evaluate(() => renderLessonSection('practice'));
+  await expect(page.locator('#dialog-body')).toContainText('execução nativa');
+
+  for (const id of ['project-chat-basic', 'project-chat-intermediate', 'project-chat-advanced']) {
+    await page.evaluate(projectId => { openProject(projectId); renderProjectSection('reference'); }, id);
+    await expect(page.locator('#dialog-body')).toContainText('Roteiro para executar no chat');
+    expect(await page.locator('#dialog-body pre code').count()).toBe(0);
+    await expect(page.locator('#dialog-body')).not.toContainText('inspecione os seus no terminal');
+    await page.evaluate(() => renderProjectSection('build'));
+    await expect(page.locator('#project-source')).toHaveAttribute('placeholder', /resposta observada/);
+  }
+  await page.evaluate(() => { openProject('project-chat-basic'); renderProjectSection('build'); });
+  await page.locator('#project-source').fill('Entrega fictícia: fonte F1 conferida; total 20, A 40%, B 60%; após mudança, total 16 e 50% por turma.');
+  await page.evaluate(() => renderProjectSection('checks'));
+  for (const checkbox of await page.locator('[data-project-manual]').all()) await checkbox.check();
+  await page.locator('#project-explanation').fill('Conferi os números com calculadora e comparei a retomada em conversa nova. Não gerei mídia nem agendamento.');
+  await page.locator('[data-action="project-submit"]').click();
+  await expect(page.locator('#project-status')).toContainText('Conversas, recursos nativos e revisão independente não foram verificados');
+  await expect.poll(() => estadosRemotos.get('user_test_2')?.projects?.['project-chat-basic']?.delivered).toBe(true);
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => !document.body.hasAttribute('data-auth-locked'));
+  // O dublê Clerk reinicia na conta 1 a cada carregamento; a entrega pertence à conta 2.
+  expect(await page.evaluate(() => state.projects['project-chat-basic'])).toBeUndefined();
+  await page.evaluate(() => window.Clerk.__switchUser('user_test_2'));
+  await page.waitForFunction(() => !document.body.hasAttribute('data-auth-locked'));
+  expect(await page.evaluate(() => state.projects['project-chat-basic'].delivered)).toBe(true);
+  expect(estadosRemotos.get('user_test_1')?.projects?.['project-chat-basic']).toBeUndefined();
+
   await page.setViewportSize({ width: 1280, height: 900 });
   const dimensoesDesktop = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }));
   expect(dimensoesDesktop.document).toBeLessThanOrEqual(dimensoesDesktop.viewport);

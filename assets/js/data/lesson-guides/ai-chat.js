@@ -6,10 +6,11 @@ function buildChatLesson(config) {
     execution: {
       mode: 'external',
       label: 'Prática em plataforma web de chat com IA',
-      detail: 'Abra a interface web de chat que você escolheu e faça a atividade ali. O curso não recebe suas conversas. Nenhuma etapa exige IDE, código, API, chave, assinatura paga ou conexão de contas. Use somente dados fictícios; nomes de recursos variam entre plataformas.'
+      detail: config.executionDetail || 'Pratique no chat web escolhido com dados fictícios. O curso não recebe suas conversas nem configura serviços por você. O caminho por texto dispensa código e assinatura; recursos nativos opcionais dependem da plataforma, plano e permissões e precisam ser verificados na sua conta.'
     },
-    prerequisites: 'Não exige experiência com programação, instalação ou conta em fornecedor específico. É necessário conseguir abrir uma interface web de chat com IA. Se a plataforma não tiver busca, envio de arquivos, agentes ou instruções salvas, use a alternativa por texto indicada na aula.',
-    setup: 'No navegador, abra uma conversa nova na plataforma de chat escolhida. Trabalhe somente com os exemplos fictícios desta aula; não envie dados pessoais, informações confidenciais, senhas ou documentos privados. Se a interface mostrar fornecedor, modelo ou data de conhecimento, anote-os para comparar resultados, sem tratar isso como garantia. Faça as atividades na caixa de conversa. Não use IDE, terminal, scripts, API, chaves ou integrações. Se um botão citado não existir, ignore o recurso e cole o material fictício como texto.',
+    prerequisites: config.prerequisites || 'Não exige experiência com programação, instalação ou conta em fornecedor específico. É necessário conseguir abrir uma interface web de chat com IA. Se a plataforma não tiver busca, envio de arquivos, agentes ou instruções salvas, use a alternativa por texto indicada na aula.',
+    prerequisiteLessons: config.prerequisiteLessons || [],
+    setup: config.setup || 'No navegador, abra uma conversa nova no chat escolhido. Use somente exemplos fictícios, sem dados pessoais ou confidenciais. Registre plataforma, data e recursos disponíveis. Faça as atividades na caixa de conversa, sem IDE, terminal, API ou chave. Se um recurso faltar, use a alternativa textual e registre que a execução nativa não foi testada. Para parar, interrompa a geração; para retomar, reabra a conversa ou copie seu resumo para outra. A confirmação de uma tarefa real precisa aparecer na interface do serviço.',
     why: config.why,
     sections: config.sections,
     example: {
@@ -106,6 +107,8 @@ Object.assign(LESSON_GUIDES, {
   }),
 
   'chat-ai-tutor': buildChatLesson({
+    prerequisites: 'Faça Pedidos claros em um chat de IA. Nenhuma outra trilha é necessária.',
+    prerequisiteLessons: ['chat-ai-first-prompts'],
     why: 'Um chat pode apoiar a aprendizagem, mas entregar uma resposta pronta pode esconder o que o aluno ainda não consegue fazer. Esta aula pratica previsão, pistas graduais, explicação com palavras próprias e transferência para um problema novo.',
     sections: [
       { title: 'Combine um papel de tutoria e uma regra de parada', paragraphs: [
@@ -122,12 +125,12 @@ Object.assign(LESSON_GUIDES, {
       ] }
     ],
     example: {
-      prompt: 'Seja meu tutor de DNS para iniciante. Faça uma pergunta por vez e espere minha resposta. Primeiro pergunte o que eu já entendo; se eu errar, dê apenas uma pista curta e peça uma nova tentativa. Depois da minha tentativa correta, peça que eu explique a ideia com minhas palavras e proponha um caso novo. Não entregue tudo de uma vez.',
+      prompt: 'Seja meu tutor sobre diferença entre fato e opinião para iniciante. Faça uma pergunta por vez e espere minha resposta. Primeiro pergunte o que eu já entendo; se eu errar, dê apenas uma pista curta e peça uma nova tentativa. Depois da minha tentativa correta, peça que eu explique a ideia com minhas palavras e proponha um caso novo. Não entregue tudo de uma vez.',
       explanation: ['O tema e o nível inicial estão delimitados.', 'A regra de uma pergunta por vez permite participar antes de receber explicações.', 'Uma pista curta e uma nova tentativa mantêm apoio decrescente.', 'A explicação própria e o caso novo verificam transferência, não apenas memória.'],
-      expected: 'A conversa deve esperar uma resposta antes de avançar. Se o chat entregar uma explicação completa, redirecione-o e continue com uma pergunta menor. O conteúdo factual sobre DNS deve ser conferido em material confiável quando for importante.'
+      expected: 'A conversa deve esperar uma resposta antes de avançar. Se o chat entregar uma explicação completa, redirecione-o e continue com uma pergunta menor. Confira se a distinção entre afirmação verificável e avaliação pessoal aparece nos exemplos.'
     },
     guided: [
-      { instruction: 'Antes de enviar, escreva em uma frase o que você já entende por DNS e uma dúvida que tem.', result: 'Existe uma tentativa própria registrada antes da explicação do chat.' },
+      { instruction: 'Antes de enviar, escreva em uma frase a diferença que você imagina existir entre fato e opinião e uma dúvida que tem.', result: 'Existe uma tentativa própria registrada antes da explicação do chat.' },
       { instruction: 'Envie o exemplo e responda à primeira pergunta sem pedir a solução. Se travar, solicite apenas uma pista.', result: 'O chat responde à tentativa com uma pergunta ou pista curta; a interação pode variar e deve ser redirecionada se revelar a solução inteira.' },
       { instruction: 'Explique a ideia sem copiar e peça um caso novo sobre uma página fictícia. Tente responder antes de pedir avaliação.', result: 'A aplicação usa elementos diferentes do exemplo e recebe feedback específico sobre a explicação.' }
     ],
@@ -148,6 +151,8 @@ Object.assign(LESSON_GUIDES, {
   }),
 
   'chat-ai-skills': buildChatLesson({
+    prerequisites: 'Faça Pedidos claros e Contexto, memória e privacidade. Aqui você cria um procedimento em texto; a configuração nativa será praticada depois.',
+    prerequisiteLessons: ['chat-ai-first-prompts', 'chat-ai-context'],
     why: 'Uma instrução reutilizável pode dar consistência a tarefas repetidas no chat. O objetivo é desenhar um procedimento legível e testá-lo, sem confundi-lo com uma Skill instalada, um arquivo especial ou uma autorização para acessar ferramentas.',
     sections: [
       { title: 'O que significa uma instrução reutilizável', paragraphs: [
@@ -190,6 +195,8 @@ Object.assign(LESSON_GUIDES, {
   }),
 
   'chat-ai-evidence': buildChatLesson({
+    prerequisites: 'Faça Pedidos claros e Arquivos, capturas e leitura conferida. Use trechos fictícios ou fontes públicas.',
+    prerequisiteLessons: ['chat-ai-first-prompts', 'chat-ai-files'],
     why: 'Uma resposta de chat pode misturar informações fornecidas, conhecimento desatualizado e suposições. Aprender a pedir evidências e verificar afirmações reduz o risco de aceitar referências inventadas ou fontes que não sustentam a conclusão.',
     sections: [
       { title: 'Separar afirmação de evidência', paragraphs: [
@@ -232,6 +239,8 @@ Object.assign(LESSON_GUIDES, {
   }),
 
   'chat-ai-bots': buildChatLesson({
+    prerequisites: 'Faça Skills e instruções reutilizáveis e Conferir evidências. A atividade inicial desenha e testa uma conversa; não instala um serviço.',
+    prerequisiteLessons: ['chat-ai-skills', 'chat-ai-evidence'],
     why: 'Um bot de conversa (chatbot) bem delimitado não precisa responder tudo. Desenhar intenções, perguntas de esclarecimento, limites e encaminhamentos ajuda a prever comportamentos antes de qualquer construção técnica; aqui toda a prática acontece como conversa e planejamento em texto.',
     sections: [
       { title: 'Defina público, tarefa e escopo', paragraphs: [
@@ -274,6 +283,8 @@ Object.assign(LESSON_GUIDES, {
   }),
 
   'chat-ai-agents': buildChatLesson({
+    prerequisites: 'Faça Desenhar um bot e Configurar um assistente. Nesta aula você simula delegação em texto; conexões reais são estudadas no módulo avançado.',
+    prerequisiteLessons: ['chat-ai-bots', 'chat-ai-custom-bot'],
     why: 'A palavra “agente” é usada para diferentes capacidades. Esta aula separa uma conversa comum de um sistema que pode selecionar ferramentas ou delegar etapas, e ensina a pedir planos sem autorizar efeitos externos.',
     sections: [
       { title: 'Conversa, ferramenta e agente são conceitos diferentes', paragraphs: [
@@ -316,7 +327,9 @@ Object.assign(LESSON_GUIDES, {
   }),
 
   'chat-ai-evaluation': buildChatLesson({
-    why: 'A qualidade de um bot ou assistente precisa ser avaliada em casos diversos, incluindo falhas, ambiguidade e falta de evidência. A prova desta trilha integra orientação reutilizável, desenho de bot, revisão de respostas e cuidado com dados, sem construir uma aplicação.',
+    prerequisites: 'Faça Bots, Configurar um assistente e Agentes. Este é um checkpoint intermediário; as aplicações profissionais e a prova avançada vêm a seguir.',
+    prerequisiteLessons: ['chat-ai-bots', 'chat-ai-custom-bot', 'chat-ai-agents'],
+    why: 'A qualidade de um bot ou assistente precisa ser avaliada em casos diversos, incluindo falhas, ambiguidade e falta de evidência. Este checkpoint intermediário integra orientação reutilizável, desenho de bot, revisão de respostas e cuidado com dados antes das aplicações profissionais e do módulo avançado.',
     sections: [
       { title: 'Transforme expectativas em critérios', paragraphs: [
         'Escolha o que uma resposta precisa fazer: responder com suporte, pedir esclarecimento, respeitar o escopo, abster-se quando falta evidência e proteger informações. Cada critério precisa corresponder a um comportamento observável.',

@@ -558,6 +558,12 @@ Toda implementação só pode ser considerada pronta quando:
   - [x] Registrar a modalidade e a explicação em cada guia/projeto; o validador falha se uma aula ou projeto de IA ficar sem rótulo.
   - [x] E2E confirma os rótulos da simulação, da referência opcional ao SDK MCP real ainda não executada e do projeto final.
 - [x] Criar a trilha independente `IA no chat`, com sete aulas básicas/intermediárias introdutórias, 28 exercícios e práticas somente em interfaces web de chat; IDE, código, API e recursos específicos de fornecedor não são pré-requisitos.
+- [x] Ampliar `IA no chat` para 24 aulas em cinco módulos e três provas próprias: fundamentos, produtividade, assistentes, oficinas profissionais e operação avançada.
+  - [x] Acrescentar arquivos, tabelas, voz/mídia, documentos, pesquisa, configuração nativa opcional e agendamento com verificação e pausa.
+  - [x] Ensinar suporte ERP, conferência contábil, pesquisa tributária e marketing com casos fictícios, fontes e limites profissionais.
+  - [x] Ensinar conexões, execução remota, coordenação de papéis, avaliação e mudança de requisito sem exigir programação.
+  - [x] Preservar os sete IDs antigos e distinguir prova textual de operação nativa comprovada; pré-requisitos permanecem na própria trilha.
+  - [ ] Observar aluno executando configuração nativa, rotina remota e revisão independente; conteúdo e testes locais não comprovam esses serviços.
   - [x] Incluir tutoria, instruções reutilizáveis, evidências, desenho de bots, noções de agentes, avaliação e privacidade com alternativas só por texto.
   - [x] Adaptar leitura e prática para prompts em texto, observações de respostas e resultados variáveis; validar formato sem código, etapas e critérios.
   - [x] E2E confirma a classificação da atividade externa, ausência de bloco de código no exemplo, roteiro de prática, teclado e largura móvel.

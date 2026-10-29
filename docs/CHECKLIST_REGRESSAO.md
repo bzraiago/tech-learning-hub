@@ -11,7 +11,10 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 
 ## Carregamento e navegação
 
-- [ ] A página inicial mostra 10 trilhas e 152 aulas no total.
+- [ ] A página inicial mostra 10 trilhas e 169 aulas no total.
+- [ ] IA no chat mostra cinco módulos, 24 aulas e três provas próprias; pré-requisitos levam somente a aulas anteriores da mesma trilha.
+- [ ] As provas de IA no chat exibem roteiro de navegador, campos de observação e autoavaliação, sem exigir Git ou execução de código.
+- [ ] Agendamentos distinguem plano/manual de tarefa configurada e execução observada; rotina remota e revisão independente podem permanecer pendentes.
 - [ ] Em “IA no chat”, abrir exemplo e prática: atividade indicada para interface web, sem bloco de código ou instrução de IDE; observações podem ser percorridas por teclado em largura móvel.
 - [ ] A trilha ativa, os módulos e os cards de progresso aparecem corretamente.
 - [ ] Busca encontra uma aula de outra trilha e permite limpar o resultado.

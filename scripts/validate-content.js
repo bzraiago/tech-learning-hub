@@ -146,7 +146,7 @@ const aiTrack = tracks.find((track) => track.id === 'ai');
 const aiLessons = (aiTrack?.modules || []).flatMap((module) => module.lessons || []);
 const chatTrack = tracks.find((track) => track.id === 'ai-chat');
 const chatLessons = (chatTrack?.modules || []).flatMap((module) => module.lessons || []);
-const chatLessonIds = ['chat-ai-first-prompts', 'chat-ai-tutor', 'chat-ai-skills', 'chat-ai-evidence', 'chat-ai-bots', 'chat-ai-agents', 'chat-ai-evaluation'];
+const chatLessonIds = ['chat-ai-first-prompts', 'chat-ai-context', 'chat-ai-tutor', 'chat-ai-files', 'chat-ai-data', 'chat-ai-media', 'chat-ai-skills', 'chat-ai-evidence', 'chat-ai-writing', 'chat-ai-research', 'chat-ai-schedules', 'chat-ai-bots', 'chat-ai-custom-bot', 'chat-ai-agents', 'chat-ai-evaluation', 'chat-ai-erp-support', 'chat-ai-accounting', 'chat-ai-tax-research', 'chat-ai-marketing', 'chat-ai-connections', 'chat-ai-cloud-operations', 'chat-ai-orchestration', 'chat-ai-security-evals', 'chat-ai-advanced-capstone'];
 const supportedExecutionModes = new Set(['simulated', 'mixed', 'real', 'external']);
 function validateExecutionLabel(execution, itemId, itemType) {
   if (!execution || !supportedExecutionModes.has(execution.mode) || !execution.label?.trim() || !execution.detail?.trim()) {
@@ -165,6 +165,13 @@ if (chatLessons.length !== chatLessonIds.length || chatLessonIds.some((id) => !c
 }
 for (const lesson of chatLessons) {
   const guide = LESSON_GUIDES[lesson.id];
+  const position = chatLessons.findIndex(item => item.id === lesson.id);
+  for (const prerequisite of guide?.prerequisiteLessons || []) {
+    const prerequisitePosition = chatLessons.findIndex(item => item.id === prerequisite);
+    if (prerequisitePosition < 0 || prerequisitePosition >= position) {
+      fail(`Pré-requisito da trilha independente precisa existir antes da aula: ${lesson.id} → ${prerequisite}`);
+    }
+  }
   validateExecutionLabel(guide?.execution, lesson.id, 'Aula de chat web');
   if (guide?.execution?.mode !== 'external') fail(`Aula ${lesson.id} precisa indicar prática externa em um chat web.`);
   if (guide?.example?.language !== 'text') fail(`Aula ${lesson.id} precisa apresentar um exemplo de conversa em texto, sem código.`);
@@ -175,6 +182,14 @@ for (const lesson of chatLessons) {
   for (const [index, exercise] of (guide?.exercises || []).entries()) {
     if (!exercise.criteria?.length) fail(`Exercício de chat sem critérios de aceite: ${lesson.id}:${index}`);
   }
+}
+
+for (const id of ['project-chat-basic', 'project-chat-intermediate', 'project-chat-advanced']) {
+  const project = PROJECTS.find(item => item.id === id);
+  if (!project || project.kind !== 'workflow' || project.practiceMode !== 'chat' || !chatTrack?.modules.some(module => module.id === project.module)) {
+    fail(`Prova de IA no chat ausente ou vinculada ao fluxo errado: ${id}`);
+  }
+  if (project?.checks?.some(check => check.mode !== 'manual')) fail(`Prova de chat não pode afirmar validação automática de serviço externo: ${id}`);
 }
 
 for (const lesson of lessons) {
