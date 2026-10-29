@@ -5934,5 +5934,179 @@
         ]
       }
     ]
+  },
+  {
+    "id": "ai-chat",
+    "title": "IA no chat",
+    "subtitle": "Prática em plataformas web, sem código.",
+    "icon": "spark",
+    "color": "#67e8f9",
+    "range": "Perguntar → verificar → orientar",
+    "description": "Aprenda a conversar, estudar, pesquisar e desenhar bots, skills e agentes diretamente em qualquer chat web com IA, sem IDE, scripts ou APIs.",
+    "prerequisite": "Não exige experiência com programação nem conta em um fornecedor específico. Você precisa de acesso a uma plataforma web de chat com IA; disponibilidade, recursos e limites variam por serviço. Todas as atividades usam exemplos fictícios.",
+    "project": "Prova prática: criar uma orientação reutilizável para um bot fictício, testar cinco cenários no chat, revisar evidências e explicar os limites sem escrever código.",
+    "modules": [
+      {
+        "id": "ai-chat-foundations",
+        "title": "Conversar e aprender com IA",
+        "level": "Básico",
+        "number": "01",
+        "description": "Escreva pedidos claros e use o chat como tutor sem terceirizar seu raciocínio.",
+        "resources": [
+          {
+            "kind": "doc",
+            "title": "Anthropic · Boas práticas de prompting (EN; exemplos específicos de Claude)",
+            "url": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/prompt-templates-and-variables",
+            "language": "EN"
+          }
+        ],
+        "lessons": [
+          {
+            "id": "chat-ai-first-prompts",
+            "title": "Pedidos claros em um chat de IA",
+            "minutes": 45,
+            "concept": "Inclua tarefa, contexto fictício, público, formato e critérios para que outra pessoa consiga conferir a resposta.",
+            "objectives": [
+              "Reescrever um pedido vago com tarefa, contexto, formato e critério observável.",
+              "Comparar duas respostas sem confundir fluência com correção.",
+              "Identificar uma informação que precisa ser confirmada fora do chat."
+            ],
+            "exercise": "Na interface web de chat escolhida, compare um pedido vago com outro que define público, contexto e formato; registre uma diferença observável.",
+            "code": "Atividade feita na caixa de conversa do chat web escolhido. Não requer IDE, conta de API ou código.",
+            "docs": []
+          },
+          {
+            "id": "chat-ai-tutor",
+            "title": "Usar IA como tutora sem pular a prática",
+            "minutes": 50,
+            "concept": "Peça pistas progressivas, responda antes de ver a explicação e transfira o conceito para um caso novo.",
+            "objectives": [
+              "Pedir uma pergunta ou pista em vez da resposta pronta.",
+              "Explicar uma ideia com as próprias palavras e receber uma checagem específica.",
+              "Testar se consegue usar o conceito em um exemplo diferente."
+            ],
+            "exercise": "Peça ao chat que ensine um conceito sem fornecer a resposta final, responda às pistas e conclua com um exemplo de transferência.",
+            "code": "Atividade feita em uma conversa web com um tema fictício ou já estudado. Não cole solução de exercício real nem dado pessoal.",
+            "docs": []
+          }
+        ]
+      },
+      {
+        "id": "ai-chat-workflows",
+        "title": "Instruções reutilizáveis e evidências",
+        "level": "Básico → Intermediário",
+        "number": "02",
+        "description": "Crie um roteiro reaproveitável dentro do chat e confira afirmações com fontes acessíveis.",
+        "resources": [
+          {
+            "kind": "doc",
+            "title": "OpenAI · Skills e ferramentas (EN; formato específico da plataforma)",
+            "url": "https://developers.openai.com/plugins/concepts/skills",
+            "language": "EN"
+          },
+          {
+            "kind": "doc",
+            "title": "NIST · Perfil de riscos de IA generativa (EN)",
+            "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence",
+            "language": "EN"
+          }
+        ],
+        "lessons": [
+          {
+            "id": "chat-ai-skills",
+            "title": "Skills e instruções reutilizáveis no chat",
+            "minutes": 55,
+            "concept": "Defina quando usar um procedimento, passos, resultado esperado e limites; não confunda um texto reutilizável com permissão ou ferramenta instalada.",
+            "objectives": [
+              "Montar um roteiro reutilizável com acionamento, passos, resultado e limites.",
+              "Aplicar o mesmo roteiro a duas solicitações fictícias e observar diferenças.",
+              "Explicar por que uma instrução não concede acesso a ferramentas ou contas."
+            ],
+            "exercise": "Escreva uma skill como instrução reutilizável na conversa e teste-a em duas tarefas permitidas e uma fora de escopo.",
+            "code": "Você pode colar um roteiro no começo de uma conversa nova ou usar um recurso de instruções reutilizáveis, se a plataforma escolhida o oferecer. Não é necessário criar arquivo SKILL.md.",
+            "docs": []
+          },
+          {
+            "id": "chat-ai-evidence",
+            "title": "Pedir evidências e conferir fontes",
+            "minutes": 60,
+            "concept": "Separe o que uma fonte fornecida sustenta do que o chat acrescenta, e trate busca web como um recurso opcional da plataforma.",
+            "objectives": [
+              "Pedir que cada afirmação factual seja ligada a um trecho ou referência identificável.",
+              "Abrir a fonte citada e verificar se ela realmente sustenta a afirmação.",
+              "Conduzir o exercício por texto quando o chat escolhido não tiver busca web."
+            ],
+            "exercise": "Compare a resposta do chat com dois trechos fictícios de fonte e registre afirmações sustentadas, contraditas ou sem evidência.",
+            "code": "A busca web, o envio de arquivos e as citações variam por plataforma. Os exercícios também fornecem trechos em texto para que essas funções não sejam pré-requisito.",
+            "docs": []
+          }
+        ]
+      },
+      {
+        "id": "ai-chat-delegation",
+        "title": "Bots, agentes e avaliação prática",
+        "level": "Intermediário introdutório",
+        "number": "03",
+        "description": "Desenhe conversas, limite delegação e teste qualidade, privacidade e falhas em uma interface de chat.",
+        "resources": [
+          {
+            "kind": "doc",
+            "title": "OpenAI · Definição de agentes (EN; conceitos e SDK específicos)",
+            "url": "https://developers.openai.com/api/docs/guides/agents/define-agents",
+            "language": "EN"
+          },
+          {
+            "kind": "doc",
+            "title": "OpenAI · Orquestração e handoffs (EN; implementação específica)",
+            "url": "https://developers.openai.com/api/docs/guides/agents/orchestration",
+            "language": "EN"
+          }
+        ],
+        "lessons": [
+          {
+            "id": "chat-ai-bots",
+            "title": "Desenhar um bot de conversa com bons limites",
+            "minutes": 55,
+            "concept": "Organize intenção, perguntas de esclarecimento, resposta permitida e encaminhamento quando a regra não cobre o caso.",
+            "objectives": [
+              "Descrever o público, os assuntos atendidos e o limite de um bot fictício.",
+              "Simular caminhos para pedido conhecido, ambíguo, fora de escopo e sem evidência.",
+              "Definir quando o bot deve pedir ajuda humana em vez de inventar uma resposta."
+            ],
+            "exercise": "Peça ao chat para elaborar um roteiro de atendimento de uma biblioteca fictícia e percorra cinco mensagens de teste na mesma conversa.",
+            "code": "Todo o trabalho é em linguagem natural no chat web. Não configure chatbot, canal de atendimento, conta ou integração.",
+            "docs": []
+          },
+          {
+            "id": "chat-ai-agents",
+            "title": "Entender agentes e delegação segura",
+            "minutes": 60,
+            "concept": "Um agente pode combinar modelo, instruções, ferramentas e controle de fluxo; a interface de chat pode não expor todas essas capacidades.",
+            "objectives": [
+              "Distinguir uma conversa de chat de um agente com ferramentas ou delegação.",
+              "Pedir um plano e uma proposta de ação sem autorizar execução externa.",
+              "Identificar efeitos que exigem confirmação e autorização independentes."
+            ],
+            "exercise": "Simule uma tarefa com um agente de chat: solicite plano, dados necessários, ferramenta proposta, riscos e uma etapa de aprovação antes de qualquer efeito.",
+            "code": "Se a plataforma não tiver modo de agente ou ferramentas, faça a simulação como conversa textual. Não conecte contas, e-mail, arquivos privados ou serviços externos.",
+            "docs": []
+          },
+          {
+            "id": "chat-ai-evaluation",
+            "title": "Avaliar respostas e concluir a trilha sem código",
+            "minutes": 70,
+            "concept": "Avalie o chat com casos de teste diferentes, critérios explícitos e revisão de risco; uma resposta bem escrita não prova domínio nem confiabilidade.",
+            "objectives": [
+              "Criar cinco casos de avaliação para um bot fictício, incluindo ambiguidade e ausência de evidência.",
+              "Comparar resultados por correção, suporte, clareza, abstenção e privacidade.",
+              "Apresentar uma instrução revisada e explicar uma limitação que permanece."
+            ],
+            "exercise": "No chat escolhido, conduza a prova final: crie um bot de apoio ao estudo, aplique cinco casos, ajuste uma instrução e repita os casos afetados.",
+            "code": "A entrega é um roteiro de conversa, uma tabela curta com os cinco casos e uma explicação em suas palavras. Não há IDE, código ou integração de API.",
+            "docs": []
+          }
+        ]
+      }
+    ]
   }
 ];

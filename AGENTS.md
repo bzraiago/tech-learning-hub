@@ -138,9 +138,9 @@ Arquivos principais:
 
 Os scripts são clássicos e compartilham o mesmo escopo global, carregados na ordem declarada em `index.html`. Não troque a ordem sem conferir as dependências e não converta para módulos ES sem aprovação, pois o projeto deve continuar abrindo diretamente no navegador e sem build.
 
-Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `git-workflow`, `quality`, `delivery`.
+Trilhas existentes: `html`, `javascript`, `python`, `database`, `ai`, `ai-chat`, `git-workflow`, `quality`, `delivery`.
 
-> Os números atuais (9 trilhas, 28 módulos, 145 aulas, 600 exercícios, 459 questões, 24 projetos) foram conferidos no código em 28/10/2026. **Confira no código antes de citá-los** e atualize `contexto/ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
+> Os números atuais (10 trilhas, 31 módulos, 152 aulas, 628 exercícios, 480 questões, 24 projetos) foram conferidos no código em 28/10/2026. **Confira no código antes de citá-los** e atualize `contexto/ANALISE_TECH_LEARNING_HUB.md` e a `<meta name="description">` se mudarem.
 
 ### 5.2 Persistência e compatibilidade (cuidado máximo)
 - O curso exige login Clerk antes de mostrar o conteúdo. O progresso persistente fica somente em `public.learning_state` no Supabase, protegido por RLS e vinculado ao ID Clerk. `state` permanece em memória durante a sessão. Ao trocar de conta, a interface aguarda a leitura da nova conta antes de aceitar edição.
@@ -262,7 +262,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 1. [x] **Etapa 0** de computador, arquivos, editor e terminal, disponível antes do primeiro exercício que dependa deles.
 2. [x] **Mapa de pré-requisitos** e instruções de instalação por sistema (Python, Git, Node.js + npm, Docker/WSL, PostgreSQL, MariaDB, Firebird, MongoDB/`mongosh`), seguindo o padrão 6.2.
 3. [x] **Resultado esperado visível** separado da solução em todos os exercícios; checkpoints distintos para *li / pratiquei / revisão / resolvi sozinho*.
-   - [x] Os 600 exercícios exibem resultado esperado e critérios específicos; o validador exige critérios nas aulas revisadas.
+   - [x] Os 628 exercícios exibem resultado esperado e critérios específicos; o validador exige critérios nas aulas revisadas.
    - [x] As aulas `prep-tools`, `prep-files`, `prep-workspace`, `prep-cycle`, `prep-errors`, as quatro instalações iniciais, `setup-docker`, `setup-docker-alternative`, `setup-postgresql`, as preparações opcionais de MariaDB, Firebird e MongoDB, `db-mariadb`, `db-firebird`, `db-mongo-crud`, `db-mongo-pipelines`, `db-nosql-models`, `db-performance`, `db-security`, `db-recovery`, `db-project`, `db-modeling`, `db-normalization`, `db-ddl-constraints`, `db-ddl-crud`, `db-select`, `db-aggregation`, `db-joins`, `db-subqueries-ctes`, `db-transactions`, `db-concurrency-boundaries`, `db-docker-basics`, `db-docker-compose`, `db-docker-operations`, `db-postgres` e `db-sqlite` iniciam os critérios específicos.
    - [x] As 13 aulas HTML/CSS contêm critérios nos 52 exercícios; 14 resultados foram revisados para que previsão, investigação e comparação não mostrem a conclusão antes da tentativa.
    - [x] As 14 aulas JavaScript contêm critérios nos 56 exercícios; 22 resultados foram revisados para preservar a previsão, investigação e diagnóstico antes da conclusão.
@@ -316,6 +316,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 14. [x] Glossário contextual no ponto de uso, renderizado por `readerTerms()` nas seções que apresentam termos novos.
 15. [ ] Laboratório de leitura de projeto alheio (achar ponto de entrada e corrigir um defeito).
 16. [ ] Ponte da IA simulada para IA conectada a um modelo real, com avaliações distintas.
+17. [x] Trilha opcional de IA em chat web, do básico ao intermediário introdutório, com práticas independentes de IDE, código, API e fornecedor.
    - [x] Classificar as 18 aulas e seis projetos de IA como simulação ou atividade mista, mostrar o aviso na interface e exigir cobertura pelo validador; `ai-mcp` identifica separadamente a referência de SDK real não executada.
 
 ---

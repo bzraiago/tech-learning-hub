@@ -144,7 +144,10 @@ for (const guideId of guideIds) {
 
 const aiTrack = tracks.find((track) => track.id === 'ai');
 const aiLessons = (aiTrack?.modules || []).flatMap((module) => module.lessons || []);
-const supportedExecutionModes = new Set(['simulated', 'mixed', 'real']);
+const chatTrack = tracks.find((track) => track.id === 'ai-chat');
+const chatLessons = (chatTrack?.modules || []).flatMap((module) => module.lessons || []);
+const chatLessonIds = ['chat-ai-first-prompts', 'chat-ai-tutor', 'chat-ai-skills', 'chat-ai-evidence', 'chat-ai-bots', 'chat-ai-agents', 'chat-ai-evaluation'];
+const supportedExecutionModes = new Set(['simulated', 'mixed', 'real', 'external']);
 function validateExecutionLabel(execution, itemId, itemType) {
   if (!execution || !supportedExecutionModes.has(execution.mode) || !execution.label?.trim() || !execution.detail?.trim()) {
     fail(`${itemType} de IA sem classificação de execução válida: ${itemId}`);
@@ -155,6 +158,23 @@ if (!aiTrack) fail('Trilha de IA ausente; não foi possível verificar suas moda
 for (const lesson of aiLessons) validateExecutionLabel(LESSON_GUIDES[lesson.id]?.execution, lesson.id, 'Aula');
 for (const project of PROJECTS.filter((item) => item.kind === 'ai')) {
   validateExecutionLabel(project.execution, project.id, 'Projeto');
+}
+if (!chatTrack) fail('Trilha de prática em chat web ausente.');
+if (chatLessons.length !== chatLessonIds.length || chatLessonIds.some((id) => !chatLessons.some((lesson) => lesson.id === id))) {
+  fail(`A trilha de chat web precisa conter exatamente as aulas: ${chatLessonIds.join(', ')}`);
+}
+for (const lesson of chatLessons) {
+  const guide = LESSON_GUIDES[lesson.id];
+  validateExecutionLabel(guide?.execution, lesson.id, 'Aula de chat web');
+  if (guide?.execution?.mode !== 'external') fail(`Aula ${lesson.id} precisa indicar prática externa em um chat web.`);
+  if (guide?.example?.language !== 'text') fail(`Aula ${lesson.id} precisa apresentar um exemplo de conversa em texto, sem código.`);
+  const prompts = (guide?.exercises || []).map((exercise) => exercise.prompt || '');
+  for (const kind of ['Prever:', 'Alterar:', 'Construir:', 'Investigar erro:']) {
+    if (!prompts.some((prompt) => prompt.startsWith(kind))) fail(`Aula ${lesson.id} sem etapa ${kind}`);
+  }
+  for (const [index, exercise] of (guide?.exercises || []).entries()) {
+    if (!exercise.criteria?.length) fail(`Exercício de chat sem critérios de aceite: ${lesson.id}:${index}`);
+  }
 }
 
 for (const lesson of lessons) {

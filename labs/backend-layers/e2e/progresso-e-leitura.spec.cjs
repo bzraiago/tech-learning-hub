@@ -95,6 +95,20 @@ test('sumário, portabilidade e retomada de leitura ficam isolados por conta', a
   // A CI não depende do CDN Tailwind; este trecho fornece só o layout rolável do diálogo.
   await page.addStyleTag({ content: '#study-dialog>div{display:flex;flex-direction:column;max-height:calc(100dvh - 42px)}#dialog-body{flex:1;min-height:0;overflow-y:auto}#lesson-sections.hidden{display:none}' });
 
+  await page.evaluate(() => openLesson('chat-ai-skills'));
+  await expect(page.locator('.execution-mode')).toContainText('Prática em plataforma web de chat com IA');
+  await page.evaluate(() => renderLessonSection('example'));
+  await expect(page.locator('#dialog-body')).toContainText('Mensagem de exemplo para usar no chat');
+  expect(await page.locator('#dialog-body code').count()).toBe(0);
+  await page.evaluate(() => renderLessonSection('practice'));
+  await expect(page.locator('#dialog-body')).toContainText('Faça as quatro etapas diretamente no chat web escolhido');
+  await expect(page.locator('#exercise-note-0')).toHaveAttribute('placeholder', /resposta observada/);
+  await expect(page.locator('#dialog-body')).not.toContainText('Rode cada exemplo no ambiente indicado');
+  const dimensoesChat = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }));
+  expect(dimensoesChat.document).toBeLessThanOrEqual(dimensoesChat.viewport);
+  await page.locator('#exercise-note-0').focus();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#dialog-body details summary').first()).toBeFocused();
   const lessonId = 'delivery-api-abuse';
   await page.evaluate(id => openLesson(id), lessonId);
   const sumario = page.locator('.reader-toc a[data-reading-target]');

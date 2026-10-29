@@ -11,7 +11,8 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 
 ## Carregamento e navegação
 
-- [ ] A página inicial mostra 9 trilhas e 145 aulas no total.
+- [ ] A página inicial mostra 10 trilhas e 152 aulas no total.
+- [ ] Em “IA no chat”, abrir exemplo e prática: atividade indicada para interface web, sem bloco de código ou instrução de IDE; observações podem ser percorridas por teclado em largura móvel.
 - [ ] A trilha ativa, os módulos e os cards de progresso aparecem corretamente.
 - [ ] Busca encontra uma aula de outra trilha e permite limpar o resultado.
 - [ ] Filtros “Todas”, “Pendentes” e “Concluídas” atualizam a listagem.
