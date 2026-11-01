@@ -22,6 +22,8 @@ O objetivo é tentar seguir **uma aula específica na ordem em que aparece** e i
 
 Quando a aula pedir para abrir ou criar um arquivo, confira se ela ensina o percurso pela interface: abrir o aplicativo editor, abrir/selecionar a pasta, localizar ou criar o arquivo com nome e extensão corretos, abrir a área de edição, salvar e reconhecer o estado salvo. “Abra o arquivo no editor” sem dizer onde clicar é uma lacuna para este perfil.
 
+Confira também que a aula separa visualmente o conteúdo que vai **dentro do arquivo** dos comandos que vão **no terminal**. Se uma mensagem `SyntaxError` apontar uma linha parecida com `python arquivo.py` ou `py arquivo.py`, registre como hipótese a troca entre esses dois lugares e peça para conferir o conteúdo salvo antes de sugerir instalação ou comandos adicionais.
+
 ## Ações e segurança
 
 - Só execute comandos locais quando o ambiente corresponder ao sistema e à ferramenta da aula e a ação for segura, reversível e isolada em pasta descartável.
