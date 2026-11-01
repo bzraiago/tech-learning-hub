@@ -2,8 +2,22 @@
 
 Object.assign(LESSON_GUIDES, {
   'setup-postgresql': {
-    prerequisites: 'Conclua setup-docker e db-docker-compose para o caminho principal. O serviço db deve estar healthy e usar a configuração do curso: PostgreSQL 17, usuário aluno, banco estudos e porta 127.0.0.1:55432. Se Docker não estiver disponível, conclua setup-docker-alternative e mantenha esta preparação como pendência antes do projeto intermediário.',
-    setup: 'Objetivo: disponibilizar um cliente PostgreSQL e comprovar uma conexão explícita ao laboratório. Requisitos: serviço PostgreSQL em execução, parâmetros de conexão, senha local e permissão para instalar um cliente quando necessário. Windows: o instalador oficial do PostgreSQL pode incluir psql e pgAdmin; se instalar somente o cliente, confirme onde o executável foi colocado e abra um terminal novo. macOS: escolha o pacote ou instalador indicado na página oficial para sua arquitetura e confirme psql no terminal. Linux: use o repositório indicado para sua distribuição e instale o cliente PostgreSQL; servidor local não é necessário quando o banco roda no Docker. Verificação: execute psql --version e conecte com psql -h 127.0.0.1 -p 55432 -U aluno -d estudos -W. Resultado esperado: o prompt pede a senha e depois mostra estudos=>; SELECT current_database(), current_user; retorna estudos e aluno. Problema comum: usar a porta 5432 no computador, embora o laboratório publique 55432; confira docker compose ps antes de culpar a senha. Como parar e retomar: saia do psql com \\q e pare o laboratório com docker compose stop; na retomada, execute docker compose start, aguarde healthy e reconecte. Alternativa leve: use psql dentro do container com docker compose exec db psql -U aluno -d estudos; isso verifica o banco, mas não comprova um cliente externo nem a porta publicada.',
+    prerequisites: 'Esta preparação depende de Preparar Docker, WSL e virtualização e da aula Compose: portas, volumes e conexão ao PostgreSQL. Como a aula Compose aparece mais adiante em Banco de Dados, pule esta preparação por enquanto e retorne depois de concluí-la. O serviço precisa estar healthy e usar PostgreSQL 17, usuário aluno, banco estudos e porta 127.0.0.1:55432. Se Docker não estiver disponível, use Seguir sem Docker em computador limitado para praticar SQLite e deixe esta conexão PostgreSQL pendente.',
+    setup: [
+      'Objetivo: instalar ou localizar o cliente psql e conectar ao servidor PostgreSQL do laboratório.',
+      'Requisitos: conclua Preparar Docker, WSL e virtualização e Compose: portas, volumes e conexão ao PostgreSQL; o serviço db precisa mostrar healthy. Não instale um segundo servidor PostgreSQL para esta aula.',
+      'Pasta do Compose: os comandos docker compose são executados no PowerShell/Terminal cuja pasta contém compose.yaml. No VS Code, abra essa pasta e escolha Terminal > Novo Terminal. psql --version e a conexão do cliente podem ser executados em qualquer pasta do terminal.',
+      'Windows: no PowerShell, instale o cliente psql pelo instalador oficial. Se houver seleção de componentes, inclua ferramentas de linha de comando. Abra um PowerShell novo e execute psql --version. pgAdmin é opcional.',
+      'macOS: no Terminal, instale o cliente pelo pacote oficial compatível com o processador. Abra um Terminal novo e execute psql --version. O servidor permanece no Compose do curso.',
+      'Linux: no Terminal, selecione sua distribuição na página oficial e instale somente o cliente PostgreSQL. Não instale outro servidor se o Compose do curso já fornece o servidor. Execute psql --version.',
+      'Verificação: na pasta que contém compose.yaml, execute docker compose ps e docker compose port db 5432. db precisa estar healthy e a porta publicada deve ser 127.0.0.1:55432. Depois conecte pelo cliente externo.',
+      'Conectar — PowerShell/Terminal: execute psql -h 127.0.0.1 -p 55432 -U aluno -d estudos -W. Digite a senha local apenas no pedido de senha; não a inclua no comando.',
+      'Dentro do psql: só depois que aparecer estudos=> execute SELECT current_database(), current_user; e \\conninfo. Use \\q para sair do psql e voltar ao PowerShell/Terminal.',
+      'Resultado esperado: psql --version mostra a versão do cliente; a conexão pede senha e abre estudos=>; a consulta retorna estudos e aluno; \\conninfo indica 127.0.0.1 e porta 55432.',
+      'Problema comum: Connection refused indica que serviço/porta não responderam; password authentication failed indica falha de autenticação; psql não reconhecido indica cliente ou PATH. Confira mensagem e destino antes de alterar a senha.',
+      'Como parar e retomar: no prompt estudos=> digite \\q. Na pasta de compose.yaml, pare com docker compose stop; para retomar, execute docker compose start, aguarde db healthy e conecte novamente.',
+      'Alternativa leve: sem instalar psql no computador, abra PowerShell/Terminal na pasta de compose.yaml e execute docker compose exec db psql -U aluno -d estudos. Isso verifica o servidor pelo próprio container, mas não comprova que psql externo ou a porta publicada funcionem.'
+    ].join('\n'),
     why: 'PostgreSQL é o servidor; psql e pgAdmin são clientes. Uma conexão só é reproduzível quando informa de onde parte, host, porta, banco e usuário. Tornar esses parâmetros explícitos evita alcançar outra instalação por acidente.',
     sections: [
       {
@@ -32,6 +46,13 @@ Object.assign(LESSON_GUIDES, {
     example: {
       language: 'Terminal e prompt psql',
       code: 'psql --version\npsql -h 127.0.0.1 -p 55432 -U aluno -d estudos -W\n\n-- Depois que aparecer estudos=>\nSELECT current_database(), current_user;\n\\conninfo\n\\q',
+      blocks: [
+        { label: 'PowerShell/Terminal — pasta que contém compose.yaml', code: 'docker compose ps\ndocker compose port db 5432' },
+        { label: 'PowerShell/Terminal — confira o cliente e conecte', code: 'psql --version\npsql -h 127.0.0.1 -p 55432 -U aluno -d estudos -W' },
+        { label: 'Prompt psql — somente depois de aparecer estudos=>', code: 'SELECT current_database(), current_user;\n\\conninfo\n\\q' },
+        { label: 'Alternativa sem psql instalado — PowerShell/Terminal na pasta do Compose', code: 'docker compose exec db psql -U aluno -d estudos' },
+        { label: 'Prompt psql da alternativa — depois de aparecer estudos=>', code: 'SELECT current_database(), current_user;\n\\q' }
+      ],
       explanation: [
         'Execute psql no terminal; execute SELECT e comandos com barra somente depois de entrar no prompt psql.',
         'A senha é digitada no prompt e não aparece no comando.',
@@ -40,9 +61,9 @@ Object.assign(LESSON_GUIDES, {
       expected: 'psql mostra sua versão; a conexão abre estudos=>; a consulta retorna estudos e aluno; \\conninfo informa host 127.0.0.1 e porta 55432.'
     },
     guided: [
-      { instruction: 'Na pasta do compose.yaml, execute docker compose ps e docker compose port db 5432.', result: 'Serviço db healthy e publicação equivalente a 127.0.0.1:55432.' },
-      { instruction: 'Em terminal novo, execute psql --version e depois a conexão com todos os parâmetros.', result: 'Cliente encontrado e prompt estudos=> aberto após a senha local.' },
-      { instruction: 'Execute SELECT current_database(), current_user; e \\conninfo; registre a saída sem senha.', result: 'Banco, usuário, host e porta confirmados por evidência real.' }
+      { instruction: 'No VS Code, abra a pasta que contém compose.yaml e escolha Terminal > Novo Terminal. Execute docker compose ps e docker compose port db 5432 no PowerShell/Terminal.', result: 'O serviço db aparece healthy e a porta publicada é 127.0.0.1:55432.' },
+      { instruction: 'Em PowerShell/Terminal, de qualquer pasta, execute psql --version e depois a conexão. Digite a senha somente quando o cliente pedir.', result: 'A versão do cliente aparece e a conexão abre o prompt estudos=>.' },
+      { instruction: 'Somente dentro do prompt estudos=>, execute SELECT current_database(), current_user; e \\conninfo. Registre a saída sem senha e digite \\q para voltar ao terminal.', result: 'Banco, usuário, host e porta confirmados por evidência real.' }
     ],
     exercises: [
       { prompt: 'Prever: um psql instalado no computador tenta 127.0.0.1:5432, mas o Compose publica 55432. O que pode acontecer?', hints: ['A porta padrão pode estar vazia ou pertencer a outro servidor.'], solution: 'A conexão pode ser recusada ou atingir outra instalação local. Use 127.0.0.1:55432 e confirme o destino com \\conninfo.', explanation: 'Uma conexão bem-sucedida na porta errada ainda pode produzir evidência inválida.', expected: 'A previsão relaciona a porta escolhida ao destino e propõe como conferir o que ocorreu.', criteria: ['Explica por que o resultado depende do serviço disponível na porta solicitada.', 'Indica uma conferência do destino real antes de considerar a conexão validada.'] },

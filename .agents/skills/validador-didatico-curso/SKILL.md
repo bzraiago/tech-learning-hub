@@ -72,6 +72,22 @@ Para cada aula/módulo do escopo, verifique:
 #### C. Instalação e ambiente
 Para cada ferramenta nova, confira o padrão: **objetivo → requisitos → passos por sistema (Windows/macOS/Linux) → verificação com saída esperada → problemas comuns → parar e retomar → alternativa leve**. Anote o que falta. Marque "não executado" se você não rodou os comandos.
 
+#### C.1. Execução sem lacunas para quem começa do zero
+Revise cada preparação e exercício como alguém que ainda não sabe onde comandos são digitados. Para toda ação executável, confirme e escreva de forma explícita:
+
+- **Aplicativo:** editor, Explorador de Arquivos, PowerShell, Prompt de Comando, Terminal, cliente SQL, prompt interativo do banco ou interface web. Não use apenas "no terminal" quando houver mais de um contexto possível.
+- **Pasta e arquivo:** qual pasta abrir, como confirmar que é a pasta certa, qual arquivo criar/abrir e com que nome salvá-lo. Explique onde um banco/arquivo local será criado.
+- **Sistema e shell:** separe Windows (diga PowerShell ou Prompt de Comando), macOS (Terminal) e Linux (Terminal) em blocos ou parágrafos distintos. Não misture sintaxe de shells diferentes no mesmo bloco sem rotular cada trecho. Se o aluno elegeu um sistema, coloque primeiro o caminho correspondente e mantenha os outros como alternativas identificadas.
+- **Transição de prompt:** em sequências como `psql`, `mariadb`, `mongosh` ou `isql`, mostre primeiro o comando executado no shell e depois a linha indicativa que aparece ao conectar (por exemplo, `estudos=>` ou `SQL>`). Identifique quais comandos pertencem ao prompt do banco e como voltar ao shell (`\\q`, `exit`, `QUIT;`, conforme a ferramenta).
+- **Execução completa:** mostre o comando que roda o arquivo ou a consulta no contexto correto. Um bloco que contém SQL puro não ensina como executá-lo por uma API Python; um comando com marcador `?` precisa mostrar também como o valor é vinculado. Não deixe o aluno deduzir como sair do editor e executar o arquivo.
+- **Evidência:** informe a saída ou estado esperado antes da solução, como conferir o resultado e que mensagem/estado observar em caso de erro. Diga como parar e retomar sem apagar dados do laboratório.
+- **Pré-requisitos acessíveis:** escreva nomes que o aluno vê na interface e indique a ordem real. Evite referências como "conclua `setup-python`"; prefira "conclua *Instalar e verificar Python 3*". Se a dependência estiver numa aula posterior, diga para pular essa preparação por enquanto e retornar antes da atividade dependente.
+- **Fontes complementares:** instrução oficial pode aprofundar ou confirmar o passo, mas não deve ser a única explicação de uma ação obrigatória. Ao indicar instalador, diga o que selecionar e como confirmar a instalação sem exigir que o aluno adivinhe a página ou componente correto.
+
+Faça uma tentativa mental na ordem exibida: parta do estado inicial declarado, siga somente as instruções que já apareceram e tente produzir a primeira saída. Se for preciso inventar um caminho, nome de arquivo, comando, troca de prompt, valor de parâmetro ou interpretação da saída, registre um **bloqueio** e recomende a menor correção concreta. Um exercício só está pronto quando o enunciado deixa claro onde agir e o aluno consegue iniciar sem abrir a solução.
+
+Para aulas com vários sistemas de banco, dê atenção extra à fronteira entre comandos do sistema e comandos SQL/NoSQL. Evite copiar um bloco misto que o aluno possa colar no PowerShell inteiro quando parte dele só funciona depois da conexão. Separe os blocos pelo contexto e inclua uma transição visível entre eles.
+
 #### D. Fontes e referências
 Para cada fonte do escopo:
 1. **Verifique de fato** (busca na web / abertura da URL). Registre: responde? mudou de endereço? conteúdo ainda condiz?

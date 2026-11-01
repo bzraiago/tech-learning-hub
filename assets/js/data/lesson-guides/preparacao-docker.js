@@ -3,7 +3,7 @@
 Object.assign(LESSON_GUIDES, {
   'setup-docker': {
     prerequisites: 'Conclua prep-workspace, prep-cycle e prep-errors. No Windows, saiba abrir o PowerShell como usuário comum e, somente quando a documentação solicitar, como administrador. Não execute esta instalação em computador corporativo sem autorização.',
-    setup: 'Objetivo: verificar requisitos e disponibilizar Docker Engine e Compose. Requisitos: sistema compatível, virtualização disponível, espaço em disco, internet e permissão de instalação. Windows: confira wsl --status e wsl --version; se WSL não estiver instalado, siga a documentação Microsoft, reinicie quando solicitado e instale Docker Desktop com backend WSL 2. macOS: identifique Apple silicon ou Intel e use o instalador oficial correspondente. Linux: escolha sua distribuição na documentação oficial do Docker Engine e não misture comandos de Ubuntu, Debian, Fedora ou outras famílias. Verificação: em terminal novo execute docker version, docker compose version e docker run --rm hello-world. Resultado esperado: docker version mostra Client e Server, Compose mostra uma versão e hello-world termina com mensagem de sucesso. Problema comum: o cliente existe, mas não alcança o Engine; inicie Docker Desktop ou o serviço antes de alterar PATH ou permissões. Como parar e retomar: encerre containers de laboratório, feche Docker Desktop quando não precisar dele e, na retomada, repita docker version. Alternativa leve: conclua setup-docker-alternative e use SQLite até ter um computador compatível.',
+    setup: 'Objetivo: verificar requisitos e disponibilizar Docker Engine e Compose. Requisitos: sistema compatível, virtualização disponível, espaço em disco, internet e permissão de instalação. Windows: confira wsl --status e wsl --version; se WSL não estiver instalado, siga a documentação Microsoft, reinicie quando solicitado e instale Docker Desktop com backend WSL 2. macOS: identifique Apple silicon ou Intel e use o instalador oficial correspondente. Linux: escolha sua distribuição na documentação oficial do Docker Engine e não misture comandos de Ubuntu, Debian, Fedora ou outras famílias. Verificação: em terminal novo execute docker version, docker compose version e docker run --rm hello-world. Resultado esperado: docker version mostra Client e Server, Compose mostra uma versão e hello-world termina com mensagem de sucesso. Problema comum: o cliente existe, mas não alcança o Engine; inicie Docker Desktop ou o serviço antes de alterar PATH ou permissões. Como parar e retomar: encerre containers de laboratório, feche Docker Desktop quando não precisar dele e, na retomada, repita docker version. Alternativa leve: faça a aula Seguir sem Docker em computador limitado e use SQLite até ter um computador compatível.',
     why: 'Docker permite reproduzir serviços locais com configuração declarada, mas depende de recursos do sistema operacional. Separar requisito, cliente, Engine e Compose evita reinstalar tudo quando somente uma camada falha.',
     sections: [
       {
@@ -26,7 +26,7 @@ Object.assign(LESSON_GUIDES, {
         paragraphs: [
           'Somente quando Client e Server responderem, execute docker run --rm hello-world. A primeira execução pode baixar uma imagem. O container imprime uma mensagem e é removido ao terminar por causa de --rm.',
           'Use docker ps para conferir containers em execução e docker ps -a para incluir os parados. O teste hello-world não prova conhecimento de volumes, redes ou bancos; ele comprova apenas que o caminho básico funciona.',
-          'Para retomar, inicie Docker Desktop ou o serviço e repita docker version. As aulas db-docker-basics, db-docker-compose e db-docker-operations ensinam o laboratório de banco depois desta preparação.'
+          'Para retomar, inicie Docker Desktop ou o serviço e repita docker version. As aulas de fundamentos, Compose e operação local no módulo Banco de Dados ensinam o laboratório depois desta preparação.'
         ]
       }
     ],
@@ -73,58 +73,85 @@ Object.assign(LESSON_GUIDES, {
   },
 
   'setup-docker-alternative': {
-    prerequisites: 'Conclua setup-python ou tenha Python 3 funcional. Leia setup-docker e use esta alternativa se a instalação estiver bloqueada por hardware, sistema, política administrativa, espaço ou tempo.',
-    setup: 'Objetivo: continuar praticando SQL localmente sem Docker, sem fingir que SQLite substitui PostgreSQL. Requisitos: Python 3 e uma pasta vazia chamada alternativa-sqlite. Windows: abra essa pasta no editor e um PowerShell nela; use py ou python conforme a preparação Python. macOS: abra a pasta e um terminal nela; use python3 ou o comando já verificado. Linux: abra a pasta e um terminal nela; use python3 ou o comando já verificado. Verificação: execute o comando curto que imprime sqlite3.sqlite_version. Resultado esperado: um número de versão do SQLite, sem instalar servidor. Problema comum: executar o comando Python errado; volte a setup-python e use o comando já verificado. Como parar e retomar: feche o terminal e preserve estudos.db; na retomada, abra a mesma pasta e consulte o arquivo. Alternativa leve: se nem Python estiver disponível, pratique consultas no ambiente interativo SQLite oficial apenas como exercício temporário e registre que o arquivo local não foi produzido.',
+    prerequisites: 'Antes, conclua a aula Instalar e verificar Python 3. Se Docker está indisponível, leia Preparar Docker, WSL e virtualização para registrar o motivo. Esta é uma rota alternativa de estudo; SQLite não substitui a prática de PostgreSQL com Docker.',
+    setup: [
+      'Objetivo: executar uma pequena prática SQLite em um arquivo Python, sem iniciar servidor ou instalar Docker.',
+      'Requisitos: Python 3 funcionando, editor de texto/código e permissão para criar arquivos numa pasta sua.',
+      'Pasta: no editor, crie ou abra a pasta alternativa-sqlite. No VS Code, use Arquivo > Abrir Pasta e depois Terminal > Novo Terminal. Confirme que o caminho exibido termina em alternativa-sqlite; não precisa digitar comandos SQL no terminal.',
+      'Windows: no PowerShell integrado ao editor, aberto dentro da pasta alternativa-sqlite, use o comando py.',
+      'macOS: no Terminal aberto dentro da pasta alternativa-sqlite, use o comando python3.',
+      'Linux: no Terminal aberto dentro da pasta alternativa-sqlite, use o comando python3.',
+      'Arquivo: no editor, crie sqlite_alternativa.py dentro de alternativa-sqlite e digite/salve o exemplo da próxima etapa nesse arquivo.',
+      'Executar no Windows — PowerShell: com o terminal na pasta alternativa-sqlite, rode py --version e depois py sqlite_alternativa.py.',
+      'Executar no macOS/Linux — Terminal: com o terminal na pasta alternativa-sqlite, rode python3 --version e depois python3 sqlite_alternativa.py.',
+      'Verificação: no PowerShell, rode Get-Location; no macOS/Linux, rode pwd. Depois confira a versão do Python e execute o arquivo conforme o sistema.',
+      'Resultado esperado: a versão do Python aparece; o programa informa a versão SQLite e Registros de marcador: 1 na primeira execução. O arquivo estudos.db aparece ao lado de sqlite_alternativa.py; ao executar novamente, a contagem aumenta para 2.',
+      'Problema comum: comando não reconhecido — confira a pasta e use o mesmo comando (`py` ou `python3`) que funcionou na aula Instalar e verificar Python 3. Se o arquivo não for encontrado, confirme o caminho com Get-Location no PowerShell ou pwd no macOS/Linux.',
+      'Se o erro disser No module named sqlite3: confira a versão e o interpretador. Não instale um pacote chamado sqlite3 por pip; retorne à aula Instalar e verificar Python 3 e consulte a documentação da distribuição do Python.',
+      'Como parar e retomar: o programa encerra sozinho. Feche o terminal se quiser; não apague estudos.db. Para retomar, abra novamente a mesma pasta e execute o mesmo arquivo.',
+      'Alternativa leve: se Python ainda não estiver disponível, não marque a prática local como concluída. Um playground de SQL no navegador pode servir para observar sintaxe, mas não executa este arquivo Python, não testa parâmetros pela API sqlite3 e não cria estudos.db no computador.'
+    ].join('\n'),
     why: 'SQLite permite praticar tabelas, inserções e consultas sem serviço em segundo plano. Ele reduz o bloqueio de hardware, mas não ensina Compose, rede, volumes, usuários do servidor ou diferenças específicas do PostgreSQL.',
     sections: [
       {
         title: 'Decida sem esconder a limitação',
         paragraphs: [
           'Use esta rota quando Docker não puder ser instalado agora, e não somente para evitar investigar um erro simples. Registre o motivo: requisito do sistema, política administrativa, espaço, memória ou tempo de download.',
-          'Marque separadamente: SQL executado em SQLite; Docker não executado; PostgreSQL não executado. Essa honestidade permite avançar no conteúdo comum e voltar depois às competências pendentes.'
+          'Marque separadamente: SQL executado em SQLite; Docker não executado; PostgreSQL não executado. Essa honestidade permite estudar os conceitos comuns e voltar depois às competências pendentes.'
         ]
       },
       {
-        title: 'Pratique o núcleo compartilhado',
+        title: 'Entenda arquivo, código e comandos',
         paragraphs: [
-          'O módulo sqlite3 faz parte da biblioteca padrão do Python. Uma conexão com estudos.db cria ou abre um arquivo local. CREATE TABLE, INSERT e SELECT fornecem prática inicial observável.',
-          'Use parâmetros para valores em vez de concatenar texto em SQL. Feche a conexão ao terminar e mantenha o arquivo na pasta do laboratório.'
+          'O exemplo é digitado no editor e salvo como sqlite_alternativa.py. Só depois você volta ao PowerShell/Terminal para executar o arquivo. O dashboard não executa esse código; ele apenas mostra o exemplo e guarda suas observações.',
+          'Quando o programa chama sqlite3.connect("estudos.db"), Python cria ou abre o arquivo na pasta em que o terminal está. Por isso, confirme a pasta antes de executar.',
+          'Dentro do arquivo, connection.execute(...) envia uma instrução SQL ao SQLite. O marcador ? recebe o valor separado em uma tupla, como ("alternativa local",). Isso evita juntar texto do aluno ao SQL.'
         ]
       },
       {
         title: 'Liste o que continua pendente',
         paragraphs: [
           'A alternativa não cobre imagem, container, Compose, porta 55432, volume nomeado, healthcheck, cliente-servidor, usuário PostgreSQL, pg_dump ou pg_restore.',
-          'Antes do projeto intermediário, retome setup-docker e depois as três aulas db-docker. O projeto com PostgreSQL real continua bloqueado até essas evidências existirem.'
+          'Antes do projeto intermediário, conclua Preparar Docker, WSL e virtualização e depois Compose: portas, volumes e conexão ao PostgreSQL. O projeto com PostgreSQL real continua pendente até essas evidências existirem.'
         ]
       }
     ],
     example: {
       language: 'Terminal · na pasta alternativa-sqlite',
-      code: 'python -c "import sqlite3; print(sqlite3.sqlite_version)"\npython -c "import sqlite3; c=sqlite3.connect(\'estudos.db\'); c.execute(\'create table if not exists marcador(texto)\'); c.execute(\'insert into marcador values (?)\', (\'alternativa local\',)); c.commit(); print(c.execute(\'select count(*) from marcador\').fetchone()[0]); c.close()"',
-      explanation: [
-        'Troque python por py ou python3 se esse foi o comando verificado no seu sistema.',
-        'A primeira linha confirma a biblioteca; a segunda cria o arquivo, grava e consulta.',
-        'O número cresce se o comando de inserção for repetido; isso demonstra persistência no arquivo local.'
+      code: 'import sqlite3\n\nprint("SQLite:", sqlite3.sqlite_version)\nconnection = sqlite3.connect("estudos.db")\nconnection.execute("CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)")\nconnection.execute("INSERT INTO marcador (texto) VALUES (?)", ("alternativa local",))\nconnection.commit()\ntotal = connection.execute("SELECT COUNT(*) FROM marcador").fetchone()[0]\nprint("Registros de marcador:", total)\nconnection.close()',
+      blocks: [
+        { label: 'Windows — PowerShell na pasta alternativa-sqlite', code: 'Get-Location\npy --version' },
+        { label: 'macOS — Terminal na pasta alternativa-sqlite', code: 'pwd\npython3 --version' },
+        { label: 'Linux — Terminal na pasta alternativa-sqlite', code: 'pwd\npython3 --version' },
+        { label: 'Editor — arquivo sqlite_alternativa.py dentro da pasta alternativa-sqlite', code: 'import sqlite3\n\nprint("SQLite:", sqlite3.sqlite_version)\nconnection = sqlite3.connect("estudos.db")\nconnection.execute("CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)")\nconnection.execute("INSERT INTO marcador (texto) VALUES (?)", ("alternativa local",))\nconnection.commit()\ntotal = connection.execute("SELECT COUNT(*) FROM marcador").fetchone()[0]\nprint("Registros de marcador:", total)\nconnection.close()' },
+        { label: 'Windows — PowerShell, ainda na pasta alternativa-sqlite', code: 'py sqlite_alternativa.py' },
+        { label: 'macOS/Linux — Terminal, ainda na pasta alternativa-sqlite', code: 'python3 sqlite_alternativa.py' }
       ],
-      expected: 'Primeiro comando imprime a versão do SQLite; o segundo imprime uma contagem maior ou igual a 1; estudos.db aparece na pasta.'
+      explanation: [
+        'Get-Location ou pwd confirma em qual pasta o terminal está. A versão mostra o interpretador; use só o comando que funcionou no seu sistema.',
+        'O editor guarda o código em sqlite_alternativa.py. Não digite as linhas Python diretamente no PowerShell, no Terminal ou num prompt SQL.',
+        'sqlite3.connect cria ou abre estudos.db na pasta atual. CREATE TABLE prepara a tabela; INSERT grava uma linha; commit confirma a gravação no arquivo.',
+        'O SQL usa ?. O valor correspondente é o segundo argumento de execute, numa tupla de um elemento: ("alternativa local",).',
+        'SELECT COUNT(*) consulta quantas linhas existem. Na segunda execução a contagem aumenta porque INSERT é executado novamente.'
+      ],
+      expected: 'Na primeira execução, o terminal mostra uma versão de SQLite e Registros de marcador: 1. O arquivo estudos.db fica na mesma pasta de sqlite_alternativa.py; na segunda execução a contagem passa a 2.'
     },
     guided: [
-      { instruction: 'Crie e abra a pasta alternativa-sqlite; confirme o comando Python 3.', result: 'Terminal está na pasta correta e Python responde.' },
-      { instruction: 'Execute a verificação de sqlite3 e depois o exemplo que cria estudos.db.', result: 'Versão, contagem e arquivo local observáveis.' },
-      { instruction: 'Crie pendencias-docker.md e liste as competências não praticadas.', result: 'Documento distingue execução real de conteúdo adiado.' }
+      { instruction: 'No editor, crie/abra alternativa-sqlite e use o menu Terminal > Novo Terminal. Confira o caminho com Get-Location (PowerShell) ou pwd (macOS/Linux); depois rode py --version no Windows ou python3 --version no macOS/Linux.', result: 'O caminho termina em alternativa-sqlite e a versão do interpretador aparece.' },
+      { instruction: 'No editor, crie sqlite_alternativa.py dentro dessa pasta e digite o exemplo. Salve antes de voltar ao terminal.', result: 'O arquivo aparece dentro de alternativa-sqlite e contém o script salvo.' },
+      { instruction: 'No terminal da mesma pasta, execute py sqlite_alternativa.py no Windows ou python3 sqlite_alternativa.py no macOS/Linux. Confira a mensagem e localize estudos.db no editor/Explorador de Arquivos.', result: 'O programa termina sem erro, imprime a contagem esperada e cria o arquivo de banco ao lado do script.' }
     ],
     exercises: [
-      { prompt: 'Prever: o que muda na segunda execução do comando que insere o marcador?', hints: ['A tabela é criada apenas se não existir.', 'O INSERT acontece em toda execução.'], solution: 'A contagem aumenta em 1 porque o arquivo persiste e uma nova linha é inserida.', explanation: 'A persistência é do arquivo SQLite, não de volume Docker.', expected: 'A previsão compara as duas execuções e pode ser conferida repetindo o comando na mesma pasta.', criteria: ['Registra a contagem prevista antes da segunda execução e justifica o raciocínio.', 'Mantém o mesmo arquivo de banco e compara a previsão com a contagem observada.'] },
-      { prompt: 'Alterar: adicione uma coluna concluido inteira com padrão 0 em uma nova tabela tarefas e insira uma tarefa por parâmetro.', hints: ['Crie outra tabela para não depender do estado do exemplo.', 'Valores entram pelos marcadores ?.'], solution: "create table if not exists tarefas(titulo text not null, concluido integer not null default 0); insert into tarefas(titulo) values (?)", explanation: 'O exercício pratica estrutura e parâmetro sem depender de servidor.', expected: 'Consulta mostra título e concluido igual a 0.', criteria: ['Cria tarefas com a coluna inteira concluido e o valor padrão solicitado.', 'Insere o título por parâmetro, sem concatená-lo ao SQL, e consulta os dois campos.', 'Omite concluido na inserção para conferir o valor padrão na consulta.'] },
-      { prompt: 'Construir: crie um relatório com uma consulta executada e duas competências que continuam pendentes.', hints: ['Não marque Docker como praticado.', 'Escolha itens observáveis, como Compose e porta.'], solution: 'Executado: SQLite local, CREATE/INSERT/SELECT e persistência em estudos.db. Pendente: subir PostgreSQL com Compose; conectar em 127.0.0.1:55432; validar volume e backup.', explanation: 'O relatório impede que a alternativa infle o nível comprovado.', expected: 'Separa explicitamente executado e pendente.', criteria: ['Inclui uma consulta realmente executada e o resultado observado no SQLite.', 'Identifica duas competências distintas ainda sem evidência de execução.', 'Explica o que precisará executar ao retomar o caminho Docker/PostgreSQL.'] },
-      { prompt: 'Investigar erro: o comando informa No module named sqlite3. Como agir?', hints: ['sqlite3 normalmente acompanha Python.', 'Confirme qual interpretador executou o comando.'], solution: 'Repetir a verificação de setup-python, conferir versão e caminho do interpretador. Não instalar um pacote aleatório chamado sqlite3. Se a distribuição separa módulos padrão, consultar a documentação oficial dela.', explanation: 'O diagnóstico evita pacotes de procedência incerta e mistura de interpretadores.', expected: 'O plano coleta evidências do ambiente e define como confirmar a causa antes de instalar algo.', criteria: ['Relaciona o comando usado ao ambiente preparado em setup-python e registra a mensagem real.', 'Propõe verificações antes de modificar a instalação e consulta a fonte oficial adequada ao sistema.', 'Define uma nova verificação observável para conferir se o módulo ficou disponível.'] }
+      { prompt: 'Prever: no editor, abra sqlite_alternativa.py e anote a contagem antes de rodar. No terminal da pasta alternativa-sqlite, execute py sqlite_alternativa.py no Windows ou python3 sqlite_alternativa.py no macOS/Linux duas vezes. Qual contagem espera na primeira e na segunda execução?', hints: ['CREATE TABLE IF NOT EXISTS mantém a tabela existente.', 'Observe que o programa executa INSERT em cada execução.'], solution: 'A primeira execução imprime Registros de marcador: 1; a segunda imprime Registros de marcador: 2. O arquivo estudos.db continua na pasta.', explanation: 'O arquivo persiste entre execuções, enquanto cada INSERT acrescenta uma linha.', expected: 'A previsão apresenta as duas contagens antes da execução e depois compara o resultado real.', criteria: ['Registra as previsões antes de executar o arquivo.', 'Roda o mesmo arquivo duas vezes na mesma pasta e compara as contagens observadas.'] },
+      { prompt: 'Alterar: no editor, crie tarefas_exercicio.py dentro de alternativa-sqlite. Faça o script abrir tarefas.db, criar a tabela tarefas com titulo e concluido inteiro padrão 0, inserir o título “Revisar SQL” pelo parâmetro ? e consultar titulo/concluido. Salve; no PowerShell aberto nessa pasta execute py tarefas_exercicio.py. No macOS/Linux, use python3 tarefas_exercicio.py. Onde você escreverá o Python e qual saída espera?', hints: ['O código Python fica no arquivo; não cole SQL puro no PowerShell.', 'Use connection.execute(SQL, (titulo,)) para associar o valor ao marcador ?. A vírgula forma uma tupla com um item.', 'Depois de gravar, use SELECT titulo, concluido FROM tarefas e fetchall() para observar as linhas.'], solution: 'import sqlite3\n\nconnection = sqlite3.connect("tarefas.db")\nconnection.execute("CREATE TABLE IF NOT EXISTS tarefas (id INTEGER PRIMARY KEY, titulo TEXT NOT NULL, concluido INTEGER NOT NULL DEFAULT 0)")\ntitulo = "Revisar SQL"\nconnection.execute("INSERT INTO tarefas (titulo) VALUES (?)", (titulo,))\nconnection.commit()\nrows = connection.execute("SELECT titulo, concluido FROM tarefas").fetchall()\nprint(rows)\nconnection.close()', explanation: 'O editor guarda o programa; o terminal executa o arquivo. A API Python recebe SQL e parâmetros em argumentos separados.', expected: 'Na primeira execução aparece [(\'Revisar SQL\', 0)]. O arquivo tarefas.db fica em alternativa-sqlite; repetir o script adiciona outra linha.', criteria: ['Cria tarefas_exercicio.py na pasta indicada e executa-o pelo terminal, não no dashboard nem como SQL direto.', 'Cria as colunas solicitadas e deixa concluido com valor padrão 0.', 'Vincula “Revisar SQL” pelo parâmetro ? com uma tupla, sem concatenar o texto ao SQL.', 'Consulta e registra a linha observada; não inventa resultado se a execução falhar.'] },
+      { prompt: 'Construir: no editor, crie pendencias-docker.md dentro de alternativa-sqlite. Registre o resultado real da consulta SQLite feita no terminal e duas tarefas que ainda faltam antes de usar PostgreSQL com Docker.', hints: ['Exemplos de pendência: iniciar PostgreSQL pelo Compose e confirmar conexão/porta.', 'Não marque Docker, Compose ou volume como executados se só estudou SQLite.'], solution: 'Executado: SQLite local, tabela, inserção parametrizada e consulta; registrar saída observada. Pendente: instalar/iniciar Docker Engine e executar Compose: portas, volumes e conexão ao PostgreSQL. Também falta verificar a conexão em 127.0.0.1:55432.', explanation: 'O relatório distingue o que você realmente executou do que ainda precisa praticar.', expected: 'O arquivo registra evidência SQLite concreta e identifica duas competências Docker/PostgreSQL pendentes.', criteria: ['Inclui arquivo e resultado realmente observados no terminal.', 'Identifica duas competências distintas que ainda não executou.', 'Indica o nome legível da preparação necessária para retomar Docker/PostgreSQL.'] },
+      { prompt: 'Investigar erro: ao executar o arquivo pelo PowerShell, aparece No module named sqlite3. Registre a mensagem completa, rode py --version e py -c "import sqlite3; print(sqlite3.sqlite_version)" na mesma pasta. No macOS/Linux, rode python3 --version e python3 -c "import sqlite3; print(sqlite3.sqlite_version)". Como separar erro de caminho, interpretador e módulo?', hints: ['Confirme primeiro se o comando py/python3 funciona e qual versão respondeu.', 'O módulo sqlite3 acompanha muitas distribuições, mas a documentação do fornecedor pode explicar uma distribuição sem esse módulo. Não instale um pacote homônimo às cegas.'], solution: 'No Windows, compare py --version com py -c ...; no macOS/Linux, compare python3 --version com python3 -c .... Se a versão funciona e só a importação falha, registre distribuição e erro, consulte a documentação oficial desse Python e retorne a Instalar e verificar Python 3. Confirme a correção repetindo o comando de importação.', explanation: 'O comando de verificação usa o mesmo interpretador que executa o arquivo e permite separar instalação de caminho incorreto.', expected: 'O diagnóstico cita sistema, pasta, comando, mensagem observada e próxima verificação sem instalar sqlite3 via pip.', criteria: ['Registra o comando e erro reais e confirma o diretório do terminal.', 'Compara a versão e a importação usando o mesmo interpretador do arquivo.', 'Indica a aula Instalar e verificar Python 3 e uma confirmação observável, sem recomendar pacote aleatório.'] }
     ],
     mistakes: [
       'Dizer que SQLite é PostgreSQL leve: são mecanismos diferentes.',
       'Marcar Docker, Compose ou rede como praticados sem executá-los.',
       'Executar o comando fora da pasta e depois não encontrar estudos.db.',
-      'Instalar pacote aleatório sqlite3 sem verificar o Python usado.',
+      'Instalar um pacote chamado sqlite3 via pip sem verificar o Python usado.',
       'Usar a alternativa como conclusão definitiva do projeto intermediário.'
     ],
     quiz: [
@@ -137,7 +164,7 @@ Object.assign(LESSON_GUIDES, {
       'SQLite mantém a prática de SQL acessível sem servidor.',
       'A alternativa não comprova Docker, Compose nem PostgreSQL.',
       'Registre evidências executadas e pendências separadamente.',
-      'Retome Docker antes do projeto intermediário com banco real.'
+      'Retome Preparar Docker, WSL e virtualização e Compose: portas, volumes e conexão ao PostgreSQL antes do projeto intermediário com banco real.'
     ]
   }
 });
