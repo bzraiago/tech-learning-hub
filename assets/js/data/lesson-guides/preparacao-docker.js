@@ -77,13 +77,14 @@ Object.assign(LESSON_GUIDES, {
     setup: [
       'Objetivo: criar e executar um arquivo Python que grava uma linha em SQLite e mostra quantas linhas existem.',
       'Requisitos: concluir Instalar e verificar Python 3; usar VS Code ou outro editor e uma pasta local sua. Esta aula não usa Docker, pip ou prompt SQL separado.',
-      'Etapa 1: no VS Code, abra ou crie a pasta alternativa-sqlite pelo menu Arquivo > Abrir Pasta. Depois escolha Terminal > Novo Terminal. O terminal integrado deve abrir nessa pasta.',
+      'Etapa 1 — abrir a pasta no editor: abra o VS Code pelo menu Iniciar do Windows (pesquise Visual Studio Code). No VS Code, clique em Arquivo > Abrir Pasta. Na janela que abrir, localize e selecione a pasta alternativa-sqlite; confirme em Selecionar Pasta. Se ela ainda não existir, crie uma pasta com esse nome nessa janela e depois a selecione. O nome alternativa-sqlite deve aparecer no painel Explorador, à esquerda.',
+      'Etapa 1.1 — abrir o terminal na pasta certa: no VS Code, clique em Terminal > Novo Terminal. Confira o caminho antes do sinal > no Prompt de Comando ou PowerShell: ele deve terminar em alternativa-sqlite. Esse terminal é onde você digita os comandos; o editor central é onde fica o código.',
       'Escolha somente o bloco do sistema operacional que você usa. Não execute os comandos dos outros sistemas.',
       'Windows: no PowerShell integrado ao VS Code, execute python --version. Se aparecer Python 3.x.x, use python nos próximos passos. Se o comando não for reconhecido, execute py --version e use py somente se ele mostrar Python 3.x.x.',
       'macOS: no Terminal aberto na pasta alternativa-sqlite, execute python3 --version. Só continue se aparecer Python 3.x.x.',
       'Linux: no Terminal aberto na pasta alternativa-sqlite, execute python3 --version. Só continue se aparecer Python 3.x.x.',
       'Se nem python --version nem py --version mostrar Python 3.x.x, pare e volte a Instalar e verificar Python 3. Não tente executar o arquivo até uma das verificações funcionar.',
-      'Etapa 2: no painel Explorador do VS Code, crie sqlite_alternativa.py dentro de alternativa-sqlite. Digite nele todo o exemplo da próxima etapa e salve com Ctrl+S.',
+      'Etapa 2 — abrir ou criar o arquivo: no painel Explorador à esquerda, procure sqlite_alternativa.py. Se já existir, clique uma vez no nome; o arquivo abrirá na área central do VS Code. Se não existir, passe o mouse sobre alternativa-sqlite no painel, clique no ícone Novo Arquivo (folha com sinal de +), digite sqlite_alternativa.py e pressione Enter. Clique no arquivo para abri-lo. Na área central, cole o exemplo completo da seção seguinte e pressione Ctrl+S. Confirme que a aba mostra sqlite_alternativa.py e que o nome termina em .py, não em .py.txt.',
       'Etapa 3: volte ao terminal da mesma pasta. No Windows, execute python sqlite_alternativa.py; use py sqlite_alternativa.py somente se foi py --version que mostrou Python 3.x.x. No macOS e Linux, execute python3 sqlite_alternativa.py.',
       'Verificação: leia a linha Registros de marcador no terminal. Na primeira execução do arquivo novo, o número deve ser 1. alternativa-sqlite.db fica junto do script.',
       'Resultado esperado: a primeira execução mostra Registros de marcador: 1. Na segunda, mostra 2, pois cada execução acrescenta uma linha ao mesmo banco.',
@@ -94,16 +95,17 @@ Object.assign(LESSON_GUIDES, {
     why: 'SQLite permite praticar uma tabela, uma gravação e uma contagem sem iniciar um servidor. Nesta aula, o foco é seguir o ciclo editor → arquivo salvo → terminal → resultado.',
     sections: [
       {
-        title: '1. Abra a pasta e crie o arquivo',
+        title: '1. Abra a pasta e o arquivo no VS Code',
         paragraphs: [
-          'No VS Code, abra a pasta alternativa-sqlite e escolha Terminal > Novo Terminal. No Windows, primeiro execute python --version; se não mostrar Python 3.x.x, tente py --version. No macOS/Linux, execute python3 --version. Volte à aula Instalar e verificar Python 3 somente se nenhum comando do seu sistema mostrar Python 3.x.x.',
-          'No painel Explorador, crie sqlite_alternativa.py. Cole o exemplo completo, salve com Ctrl+S e confirme que o nome termina em .py, não em .py.txt. Não cole o código Python no terminal.'
+          'Abra o VS Code. No Windows, se ele não estiver aberto, clique em Iniciar, pesquise Visual Studio Code e abra o aplicativo. Dentro do VS Code, clique em Arquivo > Abrir Pasta, selecione alternativa-sqlite na janela e confirme em Selecionar Pasta. O nome da pasta deve aparecer no painel Explorador à esquerda.',
+          'No painel Explorador, clique em sqlite_alternativa.py para abrir o arquivo na área central. Se não aparecer, passe o mouse sobre a pasta alternativa-sqlite, clique em Novo Arquivo (ícone de folha com +), digite sqlite_alternativa.py, pressione Enter e clique no arquivo criado. Cole o exemplo completo na área central do editor e salve com Ctrl+S. Não cole o código Python no terminal.',
+          'Agora escolha o terminal do seu sistema. No Windows, clique em Terminal > Novo Terminal e execute python --version; se o comando não for reconhecido, tente py --version. No macOS/Linux, abra Terminal na pasta alternativa-sqlite e execute python3 --version. Só continue quando um comando mostrar Python 3.x.x; se nenhum funcionar, volte à aula Instalar e verificar Python 3.'
         ]
       },
       {
         title: '2. Execute e confira a contagem',
         paragraphs: [
-          'No terminal aberto na pasta alternativa-sqlite, execute python sqlite_alternativa.py no Windows se python --version mostrou Python 3.x.x. Se somente py --version funcionou, use py sqlite_alternativa.py. No macOS ou Linux, use python3 sqlite_alternativa.py. O comando roda o arquivo; não deve ser digitado dentro dele nem em prompt SQL.',
+          'No terminal do VS Code, confira que o caminho antes do sinal > termina em alternativa-sqlite. No Windows, execute python sqlite_alternativa.py se python --version mostrou Python 3.x.x; se somente py --version funcionou, execute py sqlite_alternativa.py. No macOS ou Linux, execute python3 sqlite_alternativa.py. O comando é digitado no terminal, não dentro do arquivo nem em um prompt SQL.',
           'Na primeira execução, procure Registros de marcador: 1. Se executar de novo, a contagem aumenta porque alternativa-sqlite.db permanece entre execuções. A linha print exibe o número no terminal.'
         ]
       },
@@ -119,7 +121,7 @@ Object.assign(LESSON_GUIDES, {
       language: 'Python 3 e terminal',
       code: 'import sqlite3\n\nbanco = sqlite3.connect("alternativa-sqlite.db")\nbanco.execute("CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)")\nbanco.execute("INSERT INTO marcador (texto) VALUES (\'alternativa local\')")\nbanco.commit()\nresultado = banco.execute("SELECT COUNT(*) FROM marcador").fetchone()\nprint("Registros de marcador:", resultado[0])\nbanco.close()',
       blocks: [
-        { label: 'Editor — salve como alternativa-sqlite/sqlite_alternativa.py', code: 'import sqlite3\n\nbanco = sqlite3.connect("alternativa-sqlite.db")\nbanco.execute("CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)")\nbanco.execute("INSERT INTO marcador (texto) VALUES (\'alternativa local\')")\nbanco.commit()\nresultado = banco.execute("SELECT COUNT(*) FROM marcador").fetchone()\nprint("Registros de marcador:", resultado[0])\nbanco.close()' },
+        { label: 'Arquivo aberto na área central do VS Code — salve como alternativa-sqlite/sqlite_alternativa.py', code: 'import sqlite3\n\nbanco = sqlite3.connect("alternativa-sqlite.db")\nbanco.execute("CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)")\nbanco.execute("INSERT INTO marcador (texto) VALUES (\'alternativa local\')")\nbanco.commit()\nresultado = banco.execute("SELECT COUNT(*) FROM marcador").fetchone()\nprint("Registros de marcador:", resultado[0])\nbanco.close()' },
         { label: 'Windows — PowerShell na pasta alternativa-sqlite; use se python --version mostrou Python 3', code: 'python --version\npython sqlite_alternativa.py' },
         { label: 'Windows — PowerShell na pasta alternativa-sqlite; use somente se python não foi reconhecido e py --version mostrou Python 3', code: 'py --version\npy sqlite_alternativa.py' },
         { label: 'macOS — Terminal na pasta alternativa-sqlite', code: 'python3 --version\npython3 sqlite_alternativa.py' },
@@ -135,8 +137,8 @@ Object.assign(LESSON_GUIDES, {
       expected: 'Depois da primeira execução do arquivo novo, o terminal mostra Registros de marcador: 1. O arquivo alternativa-sqlite.db fica na pasta alternativa-sqlite; ao executar novamente, a contagem passa a 2.'
     },
     guided: [
-      { instruction: 'No VS Code, abra alternativa-sqlite, escolha Terminal > Novo Terminal e execute python --version no Windows. Se não for reconhecido, tente py --version. Continue apenas com o comando que mostrar Python 3.x.x; se nenhum funcionar, volte à aula Instalar e verificar Python 3.', result: 'O terminal mostra Python 3.x.x antes da criação do arquivo e você registra qual comando funcionou.' },
-      { instruction: 'No painel Explorador, crie sqlite_alternativa.py, copie o bloco Editor completo e salve com Ctrl+S.', result: 'O arquivo está na pasta alternativa-sqlite e inclui a linha print("Registros de marcador:", resultado[0]).' },
+      { instruction: 'Abra o VS Code, clique em Arquivo > Abrir Pasta, selecione alternativa-sqlite e confirme. Depois clique em Terminal > Novo Terminal. No Windows, teste python --version; se não for reconhecido, tente py --version. Continue apenas com o comando que mostrar Python 3.x.x.', result: 'A pasta alternativa-sqlite aparece no painel Explorador e o terminal mostra Python 3.x.x.' },
+      { instruction: 'No painel Explorador, clique em sqlite_alternativa.py para abrir na área central. Se não existir, use Novo Arquivo (folha com +), digite o nome e pressione Enter. Cole o bloco de código completo, salve com Ctrl+S.', result: 'A aba do editor mostra sqlite_alternativa.py e o arquivo salvo inclui a linha print("Registros de marcador:", resultado[0]).' },
       { instruction: 'No mesmo terminal, execute python sqlite_alternativa.py se python --version funcionou, ou py sqlite_alternativa.py se somente py --version funcionou. Em macOS/Linux, use python3 sqlite_alternativa.py no Terminal aberto na pasta do arquivo.', result: 'O terminal mostra Registros de marcador: 1 na primeira execução e cria alternativa-sqlite.db na pasta.' }
     ],
     exercises: [

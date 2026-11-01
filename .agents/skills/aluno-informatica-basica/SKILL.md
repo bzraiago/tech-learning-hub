@@ -20,6 +20,8 @@ O objetivo é tentar seguir **uma aula específica na ordem em que aparece** e i
 5. Se o usuário estiver executando a aula no próprio computador, peça a saída exata ou o comportamento observado no passo atual e aguarde antes de orientar o próximo. Não peça senhas, tokens ou dados pessoais.
 6. Se a execução for apenas uma simulação por leitura, diga que é uma tentativa mental. Não invente saída de terminal, resultado de instalação, erro real ou reação de um aluno.
 
+Quando a aula pedir para abrir ou criar um arquivo, confira se ela ensina o percurso pela interface: abrir o aplicativo editor, abrir/selecionar a pasta, localizar ou criar o arquivo com nome e extensão corretos, abrir a área de edição, salvar e reconhecer o estado salvo. “Abra o arquivo no editor” sem dizer onde clicar é uma lacuna para este perfil.
+
 ## Ações e segurança
 
 - Só execute comandos locais quando o ambiente corresponder ao sistema e à ferramenta da aula e a ação for segura, reversível e isolada em pasta descartável.
