@@ -73,98 +73,96 @@ Object.assign(LESSON_GUIDES, {
   },
 
   'setup-docker-alternative': {
-    prerequisites: 'Antes, conclua a aula Instalar e verificar Python 3. Se Docker está indisponível, leia Preparar Docker, WSL e virtualização para registrar o motivo. Esta é uma rota alternativa de estudo; SQLite não substitui a prática de PostgreSQL com Docker.',
+    prerequisites: 'Conclua Instalar e verificar Python 3. No Windows, use o comando que funcionou na verificação: python ou py. Se nenhum deles mostrar Python 3.x.x, pare e volte à instalação; sem um runtime o script não executa. SQLite é uma rota alternativa de estudo e não substitui PostgreSQL com Docker.',
     setup: [
-      'Objetivo: executar uma pequena prática SQLite em um arquivo Python, sem iniciar servidor ou instalar Docker.',
-      'Requisitos: Python 3 funcionando, editor de texto/código e permissão para criar arquivos numa pasta sua.',
-      'Pasta: no editor, crie ou abra a pasta alternativa-sqlite. No VS Code, use Arquivo > Abrir Pasta e depois Terminal > Novo Terminal. Confirme que o caminho exibido termina em alternativa-sqlite; não precisa digitar comandos SQL no terminal.',
-      'Windows: no PowerShell integrado ao editor, aberto dentro da pasta alternativa-sqlite, use o comando py.',
-      'macOS: no Terminal aberto dentro da pasta alternativa-sqlite, use o comando python3.',
-      'Linux: no Terminal aberto dentro da pasta alternativa-sqlite, use o comando python3.',
-      'Arquivo: no editor, crie sqlite_alternativa.py dentro de alternativa-sqlite e digite/salve o exemplo da próxima etapa nesse arquivo.',
-      'Executar no Windows — PowerShell: com o terminal na pasta alternativa-sqlite, rode py --version e depois py sqlite_alternativa.py.',
-      'Executar no macOS/Linux — Terminal: com o terminal na pasta alternativa-sqlite, rode python3 --version e depois python3 sqlite_alternativa.py.',
-      'Verificação: no PowerShell, rode Get-Location; no macOS/Linux, rode pwd. Depois confira a versão do Python e execute o arquivo conforme o sistema.',
-      'Resultado esperado: a versão do Python aparece; o programa informa a versão SQLite e Registros de marcador: 1 na primeira execução. O arquivo estudos.db aparece ao lado de sqlite_alternativa.py; ao executar novamente, a contagem aumenta para 2.',
-      'Problema comum: comando não reconhecido — confira a pasta e use o mesmo comando (`py` ou `python3`) que funcionou na aula Instalar e verificar Python 3. Se o arquivo não for encontrado, confirme o caminho com Get-Location no PowerShell ou pwd no macOS/Linux.',
-      'Se o erro disser No module named sqlite3: confira a versão e o interpretador. Não instale um pacote chamado sqlite3 por pip; retorne à aula Instalar e verificar Python 3 e consulte a documentação da distribuição do Python.',
-      'Como parar e retomar: o programa encerra sozinho. Feche o terminal se quiser; não apague estudos.db. Para retomar, abra novamente a mesma pasta e execute o mesmo arquivo.',
-      'Alternativa leve: se Python ainda não estiver disponível, não marque a prática local como concluída. Um playground de SQL no navegador pode servir para observar sintaxe, mas não executa este arquivo Python, não testa parâmetros pela API sqlite3 e não cria estudos.db no computador.'
+      'Objetivo: criar e executar um arquivo Python que grava uma linha em SQLite e mostra quantas linhas existem.',
+      'Requisitos: concluir Instalar e verificar Python 3; usar VS Code ou outro editor e uma pasta local sua. Esta aula não usa Docker, pip ou prompt SQL separado.',
+      'Etapa 1: no VS Code, abra ou crie a pasta alternativa-sqlite pelo menu Arquivo > Abrir Pasta. Depois escolha Terminal > Novo Terminal. O terminal integrado deve abrir nessa pasta.',
+      'Escolha somente o bloco do sistema operacional que você usa. Não execute os comandos dos outros sistemas.',
+      'Windows: no PowerShell integrado ao VS Code, execute python --version. Se aparecer Python 3.x.x, use python nos próximos passos. Se o comando não for reconhecido, execute py --version e use py somente se ele mostrar Python 3.x.x.',
+      'macOS: no Terminal aberto na pasta alternativa-sqlite, execute python3 --version. Só continue se aparecer Python 3.x.x.',
+      'Linux: no Terminal aberto na pasta alternativa-sqlite, execute python3 --version. Só continue se aparecer Python 3.x.x.',
+      'Se nem python --version nem py --version mostrar Python 3.x.x, pare e volte a Instalar e verificar Python 3. Não tente executar o arquivo até uma das verificações funcionar.',
+      'Etapa 2: no painel Explorador do VS Code, crie sqlite_alternativa.py dentro de alternativa-sqlite. Digite nele todo o exemplo da próxima etapa e salve com Ctrl+S.',
+      'Etapa 3: volte ao terminal da mesma pasta. No Windows, execute python sqlite_alternativa.py; use py sqlite_alternativa.py somente se foi py --version que mostrou Python 3.x.x. No macOS e Linux, execute python3 sqlite_alternativa.py.',
+      'Verificação: leia a linha Registros de marcador no terminal. Na primeira execução do arquivo novo, o número deve ser 1. alternativa-sqlite.db fica junto do script.',
+      'Resultado esperado: a primeira execução mostra Registros de marcador: 1. Na segunda, mostra 2, pois cada execução acrescenta uma linha ao mesmo banco.',
+      'Problema comum: se py disser que não encontrou runtime, mas python --version mostrar Python 3.x.x, use python sqlite_alternativa.py; não reinstale Python. Se os dois comandos falharem, volte à instalação do Python. Se o terminal voltar ao prompt sem mostrar a linha, confira no editor se o exemplo foi colado inteiro, se a linha print está presente e se salvou com Ctrl+S. Se não encontrar o arquivo, abra a pasta alternativa-sqlite antes de criar um novo terminal.',
+      'Como parar e retomar: o programa termina sozinho. Para continuar depois, abra no VS Code a mesma pasta, crie um novo terminal e execute novamente o arquivo. O banco permanece nessa pasta.',
+      'Alternativa leve: se não puder instalar Python agora, pause a execução local. Um playground no navegador ajuda a ler SQL, mas não executa este arquivo nem cria o banco no computador.'
     ].join('\n'),
-    why: 'SQLite permite praticar tabelas, inserções e consultas sem serviço em segundo plano. Ele reduz o bloqueio de hardware, mas não ensina Compose, rede, volumes, usuários do servidor ou diferenças específicas do PostgreSQL.',
+    why: 'SQLite permite praticar uma tabela, uma gravação e uma contagem sem iniciar um servidor. Nesta aula, o foco é seguir o ciclo editor → arquivo salvo → terminal → resultado.',
     sections: [
       {
-        title: 'Decida sem esconder a limitação',
+        title: '1. Abra a pasta e crie o arquivo',
         paragraphs: [
-          'Use esta rota quando Docker não puder ser instalado agora, e não somente para evitar investigar um erro simples. Registre o motivo: requisito do sistema, política administrativa, espaço, memória ou tempo de download.',
-          'Marque separadamente: SQL executado em SQLite; Docker não executado; PostgreSQL não executado. Essa honestidade permite estudar os conceitos comuns e voltar depois às competências pendentes.'
+          'No VS Code, abra a pasta alternativa-sqlite e escolha Terminal > Novo Terminal. No Windows, primeiro execute python --version; se não mostrar Python 3.x.x, tente py --version. No macOS/Linux, execute python3 --version. Volte à aula Instalar e verificar Python 3 somente se nenhum comando do seu sistema mostrar Python 3.x.x.',
+          'No painel Explorador, crie sqlite_alternativa.py. Cole o exemplo completo, salve com Ctrl+S e confirme que o nome termina em .py, não em .py.txt. Não cole o código Python no terminal.'
         ]
       },
       {
-        title: 'Entenda arquivo, código e comandos',
+        title: '2. Execute e confira a contagem',
         paragraphs: [
-          'O exemplo é digitado no editor e salvo como sqlite_alternativa.py. Só depois você volta ao PowerShell/Terminal para executar o arquivo. O dashboard não executa esse código; ele apenas mostra o exemplo e guarda suas observações.',
-          'Quando o programa chama sqlite3.connect("estudos.db"), Python cria ou abre o arquivo na pasta em que o terminal está. Por isso, confirme a pasta antes de executar.',
-          'Dentro do arquivo, connection.execute(...) envia uma instrução SQL ao SQLite. O marcador ? recebe o valor separado em uma tupla, como ("alternativa local",). Isso evita juntar texto do aluno ao SQL.'
+          'No terminal aberto na pasta alternativa-sqlite, execute python sqlite_alternativa.py no Windows se python --version mostrou Python 3.x.x. Se somente py --version funcionou, use py sqlite_alternativa.py. No macOS ou Linux, use python3 sqlite_alternativa.py. O comando roda o arquivo; não deve ser digitado dentro dele nem em prompt SQL.',
+          'Na primeira execução, procure Registros de marcador: 1. Se executar de novo, a contagem aumenta porque alternativa-sqlite.db permanece entre execuções. A linha print exibe o número no terminal.'
         ]
       },
       {
-        title: 'Liste o que continua pendente',
+        title: '3. Saiba o que fica para depois',
         paragraphs: [
-          'A alternativa não cobre imagem, container, Compose, porta 55432, volume nomeado, healthcheck, cliente-servidor, usuário PostgreSQL, pg_dump ou pg_restore.',
-          'Antes do projeto intermediário, conclua Preparar Docker, WSL e virtualização e depois Compose: portas, volumes e conexão ao PostgreSQL. O projeto com PostgreSQL real continua pendente até essas evidências existirem.'
+          'O SQLite cria alternativa-sqlite.db dentro da pasta do exercício. Ele não inicia PostgreSQL, Docker ou Compose e não comprova conexão por rede.',
+          'Quando puder seguir com Docker, retorne a Preparar Docker, WSL e virtualização e depois a Compose: portas, volumes e conexão ao PostgreSQL. Mantenha essa prática pendente até executá-la de verdade.'
         ]
       }
     ],
     example: {
-      language: 'Terminal · na pasta alternativa-sqlite',
-      code: 'import sqlite3\n\nprint("SQLite:", sqlite3.sqlite_version)\nconnection = sqlite3.connect("estudos.db")\nconnection.execute("CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)")\nconnection.execute("INSERT INTO marcador (texto) VALUES (?)", ("alternativa local",))\nconnection.commit()\ntotal = connection.execute("SELECT COUNT(*) FROM marcador").fetchone()[0]\nprint("Registros de marcador:", total)\nconnection.close()',
+      language: 'Python 3 e terminal',
+      code: 'import sqlite3\n\nbanco = sqlite3.connect("alternativa-sqlite.db")\nbanco.execute("CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)")\nbanco.execute("INSERT INTO marcador (texto) VALUES (\'alternativa local\')")\nbanco.commit()\nresultado = banco.execute("SELECT COUNT(*) FROM marcador").fetchone()\nprint("Registros de marcador:", resultado[0])\nbanco.close()',
       blocks: [
-        { label: 'Windows — PowerShell na pasta alternativa-sqlite', code: 'Get-Location\npy --version' },
-        { label: 'macOS — Terminal na pasta alternativa-sqlite', code: 'pwd\npython3 --version' },
-        { label: 'Linux — Terminal na pasta alternativa-sqlite', code: 'pwd\npython3 --version' },
-        { label: 'Editor — arquivo sqlite_alternativa.py dentro da pasta alternativa-sqlite', code: 'import sqlite3\n\nprint("SQLite:", sqlite3.sqlite_version)\nconnection = sqlite3.connect("estudos.db")\nconnection.execute("CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)")\nconnection.execute("INSERT INTO marcador (texto) VALUES (?)", ("alternativa local",))\nconnection.commit()\ntotal = connection.execute("SELECT COUNT(*) FROM marcador").fetchone()[0]\nprint("Registros de marcador:", total)\nconnection.close()' },
-        { label: 'Windows — PowerShell, ainda na pasta alternativa-sqlite', code: 'py sqlite_alternativa.py' },
-        { label: 'macOS/Linux — Terminal, ainda na pasta alternativa-sqlite', code: 'python3 sqlite_alternativa.py' }
+        { label: 'Editor — salve como alternativa-sqlite/sqlite_alternativa.py', code: 'import sqlite3\n\nbanco = sqlite3.connect("alternativa-sqlite.db")\nbanco.execute("CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)")\nbanco.execute("INSERT INTO marcador (texto) VALUES (\'alternativa local\')")\nbanco.commit()\nresultado = banco.execute("SELECT COUNT(*) FROM marcador").fetchone()\nprint("Registros de marcador:", resultado[0])\nbanco.close()' },
+        { label: 'Windows — PowerShell na pasta alternativa-sqlite; use se python --version mostrou Python 3', code: 'python --version\npython sqlite_alternativa.py' },
+        { label: 'Windows — PowerShell na pasta alternativa-sqlite; use somente se python não foi reconhecido e py --version mostrou Python 3', code: 'py --version\npy sqlite_alternativa.py' },
+        { label: 'macOS — Terminal na pasta alternativa-sqlite', code: 'python3 --version\npython3 sqlite_alternativa.py' },
+        { label: 'Linux — Terminal na pasta alternativa-sqlite', code: 'python3 --version\npython3 sqlite_alternativa.py' }
       ],
       explanation: [
-        'Get-Location ou pwd confirma em qual pasta o terminal está. A versão mostra o interpretador; use só o comando que funcionou no seu sistema.',
-        'O editor guarda o código em sqlite_alternativa.py. Não digite as linhas Python diretamente no PowerShell, no Terminal ou num prompt SQL.',
-        'sqlite3.connect cria ou abre estudos.db na pasta atual. CREATE TABLE prepara a tabela; INSERT grava uma linha; commit confirma a gravação no arquivo.',
-        'O SQL usa ?. O valor correspondente é o segundo argumento de execute, numa tupla de um elemento: ("alternativa local",).',
-        'SELECT COUNT(*) consulta quantas linhas existem. Na segunda execução a contagem aumenta porque INSERT é executado novamente.'
+        'O bloco Editor é o conteúdo completo de sqlite_alternativa.py. Digite ou cole esse bloco no editor e salve com Ctrl+S.',
+        'sqlite3.connect cria ou abre alternativa-sqlite.db na pasta em que o programa está sendo executado.',
+        'CREATE TABLE prepara a tabela marcador. INSERT acrescenta uma linha a cada execução. commit grava a alteração no banco.',
+        'SELECT COUNT(*) consulta quantas linhas existem. fetchone() pega a linha consultada e resultado[0] é o número. print exibe esse número no terminal.',
+        'Na primeira execução do banco novo, a saída é Registros de marcador: 1. Uma segunda execução acrescenta outra linha e mostra 2.'
       ],
-      expected: 'Na primeira execução, o terminal mostra uma versão de SQLite e Registros de marcador: 1. O arquivo estudos.db fica na mesma pasta de sqlite_alternativa.py; na segunda execução a contagem passa a 2.'
+      expected: 'Depois da primeira execução do arquivo novo, o terminal mostra Registros de marcador: 1. O arquivo alternativa-sqlite.db fica na pasta alternativa-sqlite; ao executar novamente, a contagem passa a 2.'
     },
     guided: [
-      { instruction: 'No editor, crie/abra alternativa-sqlite e use o menu Terminal > Novo Terminal. Confira o caminho com Get-Location (PowerShell) ou pwd (macOS/Linux); depois rode py --version no Windows ou python3 --version no macOS/Linux.', result: 'O caminho termina em alternativa-sqlite e a versão do interpretador aparece.' },
-      { instruction: 'No editor, crie sqlite_alternativa.py dentro dessa pasta e digite o exemplo. Salve antes de voltar ao terminal.', result: 'O arquivo aparece dentro de alternativa-sqlite e contém o script salvo.' },
-      { instruction: 'No terminal da mesma pasta, execute py sqlite_alternativa.py no Windows ou python3 sqlite_alternativa.py no macOS/Linux. Confira a mensagem e localize estudos.db no editor/Explorador de Arquivos.', result: 'O programa termina sem erro, imprime a contagem esperada e cria o arquivo de banco ao lado do script.' }
+      { instruction: 'No VS Code, abra alternativa-sqlite, escolha Terminal > Novo Terminal e execute python --version no Windows. Se não for reconhecido, tente py --version. Continue apenas com o comando que mostrar Python 3.x.x; se nenhum funcionar, volte à aula Instalar e verificar Python 3.', result: 'O terminal mostra Python 3.x.x antes da criação do arquivo e você registra qual comando funcionou.' },
+      { instruction: 'No painel Explorador, crie sqlite_alternativa.py, copie o bloco Editor completo e salve com Ctrl+S.', result: 'O arquivo está na pasta alternativa-sqlite e inclui a linha print("Registros de marcador:", resultado[0]).' },
+      { instruction: 'No mesmo terminal, execute python sqlite_alternativa.py se python --version funcionou, ou py sqlite_alternativa.py se somente py --version funcionou. Em macOS/Linux, use python3 sqlite_alternativa.py no Terminal aberto na pasta do arquivo.', result: 'O terminal mostra Registros de marcador: 1 na primeira execução e cria alternativa-sqlite.db na pasta.' }
     ],
     exercises: [
-      { prompt: 'Prever: no editor, abra sqlite_alternativa.py e anote a contagem antes de rodar. No terminal da pasta alternativa-sqlite, execute py sqlite_alternativa.py no Windows ou python3 sqlite_alternativa.py no macOS/Linux duas vezes. Qual contagem espera na primeira e na segunda execução?', hints: ['CREATE TABLE IF NOT EXISTS mantém a tabela existente.', 'Observe que o programa executa INSERT em cada execução.'], solution: 'A primeira execução imprime Registros de marcador: 1; a segunda imprime Registros de marcador: 2. O arquivo estudos.db continua na pasta.', explanation: 'O arquivo persiste entre execuções, enquanto cada INSERT acrescenta uma linha.', expected: 'A previsão apresenta as duas contagens antes da execução e depois compara o resultado real.', criteria: ['Registra as previsões antes de executar o arquivo.', 'Roda o mesmo arquivo duas vezes na mesma pasta e compara as contagens observadas.'] },
-      { prompt: 'Alterar: no editor, crie tarefas_exercicio.py dentro de alternativa-sqlite. Faça o script abrir tarefas.db, criar a tabela tarefas com titulo e concluido inteiro padrão 0, inserir o título “Revisar SQL” pelo parâmetro ? e consultar titulo/concluido. Salve; no PowerShell aberto nessa pasta execute py tarefas_exercicio.py. No macOS/Linux, use python3 tarefas_exercicio.py. Onde você escreverá o Python e qual saída espera?', hints: ['O código Python fica no arquivo; não cole SQL puro no PowerShell.', 'Use connection.execute(SQL, (titulo,)) para associar o valor ao marcador ?. A vírgula forma uma tupla com um item.', 'Depois de gravar, use SELECT titulo, concluido FROM tarefas e fetchall() para observar as linhas.'], solution: 'import sqlite3\n\nconnection = sqlite3.connect("tarefas.db")\nconnection.execute("CREATE TABLE IF NOT EXISTS tarefas (id INTEGER PRIMARY KEY, titulo TEXT NOT NULL, concluido INTEGER NOT NULL DEFAULT 0)")\ntitulo = "Revisar SQL"\nconnection.execute("INSERT INTO tarefas (titulo) VALUES (?)", (titulo,))\nconnection.commit()\nrows = connection.execute("SELECT titulo, concluido FROM tarefas").fetchall()\nprint(rows)\nconnection.close()', explanation: 'O editor guarda o programa; o terminal executa o arquivo. A API Python recebe SQL e parâmetros em argumentos separados.', expected: 'Na primeira execução aparece [(\'Revisar SQL\', 0)]. O arquivo tarefas.db fica em alternativa-sqlite; repetir o script adiciona outra linha.', criteria: ['Cria tarefas_exercicio.py na pasta indicada e executa-o pelo terminal, não no dashboard nem como SQL direto.', 'Cria as colunas solicitadas e deixa concluido com valor padrão 0.', 'Vincula “Revisar SQL” pelo parâmetro ? com uma tupla, sem concatenar o texto ao SQL.', 'Consulta e registra a linha observada; não inventa resultado se a execução falhar.'] },
-      { prompt: 'Construir: no editor, crie pendencias-docker.md dentro de alternativa-sqlite. Registre o resultado real da consulta SQLite feita no terminal e duas tarefas que ainda faltam antes de usar PostgreSQL com Docker.', hints: ['Exemplos de pendência: iniciar PostgreSQL pelo Compose e confirmar conexão/porta.', 'Não marque Docker, Compose ou volume como executados se só estudou SQLite.'], solution: 'Executado: SQLite local, tabela, inserção parametrizada e consulta; registrar saída observada. Pendente: instalar/iniciar Docker Engine e executar Compose: portas, volumes e conexão ao PostgreSQL. Também falta verificar a conexão em 127.0.0.1:55432.', explanation: 'O relatório distingue o que você realmente executou do que ainda precisa praticar.', expected: 'O arquivo registra evidência SQLite concreta e identifica duas competências Docker/PostgreSQL pendentes.', criteria: ['Inclui arquivo e resultado realmente observados no terminal.', 'Identifica duas competências distintas que ainda não executou.', 'Indica o nome legível da preparação necessária para retomar Docker/PostgreSQL.'] },
-      { prompt: 'Investigar erro: ao executar o arquivo pelo PowerShell, aparece No module named sqlite3. Registre a mensagem completa, rode py --version e py -c "import sqlite3; print(sqlite3.sqlite_version)" na mesma pasta. No macOS/Linux, rode python3 --version e python3 -c "import sqlite3; print(sqlite3.sqlite_version)". Como separar erro de caminho, interpretador e módulo?', hints: ['Confirme primeiro se o comando py/python3 funciona e qual versão respondeu.', 'O módulo sqlite3 acompanha muitas distribuições, mas a documentação do fornecedor pode explicar uma distribuição sem esse módulo. Não instale um pacote homônimo às cegas.'], solution: 'No Windows, compare py --version com py -c ...; no macOS/Linux, compare python3 --version com python3 -c .... Se a versão funciona e só a importação falha, registre distribuição e erro, consulte a documentação oficial desse Python e retorne a Instalar e verificar Python 3. Confirme a correção repetindo o comando de importação.', explanation: 'O comando de verificação usa o mesmo interpretador que executa o arquivo e permite separar instalação de caminho incorreto.', expected: 'O diagnóstico cita sistema, pasta, comando, mensagem observada e próxima verificação sem instalar sqlite3 via pip.', criteria: ['Registra o comando e erro reais e confirma o diretório do terminal.', 'Compara a versão e a importação usando o mesmo interpretador do arquivo.', 'Indica a aula Instalar e verificar Python 3 e uma confirmação observável, sem recomendar pacote aleatório.'] }
+      { prompt: 'Prever: antes de executar o arquivo pela primeira vez, anote o que espera ver no terminal. Depois, no Windows, use o comando de Python 3 que funcionou na verificação para executar o arquivo uma vez. Qual número apareceu?', hints: ['Leia a linha print do arquivo e conte quantas linhas o INSERT acrescenta por execução.'], solution: 'A primeira execução do banco novo mostra Registros de marcador: 1.', explanation: 'Prever antes de executar ajuda a comparar o comportamento esperado com a evidência real.', expected: 'Registre a previsão antes de rodar e depois copie a linha realmente impressa, sem inventar uma saída.', criteria: ['Faz a previsão antes da execução.', 'Executa o arquivo salvo uma vez e registra a saída observada.'] },
+      { prompt: 'Alterar: no editor, troque o texto alternativa local por meu primeiro registro na linha INSERT. Salve com Ctrl+S e execute novamente com o mesmo comando de Python 3 que funcionou. O que acontece com a contagem?', hints: ['A alteração muda o texto gravado; a execução continua inserindo uma nova linha.'], solution: 'O terminal mostra Registros de marcador: 2 porque a primeira linha permanece em alternativa-sqlite.db e esta execução acrescenta outra.', explanation: 'A contagem muda porque o arquivo do banco preserva a linha da execução anterior.', expected: 'Registre a contagem observada após a segunda execução. Se já havia tentativas anteriores, ela pode ser maior que 2.', criteria: ['Altera o texto no arquivo, salva e executa o mesmo script.', 'Relaciona a contagem observada às linhas gravadas em execuções anteriores.'] },
+      { prompt: 'Construir: no editor, crie resultado-sqlite.txt dentro de alternativa-sqlite. Registre o nome do script, o nome do arquivo de banco e a última linha que apareceu no terminal.', hints: ['Use somente o resultado que você observou; não inclua senha ou dado pessoal.'], solution: 'Script: sqlite_alternativa.py\nBanco: alternativa-sqlite.db\nSaída observada: Registros de marcador: (copie seu número)', explanation: 'Um registro curto ajuda a retomar a aula sem repetir passos nem confundir arquivos.', expected: 'resultado-sqlite.txt contém os três itens e a saída foi copiada do terminal.', criteria: ['Cria o arquivo no local indicado.', 'Registra os nomes corretos e a saída observada, sem inventar resultado.'] },
+      { prompt: 'Investigar erro: você executou o comando escolhido para Python 3, o terminal voltou ao prompt e nenhuma contagem apareceu. No editor, confira em ordem: o nome do arquivo termina em .py; o exemplo foi colado inteiro; a linha print está presente; você salvou com Ctrl+S; e o Terminal > Novo Terminal foi aberto com a pasta alternativa-sqlite selecionada. Se py disser “No installed Python found!”, mas python --version mostrar Python 3, qual comando de execução deve usar?', hints: ['Sem a linha print ou sem salvar o arquivo, o terminal pode executar uma versão antiga ou vazia.', 'Um comando pode falhar enquanto outro comando disponível no mesmo computador funciona.'], solution: 'Confira nome, conteúdo, salvamento e pasta do arquivo em ordem. Se python --version mostrar Python 3.x.x, execute python sqlite_alternativa.py mesmo que py falhe. Se nenhum comando encontrar Python 3, volte a Instalar e verificar Python 3.', explanation: 'O diagnóstico verifica primeiro o arquivo e a pasta, depois usa a evidência da verificação do interpretador.', expected: 'O plano identifica a primeira etapa que falhou e escolhe o comando que realmente mostrou Python 3.', criteria: ['Confere nome, conteúdo, salvamento e pasta do arquivo em ordem.', 'Distingue a falha do launcher py da ausência total de Python.', 'Usa python quando sua verificação mostrou Python 3 e indica a aula de instalação se nenhum comando funcionar.'] }
     ],
     mistakes: [
-      'Dizer que SQLite é PostgreSQL leve: são mecanismos diferentes.',
-      'Marcar Docker, Compose ou rede como praticados sem executá-los.',
-      'Executar o comando fora da pasta e depois não encontrar estudos.db.',
-      'Instalar um pacote chamado sqlite3 via pip sem verificar o Python usado.',
-      'Usar a alternativa como conclusão definitiva do projeto intermediário.'
+      'Colar o código Python no PowerShell em vez de salvar no arquivo .py.',
+      'Executar o arquivo antes de confirmar qual comando mostra Python 3.x.x.',
+      'Esquecer Ctrl+S antes de executar o script.',
+      'Esperar que cada execução mostre 1; as linhas anteriores permanecem no banco local.',
+      'Tratar SQLite como substituto de PostgreSQL, Docker ou Compose.'
     ],
     quiz: [
-      { question: 'A alternativa SQLite comprova que você sabe configurar Compose?', options: ['Sim', 'Não', 'Somente no Windows'], correctIndex: 1, explanation: 'Nenhum arquivo Compose foi criado ou executado.' },
-      { question: 'Onde os dados deste laboratório persistem?', options: ['No arquivo estudos.db', 'Em um volume Docker', 'No navegador'], correctIndex: 0, explanation: 'SQLite grava no arquivo local indicado na conexão.' },
-      { question: 'Quando retomar o caminho Docker?', options: ['Antes do projeto real com PostgreSQL', 'Nunca', 'Somente depois do nível avançado'], correctIndex: 0, explanation: 'O projeto intermediário exige persistência real com PostgreSQL e Docker.' }
+      { question: 'Qual linha mostra a contagem no terminal?', options: ['print("Registros de marcador:", resultado[0])', 'sqlite3.connect("alternativa-sqlite.db")', 'CREATE TABLE IF NOT EXISTS marcador'], correctIndex: 0, explanation: 'print escreve a mensagem e o número no terminal.' },
+      { question: 'Onde fica alternativa-sqlite.db?', options: ['Na pasta alternativa-sqlite do exercício', 'No navegador', 'Em um container Docker'], correctIndex: 0, explanation: 'O programa cria o arquivo na pasta de trabalho aberta no terminal.' },
+      { question: 'Se py --version responde “No installed Python found!”, mas python --version mostra Python 3.x.x, o que fazer?', options: ['Usar python para executar o arquivo', 'Reinstalar Python imediatamente', 'Instalar sqlite3 com pip'], correctIndex: 0, explanation: 'Use o comando que encontrou o runtime Python 3.' }
     ],
-    retry: { prompt: 'Você não pode executar Docker em um computador administrado, mas consegue abrir Python 3. Descreva uma consulta pequena em SQLite e registre separadamente duas capacidades de PostgreSQL com Compose que continuarão pendentes.', expected: 'A resposta inclui uma consulta local observável e deixa Docker, rede ou backup do PostgreSQL como pendência explícita.', hint: 'A alternativa permite praticar SQL, mas não substitui um servidor.' },
+    retry: { prompt: 'O terminal voltou ao prompt sem mostrar a contagem. Descreva, na ordem, como conferir o nome do arquivo, o conteúdo, o salvamento, a pasta aberta e qual comando encontrou Python 3 antes de tentar de novo.', expected: 'A resposta verifica arquivo e pasta no editor, confirma a linha print e Ctrl+S, usa python ou py somente se a respectiva verificação mostrar Python 3 e volta à aula de instalação se nenhum funcionar.', hint: 'Não acrescente comandos novos antes de descobrir qual etapa falhou.' },
     summary: [
-      'SQLite mantém a prática de SQL acessível sem servidor.',
-      'A alternativa não comprova Docker, Compose nem PostgreSQL.',
-      'Registre evidências executadas e pendências separadamente.',
-      'Retome Preparar Docker, WSL e virtualização e Compose: portas, volumes e conexão ao PostgreSQL antes do projeto intermediário com banco real.'
-    ]
-  }
+      'Primeiro confirme Python 3; no Windows, use python ou py conforme o comando que mostrou Python 3.x.x.',
+      'Digite o código em sqlite_alternativa.py e salve antes de executar.',
+      'Execute o arquivo no PowerShell aberto na pasta: python sqlite_alternativa.py ou py sqlite_alternativa.py, conforme a verificação que funcionou.',
+      'A contagem aparece porque o script chama print; o banco permanece em alternativa-sqlite.db.',
+      'SQLite mantém esta prática local, mas não substitui PostgreSQL com Docker.'
+    ]  }
 });

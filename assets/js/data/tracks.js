@@ -148,8 +148,12 @@
             "concept": "Instalar Python 3, identificar o comando do sistema e executar uma verificação mínima antes da trilha Python.",
             "objectives": ["Instalar uma versão estável de Python 3 pela fonte adequada ao sistema.", "Distinguir `py`, `python` e `python3` sem adivinhar.", "Executar um arquivo simples e diagnosticar falha de PATH."],
             "exercise": "Registre o comando reconhecido, a versão observada e a saída de um arquivo verificar_python.py.",
-            "code": "# Windows\npy --version\n# macOS/Linux\npython3 --version",
-            "docs": [{"kind": "doc", "title": "Python · Usando Python nos sistemas", "url": "https://docs.python.org/3/using/index.html", "language": "EN"}]
+            "code": "# Windows: tente os comandos e use o que mostrar Python 3\npython --version\npy --version\n# macOS/Linux\npython3 --version",
+            "docs": [
+              {"kind": "doc", "title": "Python · Install Manager no Windows", "url": "https://docs.python.org/3/using/windows.html", "language": "EN"},
+              {"kind": "doc", "title": "Python · Releases para Windows", "url": "https://www.python.org/downloads/windows/", "language": "EN"},
+              {"kind": "doc", "title": "Python · Usando Python nos sistemas", "url": "https://docs.python.org/3/using/index.html", "language": "EN"}
+            ]
           },
           {
             "id": "setup-git",
@@ -192,8 +196,8 @@
             "minutes": 45,
             "concept": "Usar SQLite e laboratórios conceituais enquanto Docker não estiver disponível, registrando claramente o que foi simulado e o que foi executado.",
             "objectives": ["Decidir com critérios quando adiar Docker.", "Executar a alternativa SQLite sem fingir que ela equivale a PostgreSQL em contêiner.", "Preparar evidências para retomar o caminho principal depois."],
-            "exercise": "Crie um banco SQLite local, execute uma consulta e registre quais competências de Docker/PostgreSQL continuam pendentes.",
-            "code": "python -c \"import sqlite3; print(sqlite3.sqlite_version)\"\npython -c \"import sqlite3; c=sqlite3.connect('estudos.db'); c.execute('create table if not exists marcador(texto)'); c.execute('insert into marcador values (?)', ('alternativa local',)); c.commit(); print(c.execute('select count(*) from marcador').fetchone()[0]); c.close()\"",
+            "exercise": "No VS Code, abra alternativa-sqlite, confirme qual comando mostra Python 3, salve sqlite_alternativa.py e execute-o no terminal do seu sistema: Windows (python sqlite_alternativa.py ou py sqlite_alternativa.py conforme a verificação), macOS/Linux (python3 sqlite_alternativa.py). Registre a contagem observada.",
+            "code": "import sqlite3\n\nbanco = sqlite3.connect(\"alternativa-sqlite.db\")\nbanco.execute(\"CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)\")\nbanco.execute(\"INSERT INTO marcador (texto) VALUES ('alternativa local')\")\nbanco.commit()\nresultado = banco.execute(\"SELECT COUNT(*) FROM marcador\").fetchone()\nprint(\"Registros de marcador:\", resultado[0])\nbanco.close()",
             "docs": [
               {"kind": "doc", "title": "Python · sqlite3", "url": "https://docs.python.org/3/library/sqlite3.html", "language": "EN"},
               {"kind": "doc", "title": "Docker · instalação por plataforma", "url": "https://docs.docker.com/engine/install/", "language": "EN"}
