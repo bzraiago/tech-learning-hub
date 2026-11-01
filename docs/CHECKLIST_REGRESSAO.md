@@ -40,6 +40,9 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 
 ## Aula, quiz e anotações
 
+- [x] `setup-docker-alternative`: código extraído da aula executado por `node scripts/verify-sqlite-preparation.cjs`; mensagem simples, persistência, alteração, desafio e diagnósticos passam em pasta temporária. Percurso e atalhos conferidos pelo E2E com serviços simulados. Conferência visual local em 375/768/1280 px registrada em `AUDITORIA_SQLITE_ETAPA_0.md`.
+- [ ] Repetir a nova aula SQLite com o aluno na etapa 0 e registrar o primeiro passo que ainda exige orientação externa; o teste técnico não comprova autonomia do aluno.
+
 - [ ] Abas Conceitos, Exemplo, Prática, Revisão e Fontes funcionam.
 - [x] `progresso-e-leitura.spec.cjs` valida em Chromium local que não há controles de exportação/importação, que o salvamento Supabase simulado é automático, que progresso e leitura retomam após recarga e que o estado fica isolado entre contas fictícias; também cobre teclado, 375/1280 px e `localStorage` bloqueado. Os serviços são mocks e as regras estruturais de flex/overflow são fornecidas pelo harness.
 - [ ] Na aba Prática, cada aula mostra previsão guiada, alteração com pistas, construção para um caso novo, investigação de erro segura e desafio de mudança de requisito, nessa ordem.

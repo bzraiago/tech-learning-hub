@@ -217,6 +217,26 @@ for (const lesson of lessons) {
   } else {
     validateJavaScriptExample(lesson.id, guide.example);
   }
+  if (guide.example?.steps !== undefined) {
+    if (!Array.isArray(guide.example.steps) || !guide.example.steps.length) {
+      fail(`Percurso guiado vazio: ${lesson.id}`);
+    } else {
+      guide.example.steps.forEach((step, index) => {
+        const label = `${lesson.id}:passo-${index + 1}`;
+        if (!step.title?.trim() || !step.expected?.trim()) fail(`Passo sem título ou confirmação: ${label}`);
+        const parts = [step, ...(step.alternatives || [])];
+        parts.forEach(part => {
+          if (!part.title?.trim() || !Array.isArray(part.paragraphs) || !part.paragraphs.length || part.paragraphs.some(text => typeof text !== 'string' || !text.trim())) fail(`Passo ou alternativa sem instrução: ${label}`);
+          for (const block of part.blocks || []) {
+            if (!block.label?.trim() || !block.code?.trim()) fail(`Bloco sem contexto ou conteúdo: ${label}`);
+          }
+        });
+      });
+    }
+  }
+  if (guide.requirementChange && (!guide.requirementChange.prompt?.trim() || !Array.isArray(guide.requirementChange.criteria) || !guide.requirementChange.criteria.length || guide.requirementChange.criteria.some(item => typeof item !== 'string' || !item.trim()))) {
+    fail(`Mudança de requisito sem enunciado ou critérios: ${lesson.id}`);
+  }
   if (!Array.isArray(guide.exercises) || guide.exercises.length === 0) {
     fail(`Aula sem exercícios: ${lesson.id}`);
   } else {

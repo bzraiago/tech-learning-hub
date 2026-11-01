@@ -98,6 +98,38 @@ test('sumário, salvamento automático e retomada de leitura ficam isolados por 
   // A CI não depende do CDN Tailwind; este trecho fornece só o layout rolável do diálogo.
   await page.addStyleTag({ content: '#study-dialog>div{display:flex;flex-direction:column;max-height:calc(100dvh - 42px)}#dialog-body{flex:1;min-height:0;overflow-y:auto}#lesson-sections.hidden{display:none}' });
 
+  // A preparação precisa apresentar o código no passo certo, antes de executá-lo.
+  await page.evaluate(() => openLesson('setup-docker-alternative'));
+  await expect(page.locator('#dialog-body [aria-label="Aulas anteriores necessárias"] [data-lesson="setup-editor"]')).toBeVisible();
+  await page.evaluate(() => renderLessonSection('example'));
+  const passosSQLite = page.locator('.reader-example-step');
+  await expect(passosSQLite).toHaveCount(10);
+  await expect(passosSQLite.nth(2).locator('pre')).toHaveText('print("Arquivo Python funcionando")');
+  await expect(passosSQLite.nth(4).locator('pre')).toHaveText('py sqlite_alternativa.py');
+  await expect(passosSQLite.nth(5).locator('pre')).toContainText('import sqlite3');
+  await expect(passosSQLite.nth(5).locator('pre')).toContainText('banco.close()');
+  await expect(passosSQLite.nth(5).locator('pre')).not.toHaveClass(/max-h-/);
+  await expect(passosSQLite.nth(6)).toContainText('o número pode ser maior');
+  const alternativa = passosSQLite.nth(3).locator('summary').first();
+  await alternativa.focus();
+  await page.keyboard.press('Enter');
+  await expect(passosSQLite.nth(3).locator('details').first()).toHaveAttribute('open', '');
+  await expect(passosSQLite.nth(3).locator('details').first().locator('pre')).toHaveText('python --version');
+  await page.evaluate(() => renderLessonSection('practice'));
+  await expect(page.locator('#dialog-body')).toContainText('Pratica concluida.');
+  await expect(page.locator('#dialog-body')).not.toContainText('Escolha uma mudança pequena ligada');
+  await expect(page.locator('#requirement-change-note-setup-docker-alternative')).toHaveAttribute('maxlength', '2000');
+  await page.evaluate(() => renderLessonSection('review'));
+  await expect(page.locator('#dialog-body')).toContainText('No module named sqlite3');
+  await page.evaluate(() => renderLessonSection('resources'));
+  await expect(page.locator('#dialog-body a[href="https://docs.python.org/3/library/sqlite3.html"]')).toBeVisible();
+  // Exercícios de outras aulas mantêm o enunciado padrão e os blocos antigos.
+  await page.evaluate(() => { openLesson('setup-editor'); renderLessonSection('example'); });
+  await expect(page.locator('#dialog-body pre')).not.toHaveCount(0);
+  await expect(page.locator('.reader-example-step')).toHaveCount(0);
+  await page.evaluate(() => renderLessonSection('practice'));
+  await expect(page.locator('#dialog-body')).toContainText('Escolha uma mudança pequena ligada');
+
   await page.evaluate(() => openLesson('chat-ai-skills'));
   await expect(page.locator('.execution-mode')).toContainText('Prática em plataforma web de chat com IA');
   await page.evaluate(() => renderLessonSection('example'));

@@ -648,6 +648,7 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 
 | Data | Fase/item | Commit | Resultado e verificação |
 |---|---|---|---|
+| 01/11/2026 | Etapa 0 — refazer alternativa SQLite | Commit desta revisão | Aula reescrita com percurso numerado e mensagem simples antes do banco; instrução, código e confirmação no mesmo passo; desafio específico. Código SQLite real e E2E local verificados. Auditoria e limites em `docs/AUDITORIA_SQLITE_ETAPA_0.md`; retomada com aluno pendente. |
 | 24/10/2026 | Criação do roadmap | `14126c8` | Roadmap consolidado a partir do backlog e da análise pedagógica. |
 | 24/10/2026 | Reorganização estrutural | `14126c8` | HTML, CSS, dados e funções separados por responsabilidade, sem mudança intencional de comportamento. |
 | 24/10/2026 | Fase 0 — base de medição | Commit da Fase 0 | Validador automático, linha de base e checklist manual de regressão adicionados. |

@@ -193,13 +193,15 @@
           {
             "id": "setup-docker-alternative",
             "title": "Seguir sem Docker em computador limitado",
-            "minutes": 45,
-            "concept": "Usar SQLite e laboratórios conceituais enquanto Docker não estiver disponível, registrando claramente o que foi simulado e o que foi executado.",
-            "objectives": ["Decidir com critérios quando adiar Docker.", "Executar a alternativa SQLite sem fingir que ela equivale a PostgreSQL em contêiner.", "Preparar evidências para retomar o caminho principal depois."],
-            "exercise": "No VS Code, abra alternativa-sqlite, confirme qual comando mostra Python 3, salve sqlite_alternativa.py e execute-o no terminal do seu sistema: Windows (python sqlite_alternativa.py ou py sqlite_alternativa.py conforme a verificação), macOS/Linux (python3 sqlite_alternativa.py). Registre a contagem observada.",
-            "code": "import sqlite3\n\nbanco = sqlite3.connect(\"alternativa-sqlite.db\")\nbanco.execute(\"CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)\")\nbanco.execute(\"INSERT INTO marcador (texto) VALUES ('alternativa local')\")\nbanco.commit()\nresultado = banco.execute(\"SELECT COUNT(*) FROM marcador\").fetchone()\nprint(\"Registros de marcador:\", resultado[0])\nbanco.close()",
+            "minutes": 75,
+            "concept": "Preparar uma prática leve com SQLite, começando por abrir, salvar e executar uma mensagem simples antes do banco.",
+            "objectives": ["Distinguir pasta, arquivo Python, editor e terminal.", "Salvar e executar primeiro uma mensagem, depois o exemplo SQLite guiado.", "Observar a contagem aumentar e retomar sem apagar o banco; registrar Docker e PostgreSQL como pendências."],
+            "exercise": "Siga os passos numerados da aba Exemplo: confirme a mensagem simples, execute SQLite e compare duas contagens reais. Depois faça a Prática.",
+            "code": "# Este bloco inteiro pertence ao arquivo sqlite_alternativa.py.\nimport sqlite3\n\nprint(\"Iniciando a pratica SQLite.\")\n\n# Abre o banco na pasta atual; cria o arquivo se ele ainda nao existir.\nbanco = sqlite3.connect(\"alternativa-sqlite.db\")\n\n# Prepara uma tabela e acrescenta uma linha a cada execucao.\nbanco.execute(\"CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)\")\nbanco.execute(\"INSERT INTO marcador (texto) VALUES ('alternativa local')\")\nbanco.commit()\n\n# Consulta a quantidade de linhas e mostra o numero no terminal.\nresultado = banco.execute(\"SELECT COUNT(*) FROM marcador\").fetchone()\nprint(\"Registros de marcador:\", resultado[0])\nbanco.close()",
             "docs": [
               {"kind": "doc", "title": "Python · sqlite3", "url": "https://docs.python.org/3/library/sqlite3.html", "language": "EN"},
+              {"kind": "doc", "title": "VS Code · áreas da interface", "url": "https://code.visualstudio.com/docs/editing/getting-started/userinterface", "language": "EN"},
+              {"kind": "doc", "title": "VS Code · terminal integrado", "url": "https://code.visualstudio.com/docs/terminal/basics", "language": "EN"},
               {"kind": "doc", "title": "Docker · instalação por plataforma", "url": "https://docs.docker.com/engine/install/", "language": "EN"}
             ]
           },

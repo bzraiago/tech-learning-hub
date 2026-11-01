@@ -73,99 +73,467 @@ Object.assign(LESSON_GUIDES, {
   },
 
   'setup-docker-alternative': {
-    prerequisites: 'Conclua Instalar e verificar Python 3. No Windows, use o comando que funcionou na verificação: python ou py. Se nenhum deles mostrar Python 3.x.x, pare e volte à instalação; sem um runtime o script não executa. SQLite é uma rota alternativa de estudo e não substitui PostgreSQL com Docker.',
-    setup: [
-      'Objetivo: criar e executar um arquivo Python que grava uma linha em SQLite e mostra quantas linhas existem.',
-      'Requisitos: concluir Instalar e verificar Python 3; usar VS Code ou outro editor e uma pasta local sua. Esta aula não usa Docker, pip ou prompt SQL separado.',
-      'Etapa 1 — abrir a pasta no editor: abra o VS Code pelo menu Iniciar do Windows (pesquise Visual Studio Code). No VS Code, clique em Arquivo > Abrir Pasta. Na janela que abrir, localize e selecione a pasta alternativa-sqlite; confirme em Selecionar Pasta. Se ela ainda não existir, crie uma pasta com esse nome nessa janela e depois a selecione. O nome alternativa-sqlite deve aparecer no painel Explorador, à esquerda.',
-      'Etapa 1.1 — abrir o terminal na pasta certa: no VS Code, clique em Terminal > Novo Terminal. Confira o caminho antes do sinal > no Prompt de Comando ou PowerShell: ele deve terminar em alternativa-sqlite. Esse terminal é onde você digita os comandos; o editor central é onde fica o código.',
-      'Escolha somente o bloco do sistema operacional que você usa. Não execute os comandos dos outros sistemas.',
-      'Windows: no PowerShell integrado ao VS Code, execute python --version. Se aparecer Python 3.x.x, use python nos próximos passos. Se o comando não for reconhecido, execute py --version e use py somente se ele mostrar Python 3.x.x.',
-      'macOS: no Terminal aberto na pasta alternativa-sqlite, execute python3 --version. Só continue se aparecer Python 3.x.x.',
-      'Linux: no Terminal aberto na pasta alternativa-sqlite, execute python3 --version. Só continue se aparecer Python 3.x.x.',
-      'Se nem python --version nem py --version mostrar Python 3.x.x, pare e volte a Instalar e verificar Python 3. Não tente executar o arquivo até uma das verificações funcionar.',
-      'Etapa 2 — abrir ou criar o arquivo: no painel Explorador à esquerda, procure sqlite_alternativa.py. Se já existir, clique uma vez no nome; o arquivo abrirá na área central do VS Code. Se não existir, passe o mouse sobre alternativa-sqlite no painel, clique no ícone Novo Arquivo (folha com sinal de +), digite sqlite_alternativa.py e pressione Enter. Clique no arquivo para abri-lo. Na área central, cole somente o bloco identificado como arquivo Python: ele começa com import sqlite3 e termina com banco.close(). Não cole aqui nenhum comando que comece com python ou py. Pressione Ctrl+S; a bolinha branca na aba deve desaparecer. Confirme que o nome termina em .py, não em .py.txt.',
-      'Etapa 3 — executar o arquivo: clique no painel Terminal, na parte inferior do VS Code. Na linha que começa com PS e termina com >, digite python sqlite_alternativa.py; use py sqlite_alternativa.py somente se foi py --version que mostrou Python 3.x.x. macOS/Linux: digite python3 sqlite_alternativa.py no Terminal aberto na pasta do arquivo. Esses comandos vão no terminal, nunca na área central do editor.',
-      'Verificação: leia a linha Registros de marcador no terminal. Na primeira execução do arquivo novo, o número deve ser 1. alternativa-sqlite.db fica junto do script.',
-      'Resultado esperado: a primeira execução mostra Registros de marcador: 1. Na segunda, mostra 2, pois cada execução acrescenta uma linha ao mesmo banco.',
-      'Problema comum: se aparecer SyntaxError e a linha indicada mostrar py sqlite_alternativa.py ou python sqlite_alternativa.py, esse comando foi parar dentro do arquivo; substitua o conteúdo pelo bloco Python e salve. Comandos python/py são digitados no terminal inferior. Se py disser que não encontrou runtime, mas python --version mostrar Python 3.x.x, use python sqlite_alternativa.py; não reinstale Python. Se o terminal voltar ao prompt sem mostrar a linha, confira se o bloco completo e a linha print estão no arquivo salvo. Se não encontrar o arquivo, abra a pasta alternativa-sqlite no Explorador antes de criar um novo terminal.',
-      'Como parar e retomar: o programa termina sozinho. Para continuar depois, abra no VS Code a mesma pasta, crie um novo terminal e execute novamente o arquivo. O banco permanece nessa pasta.',
-      'Alternativa leve: se não puder instalar Python agora, pause a execução local. Um playground no navegador ajuda a ler SQL, mas não executa este arquivo nem cria o banco no computador.'
-    ].join('\n'),
-    why: 'SQLite permite praticar uma tabela, uma gravação e uma contagem sem iniciar um servidor. Nesta aula, o foco é seguir o ciclo editor → arquivo salvo → terminal → resultado.',
-    sections: [
+    "prerequisiteLessons": [
+      "setup-editor",
+      "setup-python"
+    ],
+    "prerequisites": "Tenha concluído Preparar o editor de código e Instalar e verificar Python 3. Use os atalhos de pré-requisitos desta aula para abrir essas preparações. Você não precisa conhecer SQL nem saber escrever um programa Python: esta aula fornece o exemplo e ensina a colocá-lo no lugar certo.",
+    "setup": "Objetivo: abrir, editar, salvar e executar um arquivo Python; depois observar um registro permanecer em um banco SQLite local.\nRequisitos: VS Code e Python 3 instalados, permissão para criar uma pasta sua e este curso aberto no navegador. Não é necessário instalar extensão do VS Code, SQLite por pip ou Docker para esta prática.\nPercurso: leia Conceito para reconhecer os lugares da tela. Depois clique em Continuar: Exemplo no rodapé ou na aba Exemplo. Lá estão os passos numerados de execução, com o código no momento em que será usado. Não execute nada desta aula antes de abrir Exemplo.\nWindows: siga o caminho principal com VS Code e py. Se py falhar, o passo 4 ensina a verificar python. Use apenas o comando que responder Python 3.\nmacOS: abra as caixas macOS nos passos 1 e 2 e macOS ou Linux no passo 4. O comando será python3; os atalhos de edição usam Command no lugar de Ctrl.\nLinux: abra as caixas Linux nos passos 1 e 2 e macOS ou Linux no passo 4. O comando será python3.\nVerificação: no Exemplo, confirme primeiro uma mensagem simples; só depois execute o programa SQLite.\nResultado esperado: Arquivo Python funcionando no primeiro teste; depois duas mensagens do SQLite e uma contagem que aumenta em 1 a cada execução.\nProblema comum: se colar um comando de terminal dentro do .py, Python poderá mostrar SyntaxError. O passo 9 ensina a identificar esse e outros casos.\nComo parar e retomar: o programa termina sozinho; o passo 10 ensina a reabrir a mesma pasta. Não apague os arquivos de banco de tentativas anteriores.\nAlternativa leve: esta é a rota sem Docker. Se também não puder usar Python local, leia a explicação e deixe a prática pendente. Ler no navegador não cria o banco.",
+    "why": "Docker pode exigir recursos ou permissões indisponíveis no computador. SQLite permite esta primeira prática de dados em um arquivo local. A meta da etapa 0 é conseguir executar e reconhecer o resultado; configurar PostgreSQL e escrever consultas sozinho vêm depois.",
+    "sections": [
       {
-        title: '1. Abra a pasta e o arquivo no VS Code',
-        paragraphs: [
-          'Abra o VS Code. No Windows, se ele não estiver aberto, clique em Iniciar, pesquise Visual Studio Code e abra o aplicativo. Dentro do VS Code, clique em Arquivo > Abrir Pasta, selecione alternativa-sqlite na janela e confirme em Selecionar Pasta. O nome da pasta deve aparecer no painel Explorador à esquerda.',
-          'No painel Explorador, clique em sqlite_alternativa.py para abrir o arquivo na área central. Se não aparecer, passe o mouse sobre a pasta alternativa-sqlite, clique em Novo Arquivo (ícone de folha com +), digite sqlite_alternativa.py, pressione Enter e clique no arquivo criado. Na área central, cole somente o bloco Python que começa com import sqlite3 e termina com banco.close(). Não cole comandos python/py aqui. Salve com Ctrl+S e confirme que a bolinha branca da aba desapareceu.',
-          'Agora escolha o terminal do seu sistema. No Windows, clique em Terminal > Novo Terminal e execute python --version; se o comando não for reconhecido, tente py --version. No macOS/Linux, abra Terminal na pasta alternativa-sqlite e execute python3 --version. Só continue quando um comando mostrar Python 3.x.x; se nenhum funcionar, volte à aula Instalar e verificar Python 3.'
+        "title": "Reconheça pasta, arquivo e programa",
+        "paragraphs": [
+          "alternativa-sqlite é a pasta: ela agrupa os arquivos deste exercício. sqlite_alternativa.py é um arquivo de texto dentro dela. O final .py indica que seu conteúdo é código Python.",
+          "Python é o programa que lê esse arquivo e executa suas instruções. Criar um arquivo vazio não cria um programa: precisamos escrever algo nele e salvar.",
+          "alternativa-sqlite.db será o arquivo de dados criado pelo exemplo. Você não precisa criá-lo nem editá-lo. Ele não é texto comum e pode aparecer como binário se for aberto no editor."
+        ],
+        "terms": [
+          {
+            "term": "Banco de dados",
+            "meaning": "Lugar organizado onde o programa guarda e consulta informações. Nesta prática, os dados ficam em um arquivo .db no computador."
+          },
+          {
+            "term": "SQLite",
+            "meaning": "Ferramenta de banco de dados que o exemplo usa sem iniciar um servidor separado."
+          }
         ]
       },
       {
-        title: '2. Execute e confira a contagem',
-        paragraphs: [
-          'Agora clique em Terminal, no painel inferior do VS Code. Confira que o caminho antes do sinal > termina em alternativa-sqlite. Na linha do terminal que começa com PS, digite python sqlite_alternativa.py se python --version mostrou Python 3.x.x; se somente py --version funcionou, digite py sqlite_alternativa.py. macOS ou Linux: digite python3 sqlite_alternativa.py no Terminal. Não coloque esse comando no arquivo .py.',
-          'Na primeira execução, procure Registros de marcador: 1. Se executar de novo, a contagem aumenta porque alternativa-sqlite.db permanece entre execuções. A linha print exibe o número no terminal.'
+        "title": "Reconheça os três lugares em que você vai trabalhar",
+        "paragraphs": [
+          "Navegador: mostra esta aula. Os campos de rascunho guardam suas observações; eles não executam o programa.",
+          "Editor do VS Code: é a área central com uma aba chamada sqlite_alternativa.py e números de linha à esquerda. Nela você escreve o conteúdo do arquivo e usa Arquivo > Salvar.",
+          "Terminal do VS Code: é o painel normalmente na parte inferior, aberto pelo menu Terminal > Novo Terminal. Nele você pede ao Python para executar o arquivo. Cada comando só é enviado quando você pressiona Enter.",
+          "Na aba Exemplo, os blocos ARQUIVO são conteúdo do editor. Os blocos TERMINAL são comandos do painel inferior. Os resultados esperados são mensagens para comparar com a tela, não para copiar para nenhum desses lugares."
         ]
       },
       {
-        title: '3. Saiba o que fica para depois',
-        paragraphs: [
-          'O SQLite cria alternativa-sqlite.db dentro da pasta do exercício. Ele não inicia PostgreSQL, Docker ou Compose e não comprova conexão por rede.',
-          'Quando puder seguir com Docker, retorne a Preparar Docker, WSL e virtualização e depois a Compose: portas, volumes e conexão ao PostgreSQL. Mantenha essa prática pendente até executá-la de verdade.'
+        "title": "O primeiro resultado será só uma mensagem",
+        "paragraphs": [
+          "Antes do banco, vamos executar uma única linha: print(\"Arquivo Python funcionando\"). print significa mostrar algo na tela; as aspas delimitam o texto da mensagem. Quando o arquivo for executado, o terminal deverá mostrar Arquivo Python funcionando, sem as aspas.",
+          "Esse primeiro teste confirma que você abriu o arquivo certo, salvou e executou no lugar certo. Só depois dele trocaremos o conteúdo pelo exemplo SQLite.",
+          "O exemplo SQLite cria uma tabela chamada marcador, acrescenta um registro e conta quantos registros existem. Pense em tabela como uma lista organizada e em registro como uma linha dessa lista. Não será pedido que você invente comandos SQL nesta preparação."
+        ]
+      },
+      {
+        "title": "O que esta alternativa permite concluir",
+        "paragraphs": [
+          "Cada execução do exemplo completo acrescenta uma linha ao mesmo arquivo de banco. Por isso a contagem aumenta; fechar o VS Code não apaga essas linhas.",
+          "Você poderá registrar que executou Python e SQLite localmente. Docker, Compose, rede e PostgreSQL continuam pendentes. Retome Preparar Docker, WSL e virtualização quando o computador e as permissões permitirem.",
+          "Agora clique em Continuar: Exemplo. A sequência começa pela pasta e não exige ter executado nenhum código desta aula ainda."
         ]
       }
     ],
-    example: {
-      language: 'Python 3 e terminal',
-      code: 'import sqlite3\n\nbanco = sqlite3.connect("alternativa-sqlite.db")\nbanco.execute("CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)")\nbanco.execute("INSERT INTO marcador (texto) VALUES (\'alternativa local\')")\nbanco.commit()\nresultado = banco.execute("SELECT COUNT(*) FROM marcador").fetchone()\nprint("Registros de marcador:", resultado[0])\nbanco.close()',
-      blocks: [
-        { label: 'COLE NO ARQUIVO — área central do VS Code: sqlite_alternativa.py', code: 'import sqlite3\n\nbanco = sqlite3.connect("alternativa-sqlite.db")\nbanco.execute("CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)")\nbanco.execute("INSERT INTO marcador (texto) VALUES (\'alternativa local\')")\nbanco.commit()\nresultado = banco.execute("SELECT COUNT(*) FROM marcador").fetchone()\nprint("Registros de marcador:", resultado[0])\nbanco.close()' },
-        { label: 'DIGITE NO TERMINAL inferior — Windows PowerShell: use se python --version mostrou Python 3', code: 'python --version\npython sqlite_alternativa.py' },
-        { label: 'DIGITE NO TERMINAL inferior — Windows PowerShell: use somente se python não foi reconhecido e py --version mostrou Python 3', code: 'py --version\npy sqlite_alternativa.py' },
-        { label: 'macOS — Terminal na pasta alternativa-sqlite', code: 'python3 --version\npython3 sqlite_alternativa.py' },
-        { label: 'Linux — Terminal na pasta alternativa-sqlite', code: 'python3 --version\npython3 sqlite_alternativa.py' }
+    "example": {
+      "language": "Python 3",
+      "code": "# Este bloco inteiro pertence ao arquivo sqlite_alternativa.py.\nimport sqlite3\n\nprint(\"Iniciando a pratica SQLite.\")\n\n# Abre o banco na pasta atual; cria o arquivo se ele ainda nao existir.\nbanco = sqlite3.connect(\"alternativa-sqlite.db\")\n\n# Prepara uma tabela e acrescenta uma linha a cada execucao.\nbanco.execute(\"CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)\")\nbanco.execute(\"INSERT INTO marcador (texto) VALUES ('alternativa local')\")\nbanco.commit()\n\n# Consulta a quantidade de linhas e mostra o numero no terminal.\nresultado = banco.execute(\"SELECT COUNT(*) FROM marcador\").fetchone()\nprint(\"Registros de marcador:\", resultado[0])\nbanco.close()",
+      "steps": [
+        {
+          "title": "Localize ou crie a pasta do exercício",
+          "paragraphs": [
+            "Windows: pressione Windows + E para abrir o Explorador de Arquivos. Se você já criou alternativa-sqlite, encontre essa pasta no local que escolheu anteriormente e use a mesma. Não crie uma segunda pasta com o mesmo nome em outro lugar.",
+            "Se está começando agora: clique em Documentos no Explorador. Pressione Ctrl+Shift+N, digite alternativa-sqlite e pressione Enter. Esse atalho cria uma pasta; o nome não inclui .py.",
+            "Abra alternativa-sqlite com dois cliques. Clique na barra de endereço do Explorador, na parte de cima da janela, para ver o caminho completo. Anote onde a pasta fica; você a selecionará no próximo passo."
+          ],
+          "alternatives": [
+            {
+              "title": "macOS",
+              "paragraphs": [
+                "Abra Finder > Documentos. Se a pasta alternativa-sqlite já existir, use-a. Caso contrário, escolha Arquivo > Nova Pasta, digite alternativa-sqlite e pressione Return. Abra a pasta e lembre esse local."
+              ]
+            },
+            {
+              "title": "Linux",
+              "paragraphs": [
+                "Abra o aplicativo Arquivos e entre em Documentos ou em outra pasta pessoal gravável. Use a opção Nova pasta do menu ou do botão direito, dê o nome alternativa-sqlite e abra-a. Se ela já existir, use a pasta existente. Os nomes podem variar conforme o ambiente gráfico."
+              ]
+            }
+          ],
+          "expected": "Você vê a pasta alternativa-sqlite aberta no gerenciador de arquivos e sabe em que local ela está. Ainda não é necessário ter um arquivo Python."
+        },
+        {
+          "title": "Abra essa pasta no VS Code",
+          "paragraphs": [
+            "Windows: abra Iniciar, pesquise Visual Studio Code e clique no aplicativo. Se ele já estiver aberto, use essa janela. Você pode alternar entre a aula no navegador e o VS Code pela barra de tarefas.",
+            "No VS Code, clique em Arquivo > Abrir Pasta (File > Open Folder). Na janela que abrir, clique em Documentos na lateral se criou a pasta ali; clique em alternativa-sqlite e confirme em Selecionar Pasta (Select Folder). Se usou outro local, clique na barra de endereço dessa janela, digite ou cole o caminho completo que viu no passo 1 e pressione Enter; depois confirme em Selecionar Pasta. Se aparecer uma pergunta sobre confiança, confirme apenas para essa pasta que você mesmo criou.",
+            "À esquerda, procure o painel Explorador (Explorer). Se estiver oculto, clique em Exibir > Explorador (View > Explorer). Se o nome da pasta estiver recolhido, clique na seta ao lado de alternativa-sqlite para mostrar seus arquivos."
+          ],
+          "alternatives": [
+            {
+              "title": "macOS ou Linux",
+              "paragraphs": [
+                "Abra Visual Studio Code pela lista de aplicativos do sistema (no macOS, Finder > Aplicativos; no Linux, menu de aplicativos). Use Arquivo > Abrir Pasta (File > Open Folder), selecione a pasta criada no passo 1 e confirme em Abrir/Open. Use Exibir > Explorador para mostrar a lista à esquerda."
+              ]
+            }
+          ],
+          "expected": "O painel esquerdo do VS Code mostra alternativa-sqlite. Esta é a pasta de trabalho, mesmo que ainda esteja vazia."
+        },
+        {
+          "title": "Escreva uma mensagem e salve o arquivo Python",
+          "paragraphs": [
+            "Se sqlite_alternativa.py já aparecer à esquerda, clique no nome para abri-lo. Se não aparecer, escolha Arquivo > Novo Arquivo de Texto (File > New Text File). No Windows/Linux, Ctrl+N também abre um texto novo; no macOS, use Command+N.",
+            "Clique na área central de edição, ao lado do número de linha 1. Se houver tentativas anteriores nesse arquivo, selecione o conteúdo com Ctrl+A (Command+A no macOS). Vamos substituí-lo temporariamente por uma linha simples. A seleção deve estar dentro do editor, não no navegador ou no terminal.",
+            "Digite exatamente a linha do bloco ARQUIVO abaixo, incluindo parênteses e aspas. O texto cinza “Gerar código” ou semelhante em um editor vazio é uma sugestão do aplicativo; você pode começar a digitar normalmente.",
+            "Clique em Arquivo > Salvar (File > Save). Se abrir a janela de salvamento, selecione a pasta alternativa-sqlite, digite sqlite_alternativa.py no campo Nome e confirme em Salvar. Se existir a opção Tipo, escolha Todos os arquivos; evite terminar com .py.txt. Para salvar novamente, use Ctrl+S (Command+S no macOS)."
+          ],
+          "blocks": [
+            {
+              "label": "ARQUIVO — selecione e copie somente o código abaixo para a área central do VS Code",
+              "code": "print(\"Arquivo Python funcionando\")"
+            }
+          ],
+          "alternatives": [
+            {
+              "title": "Quero guardar o código de uma tentativa anterior",
+              "paragraphs": [
+                "Antes de substituir, use Arquivo > Salvar Como e salve uma cópia chamada tentativa-anterior.py na mesma pasta. Depois clique no arquivo original sqlite_alternativa.py no Explorador e faça o passo acima nele. Os arquivos .db não serão apagados."
+              ]
+            }
+          ],
+          "expected": "A aba central e a lista à esquerda mostram sqlite_alternativa.py. Dentro dele há apenas print(\"Arquivo Python funcionando\"). Uma bolinha na aba indica alteração pendente; após salvar ela deve desaparecer (com salvamento automático, pode nem aparecer)."
+        },
+        {
+          "title": "Abra o terminal e confirme qual comando encontra Python",
+          "paragraphs": [
+            "No menu superior do VS Code, clique em Terminal > Novo Terminal (Terminal > New Terminal). Clique dentro do painel Terminal que abriu, normalmente na parte inferior. Você deve ver um cursor após um caminho e um sinal como >, $ ou %.",
+            "No Windows PowerShell, uma linha pode começar com PS e terminar em alternativa-sqlite>. No Prompt de Comando, ela não começa com PS. Ambos aceitam os comandos Python desta aula. Não copie PS, o caminho ou o sinal >; digite somente o comando do bloco TERMINAL e pressione Enter.",
+            "Use py --version primeiro no Windows. Se responder Python 3 seguido de números, anote py como seu comando. Não é preciso que a versão seja igual à de outra pessoa. Se falhar, abra a alternativa abaixo; isso por si só não prova que Python está ausente.",
+            "Se o terminal estiver em outra pasta, clique na lixeira do painel para fechar apenas esse terminal; no Explorador do VS Code, clique com o botão direito na pasta alternativa-sqlite e escolha Abrir no Terminal Integrado (Open in Integrated Terminal)."
+          ],
+          "blocks": [
+            {
+              "label": "TERMINAL — Windows: digite esta linha no painel inferior e pressione Enter",
+              "code": "py --version"
+            }
+          ],
+          "alternatives": [
+            {
+              "title": "Windows: py não encontrou Python",
+              "paragraphs": [
+                "No mesmo terminal, digite python --version e pressione Enter. Se aparecer Python 3.x.x, anote python como seu comando e substitua apenas o início py dos comandos seguintes por python. Exemplo: python sqlite_alternativa.py. Se a Microsoft Store abrir ou nenhum dos comandos mostrar Python 3, pare e retorne a Instalar e verificar Python 3."
+              ],
+              "blocks": [
+                {
+                  "label": "TERMINAL — Windows: digite esta linha no painel inferior e pressione Enter",
+                  "code": "python --version"
+                }
+              ]
+            },
+            {
+              "title": "macOS ou Linux",
+              "paragraphs": [
+                "No terminal integrado do VS Code, digite pwd e pressione Enter: o caminho mostrado deve terminar em alternativa-sqlite. Se estiver diferente, reabra o terminal pelo botão direito na pasta, conforme a instrução acima. Depois digite python3 --version. Continue somente se aparecer Python 3.x.x. Seu comando será python3: em todos os próximos passos, use python3 no lugar de py."
+              ],
+              "blocks": [
+                {
+                  "label": "TERMINAL — macOS/Linux: uma linha por vez, pressionando Enter após cada uma",
+                  "code": "pwd\npython3 --version"
+                }
+              ]
+            },
+            {
+              "title": "Aparece >>> no lugar do caminho da pasta",
+              "paragraphs": [
+                "Você entrou no modo interativo do Python. Nesse painel, digite exit() e pressione Enter para voltar ao terminal do sistema. Então faça a verificação de versão acima. exit() é usado somente para sair desse modo."
+              ]
+            }
+          ],
+          "expected": "O terminal está na pasta alternativa-sqlite; você viu Python 3.x.x e anotou o comando que funcionou: py, python ou python3. Não prossiga com uma mensagem de erro."
+        },
+        {
+          "title": "Execute a mensagem simples antes de usar o banco",
+          "paragraphs": [
+            "Confirme que o arquivo da área central foi salvo. Clique no Terminal inferior, digite a linha abaixo e pressione Enter. Faça isso uma vez. O espaço separa o comando py do nome do arquivo.",
+            "Antes de pressionar Enter, diga o que espera ver. A confirmação será Arquivo Python funcionando em uma linha do terminal, seguida do retorno do caminho da pasta. Isso é o resultado; não precisa digitá-lo.",
+            "Se não aparecer a mensagem, pare aqui. Clique na aba sqlite_alternativa.py, confira a linha print, use Arquivo > Salvar e só então repita o comando no terminal. Se houver erro, veja o passo Diagnóstico ao final desta sequência. Não avance para SQLite enquanto esse teste não funcionar."
+          ],
+          "blocks": [
+            {
+              "label": "TERMINAL — Windows: digite esta linha no painel inferior e pressione Enter",
+              "code": "py sqlite_alternativa.py"
+            }
+          ],
+          "alternatives": [
+            {
+              "title": "Se você escolheu python, macOS ou Linux no passo de verificação",
+              "paragraphs": [
+                "No Windows com python funcionando, digite python sqlite_alternativa.py. No macOS/Linux, digite python3 sqlite_alternativa.py. Use sempre o mesmo comando que mostrou Python 3. O restante da aula é igual."
+              ]
+            }
+          ],
+          "expected": "O terminal mostra Arquivo Python funcionando. Você comprovou abrir → editar → salvar → executar. Ainda não há necessidade de criar ou contar registros."
+        },
+        {
+          "title": "Troque a mensagem pelo exemplo completo de SQLite",
+          "paragraphs": [
+            "Agora volte à aba sqlite_alternativa.py, na área central. Clique dentro do código e selecione tudo com Ctrl+A (Command+A no macOS). Você vai substituir a mensagem simples pelo bloco inteiro abaixo.",
+            "No navegador, selecione com o mouse somente as linhas dentro do bloco ARQUIVO, da primeira linha iniciada por # até banco.close(). Copie com Ctrl+C (Command+C no macOS). Volte ao editor central do VS Code e cole com Ctrl+V (Command+V no macOS). Não copie o título do bloco nem um bloco TERMINAL.",
+            "O código abaixo é um exemplo guiado para preparar o ambiente. Você pode copiá-lo completo nesta etapa; a escrita de SQL será estudada na trilha de dados. Linhas iniciadas por # são comentários: explicam o trecho e não são executadas.",
+            "Use Arquivo > Salvar. Confira no editor três sinais: há import sqlite3 perto do início, print(\"Registros de marcador:\", resultado[0]) perto do fim e banco.close() na última linha. Não deve existir uma linha py sqlite_alternativa.py dentro do arquivo."
+          ],
+          "blocks": [
+            {
+              "label": "ARQUIVO — selecione e copie somente o código abaixo para a área central do VS Code",
+              "code": "# Este bloco inteiro pertence ao arquivo sqlite_alternativa.py.\nimport sqlite3\n\nprint(\"Iniciando a pratica SQLite.\")\n\n# Abre o banco na pasta atual; cria o arquivo se ele ainda nao existir.\nbanco = sqlite3.connect(\"alternativa-sqlite.db\")\n\n# Prepara uma tabela e acrescenta uma linha a cada execucao.\nbanco.execute(\"CREATE TABLE IF NOT EXISTS marcador (texto TEXT NOT NULL)\")\nbanco.execute(\"INSERT INTO marcador (texto) VALUES ('alternativa local')\")\nbanco.commit()\n\n# Consulta a quantidade de linhas e mostra o numero no terminal.\nresultado = banco.execute(\"SELECT COUNT(*) FROM marcador\").fetchone()\nprint(\"Registros de marcador:\", resultado[0])\nbanco.close()"
+            }
+          ],
+          "expected": "O arquivo salvo contém o bloco completo de SQLite. Trocar o texto no editor e salvar ainda não executa o programa nem altera o banco."
+        },
+        {
+          "title": "Execute SQLite uma vez e leia as duas mensagens",
+          "paragraphs": [
+            "Clique no Terminal inferior e execute o mesmo comando usado para a mensagem simples. O nome do arquivo não mudou, apenas seu conteúdo salvo.",
+            "Espere duas linhas: Iniciando a pratica SQLite. e Registros de marcador: seguido de um número. Se alternativa-sqlite.db não existia, o número será 1. Se você já fez tentativas com esse banco, o número pode ser maior; isso não é um erro.",
+            "No painel Explorador, procure alternativa-sqlite.db ao lado de sqlite_alternativa.py. O programa criou ou abriu esse arquivo automaticamente. Não é preciso abri-lo, editá-lo ou criar uma pasta com esse nome.",
+            "Anote a contagem que realmente apareceu. estudos.db, se existir de uma versão anterior da aula, é outro arquivo e não é usado por este exemplo. Mantenha-o como está."
+          ],
+          "blocks": [
+            {
+              "label": "TERMINAL — Windows: digite esta linha no painel inferior e pressione Enter",
+              "code": "py sqlite_alternativa.py"
+            }
+          ],
+          "alternatives": [
+            {
+              "title": "Se você escolheu python, macOS ou Linux no passo de verificação",
+              "paragraphs": [
+                "No Windows com python funcionando, digite python sqlite_alternativa.py. No macOS/Linux, digite python3 sqlite_alternativa.py. Use sempre o mesmo comando que mostrou Python 3. O restante da aula é igual."
+              ]
+            }
+          ],
+          "expected": "Duas mensagens no terminal e o arquivo alternativa-sqlite.db no Explorador. Exemplo com banco novo: Iniciando a pratica SQLite. / Registros de marcador: 1. A barra aqui separa as duas linhas, não faz parte da saída."
+        },
+        {
+          "title": "Execute de novo e observe a persistência",
+          "paragraphs": [
+            "Antes de executar novamente, olhe o último número e preveja qual será o próximo. Cada execução acrescenta exatamente um registro. Se você viu 1, espere 2; se viu 5, espere 6.",
+            "No Terminal inferior, digite o mesmo comando e pressione Enter uma vez. Compare com sua previsão. Não troque a pasta nem apague o banco para forçar a contagem a começar em 1.",
+            "Agora você viu persistência: as linhas anteriores ficaram no arquivo .db e a nova execução acrescentou uma linha. Se a contagem reiniciou, confira se usou outra pasta ou outro arquivo de banco."
+          ],
+          "blocks": [
+            {
+              "label": "TERMINAL — Windows: digite esta linha no painel inferior e pressione Enter",
+              "code": "py sqlite_alternativa.py"
+            }
+          ],
+          "alternatives": [
+            {
+              "title": "Se você escolheu python, macOS ou Linux no passo de verificação",
+              "paragraphs": [
+                "No Windows com python funcionando, digite python sqlite_alternativa.py. No macOS/Linux, digite python3 sqlite_alternativa.py. Use sempre o mesmo comando que mostrou Python 3. O restante da aula é igual."
+              ]
+            }
+          ],
+          "expected": "O número passou de N para N + 1, em que N é a contagem que você realmente anotou no passo anterior."
+        },
+        {
+          "title": "Diagnóstico: use apenas o caso que corresponde à sua tela",
+          "paragraphs": [
+            "Se um passo falhou, não execute os seguintes. Registre o comando, a mensagem completa e o que esperava ver. Abra abaixo somente o caso parecido com o seu, faça uma correção e retorne ao passo que falhou."
+          ],
+          "alternatives": [
+            {
+              "title": "SyntaxError aponta uma linha como py sqlite_alternativa.py",
+              "paragraphs": [
+                "O comando de terminal está dentro do arquivo salvo. Clique na aba sqlite_alternativa.py na área central e substitua o conteúdo pelo bloco ARQUIVO do passo em que você está: a mensagem simples no passo 3 ou SQLite no passo 6. Salve. Clique no Terminal inferior e digite o comando ali. Se você apagou a linha no editor mas o erro continua igual, confira se salvou a alteração."
+              ]
+            },
+            {
+              "title": "O terminal volta ao caminho da pasta sem mostrar nada",
+              "paragraphs": [
+                "Um arquivo vazio pode terminar sem mensagem. Abra sqlite_alternativa.py pelo painel esquerdo e confira seu conteúdo. No teste simples, precisa existir a linha print; no teste SQLite, o bloco deve estar completo. Use Arquivo > Salvar e execute novamente. Se continuar, confirme o nome da aba e a pasta do terminal; pode estar executando outra cópia do arquivo."
+              ]
+            },
+            {
+              "title": "can’t open file / No such file or directory",
+              "paragraphs": [
+                "Python não encontrou o nome solicitado nessa pasta. Confira no Explorador do VS Code se o nome é sqlite_alternativa.py, sem .txt no final. Se estiver errado, clique com o botão direito no arquivo, escolha Renomear e corrija. Confira também se o terminal foi aberto na pasta alternativa-sqlite conforme o passo 4."
+              ]
+            },
+            {
+              "title": "SyntaxError ou IndentationError aponta uma linha do código Python",
+              "paragraphs": [
+                "Confira o número da linha no erro e compare essa linha com o bloco ARQUIVO. Verifique aspas retas, parênteses, partes faltando e espaços antes das instruções. Neste exemplo, as instruções começam na margem esquerda. Corrija uma diferença, salve e execute novamente; a cor do texto no editor não indica erro por si só."
+              ]
+            },
+            {
+              "title": "No module named sqlite3",
+              "paragraphs": [
+                "Esta distribuição do Python não disponibilizou o módulo SQLite. Registre a versão e o comando que usou e retorne a Instalar e verificar Python 3 para conferir a distribuição. Não instale um pacote chamado sqlite3 via pip. Deixe a prática SQLite pendente até resolver o módulo."
+              ]
+            },
+            {
+              "title": "O comando py não funciona ou abre a loja",
+              "paragraphs": [
+                "Retorne à alternativa Windows do passo 4 e confira python --version. Use somente um comando que mostrou Python 3.x.x. Não conclua que Python está ausente só porque py falhou."
+              ]
+            },
+            {
+              "title": "No such table/column, database is locked ou banco diferente de uma tentativa antiga",
+              "paragraphs": [
+                "Não apague o banco antigo. Encerre outro programa que o esteja usando e confira se copiou o bloco inteiro. Se você alterou a estrutura do banco numa tentativa anterior, crie uma nova pasta de prática pelo passo 1, com o nome alternativa-sqlite-reinicio, e faça o roteiro ali. O nome do script continua sqlite_alternativa.py; no terminal, confira agora o nome da nova pasta. Isso cria uma base isolada e preserva a anterior."
+              ]
+            }
+          ],
+          "expected": "Você identificou o passo e a mensagem da falha, corrigiu uma causa e repetiu o mesmo passo. Se não conseguir confirmar a correção, registre a pendência em vez de marcar a prática como feita."
+        },
+        {
+          "title": "Pare, retome e passe para a prática",
+          "paragraphs": [
+            "Quando o caminho da pasta reaparece após as mensagens, o programa já terminou. Não há servidor para desligar. Salve o arquivo e pode fechar o VS Code.",
+            "Para retomar, abra novamente o VS Code e use Arquivo > Abrir Pasta para selecionar a mesma alternativa-sqlite. Clique em sqlite_alternativa.py na lista da esquerda, abra Terminal > Novo Terminal e execute o comando que você verificou. O banco existente permanece; a execução acrescentará mais um registro.",
+            "Leia abaixo a explicação das linhas. Depois clique em Continuar: Prática no rodapé. Os exercícios partem da última contagem observada, sem exigir que você volte a 1. Você ainda não precisa escrever uma nova tabela sozinho."
+          ],
+          "expected": "Você sabe localizar o script, o banco e o terminal e retomar a execução sem apagar as tentativas anteriores."
+        }
       ],
-      explanation: [
-        'O primeiro bloco, marcado COLE NO ARQUIVO, é o conteúdo de sqlite_alternativa.py. Ele começa com import sqlite3 e termina com banco.close(). Os blocos marcados DIGITE NO TERMINAL são comandos separados; nunca os cole no arquivo Python.',
-        'sqlite3.connect cria ou abre alternativa-sqlite.db na pasta em que o programa está sendo executado.',
-        'CREATE TABLE prepara a tabela marcador. INSERT acrescenta uma linha a cada execução. commit grava a alteração no banco.',
-        'SELECT COUNT(*) consulta quantas linhas existem. fetchone() pega a linha consultada e resultado[0] é o número. print exibe esse número no terminal.',
-        'Na primeira execução do banco novo, a saída é Registros de marcador: 1. Uma segunda execução acrescenta outra linha e mostra 2.'
+      "explanation": [
+        "print(\"Arquivo Python funcionando\") foi o teste de abertura, salvamento e execução. No programa completo, os dois print mostram o início e a contagem; nada é exibido automaticamente apenas porque você criou um arquivo.",
+        "import sqlite3 disponibiliza o módulo de acesso ao SQLite. Um módulo é um conjunto de ferramentas que o programa pode usar. banco = sqlite3.connect(...) guarda em banco a conexão com o arquivo .db na pasta de trabalho do terminal.",
+        "banco.execute(...) envia ao SQLite o texto entre aspas. CREATE TABLE IF NOT EXISTS prepara a tabela marcador se ela ainda não existir. texto TEXT NOT NULL define uma coluna de texto que não aceita ausência de valor. Aqui estamos apenas usando esse modelo pronto.",
+        "INSERT INTO marcador (texto) VALUES (...) acrescenta uma linha com o texto alternativa local. banco.commit() confirma essa gravação. O script usa um texto fixo de exemplo; ele não recebe dados digitados por outras pessoas.",
+        "SELECT COUNT(*) FROM marcador pergunta quantas linhas há na tabela. fetchone() obtém uma linha de resposta, guardada em resultado. resultado[0] pega o primeiro valor dessa linha: o número que o print mostra.",
+        "banco.close() fecha a conexão. Ele não apaga o arquivo. Rodar o programa novamente abre o mesmo banco e acrescenta mais uma linha. SQL, consultas e parâmetros serão desenvolvidos na trilha de dados."
       ],
-      expected: 'Depois da primeira execução do arquivo novo, o terminal mostra Registros de marcador: 1. O arquivo alternativa-sqlite.db fica na pasta alternativa-sqlite; ao executar novamente, a contagem passa a 2.'
+      "expected": "Primeiro você viu Arquivo Python funcionando. Depois viu as duas mensagens do programa SQLite e a contagem crescer em 1 ao executar novamente na mesma pasta. O número inicial depende de o banco já existir."
     },
-    guided: [
-      { instruction: 'Abra o VS Code, clique em Arquivo > Abrir Pasta, selecione alternativa-sqlite e confirme. Depois clique em Terminal > Novo Terminal. No Windows, teste python --version; se não for reconhecido, tente py --version. Continue apenas com o comando que mostrar Python 3.x.x.', result: 'A pasta alternativa-sqlite aparece no painel Explorador e o terminal mostra Python 3.x.x.' },
-      { instruction: 'No painel Explorador, clique em sqlite_alternativa.py para abrir na área central. Se não existir, use Novo Arquivo (folha com +), digite o nome e pressione Enter. Cole no arquivo apenas o bloco iniciado por import sqlite3, salve com Ctrl+S e confirme que a bolinha branca da aba sumiu.', result: 'A aba do editor mostra sqlite_alternativa.py e o arquivo salvo inclui a linha print("Registros de marcador:", resultado[0]); nenhum comando python/py foi colado no arquivo.' },
-      { instruction: 'No mesmo terminal, execute python sqlite_alternativa.py se python --version funcionou, ou py sqlite_alternativa.py se somente py --version funcionou. Em macOS/Linux, use python3 sqlite_alternativa.py no Terminal aberto na pasta do arquivo.', result: 'O terminal mostra Registros de marcador: 1 na primeira execução e cria alternativa-sqlite.db na pasta.' }
+    "guided": [
+      {
+        "instruction": "Sem executar novamente, localize no painel esquerdo o script e o banco. Diga qual arquivo você edita e qual é criado pelo programa.",
+        "result": "sqlite_alternativa.py contém o código; alternativa-sqlite.db guarda os registros."
+      },
+      {
+        "instruction": "Aponte a área em que colocou print e a área em que digitou o comando de execução. Diga por que foi necessário salvar antes de executar.",
+        "result": "Código na área central; comando no terminal. Python lê a versão salva do arquivo."
+      },
+      {
+        "instruction": "Compare as duas últimas contagens reais. Registre se a segunda é a primeira mais 1; se não for, retorne ao passo de diagnóstico.",
+        "result": "A comparação se baseia nas saídas observadas, sem inventar valores nem reiniciar o banco."
+      }
     ],
-    exercises: [
-      { prompt: 'Prever: antes de executar o arquivo pela primeira vez, anote o que espera ver no terminal. Depois, no Windows, use o comando de Python 3 que funcionou na verificação para executar o arquivo uma vez. Qual número apareceu?', hints: ['Leia a linha print do arquivo e conte quantas linhas o INSERT acrescenta por execução.'], solution: 'A primeira execução do banco novo mostra Registros de marcador: 1.', explanation: 'Prever antes de executar ajuda a comparar o comportamento esperado com a evidência real.', expected: 'Registre a previsão antes de rodar e depois copie a linha realmente impressa, sem inventar uma saída.', criteria: ['Faz a previsão antes da execução.', 'Executa o arquivo salvo uma vez e registra a saída observada.'] },
-      { prompt: 'Alterar: no editor, troque o texto alternativa local por meu primeiro registro na linha INSERT. Salve com Ctrl+S e execute novamente com o mesmo comando de Python 3 que funcionou. O que acontece com a contagem?', hints: ['A alteração muda o texto gravado; a execução continua inserindo uma nova linha.'], solution: 'O terminal mostra Registros de marcador: 2 porque a primeira linha permanece em alternativa-sqlite.db e esta execução acrescenta outra.', explanation: 'A contagem muda porque o arquivo do banco preserva a linha da execução anterior.', expected: 'Registre a contagem observada após a segunda execução. Se já havia tentativas anteriores, ela pode ser maior que 2.', criteria: ['Altera o texto no arquivo, salva e executa o mesmo script.', 'Relaciona a contagem observada às linhas gravadas em execuções anteriores.'] },
-      { prompt: 'Construir: no editor, crie resultado-sqlite.txt dentro de alternativa-sqlite. Registre o nome do script, o nome do arquivo de banco e a última linha que apareceu no terminal.', hints: ['Use somente o resultado que você observou; não inclua senha ou dado pessoal.'], solution: 'Script: sqlite_alternativa.py\nBanco: alternativa-sqlite.db\nSaída observada: Registros de marcador: (copie seu número)', explanation: 'Um registro curto ajuda a retomar a aula sem repetir passos nem confundir arquivos.', expected: 'resultado-sqlite.txt contém os três itens e a saída foi copiada do terminal.', criteria: ['Cria o arquivo no local indicado.', 'Registra os nomes corretos e a saída observada, sem inventar resultado.'] },
-      { prompt: 'Investigar erro: ao executar py sqlite_alternativa.py, aparece SyntaxError: invalid syntax e o texto da linha 1 é py sqlite_alternativa.py. O que isso mostra sobre o conteúdo salvo do arquivo? Em qual área do VS Code deve ficar o código que começa com import sqlite3 e em qual área deve ser digitado o comando py sqlite_alternativa.py?', hints: ['Compare o texto exibido como linha 1 do erro com o início do bloco Python da aula.', 'O VS Code separa a área central de edição do painel Terminal inferior.'], solution: 'O comando de terminal foi salvo dentro do arquivo .py. Na área central do editor, substitua o conteúdo pelo bloco Python completo, começando com import sqlite3, e salve com Ctrl+S. No painel Terminal inferior, depois do prompt PS ... >, digite py sqlite_alternativa.py. A linha de erro deixa de ser um comando de terminal.', explanation: 'O diagnóstico distingue código que o interpretador lê do comando que inicia o arquivo pelo terminal.', expected: 'O plano identifica a troca entre editor e terminal e coloca cada conteúdo na área correta antes de executar novamente.', criteria: ['Interpreta SyntaxError com linha 1 py sqlite_alternativa.py como comando salvo dentro do arquivo.', 'Indica a área central para o código Python e o terminal inferior para o comando py.', 'Salva o arquivo antes de tentar executá-lo novamente.'] }
+    "exercises": [
+      {
+        "prompt": "Prever: depois do exemplo, olhe a última contagem no terminal. No campo Seu rascunho abaixo, anote esse número e o que espera após mais uma execução. Clique no Terminal do VS Code e execute py sqlite_alternativa.py uma vez (ou python/python3, conforme o comando verificado). Volte ao rascunho e registre o número observado.",
+        "hints": [
+          "Use o último resultado, que pode ser maior que 2.",
+          "Cada execução do bloco completo acrescenta uma linha."
+        ],
+        "solution": "Situação: anotei 4. Previsão: uma execução acrescentará 1, então espero 5. Observação: registrei a saída real e comparei. Substitua os valores pelas suas evidências.",
+        "explanation": "A previsão usa a situação atual; não pede uma primeira execução depois de várias tentativas.",
+        "expected": "Entrada: sua última contagem N. Saída a registrar: nova contagem após uma execução. Compare os números; não apague o banco para reproduzir um número do exemplo.",
+        "criteria": [
+          "Registra a previsão antes de executar.",
+          "Compara a contagem real com a anterior e explica se aumentou em 1."
+        ]
+      },
+      {
+        "prompt": "Alterar: clique na aba sqlite_alternativa.py. Na linha print(\"Registros de marcador:\", resultado[0]), troque somente o texto Registros de marcador: por Total de registros:. Preserve aspas, vírgula, resultado[0] e parênteses. Salve pelo menu Arquivo > Salvar. No Terminal, execute o mesmo comando e anote a nova mensagem.",
+        "hints": [
+          "Você altera o rótulo exibido, não o comando SELECT nem o nome do banco.",
+          "Confira se salvou antes de concluir que a alteração não funcionou."
+        ],
+        "solution": "ARQUIVO — linha alterada:\nprint(\"Total de registros:\", resultado[0])\n\nDepois de salvar, execute pelo TERMINAL com o comando já verificado.",
+        "explanation": "Mudar o texto do print muda a apresentação. O INSERT continua acrescentando uma linha e a contagem continua aumentando.",
+        "expected": "Se antes havia N registros, uma execução mostra Total de registros: N+1. O arquivo de banco continua o mesmo.",
+        "criteria": [
+          "Altera apenas o texto do print e salva.",
+          "Observa o novo rótulo e confirma que a contagem continua aumentando em 1."
+        ]
+      },
+      {
+        "prompt": "Construir: crie um registro para conseguir retomar amanhã. No VS Code, escolha Arquivo > Novo Arquivo de Texto. Escreva cinco linhas: Pasta: (seu local); Script: (nome do .py); Comando: (o que funcionou); Última saída: (a mensagem real); Pendente: Docker e PostgreSQL. Use Arquivo > Salvar Como e salve na pasta alternativa-sqlite com o nome resultado-sqlite.txt. Você está criando um arquivo de anotações; não execute esse .txt.",
+        "hints": [
+          "O comando do relatório pode ser py, python ou python3; registre o seu.",
+          "A pasta é o local selecionado no passo 1; copie a saída real do terminal ou transcreva-a."
+        ],
+        "solution": "Exemplo de relatório fictício:\nPasta: minha pasta alternativa-sqlite em Documentos\nScript: sqlite_alternativa.py\nComando: py sqlite_alternativa.py\nÚltima saída: Total de registros: 6\nPendente: Docker e PostgreSQL\n\nUse seus próprios valores observados.",
+        "explanation": "A transferência é construir um arquivo novo de apoio usando a mesma habilidade de criar, editar e salvar, sem cobrar SQL ainda não ensinado.",
+        "expected": "resultado-sqlite.txt aparece no Explorador com os cinco campos preenchidos. A última saída deve corresponder à sua tela; o relatório não é um programa.",
+        "criteria": [
+          "Salva o relatório na pasta da prática, com nome e extensão corretos.",
+          "Registra evidência própria e mantém Docker/PostgreSQL como pendências."
+        ]
+      },
+      {
+        "prompt": "Investigar erro: analise no rascunho esta situação, sem estragar seu script: o aluno executou py sqlite_alternativa.py no terminal e recebeu SyntaxError: invalid syntax. O erro mostrou que a linha 1 do arquivo também era py sqlite_alternativa.py. Registre observação, hipótese, causa provável e uma correção. Explique em qual área deve ficar cada conteúdo. Use como evidência o texto da linha 1; não é necessário reproduzir a falha.",
+        "hints": [
+          "O erro informa o que Python leu dentro do arquivo salvo.",
+          "Compare o início do bloco ARQUIVO com o comando do bloco TERMINAL."
+        ],
+        "solution": "Observação: a linha 1 salva é um comando do terminal. Hipótese/causa: ele foi colado no editor. Correção: abrir o .py, substituir pelo bloco ARQUIVO do exemplo e salvar. Então executar o comando somente no Terminal. Confirmar a mensagem de início e a contagem. Uma aba com mudanças não salvas pode explicar por que o erro antigo continua.",
+        "explanation": "A investigação pode ser feita no papel. O texto apontado pelo erro permite localizar a troca de contexto sem alterar um programa que já funciona.",
+        "expected": "Entrada: a mensagem e a linha 1 fornecidas. Entrega: diagnóstico com as duas áreas corretas, ação de salvamento e resultado que confirmaria a recuperação.",
+        "criteria": [
+          "Usa a linha apontada no erro para fundamentar a hipótese.",
+          "Distingue código no arquivo de comando no terminal.",
+          "Inclui salvar e conferir a saída, sem reinstalar Python sem evidência."
+        ]
+      }
     ],
-    mistakes: [
-      'Colar o código Python no PowerShell em vez de salvar no arquivo .py.',
-      'Colar o comando py sqlite_alternativa.py dentro do arquivo .py; esse comando deve ser digitado no Terminal inferior.',
-      'Executar o arquivo antes de confirmar qual comando mostra Python 3.x.x.',
-      'Esquecer Ctrl+S antes de executar o script.',
-      'Esperar que cada execução mostre 1; as linhas anteriores permanecem no banco local.',
-      'Tratar SQLite como substituto de PostgreSQL, Docker ou Compose.'
+    "requirementChange": {
+      "prompt": "Novo pedido: além das mensagens atuais, o programa precisa escrever Pratica concluida. na última linha da saída. Preserve o banco, a inserção e a contagem. Você já usou print no primeiro teste: acrescente uma linha print ao final do arquivo, após banco.close(), salve e execute pelo mesmo terminal.",
+      "criteria": [
+        "Antes de editar, anote a última contagem N e preveja a próxima.",
+        "Comportamento preservado: uma execução continua aumentando a contagem em 1.",
+        "Comportamento novo: Pratica concluida. aparece depois da contagem. Registre a saída real e explique qual linha acrescentou."
+      ]
+    },
+    "mistakes": [
+      "Arquivo vazio ou não salvo: o terminal pode voltar ao caminho sem mensagem. Confira print no arquivo certo, use Arquivo > Salvar e repita o comando. A aparência vazia no editor não prova que a versão no disco esteja vazia.",
+      "SyntaxError com py sqlite_alternativa.py na linha indicada: comando de terminal salvo dentro do .py. Reponha o bloco ARQUIVO e salve; execute o comando no painel Terminal.",
+      "can’t open file ou No such file or directory: confira nome .py, possível final .py.txt e pasta do terminal pelo passo 4 do exemplo.",
+      "SyntaxError em uma linha Python: compare aspas, parênteses e código copiado com o exemplo. IndentationError pode indicar espaços antes das instruções; neste exemplo elas começam na margem esquerda.",
+      ">>> indica Python interativo: digite exit() nesse painel para voltar ao terminal do sistema antes de executar o arquivo.",
+      "No module named sqlite3: registre a distribuição/versão e volte à preparação de Python. Não tente resolver instalando um pacote sqlite3 por pip.",
+      "Contagem acima de 1 não é falha quando o banco já existia. Compare N com N+1. Recomeçar em outra pasta ou apagar o banco muda a situação inicial.",
+      "Abrir .db no editor pode mostrar aviso de binário. O arquivo de código é .py; o banco é criado e consultado pelo programa.",
+      "Ter executado SQLite não comprova Docker, PostgreSQL ou criação independente de consultas SQL. Registre essas práticas separadamente."
     ],
-    quiz: [
-      { question: 'Qual linha mostra a contagem no terminal?', options: ['print("Registros de marcador:", resultado[0])', 'sqlite3.connect("alternativa-sqlite.db")', 'CREATE TABLE IF NOT EXISTS marcador'], correctIndex: 0, explanation: 'print escreve a mensagem e o número no terminal.' },
-      { question: 'Onde fica alternativa-sqlite.db?', options: ['Na pasta alternativa-sqlite do exercício', 'No navegador', 'Em um container Docker'], correctIndex: 0, explanation: 'O programa cria o arquivo na pasta de trabalho aberta no terminal.' },
-      { question: 'Se py --version responde “No installed Python found!”, mas python --version mostra Python 3.x.x, o que fazer?', options: ['Usar python para executar o arquivo', 'Reinstalar Python imediatamente', 'Instalar sqlite3 com pip'], correctIndex: 0, explanation: 'Use o comando que encontrou o runtime Python 3.' }
+    "quiz": [
+      {
+        "question": "Qual linha mostra a contagem no terminal?",
+        "options": [
+          "print(\"Registros de marcador:\", resultado[0])",
+          "sqlite3.connect(\"alternativa-sqlite.db\")",
+          "CREATE TABLE IF NOT EXISTS marcador"
+        ],
+        "correctIndex": 0,
+        "explanation": "print escreve a mensagem e o número no terminal."
+      },
+      {
+        "question": "Onde fica alternativa-sqlite.db?",
+        "options": [
+          "Na pasta alternativa-sqlite do exercício",
+          "No navegador",
+          "Em um container Docker"
+        ],
+        "correctIndex": 0,
+        "explanation": "O programa cria o arquivo na pasta de trabalho aberta no terminal."
+      },
+      {
+        "question": "Se py --version responde “No installed Python found!”, mas python --version mostra Python 3.x.x, o que fazer?",
+        "options": [
+          "Usar python para executar o arquivo",
+          "Reinstalar Python imediatamente",
+          "Instalar sqlite3 com pip"
+        ],
+        "correctIndex": 0,
+        "explanation": "Use o comando que encontrou o runtime Python 3."
+      }
     ],
-    retry: { prompt: 'O terminal mostra SyntaxError e aponta a linha 1 como py sqlite_alternativa.py. Explique onde o código Python deve ser colado, onde o comando deve ser digitado, como salvar o arquivo e qual resultado espera observar.', expected: 'A resposta separa o bloco Python para a área central do editor do comando para o Terminal inferior, salva com Ctrl+S e espera ver Registros de marcador seguido do número.', hint: 'O texto da linha 1 no erro mostra o conteúdo que Python encontrou dentro do arquivo.' },
-    summary: [
-      'Primeiro confirme Python 3; no Windows, use python ou py conforme o comando que mostrou Python 3.x.x.',
-      'Digite o código em sqlite_alternativa.py e salve antes de executar.',
-      'Execute o arquivo no PowerShell aberto na pasta: python sqlite_alternativa.py ou py sqlite_alternativa.py, conforme a verificação que funcionou.',
-      'A contagem aparece porque o script chama print; o banco permanece em alternativa-sqlite.db.',
-      'SQLite mantém esta prática local, mas não substitui PostgreSQL com Docker.'
-    ]  }
+    "retry": {
+      "prompt": "Uma colega mudou o texto do print no editor, mas o terminal continua mostrando a mensagem anterior. A aba do arquivo tem uma bolinha e não há SyntaxError. Explique uma hipótese, como conferir o arquivo/pasta usados, o que fazer antes de executar novamente e qual saída confirmará a correção.",
+      "expected": "A resposta considera alteração não salva ou outra cópia do script, verifica a aba e a pasta, salva e compara a mensagem nova com a antiga. Não conclui que falta Python.",
+      "hint": "Python executa a versão salva no disco; o editor pode estar mostrando mudanças ainda pendentes."
+    },
+    "summary": [
+      "Pasta agrupa arquivos; .py contém o programa; .db guarda os dados.",
+      "O editor recebe o código; o terminal recebe o comando de execução. Salve antes de executar.",
+      "Primeiro confirme uma mensagem simples. Depois use o exemplo SQLite completo.",
+      "Cada execução acrescenta uma linha; compare a contagem atual com a anterior, inclusive ao retomar.",
+      "Na próxima etapa, aprenderemos a escrever consultas. Esta prática comprova apenas que você conseguiu seguir o ciclo com apoio.",
+      "Na trilha Banco de Dados, você aprenderá a escrever consultas. Esta prática comprova apenas que conseguiu seguir o ciclo com apoio."
+    ]
+  }
 });
