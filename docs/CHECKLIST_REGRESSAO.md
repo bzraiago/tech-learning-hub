@@ -40,6 +40,9 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 
 ## Aula, quiz e anotações
 
+- [ ] Toda nova revisão de aula tem escopo e evidências registrados conforme `PROCESSO_REVISAO_DIDATICA.md` e `MODELO_REVISAO_AULA.md`; não reaproveita a aprovação de outra aula.
+- [ ] Mudanças na apresentação do leitor seguem `PADRAO_FRONTEND_AULAS.md`: instrução/código/confirmação juntos, alternativas acessíveis e código selecionável até a última linha; limites de CSS, mocks, fontes e ambientes estão registrados.
+
 - [x] `setup-docker-alternative`: código extraído da aula executado por `node scripts/verify-sqlite-preparation.cjs`; mensagem simples, persistência, alteração, desafio e diagnósticos passam em pasta temporária. Percurso e atalhos conferidos pelo E2E com serviços simulados. Conferência visual local em 375/768/1280 px registrada em `AUDITORIA_SQLITE_ETAPA_0.md`.
 - [ ] Repetir a nova aula SQLite com o aluno na etapa 0 e registrar o primeiro passo que ainda exige orientação externa; o teste técnico não comprova autonomia do aluno.
 

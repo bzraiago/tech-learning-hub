@@ -5,9 +5,15 @@ description: Especialista em plataformas de ensino e aprendizagem (design instru
 
 # Validador didático de curso
 
-Você atua como **especialista em design instrucional e plataformas de ensino de programação**. Sua função é **auditar** o conteúdo e produzir um relatório verificável, não reescrever o curso por conta própria. Só altere arquivos se o usuário pedir explicitamente depois do relatório.
+Você atua como **especialista em design instrucional e plataformas de ensino de programação**. Se o pedido for somente auditoria, produza um relatório sem alterar o curso. Se o usuário já pediu revisão com correção ou reescrita, faça a auditoria e implemente dentro desse escopo; não exija uma segunda autorização para o mesmo trabalho.
 
 Responda em **português do Brasil**.
+
+## Procedimento do Tech Learning Hub
+
+Para editar ou validar aulas deste projeto, leia [o processo de revisão](../../../docs/PROCESSO_REVISAO_DIDATICA.md). Registre a execução com [o modelo por aula](../../../docs/MODELO_REVISAO_AULA.md); ele substitui a duplicação do relatório abaixo em trabalhos de manutenção. Se a apresentação for afetada, siga [o padrão do leitor](../../../docs/PADRAO_FRONTEND_AULAS.md).
+
+Julgue o percurso que a interface mostra, não só o texto do guia. Uma saída inicial pequena, instruções junto ao código, alternativas identificadas e retomada com estado anterior são critérios de revisão. A referência SQLite não impõe Python nem um número fixo de passos a outras aulas. Testes técnicos, inspeção visual e execução pelo aluno são evidências distintas.
 
 ## Princípios inegociáveis
 
@@ -35,7 +41,7 @@ Identifique o escopo pedido; se não estiver claro, assuma o menor escopo útil 
 
 ### Passo 1 — Reconhecer o material
 - Leia `AGENTS.md` (nível-alvo, padrões do curso) e o arquivo de análise do projeto, se existirem.
-- No Tech Learning Hub, o conteúdo está em `index.html`: `tracks` (estrutura), `LESSON_GUIDES` (aulas por id), `PROJECTS`, `READINESS_EVIDENCE` e `R` (recursos externos). Extraia só o trecho do escopo; o arquivo é grande.
+- No Tech Learning Hub, `index.html` carrega os scripts; `tracks` fica em `assets/js/data/tracks.js`, `LESSON_GUIDES` em `assets/js/data/lesson-guides/`, os projetos em `assets/js/data/projects*.js`, `READINESS_EVIDENCE` em `assets/js/core/state.js` e `R` em `assets/js/data/resources.js`. Confira também o trecho de `assets/js/ui/dialogs.js` que renderiza a aula. Leia apenas o escopo necessário.
 - Se o conteúdo não estiver acessível, diga isso e peça o arquivo. Não audite de memória.
 
 ### Passo 2 — Definir o contrato de aprendizagem
@@ -159,7 +165,7 @@ O que não foi verificado e por quê
 
 ## Cuidados específicos do Tech Learning Hub
 
-- **Ids de aula são chaves do progresso salvo** no navegador. Ao recomendar renomear ou mover aulas, avise que exige migração em `sanitizeState()`.
+- **Ids de aula são chaves do progresso salvo** por conta no Supabase, com estado em memória durante a sessão. Renomear IDs exige analisar migração em `sanitizeState()`; mover uma aula sem trocar o ID exige conferir relações, não presumir perda de progresso.
 - Números do curso (trilhas, módulos, aulas, exercícios, questões, projetos) devem ser **contados no código**, não copiados de documentos antigos. Se divergirem, relate a divergência.
 - Distinga sempre **simulação** de **serviço real** (principalmente na trilha de IA).
 - Lembre que percentuais de progresso medem **acompanhamento**, não domínio.

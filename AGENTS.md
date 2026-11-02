@@ -233,6 +233,12 @@ Todo projeto tem: objetivo, pré-requisitos, entrega observável, `checks` verif
 
 ---
 
+### 6.7 Processo de revisão e padrão visual
+
+Em revisões ou reescritas de aulas, siga `docs/PROCESSO_REVISAO_DIDATICA.md` e registre o escopo/evidências com `docs/MODELO_REVISAO_AULA.md`. Para apresentação no leitor, aplique `docs/PADRAO_FRONTEND_AULAS.md`. Esses documentos consolidam a revisão SQLite do commit `61b6872` como referência, sem impor Python, dez passos ou a mesma carga de instruções a todas as trilhas.
+
+Confira a ordem real das abas, a primeira saída pequena, a disponibilidade do exemplo antes da execução, o local de cada ação e a retomada. Use uma aula por vez como unidade de revisão, salvo lote delimitado. Validador verde não comprova clareza: diferencie estrutura, execução, interface e observação com aluno. Registro de publicação segue a autorização vigente; documentar o padrão não autoriza revisar ou publicar todo o curso automaticamente.
+
 ## 7. Trilha de evolução recomendada (do zero ao júnior e além)
 
 Sequência sugerida; use atalhos de pré-requisito em vez de reordenar tudo.

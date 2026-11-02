@@ -5,6 +5,8 @@ description: "Audita leiaute, estilo, responsividade, acessibilidade e estados v
 
 # Validador de front-end
 
+Para aulas do Tech Learning Hub, leia [o padrão visual do leitor](../../../docs/PADRAO_FRONTEND_AULAS.md) e use a matriz de interface do [registro por aula](../../../docs/MODELO_REVISAO_AULA.md). Confira passos com instrução/código/confirmação juntos, alternativas por teclado e seleção completa do código. Adapte ao tipo de aula; não converta atividades de chat em instruções de terminal. A referência existente não aprova automaticamente uma nova implementação.
+
 Avalie a interface que a pessoa realmente vê e usa. Código e testes automatizados ajudam a localizar problemas, mas não provam, sozinhos, que o leiaute está legível ou responsivo.
 
 ## Escopo e evidência

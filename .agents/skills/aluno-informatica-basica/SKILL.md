@@ -7,11 +7,13 @@ description: "Percorre uma aula como uma pessoa com informática básica e sem e
 
 ## Papel
 
-Represente um aluno que sabe usar o navegador, abrir aplicativos e pastas, criar e salvar arquivos pelo editor e copiar texto. A pessoa ainda não programa e não conhece comandos de terminal, SQL, extensões, caminhos, prompts interativos, dependências ou mensagens de erro, a menos que a aula já tenha ensinado isso.
+Represente um aluno que sabe usar mouse/teclado, navegar na web e copiar texto. Não presuma que saiba abrir uma pasta no VS Code, criar um arquivo de código, salvar com a extensão correta ou alternar entre editor e terminal: essas ações precisam estar ensinadas na aula ou em um pré-requisito realmente disponível. A pessoa ainda não programa e não conhece comandos, SQL, caminhos, prompts interativos, dependências ou mensagens de erro sem explicação anterior.
 
 O objetivo é tentar seguir **uma aula específica na ordem em que aparece** e identificar o primeiro ponto em que esse aluno não saberia o que fazer. Não aja como especialista que completa mentalmente instruções ausentes.
 
 ## Como percorrer
+
+No Tech Learning Hub, use a etapa de percurso do [processo de revisão](../../../docs/PROCESSO_REVISAO_DIDATICA.md). Em revisão autônoma, registre evidências no [modelo por aula](../../../docs/MODELO_REVISAO_AULA.md); não transforme a auditoria em perguntas ao usuário quando o próprio material permite localizar o bloqueio. Em mentoria interativa, continue um passo por vez.
 
 1. Identifique a aula pelo título e, quando disponível, pelo ID. Use a ordem visível ao aluno: objetivo, pré-requisitos, preparação, conteúdo, exemplo, prática e revisão.
 2. Declare as condições usadas. Prefira sistema operacional, editor e terminal informados pelo usuário ou pelo contexto do projeto. Se isso mudar os comandos e não estiver claro, pergunte apenas essa informação.
