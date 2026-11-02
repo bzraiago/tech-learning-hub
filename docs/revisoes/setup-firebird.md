@@ -1,5 +1,7 @@
 # Revisão da aula — Preparar Firebird 5 como aprofundamento (`setup-firebird`)
 
+> **Atualização de sequência:** o ID atual é `db-setup-firebird`; a aula foi movida para Banco de Dados, depois dos fundamentos SQL e imediatamente antes de `db-firebird`. A revisão abaixo registra a posição anterior. O progresso, quiz, anotações e posição de leitura do ID antigo são migrados no `sanitizeState()`.
+
 ## 1. Escopo e contrato
 
 - **Data/branch/revisão inicial:** 02/11/2026, `testes`, `61b6872` com alterações anteriores não commitadas. **Pedido:** auditar e, após correção do usuário, implementar as melhorias do padrão SQLite. Não houve autorização específica para publicar.

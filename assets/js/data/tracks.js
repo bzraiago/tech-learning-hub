@@ -205,60 +205,6 @@
               {"kind": "doc", "title": "Docker · instalação por plataforma", "url": "https://docs.docker.com/engine/install/", "language": "EN"}
             ]
           },
-          {
-            "id": "setup-postgresql",
-            "title": "Preparar PostgreSQL e clientes de conexão",
-            "minutes": 75,
-            "concept": "Confirmar o PostgreSQL do laboratório Compose com o psql do container e, opcionalmente, testar um cliente externo pela porta 55432.",
-            "objectives": ["Distinguir servidor PostgreSQL do cliente psql.", "Consultar estudos/aluno pelo psql do container antes de tentar a porta externa 127.0.0.1:55432.", "Diagnosticar separadamente serviço, porta, credencial e banco."],
-            "exercise": "Depois da aula Compose, use o psql do container para consultar banco e usuário; registre o que executou sem senha. Cliente externo é opcional.",
-            "code": "docker compose exec db psql -U aluno -d estudos\n# Somente depois de aparecer estudos=>:\nSELECT current_database(), current_user;\n\\q",
-            "docs": [
-              {"kind": "doc", "title": "PostgreSQL · downloads", "url": "https://www.postgresql.org/download/", "language": "EN"},
-              {"kind": "doc", "title": "PostgreSQL · cliente psql", "url": "https://www.postgresql.org/docs/current/app-psql.html", "language": "EN"},
-              {"kind": "doc", "title": "pgAdmin · downloads", "url": "https://www.pgadmin.org/download/", "language": "EN"},
-              {"kind": "doc", "title": "PostgreSQL · imagem oficial", "url": "https://hub.docker.com/_/postgres", "language": "EN"}
-            ]
-          },
-          {
-            "id": "setup-mariadb",
-            "title": "Preparar MariaDB como aprofundamento",
-            "minutes": 65,
-            "concept": "Instalar MariaDB Community Server e o cliente mariadb, verificar o serviço e criar um banco descartável sem confundir MariaDB com PostgreSQL ou MySQL.",
-            "objectives": ["Instalar servidor e cliente pelo caminho oficial do sistema.", "Conectar localmente sem registrar a senha.", "Confirmar banco, usuário, versão e porta antes de iniciar db-mariadb."],
-            "exercise": "Crie hub_maria_aula, confirme SELECT DATABASE(), USER(), VERSION(); e registre a conexão sem senha.",
-            "code": "mariadb --version\nmariadb -h 127.0.0.1 -P 3306 -u root -p\nCREATE DATABASE hub_maria_aula CHARACTER SET utf8mb4;\nUSE hub_maria_aula;\nSELECT DATABASE(), USER(), VERSION();",
-            "docs": [
-              {"kind": "doc", "title": "MariaDB · instalação inicial", "url": "https://mariadb.com/get-started-with-mariadb/", "language": "EN"},
-              {"kind": "doc", "title": "MariaDB · implantação e instalação", "url": "https://mariadb.com/docs/server/server-management/install-and-upgrade-mariadb", "language": "EN"}
-            ]
-          },
-          {
-            "id": "setup-firebird",
-            "title": "Preparar Firebird 5 como aprofundamento",
-            "minutes": 75,
-            "concept": "Instalar Firebird 5 e localizar o cliente isql correto, verificando serviço, autenticação e caminho permitido para um banco de laboratório.",
-            "objectives": ["Instalar o kit oficial adequado ao sistema.", "Distinguir o isql do Firebird de programas homônimos.", "Criar e acessar um arquivo .fdb em pasta permitida sem expor a senha SYSDBA."],
-            "exercise": "Localize o isql do Firebird, crie um banco de laboratório e confirme CURRENT_USER sem salvar credenciais.",
-            "code": "isql -z\n# No isql do Firebird, adapte o caminho:\nCREATE DATABASE 'localhost:C:/dados/hub_fb_aula.fdb' USER 'SYSDBA' PASSWORD 'SUA_SENHA_LOCAL' DEFAULT CHARACTER SET UTF8;\nSELECT CURRENT_USER FROM RDB$DATABASE;\nQUIT;",
-            "docs": [
-              {"kind": "doc", "title": "Firebird · downloads", "url": "https://www.firebirdsql.org/en/downloads/", "language": "EN"},
-              {"kind": "doc", "title": "Firebird 5 · guia de início", "url": "https://www.firebirdsql.org/file/documentation/html/en/firebirddocs/qsg5/firebird-5-quickstartguide.html", "language": "EN"}
-            ]
-          },
-          {
-            "id": "setup-mongodb",
-            "title": "Preparar MongoDB Community e mongosh",
-            "minutes": 70,
-            "concept": "Instalar o servidor MongoDB Community e o cliente mongosh separadamente, verificar o serviço local e confirmar uma conexão em 127.0.0.1:27017.",
-            "objectives": ["Distinguir servidor MongoDB de cliente mongosh.", "Confirmar o serviço local antes de conectar e saber retomar sem apagar dados.", "Executar ping e registrar URI, versão e estado sem credenciais."],
-            "exercise": "Siga o percurso local: confirme o serviço, conecte com mongosh, execute db.runCommand({ping:1}) no prompt correto e registre a evidência antes de db-mongo-crud.",
-            "code": "mongosh --version\nmongosh \"mongodb://127.0.0.1:27017\"\ndb.runCommand({ ping: 1 })\nexit",
-            "docs": [
-              {"kind": "doc", "title": "MongoDB Community · instalação", "url": "https://www.mongodb.com/docs/manual/installation/", "language": "EN"},
-              {"kind": "doc", "title": "MongoDB Shell · instalar mongosh", "url": "https://www.mongodb.com/docs/mongodb-shell/install/", "language": "EN"}
-            ]
-          }
         ]
       }
     ]
@@ -2740,6 +2686,21 @@
         ],
         "lessons": [
           {
+            "id": "db-setup-postgresql",
+            "title": "Preparar PostgreSQL e clientes de conexão",
+            "minutes": 75,
+            "concept": "Confirmar o PostgreSQL do laboratório Compose com o psql do container e, opcionalmente, testar um cliente externo pela porta 55432.",
+            "objectives": ["Distinguir servidor PostgreSQL do cliente psql.", "Consultar estudos/aluno pelo psql do container antes de tentar a porta externa 127.0.0.1:55432.", "Diagnosticar separadamente serviço, porta, credencial e banco."],
+            "exercise": "Depois da aula Compose, use o psql do container para consultar banco e usuário; registre o que executou sem senha. Cliente externo é opcional.",
+            "code": "docker compose exec db psql -U aluno -d estudos\n# Somente depois de aparecer estudos=>:\nSELECT current_database(), current_user;\n\\q",
+            "docs": [
+              {"kind": "doc", "title": "PostgreSQL · downloads", "url": "https://www.postgresql.org/download/", "language": "EN"},
+              {"kind": "doc", "title": "PostgreSQL · cliente psql", "url": "https://www.postgresql.org/docs/current/app-psql.html", "language": "EN"},
+              {"kind": "doc", "title": "pgAdmin · downloads", "url": "https://www.pgadmin.org/download/", "language": "EN"},
+              {"kind": "doc", "title": "PostgreSQL · imagem oficial", "url": "https://hub.docker.com/_/postgres", "language": "EN"}
+            ]
+          },
+          {
             "id": "db-postgres",
             "title": "PostgreSQL: conexão, integridade e consultas verificáveis",
             "minutes": 75,
@@ -2770,6 +2731,19 @@
                 "url": "https://www.postgresql.org/docs/current/sql-createtable.html",
                 "language": "EN"
               }
+            ]
+          },
+          {
+            "id": "db-setup-mariadb",
+            "title": "Preparar MariaDB como aprofundamento",
+            "minutes": 65,
+            "concept": "Instalar MariaDB Community Server e o cliente mariadb, verificar o serviço e criar um banco descartável sem confundir MariaDB com PostgreSQL ou MySQL.",
+            "objectives": ["Instalar servidor e cliente pelo caminho oficial do sistema.", "Conectar localmente sem registrar a senha.", "Confirmar banco, usuário, versão e porta antes de iniciar db-mariadb."],
+            "exercise": "Crie hub_maria_aula, confirme SELECT DATABASE(), USER(), VERSION(); e registre a conexão sem senha.",
+            "code": "mariadb --version\nmariadb -h 127.0.0.1 -P 3306 -u root -p\nCREATE DATABASE hub_maria_aula CHARACTER SET utf8mb4;\nUSE hub_maria_aula;\nSELECT DATABASE(), USER(), VERSION();",
+            "docs": [
+              {"kind": "doc", "title": "MariaDB · instalação inicial", "url": "https://mariadb.com/get-started-with-mariadb/", "language": "EN"},
+              {"kind": "doc", "title": "MariaDB · implantação e instalação", "url": "https://mariadb.com/docs/server/server-management/install-and-upgrade-mariadb", "language": "EN"}
             ]
           },
           {
@@ -2836,6 +2810,19 @@
                 "url": "https://www.sqlite.org/datatype3.html",
                 "language": "EN"
               }
+            ]
+          },
+          {
+            "id": "db-setup-firebird",
+            "title": "Preparar Firebird 5 como aprofundamento",
+            "minutes": 75,
+            "concept": "Instalar Firebird 5 e localizar o cliente isql correto, verificando serviço, autenticação e caminho permitido para um banco de laboratório.",
+            "objectives": ["Instalar o kit oficial adequado ao sistema.", "Distinguir o isql do Firebird de programas homônimos.", "Criar e acessar um arquivo .fdb em pasta permitida sem expor a senha SYSDBA."],
+            "exercise": "Localize o isql do Firebird, crie um banco de laboratório e confirme CURRENT_USER sem salvar credenciais.",
+            "code": "isql -z\n# No isql do Firebird, adapte o caminho:\nCREATE DATABASE 'localhost:C:/dados/hub_fb_aula.fdb' USER 'SYSDBA' PASSWORD 'SUA_SENHA_LOCAL' DEFAULT CHARACTER SET UTF8;\nSELECT CURRENT_USER FROM RDB$DATABASE;\nQUIT;",
+            "docs": [
+              {"kind": "doc", "title": "Firebird · downloads", "url": "https://www.firebirdsql.org/en/downloads/", "language": "EN"},
+              {"kind": "doc", "title": "Firebird 5 · guia de início", "url": "https://www.firebirdsql.org/file/documentation/html/en/firebirddocs/qsg5/firebird-5-quickstartguide.html", "language": "EN"}
             ]
           },
           {
@@ -2955,6 +2942,19 @@
                 "url": "https://www.mongodb.com/docs/manual/data-modeling/",
                 "language": "EN"
               }
+            ]
+          },
+          {
+            "id": "db-setup-mongodb",
+            "title": "Preparar MongoDB Community e mongosh",
+            "minutes": 70,
+            "concept": "Instalar o servidor MongoDB Community e o cliente mongosh separadamente, verificar o serviço local e confirmar uma conexão em 127.0.0.1:27017.",
+            "objectives": ["Distinguir servidor MongoDB de cliente mongosh.", "Confirmar o serviço local antes de conectar e saber retomar sem apagar dados.", "Executar ping e registrar URI, versão e estado sem credenciais."],
+            "exercise": "Siga o percurso local: confirme o serviço, conecte com mongosh, execute db.runCommand({ping:1}) no prompt correto e registre a evidência antes de db-mongo-crud.",
+            "code": "mongosh --version\nmongosh \"mongodb://127.0.0.1:27017\"\ndb.runCommand({ ping: 1 })\nexit",
+            "docs": [
+              {"kind": "doc", "title": "MongoDB Community · instalação", "url": "https://www.mongodb.com/docs/manual/installation/", "language": "EN"},
+              {"kind": "doc", "title": "MongoDB Shell · instalar mongosh", "url": "https://www.mongodb.com/docs/mongodb-shell/install/", "language": "EN"}
             ]
           },
           {

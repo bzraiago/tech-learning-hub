@@ -123,6 +123,16 @@ test('sumário, salvamento automático e retomada de leitura ficam isolados por 
   await expect(page.locator('#dialog-body')).toContainText('No module named sqlite3');
   await page.evaluate(() => renderLessonSection('resources'));
   await expect(page.locator('#dialog-body a[href="https://docs.python.org/3/library/sqlite3.html"]')).toBeVisible();
+  await page.evaluate(() => { openLesson('db-setup-postgresql'); renderLessonSection('learn'); });
+  const sistemasPostgres = page.locator('#dialog-body details').filter({ has: page.locator('summary').filter({ hasText: /^(macOS|Linux)$/ }) });
+  await expect(sistemasPostgres).toHaveCount(2);
+  await expect(sistemasPostgres.first()).not.toHaveAttribute('open', '');
+  await sistemasPostgres.first().locator('summary').focus();
+  await page.keyboard.press('Enter');
+  await expect(sistemasPostgres.first()).toHaveAttribute('open', '');
+  await page.evaluate(() => renderLessonSection('example'));
+  await expect(page.locator('.reader-example-step').first()).toBeVisible();
+  await expect(page.locator('#dialog-body')).not.toContainText('Prepare seu ambiente');
   // Exercícios de outras aulas mantêm o enunciado padrão e os blocos antigos.
   await page.evaluate(() => { openLesson('setup-editor'); renderLessonSection('example'); });
   await expect(page.locator('#dialog-body pre')).not.toHaveCount(0);

@@ -16,6 +16,8 @@ Este padrão acompanha [PROCESSO_REVISAO_DIDATICA.md](PROCESSO_REVISAO_DIDATICA.
 
 O cabeçalho identifica a aula, as abas indicam o contexto e o rodapé permite seguir. A rolagem do conteúdo não deve esconder permanentemente instruções ou controles. “Continuar: Prática” navega para a próxima aba; não é um verificador automático dos passos do exemplo.
 
+Nas preparações com percurso numerado, a aba Exemplo começa diretamente pelos cartões de passos; não repete o bloco inteiro “Prepare seu ambiente” da aba Conceitos. Dentro desse bloco, mantenha o caminho Windows visível e apresente macOS e Linux em seções recolhidas com o nome do sistema. As instruções essenciais, os comandos e a confirmação continuam no passo correspondente. Compare as aulas na **mesma aba** e no mesmo ponto de rolagem antes de concluir que a apresentação é equivalente.
+
 ## 2. Anatomia de um passo
 
 Cada cartão de percurso contém, nesta ordem:

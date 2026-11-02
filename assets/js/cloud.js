@@ -70,11 +70,17 @@ async function cloudLoad(userId, generation) {
       throw new Error('O progresso remoto tem formato desconhecido.');
     }
     state = sanitizeState(candidate || null);
+    const persistLessonIdMigration = lessonIdMigrationPending;
+    lessonIdMigrationPending = false;
     if (dialog.open) closeDialog(false);
     render();
     cloudReady = true;
     cloudLock(false);
     cloudMessage(candidate ? 'Progresso desta conta carregado da nuvem.' : 'Conta pronta. Seu progresso será salvo automaticamente.');
+    if (persistLessonIdMigration) {
+      cloudRevision += 1;
+      void cloudFlush();
+    }
     if (startupNotice) notify(startupNotice);
   } catch (error) {
     if (generation !== cloudGeneration) return;

@@ -1,5 +1,7 @@
 # Revisão da aula — Preparar MongoDB Community e mongosh (`setup-mongodb`)
 
+> **Atualização de sequência:** o ID atual é `db-setup-mongodb`; a aula foi movida para Banco de Dados, após os modelos NoSQL e imediatamente antes de `db-mongo-crud`. A revisão abaixo registra a posição anterior. O progresso, quiz, anotações e posição de leitura do ID antigo são migrados no `sanitizeState()`.
+
 ## 1. Escopo e contrato
 
 - **Data/branch/revisão inicial:** 02/11/2026, `testes`, `61b6872` mais alterações locais anteriores. **Pedido:** finalizar a última preparação da etapa 0 e publicar na branch `review` após validar.

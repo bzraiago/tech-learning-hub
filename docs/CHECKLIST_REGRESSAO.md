@@ -63,8 +63,8 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 - [ ] Nas aulas `setup-editor`, `setup-python`, `setup-git` e `setup-node`, os quatro exercícios mostram critérios; previsão e diagnóstico não antecipam respostas ou versões.
 - [ ] Em `setup-docker`, os quatro critérios distinguem cliente, Engine e Compose, preservam a ordem dos pré-requisitos e não recomendam permissões sem avaliar seu impacto.
 - [ ] Em `setup-docker-alternative`, os critérios aparecem antes das dicas; a previsão não revela a contagem e o relatório distingue SQLite executado de Docker/PostgreSQL pendentes.
-- [ ] Em `setup-postgresql`, os quatro exercícios mostram critérios antes das dicas; a previsão não lista as respostas e o diagnóstico preserva volume e senha.
-- [ ] Em `setup-mariadb`, `setup-firebird` e `setup-mongodb`, os critérios correspondem aos diagnósticos de cada motor, não antecipam a solução e mantêm segredos fora dos relatórios.
+- [ ] Em `db-setup-postgresql`, os quatro exercícios mostram critérios antes das dicas; a previsão não lista as respostas e o diagnóstico preserva volume e senha.
+- [ ] Em `db-setup-mariadb`, `db-setup-firebird` e `db-setup-mongodb`, os critérios correspondem aos diagnósticos de cada motor, não antecipam a solução e mantêm segredos fora dos relatórios.
 - [ ] Em `db-mariadb`, os critérios dos quatro exercícios aparecem antes das dicas; a inspeção usa a definição real e os resultados esperados não revelam linhas ou valores finais.
 - [ ] Em `db-firebird`, os critérios aparecem nos quatro exercícios; a ordenação precede o limite e os resultados esperados não antecipam nomes ou contagens.
 - [ ] Em `db-mongo-crud`, previsão e contagens não aparecem antecipadas; a remoção confirma a ausência de x9 e a preservação de a1.

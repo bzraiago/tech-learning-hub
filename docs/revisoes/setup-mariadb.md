@@ -1,5 +1,7 @@
 # Auditoria da aula — Preparar MariaDB como aprofundamento (`setup-mariadb`)
 
+> **Atualização de sequência:** o ID atual é `db-setup-mariadb`; a aula foi movida para Banco de Dados, depois dos fundamentos SQL e imediatamente antes de `db-mariadb`. A auditoria abaixo registra a posição anterior. O progresso, quiz, anotações e posição de leitura do ID antigo são migrados no `sanitizeState()`.
+
 ## 1. Escopo e contrato
 
 - **Data:** 02/11/2026. **Branch:** `testes`. **Código examinado:** `61b6872`, com documentos do processo ainda modificados localmente.

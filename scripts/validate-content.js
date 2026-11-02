@@ -251,7 +251,7 @@ for (const lesson of lessons) {
       if (exercise.criteria !== undefined && (!Array.isArray(exercise.criteria) || !exercise.criteria.length || exercise.criteria.some((item) => typeof item !== 'string' || !item.trim()))) {
         fail(`Critérios de aceite inválidos: ${lesson.id}:${index}`);
       }
-      if (['prep-tools', 'prep-files', 'prep-workspace', 'prep-cycle', 'prep-errors', 'setup-editor', 'setup-python', 'setup-git', 'setup-node', 'setup-docker', 'setup-docker-alternative', 'setup-postgresql', 'setup-mariadb', 'setup-firebird', 'setup-mongodb', 'db-mariadb', 'db-firebird', 'db-mongo-crud', 'db-mongo-pipelines', 'db-nosql-models', 'db-performance', 'db-security', 'db-recovery', 'db-project', 'db-modeling', 'db-normalization', 'db-ddl-constraints', 'db-ddl-crud', 'db-select', 'db-aggregation', 'db-joins', 'db-subqueries-ctes', 'db-transactions', 'db-concurrency-boundaries', 'db-docker-basics', 'db-docker-compose', 'db-docker-operations', 'db-postgres', 'db-sqlite', 'html-semantic', 'html-links-media', 'html-forms', 'html-tables', 'html-accessibility', 'css-cascade', 'css-box', 'css-typography', 'css-states', 'css-flex', 'css-grid', 'css-responsive', 'css-variables', 'js-values', 'js-flow', 'js-functions', 'js-scope-pure', 'js-callbacks-closures', 'js-arrays', 'js-es6', 'js-debug', 'js-dom', 'js-events', 'js-storage', 'js-promises', 'js-fetch', 'js-modules', 'py-syntax', 'py-control', 'py-data', 'py-functions', 'py-files', 'py-debug', 'py-oop', 'py-errors', 'py-modules', 'py-venv', 'py-requests', 'py-tests', 'ai-llms', 'ai-prompts', 'ai-system', 'ai-data', 'ai-embeddings', 'ai-rag', 'ai-api', 'ai-tools', 'ai-libraries', 'ai-mcp', 'ai-skills', 'ai-workflows', 'ai-evals', 'ai-safety', 'ai-operations', 'ai-adaptation', 'ai-multimodal', 'ai-capstone', 'git-start', 'git-history', 'git-branches', 'git-remote', 'git-requirements', 'git-review', 'quality-cases', 'quality-ui', 'quality-ci', 'quality-debug', 'quality-refactor', 'quality-review', 'delivery-web-foundations', 'delivery-dns', 'delivery-dns-resolution', 'delivery-https', 'delivery-hosting-models', 'delivery-static-deploy', 'delivery-custom-domain', 'delivery-http', 'delivery-forms', 'delivery-security', 'delivery-environments', 'delivery-oauth-google', 'delivery-clerk-supabase', 'delivery-threat-model', 'delivery-owasp-top10', 'delivery-xss-output', 'delivery-csrf', 'delivery-api-abuse', 'delivery-supply-chain', 'delivery-secret-lifecycle', 'delivery-audit-response', 'delivery-lgpd-foundations', 'delivery-lgpd-legal-bases', 'delivery-lgpd-rights-lifecycle', 'delivery-lgpd-incident-response', 'delivery-redis-foundations', 'delivery-redis-cache-aside', 'delivery-redis-rate-limit', 'delivery-ci', 'delivery-observability', 'delivery-recovery', 'delivery-requirements'].includes(lesson.id) && !exercise.criteria?.length) fail(`Exercício sem critérios de aceite: ${lesson.id}:${index}`);
+      if (['prep-tools', 'prep-files', 'prep-workspace', 'prep-cycle', 'prep-errors', 'setup-editor', 'setup-python', 'setup-git', 'setup-node', 'setup-docker', 'setup-docker-alternative', 'db-setup-postgresql', 'db-setup-mariadb', 'db-setup-firebird', 'db-setup-mongodb', 'db-mariadb', 'db-firebird', 'db-mongo-crud', 'db-mongo-pipelines', 'db-nosql-models', 'db-performance', 'db-security', 'db-recovery', 'db-project', 'db-modeling', 'db-normalization', 'db-ddl-constraints', 'db-ddl-crud', 'db-select', 'db-aggregation', 'db-joins', 'db-subqueries-ctes', 'db-transactions', 'db-concurrency-boundaries', 'db-docker-basics', 'db-docker-compose', 'db-docker-operations', 'db-postgres', 'db-sqlite', 'html-semantic', 'html-links-media', 'html-forms', 'html-tables', 'html-accessibility', 'css-cascade', 'css-box', 'css-typography', 'css-states', 'css-flex', 'css-grid', 'css-responsive', 'css-variables', 'js-values', 'js-flow', 'js-functions', 'js-scope-pure', 'js-callbacks-closures', 'js-arrays', 'js-es6', 'js-debug', 'js-dom', 'js-events', 'js-storage', 'js-promises', 'js-fetch', 'js-modules', 'py-syntax', 'py-control', 'py-data', 'py-functions', 'py-files', 'py-debug', 'py-oop', 'py-errors', 'py-modules', 'py-venv', 'py-requests', 'py-tests', 'ai-llms', 'ai-prompts', 'ai-system', 'ai-data', 'ai-embeddings', 'ai-rag', 'ai-api', 'ai-tools', 'ai-libraries', 'ai-mcp', 'ai-skills', 'ai-workflows', 'ai-evals', 'ai-safety', 'ai-operations', 'ai-adaptation', 'ai-multimodal', 'ai-capstone', 'git-start', 'git-history', 'git-branches', 'git-remote', 'git-requirements', 'git-review', 'quality-cases', 'quality-ui', 'quality-ci', 'quality-debug', 'quality-refactor', 'quality-review', 'delivery-web-foundations', 'delivery-dns', 'delivery-dns-resolution', 'delivery-https', 'delivery-hosting-models', 'delivery-static-deploy', 'delivery-custom-domain', 'delivery-http', 'delivery-forms', 'delivery-security', 'delivery-environments', 'delivery-oauth-google', 'delivery-clerk-supabase', 'delivery-threat-model', 'delivery-owasp-top10', 'delivery-xss-output', 'delivery-csrf', 'delivery-api-abuse', 'delivery-supply-chain', 'delivery-secret-lifecycle', 'delivery-audit-response', 'delivery-lgpd-foundations', 'delivery-lgpd-legal-bases', 'delivery-lgpd-rights-lifecycle', 'delivery-lgpd-incident-response', 'delivery-redis-foundations', 'delivery-redis-cache-aside', 'delivery-redis-rate-limit', 'delivery-ci', 'delivery-observability', 'delivery-recovery', 'delivery-requirements'].includes(lesson.id) && !exercise.criteria?.length) fail(`Exercício sem critérios de aceite: ${lesson.id}:${index}`);
     });
   }
   if (!guide.retry) {
@@ -284,11 +284,35 @@ const preparationIds = [
   'setup-node',
   'setup-docker',
   'setup-docker-alternative',
-  'setup-postgresql',
-  'setup-mariadb',
-  'setup-firebird',
-  'setup-mongodb',
+  'db-setup-postgresql',
+  'db-setup-mariadb',
+  'db-setup-firebird',
+  'db-setup-mongodb',
 ];
+const preparationPairs = [
+  ['db-setup-postgresql', 'db-postgres'],
+  ['db-setup-mariadb', 'db-mariadb'],
+  ['db-setup-firebird', 'db-firebird'],
+  ['db-setup-mongodb', 'db-mongo-crud'],
+];
+const lessonLocation = (lessonId) => tracks.flatMap((track) => track.modules.map((module) => ({ track, module })))
+  .find(({ module }) => module.lessons.some((lesson) => lesson.id === lessonId));
+for (const [preparationId, lessonId] of preparationPairs) {
+  const preparation = lessonLocation(preparationId);
+  const lesson = lessonLocation(lessonId);
+  if (!preparation || !lesson) continue;
+  if (preparation.track.id !== 'database' || preparation.module.id !== lesson.module.id) {
+    fail(`${preparationId} deve ficar no mesmo módulo Banco de Dados que ${lessonId}.`);
+  }
+  if (preparation.module.lessons.findIndex((item) => item.id === preparationId) >= preparation.module.lessons.findIndex((item) => item.id === lessonId)) {
+    fail(`${preparationId} deve aparecer antes de ${lessonId}.`);
+  }
+  for (const prerequisite of LESSON_GUIDES[preparationId]?.prerequisiteLessons || []) {
+    if (lessonIds.indexOf(prerequisite) >= lessonIds.indexOf(preparationId)) {
+      fail(`Pré-requisito ${prerequisite} precisa vir antes de ${preparationId}.`);
+    }
+  }
+}
 const setupMarkers = [
   'Objetivo:',
   'Requisitos:',
@@ -468,11 +492,11 @@ for (const lessonId of progressiveDatabaseLessonIds) {
 }
 
 const environmentContracts = [
-  ['PostgreSQL no host', LESSON_GUIDES['setup-postgresql'], ['127.0.0.1', '55432', 'estudos', 'aluno']],
+  ['PostgreSQL no host', LESSON_GUIDES['db-setup-postgresql'], ['127.0.0.1', '55432', 'estudos', 'aluno']],
   ['PostgreSQL no projeto relacional', PROJECTS.find((project) => project.id === 'project-db-relational'), ['127.0.0.1', '55432', 'laboratorio_estoque', 'aluno']],
-  ['MariaDB local', LESSON_GUIDES['setup-mariadb'], ['127.0.0.1', '3306', 'hub_maria_aula', 'root']],
-  ['Firebird local', LESSON_GUIDES['setup-firebird'], ['localhost', 'hub_fb_aula.fdb', 'SYSDBA']],
-  ['MongoDB local', LESSON_GUIDES['setup-mongodb'], ['127.0.0.1', '27017', 'mongosh']],
+  ['MariaDB local', LESSON_GUIDES['db-setup-mariadb'], ['127.0.0.1', '3306', 'hub_maria_aula', 'root']],
+  ['Firebird local', LESSON_GUIDES['db-setup-firebird'], ['localhost', 'hub_fb_aula.fdb', 'SYSDBA']],
+  ['MongoDB local', LESSON_GUIDES['db-setup-mongodb'], ['127.0.0.1', '27017', 'mongosh']],
   ['MongoDB no projeto', PROJECTS.find((project) => project.id === 'project-db-mongo'), ['127.0.0.1', '27017', 'th_catalogo_lab', 'mongosh']],
 ];
 

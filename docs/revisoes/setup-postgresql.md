@@ -1,5 +1,7 @@
 # Auditoria da aula — Preparar PostgreSQL e clientes de conexão (`setup-postgresql`)
 
+> **Atualização de sequência:** o ID atual é `db-setup-postgresql`; a aula foi movida para Banco de Dados, depois de Compose e antes de `db-postgres`. A auditoria abaixo registra a posição anterior. O progresso, quiz, anotações e posição de leitura do ID antigo são migrados no `sanitizeState()`.
+
 ## 1. Escopo e contrato
 
 - **Data:** 02/11/2026. **Branch:** `testes`. **Código auditado:** `61b6872`, com os documentos do novo processo ainda modificados localmente.

@@ -23,6 +23,7 @@ const icon = (name, classes = 'h-4 w-4') => `<svg class="${classes} shrink-0" fi
 const duration = (minutes) => minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)}h${minutes % 60 ? ` ${minutes % 60}min` : ''}`;
 const lessonsOf = (track) => track.modules.flatMap((module) => module.lessons);
 let startupNotice = '';
+let lessonIdMigrationPending = false;
 
 const READINESS_EVIDENCE = [
   { id: 'history', title: 'Histórico compreensível', detail: 'Repositório com commits pequenos, README reproduzível e uma mudança feita em branch.', track: 'git-workflow', projectId: 'project-git-capstone', projectNote: 'Confira o histórico e o README no repositório; o dashboard não inspeciona Git.' },
@@ -54,9 +55,59 @@ function validEvidenceDate(value) {
   return typeof value === 'string' && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString() === value ? value : null;
 }
 
+const lessonIdMigrations = [
+  ['setup-postgresql', 'db-setup-postgresql'],
+  ['setup-mariadb', 'db-setup-mariadb'],
+  ['setup-firebird', 'db-setup-firebird'],
+  ['setup-mongodb', 'db-setup-mongodb']
+];
+
+function migrateLessonIds(candidate) {
+  const migrated = { ...candidate };
+  let changed = false;
+  for (const field of ['completed', 'learningEvidence', 'quizAttempts', 'readingPositions']) {
+    const source = candidate[field];
+    if (!source || typeof source !== 'object' || Array.isArray(source)) continue;
+    const destination = { ...source };
+    for (const [oldId, newId] of lessonIdMigrations) {
+      if (Object.hasOwn(source, oldId)) {
+        if (!Object.hasOwn(destination, newId) || (field === 'completed' && source[oldId] === true)) {
+          destination[newId] = source[oldId];
+        }
+        changed = true;
+      }
+    }
+    migrated[field] = destination;
+  }
+  if (candidate.notes && typeof candidate.notes === 'object' && !Array.isArray(candidate.notes)) {
+    const notes = { ...candidate.notes };
+    for (const [oldId, newId] of lessonIdMigrations) {
+      for (const [key, value] of Object.entries(candidate.notes)) {
+        if (!key.startsWith(`${oldId}:`)) continue;
+        const nextKey = `${newId}${key.slice(oldId.length)}`;
+        if (!Object.hasOwn(notes, nextKey)) notes[nextKey] = value;
+        changed = true;
+      }
+    }
+    migrated.notes = notes;
+  }
+  const lastLesson = lessonIdMigrations.find(([oldId]) => candidate.lastLesson === oldId);
+  if (lastLesson) {
+    migrated.lastLesson = lastLesson[1];
+    changed = true;
+  }
+  if (changed) {
+    lessonIdMigrationPending = true;
+    const notice = 'As aulas de preparação de banco mudaram para seus módulos. O progresso, as respostas e as anotações anteriores foram transferidos.';
+    startupNotice = startupNotice ? `${startupNotice} ${notice}` : notice;
+  }
+  return migrated;
+}
+
 function sanitizeState(candidate) {
   const clean = { version: 1, completed: {}, learningEvidence: {}, activeTrack: 'preparacao', lastLesson: null, notes: {}, quizAttempts: {}, projects: {}, htmlCssRevision: 2, javascriptRevision: 3, pythonRevision: 2, databaseRevision: 3, aiRevision: 2, deliveryRevision: 1, readiness: {}, readingPositions: {}, readingPreferences: { fontScale: 100, lineHeight: 1.8, width: 'standard' } };
   if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return clean;
+  candidate = migrateLessonIds(candidate);
   if (candidate.completed && typeof candidate.completed === 'object') {
     for (const id of lessonIndex.keys()) {
       if (candidate.completed[id] === true) clean.completed[id] = true;

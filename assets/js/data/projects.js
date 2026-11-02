@@ -758,7 +758,7 @@ const PROJECTS=[
     "sourceLabel": "estoque.sql",
     "level": "Projeto do módulo · dados verificáveis",
     "goal": "Registrar uma saída de estoque apenas quando a quantidade estiver disponível, mantendo registro e saldo na mesma transação.",
-    "prerequisites": "Revise PostgreSQL e transações e conclua setup-postgresql. O caminho principal usa o laboratório Docker: host 127.0.0.1, porta 55432, usuário aluno e senha local do .env. Crie a base descartável com createdb -h 127.0.0.1 -p 55432 -U aluno laboratorio_estoque. Se usar outra instalação, documente host, porta, usuário e banco sem registrar a senha.",
+    "prerequisites": "Revise PostgreSQL e transações e conclua db-setup-postgresql. O caminho principal usa o laboratório Docker: host 127.0.0.1, porta 55432, usuário aluno e senha local do .env. Crie a base descartável com createdb -h 127.0.0.1 -p 55432 -U aluno laboratorio_estoque. Se usar outra instalação, documente host, porta, usuário e banco sem registrar a senha.",
     "deliverable": "Salve estoque.sql e verificar_estoque.sql. Execute os comandos abaixo em uma base nova pelo cliente psql externo. Cole estoque.sql e mantenha um README com host, porta, banco, usuário, comandos e resultados, sem senha. Dentro da rede Compose, o endereço equivalente é db:5432; ele não deve ser usado pelo cliente instalado no computador.",
     "brief": [
       "Tabelas produtos(id,nome,estoque não negativo) e movimentos(id identity,produto_id FK,quantidade positiva). Dados iniciais: Caderno id 1 estoque 5, Caneta id 2 estoque 0.",

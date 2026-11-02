@@ -10,7 +10,7 @@ Para diagnosticar Preview, login e persistência na nuvem separadamente da API e
 
 ## Pré-requisitos
 
-1. Conclua `setup-node`, `setup-docker`, `setup-postgresql`, `delivery-http` e `labs/backend-validation/README.md`. Não é necessário concluir toda a trilha de banco.
+1. Conclua `setup-node`, `setup-docker`, `db-setup-postgresql`, `delivery-http` e `labs/backend-validation/README.md`. Não é necessário concluir toda a trilha de banco.
 2. Abra esta pasta `labs/backend-layers` no editor e no terminal.
 3. Node.js `20.9.0` ou mais novo, npm e Docker Compose operacional. No terminal, confira `node --version`, `npm --version` e `docker version`.
 4. O comando `docker version` deve mostrar as versões de cliente e servidor. Se a seção Server falhar, inicie Docker Desktop (Windows/macOS) ou o serviço Docker (Linux) antes de continuar.
@@ -463,7 +463,7 @@ Para conferir localmente os mesmos passos, execute `node scripts/validate-conten
 
 Para continuar estudando validação, regras e HTTP em um computador sem Docker/banco, no Windows execute `$env:BACKEND_STORAGE = 'memory'; npm.cmd run start:memory`; depois de parar com `Ctrl+C`, limpe a variável com `Remove-Item Env:BACKEND_STORAGE`. Em macOS/Linux execute `BACKEND_STORAGE=memory npm run start:memory`. A saída identifica armazenamento e rate limit como memória temporária e cache como desativado. Nesse modo os dados e contadores somem ao reiniciar o servidor e não são compartilhados; marque as integrações PostgreSQL/Redis/cache-aside como pendentes e volte a este roteiro quando Docker estiver disponível.
 
-Se Docker não estiver disponível mas o computador já tiver PostgreSQL local, conclua `setup-postgresql`, crie uma base descartável `backend_camadas` e ajuste em `.env` `PGHOST`, `PGPORT`, `PGUSER`, `PGDATABASE`, `PGPASSWORD`, `PGAPPUSER` e `PGAPPPASSWORD` para essa instalação antes de executar `npm run setup:app-role`, `npm run migrate` e `npm run db:check`.
+Se Docker não estiver disponível mas o computador já tiver PostgreSQL local, conclua `db-setup-postgresql`, crie uma base descartável `backend_camadas` e ajuste em `.env` `PGHOST`, `PGPORT`, `PGUSER`, `PGDATABASE`, `PGPASSWORD`, `PGAPPUSER` e `PGAPPPASSWORD` para essa instalação antes de executar `npm run setup:app-role`, `npm run migrate` e `npm run db:check`.
 
 ## Como as camadas se conectam
 

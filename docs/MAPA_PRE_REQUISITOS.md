@@ -91,6 +91,8 @@ Outro serviço dentro da mesma rede Compose usa `db:5432`. Não substitua um end
 
 Senhas nunca fazem parte deste catálogo: são locais, não entram em comandos publicados nem no repositório.
 
+As preparações `db-setup-postgresql`, `db-setup-mariadb`, `db-setup-firebird` e `db-setup-mongodb` ficam na trilha Banco de Dados, junto da aula que usa cada ferramenta. Elas não entram na contagem da Etapa 0. Os IDs substituem os antigos `setup-*`; `sanitizeState()` migra conclusão, evidências, respostas de quiz, rascunhos e posição de leitura já salvos.
+
 ## Arestas atualmente abertas
 
 | Severidade | Aresta | Estado | Próxima implementação |
@@ -100,7 +102,7 @@ Senhas nunca fazem parte deste catálogo: são locais, não entram em comandos p
 | Alta | Etapa 0 → instalação Git | Resolvida | Manter a preparação `setup-git` atualizada com a documentação oficial. |
 | Alta | Etapa 0 → instalação Node.js/npm | Resolvida | Manter `setup-node` e a distinção navegador/runtime. |
 | Alta | Etapa 0 → Docker/WSL | Resolvida | Manter `setup-docker` e `setup-docker-alternative` atualizadas. |
-| Alta | Docker → PostgreSQL | Resolvida | Manter `setup-postgresql` e a conexão `127.0.0.1:55432` coerentes. |
+| Alta | Docker → PostgreSQL | Resolvida | Manter `db-setup-postgresql` e a conexão `127.0.0.1:55432` coerentes. |
 | Média | PostgreSQL → MariaDB/Firebird/MongoDB | Resolvida como aprofundamento | Manter as três preparações opcionais sem bloquear SQLite/PostgreSQL. |
 
 ## Regra de manutenção
