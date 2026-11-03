@@ -696,7 +696,7 @@ const PROJECTS=[
     "sourceLabel": "catalogo.sql",
     "level": "Projeto do módulo · dados verificáveis",
     "goal": "Modelar e consultar um catálogo em que a conclusão pertence ao par estudante–lição.",
-    "prerequisites": "Conclua as cinco aulas de fundamentos. Instale Python 3; sqlite3 já faz parte da biblioteca padrão. Não é preciso conhecer a implementação do verificador para executá-lo.",
+    "prerequisites": "Conclua as dez aulas de Fundamentos e linguagem SQL. A aula Subconsultas e CTEs inclui a preparação de CREATE VIEW. Use Python verificado na Etapa 0 para executar o teste fornecido; não é necessário implementar o verificador.",
     "deliverable": "Salve catalogo.sql com schema, dados iniciais e view progresso. Salve o verificador da aba Referência como verificar_catalogo.py na mesma pasta; execute python verificar_catalogo.py. Cole o conteúdo SQL na Entrega.",
     "brief": [
       "Crie estudantes(id,nome,email único), licoes(id,titulo,minutos positivos) e conclusoes(estudante_id,licao_id), com chaves obrigatórias e sem duplicar o mesmo par.",
@@ -745,7 +745,7 @@ const PROJECTS=[
       "COUNT da coluna do lado opcional não conta a linha vazia criada pelo LEFT JOIN.",
       "A view organiza uma consulta reutilizável; os dados permanecem nas tabelas."
     ],
-    "transfer": "Acrescente data_conclusao obrigatória. Escreva uma consulta por mês e um teste para mês sem conclusões sem quebrar o relatório existente.",
+    "transfer": "Acrescente uma quarta lição de 20 minutos e conclua-a para Beto. Adapte o teste para esperar Beto com uma conclusão e 20 minutos; Ana deve continuar com duas e 75. Preserve os testes negativos de integridade.",
     "rubric": "Registre evidências reais de execução no ambiente indicado. Os testes publicados verificam um contrato limitado; acrescente casos próprios. A página guarda código e autoavaliação, mas não executa bancos nem confirma resultados externos."
   },
   {
@@ -758,17 +758,17 @@ const PROJECTS=[
     "sourceLabel": "estoque.sql",
     "level": "Projeto do módulo · dados verificáveis",
     "goal": "Registrar uma saída de estoque apenas quando a quantidade estiver disponível, mantendo registro e saldo na mesma transação.",
-    "prerequisites": "Revise PostgreSQL e transações e conclua db-setup-postgresql. O caminho principal usa o laboratório Docker: host 127.0.0.1, porta 55432, usuário aluno e senha local do .env. Crie a base descartável com createdb -h 127.0.0.1 -p 55432 -U aluno laboratorio_estoque. Se usar outra instalação, documente host, porta, usuário e banco sem registrar a senha.",
-    "deliverable": "Salve estoque.sql e verificar_estoque.sql. Execute os comandos abaixo em uma base nova pelo cliente psql externo. Cole estoque.sql e mantenha um README com host, porta, banco, usuário, comandos e resultados, sem senha. Dentro da rede Compose, o endereço equivalente é db:5432; ele não deve ser usado pelo cliente instalado no computador.",
+    "prerequisites": "Revise PostgreSQL e transações e conclua Preparar PostgreSQL e clientes de conexão. Na pasta dados-local, confirme o serviço healthy. O caminho principal usa psql dentro do container: crie a base nova com docker compose exec db createdb -U aluno laboratorio_estoque. Cliente externo opcional usa 127.0.0.1, porta 55432, usuário aluno e senha local; nunca registre a senha. A aula PostgreSQL prepara UPDATE ... RETURNING e CTE modificadora.",
+    "deliverable": "No VS Code aberto em dados-local, salve estoque.sql e verificar_estoque.sql (teste fornecido na aba Referência). No terminal dessa pasta, copie os dois arquivos e execute os comandos abaixo pelo psql interno. Não precisa instalar psql externo. Entregue também README com parâmetros sem senha, resultados e limitações.",
     "brief": [
       "Tabelas produtos(id,nome,estoque não negativo) e movimentos(id identity,produto_id FK,quantidade positiva). Dados iniciais: Caderno id 1 estoque 5, Caneta id 2 estoque 0.",
       "Sua entrega registra exatamente uma saída de 2 Cadernos. Use UPDATE condicional e só registre movimento se ele afetar a linha. O resultado é estoque 3 e um movimento de quantidade 2.",
-      "Documente as adaptações para MariaDB (AUTO_INCREMENT e estratégia de transação sem esta CTE modificadora), Firebird (identity/RETURNING no cliente apropriado) e SQLite (INTEGER PRIMARY KEY e controle na aplicação). Não copie a sintaxe PostgreSQL para outro motor.",
+      "Aprofundamento opcional: se estudou MariaDB ou Firebird, documente adaptações de identidade e transação. Para o caminho principal, compare PostgreSQL com SQLite: INTEGER PRIMARY KEY e controle transacional pela aplicação. Não execute CTE modificadora do PostgreSQL no SQLite.",
       "O laboratório não implementa idempotência de pedidos nem auditoria completa. Explique como uma solicitação repetida poderia registrar duas saídas e proponha uma chave de operação única."
     ],
     "exampleOutput": "1 | Caderno | 3\n2 | Caneta | 0\nmovimentos: uma linha, produto_id=1, quantidade=2\nTentativa de retirar 99: nenhuma linha alterada e nenhum novo movimento.",
-    "testCommand": "psql -h 127.0.0.1 -p 55432 -U aluno -d laboratorio_estoque -W -v ON_ERROR_STOP=1 -f estoque.sql\npsql -h 127.0.0.1 -p 55432 -U aluno -d laboratorio_estoque -W -v ON_ERROR_STOP=1 -f verificar_estoque.sql",
-    "testsCode": "-- Salve verificar_estoque.sql e execute em uma base de laboratório nova.\nDO $$\nBEGIN\n  IF (SELECT estoque FROM produtos WHERE id=1) IS DISTINCT FROM 3 THEN\n    RAISE EXCEPTION 'Estoque esperado: 3';\n  END IF;\n  IF (SELECT count(*) FROM movimentos) \u003c> 1 THEN\n    RAISE EXCEPTION 'Esperado um movimento';\n  END IF;\n  BEGIN\n    INSERT INTO movimentos(produto_id,quantidade) VALUES(99,1);\n    RAISE EXCEPTION 'FK ausente';\n  EXCEPTION WHEN foreign_key_violation THEN NULL;\n  END;\n  BEGIN\n    UPDATE produtos SET estoque=-1 WHERE id=1;\n    RAISE EXCEPTION 'CHECK ausente';\n  EXCEPTION WHEN check_violation THEN NULL;\n  END;\nEND $$;\nBEGIN;\nWITH alterado AS (\n  UPDATE produtos SET estoque=estoque-99\n  WHERE id=1 AND estoque>=99 RETURNING id\n)\nINSERT INTO movimentos(produto_id,quantidade) SELECT id,99 FROM alterado;\nDO $$ BEGIN\n  IF (SELECT count(*) FROM movimentos) \u003c> 1 THEN RAISE EXCEPTION 'Venda sem estoque'; END IF;\nEND $$;\nROLLBACK;\nSELECT id,nome,estoque FROM produtos ORDER BY id;\nSELECT 'OK: estoque e integridade' AS resultado;\n",
+    "testCommand": "docker compose cp ./estoque.sql db:/tmp/estoque.sql\ndocker compose cp ./verificar_estoque.sql db:/tmp/verificar_estoque.sql\ndocker compose exec db psql -U aluno -d laboratorio_estoque -v ON_ERROR_STOP=1 -f /tmp/estoque.sql\ndocker compose exec db psql -U aluno -d laboratorio_estoque -v ON_ERROR_STOP=1 -f /tmp/verificar_estoque.sql",
+    "testsCode": "-- Salve verificar_estoque.sql e execute em uma base de laboratório nova.\nDO $$\nBEGIN\n  IF (SELECT estoque FROM produtos WHERE id=1) IS DISTINCT FROM 3 THEN\n    RAISE EXCEPTION 'Estoque esperado: 3';\n  END IF;\n  IF (SELECT count(*) FROM movimentos) <> 1 THEN\n    RAISE EXCEPTION 'Esperado um movimento';\n  END IF;\n  BEGIN\n    INSERT INTO movimentos(produto_id,quantidade) VALUES(99,1);\n    RAISE EXCEPTION 'FK ausente';\n  EXCEPTION WHEN foreign_key_violation THEN NULL;\n  END;\n  BEGIN\n    UPDATE produtos SET estoque=-1 WHERE id=1;\n    RAISE EXCEPTION 'CHECK ausente';\n  EXCEPTION WHEN check_violation THEN NULL;\n  END;\nEND $$;\nBEGIN;\nWITH alterado AS (\n  UPDATE produtos SET estoque=estoque-99\n  WHERE id=1 AND estoque>=99 RETURNING id\n)\nINSERT INTO movimentos(produto_id,quantidade) SELECT id,99 FROM alterado;\nDO $$ BEGIN\n  IF (SELECT count(*) FROM movimentos) <> 1 THEN RAISE EXCEPTION 'Venda sem estoque'; END IF;\nEND $$;\nROLLBACK;\nSELECT id,nome,estoque FROM produtos ORDER BY id;\nSELECT 'OK: estoque e integridade' AS resultado;\n",
     "solution": "CREATE TABLE produtos (\n  id integer PRIMARY KEY,\n  nome text NOT NULL,\n  estoque integer NOT NULL CHECK (estoque >= 0)\n);\nCREATE TABLE movimentos (\n  id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n  produto_id integer NOT NULL REFERENCES produtos(id),\n  quantidade integer NOT NULL CHECK (quantidade > 0)\n);\nINSERT INTO produtos VALUES(1,'Caderno',5),(2,'Caneta',0);\nBEGIN;\nWITH alterado AS (\n  UPDATE produtos SET estoque=estoque-2\n  WHERE id=1 AND estoque>=2 RETURNING id\n)\nINSERT INTO movimentos(produto_id,quantidade) SELECT id,2 FROM alterado;\nCOMMIT;\n",
     "checks": [
       {
@@ -789,7 +789,7 @@ const PROJECTS=[
       {
         "id": "criterion-4",
         "mode": "manual",
-        "label": "Documentei três diferenças ao portar para MariaDB, Firebird e SQLite."
+        "label": "Comparei PostgreSQL e SQLite; registrei MariaDB/Firebird como executados ou aprofundamentos pendentes."
       },
       {
         "id": "criterion-5",
@@ -869,7 +869,7 @@ const PROJECTS=[
       "O pipeline trabalha com documentos e a ordenação final estabiliza a saída.",
       "O índice foi desenhado para uma consulta específica; ele não é uma solução universal."
     ],
-    "transfer": "Acrescente data da sessão e filtre um intervalo. Inclua testes de início e fim do intervalo e revise o índice para a consulta real.",
+    "transfer": "Acrescente uma sessão pendente de 10 minutos para Beto e prove que ela não altera o total de concluídas. Depois conclua essa sessão e adapte o teste para Beto 55 minutos, preservando Ana 30 e a rejeição de duração zero.",
     "rubric": "Registre evidências reais de execução no ambiente indicado. Os testes publicados verificam um contrato limitado; acrescente casos próprios. A página guarda código e autoavaliação, mas não executa bancos nem confirma resultados externos."
   },
   {

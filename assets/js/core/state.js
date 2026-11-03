@@ -105,7 +105,7 @@ function migrateLessonIds(candidate) {
 }
 
 function sanitizeState(candidate) {
-  const clean = { version: 1, completed: {}, learningEvidence: {}, activeTrack: 'preparacao', lastLesson: null, notes: {}, quizAttempts: {}, projects: {}, htmlCssRevision: 2, javascriptRevision: 3, pythonRevision: 2, databaseRevision: 3, aiRevision: 2, deliveryRevision: 1, readiness: {}, readingPositions: {}, readingPreferences: { fontScale: 100, lineHeight: 1.8, width: 'standard' } };
+  const clean = { version: 1, completed: {}, learningEvidence: {}, activeTrack: 'preparacao', lastLesson: null, notes: {}, quizAttempts: {}, projects: {}, htmlCssRevision: 2, javascriptRevision: 3, pythonRevision: 2, databaseRevision: 4, aiRevision: 2, deliveryRevision: 1, readiness: {}, readingPositions: {}, readingPreferences: { fontScale: 100, lineHeight: 1.8, width: 'standard' } };
   if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return clean;
   candidate = migrateLessonIds(candidate);
   if (candidate.completed && typeof candidate.completed === 'object') {
@@ -201,7 +201,18 @@ function sanitizeState(candidate) {
     if (Object.keys(candidate.quizAttempts || {}).some(id => lessonIndex.get(id)?.track.id === 'javascript')) startupNotice='JavaScript foi revisado. As respostas dessa trilha foram reiniciadas; conclusões e rascunhos foram preservados.';
   }
   if(candidate.pythonRevision!==2){for(const lesson of tracks.find(track=>track.id==='python').modules.flatMap(module=>module.lessons))delete clean.quizAttempts[lesson.id];}
-  if(candidate.databaseRevision!==3){
+  // Revisão 4 apenas reorganiza construir/investigar em quatro aulas.
+  // Reposicione os rascunhos uma única vez; quizzes e conclusões não mudaram.
+  if (candidate.databaseRevision !== 4) {
+    for (const id of ['db-postgres', 'db-mariadb', 'db-sqlite', 'db-firebird']) {
+      for (const [from, to] of [[2, 3], [3, 2]]) {
+        const value = candidate.notes?.[`${id}:${from}`];
+        delete clean.notes[`${id}:${to}`];
+        if (typeof value === 'string') clean.notes[`${id}:${to}`] = value.slice(0, 10000);
+      }
+    }
+  }
+  if(candidate.databaseRevision!==3 && candidate.databaseRevision!==4){
     for(const lesson of tracks.find(t=>t.id==='database').modules.flatMap(m=>m.lessons))delete clean.quizAttempts[lesson.id];
     if (Object.keys(candidate.quizAttempts || {}).some(id => lessonIndex.get(id)?.track.id === 'database')) startupNotice='Banco de Dados foi revisado. As respostas dessa trilha foram reiniciadas; conclusões e rascunhos foram preservados.';
   }

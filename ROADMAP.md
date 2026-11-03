@@ -784,6 +784,8 @@ O projeto intermediário permanece bloqueado enquanto as fases 2, 6 e 7 não est
 
 ## Decisões e bloqueios
 
+Revisão de 03/11/2026: as 28 aulas de Banco de Dados foram auditadas e corrigidas no lote autorizado. Executor SQLite visível, progressão inicial, SAVEPOINT, preparação de views, projetos e migração de rascunhos verificados. Validador, exemplos locais, dois projetos e E2E passaram. Execução dos motores servidores e formação avançada completa permanecem pendentes. Evidências: [relatório da revisão](docs/revisoes/database-2026-11-03.md).
+
 Registre aqui mudanças de direção e impedimentos que afetem a sequência.
 
 | Data | Tipo | Decisão ou bloqueio | Motivo | Próxima ação |

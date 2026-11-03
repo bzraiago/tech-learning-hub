@@ -53,6 +53,7 @@ test.afterAll(async () => {
 });
 
 test('sumário, salvamento automático e retomada de leitura ficam isolados por conta', async ({ page }) => {
+  test.setTimeout(120000);
   const estadosRemotos = new Map();
   const gravacoes = [];
   const errosDeRuntime = [];
@@ -62,7 +63,10 @@ test('sumário, salvamento automático e retomada de leitura ficam isolados por 
     Object.defineProperty(window, 'localStorage', { configurable: false, get() { throw new DOMException('Armazenamento bloqueado pelo teste.', 'SecurityError'); } });
   });
 
-  await page.route('https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4**', route => route.abort());
+  const tailwindLocal = process.env.TECHHUB_TAILWIND_FILE;
+  await page.route('https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4**', route => tailwindLocal
+    ? route.fulfill({ path: tailwindLocal, contentType: 'text/javascript' })
+    : route.abort());
   await page.route('https://fake.clerk.accounts.dev/**', async route => {
     const url = route.request().url();
     const conteudo = url.includes('/npm/@clerk/ui@1/')
@@ -96,7 +100,7 @@ test('sumário, salvamento automático e retomada de leitura ficam isolados por 
   await expect(page.locator('#cloud-panel')).not.toContainText('Exportar progresso');
   await expect(page.locator('#cloud-panel')).not.toContainText('Importar arquivo JSON');
   // A CI não depende do CDN Tailwind; este trecho fornece só o layout rolável do diálogo.
-  await page.addStyleTag({ content: '#study-dialog>div{display:flex;flex-direction:column;max-height:calc(100dvh - 42px)}#dialog-body{flex:1;min-height:0;overflow-y:auto}#lesson-sections.hidden{display:none}' });
+  if (!tailwindLocal) await page.addStyleTag({ content: '#study-dialog>div{display:flex;flex-direction:column;max-height:calc(100dvh - 42px)}#dialog-body{flex:1;min-height:0;overflow-y:auto}#lesson-sections.hidden{display:none}' });
 
   // A preparação precisa apresentar o código no passo certo, antes de executá-lo.
   await page.evaluate(() => openLesson('setup-docker-alternative'));
@@ -133,6 +137,54 @@ test('sumário, salvamento automático e retomada de leitura ficam isolados por 
   await page.evaluate(() => renderLessonSection('example'));
   await expect(page.locator('.reader-example-step').first()).toBeVisible();
   await expect(page.locator('#dialog-body')).not.toContainText('Prepare seu ambiente');
+  // O aluno precisa alcançar o executor, não apenas existir no objeto de dados.
+  const aulasDados = await page.evaluate(() => tracks.find(t => t.id === 'database').modules.flatMap(m => m.lessons.map(l => l.id)));
+  expect(aulasDados).toHaveLength(28);
+  for (const id of aulasDados) {
+    await page.evaluate(id => { openLesson(id); renderLessonSection('learn'); }, id);
+    await expect(page.locator('#dialog-body')).toContainText('Ao terminar esta aula');
+    await page.evaluate(() => renderLessonSection('example'));
+    await expect(page.locator('#dialog-body pre').first()).toBeVisible();
+    await page.evaluate(() => renderLessonSection('practice'));
+    await expect(page.locator('#dialog-body')).not.toContainText('Escolha uma mudança pequena ligada');
+    await expect(page.locator(`#requirement-change-note-${id}`)).toHaveAttribute('maxlength', '2000');
+    await page.evaluate(() => renderLessonSection('review'));
+    await expect(page.locator('#lesson-quiz fieldset')).toHaveCount(3);
+  }
+  for (const width of [375, 768, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.evaluate(() => { openLesson('db-modeling'); renderLessonSection('example'); });
+    const codigo = page.locator('.reader-example-step').first().locator('pre');
+    await expect(codigo).toContainText('def executar(sql):');
+    await expect(codigo).toContainText('con.close()');
+    await expect(codigo).not.toHaveClass(/max-h-/);
+    await codigo.focus();
+    await page.keyboard.press('ArrowRight');
+    const selecionado = await codigo.locator('code').evaluate(node => {
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      const selection = getSelection();
+      selection.removeAllRanges(); selection.addRange(range);
+      const text = selection.toString(); selection.removeAllRanges();
+      node.parentElement.scrollLeft = 0;
+      return { text, expected: node.textContent };
+    });
+    // Chromium pode omitir a quebra final vazia na seleção, sem perder código.
+    expect(selecionado.text.trimEnd()).toBe(selecionado.expected.trimEnd());
+    const alternativaSQL = page.locator('.reader-example-step').nth(2).locator('summary');
+    await alternativaSQL.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('.reader-example-step').nth(2).locator('details')).toHaveAttribute('open', '');
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
+    expect(overflow).toBe(false);
+    if (process.env.TECHHUB_SCREENSHOTS) {
+      await page.locator('.reader-example-step').first().locator('h3').scrollIntoViewIfNeeded();
+      await page.screenshot({ path: path.join(process.env.TECHHUB_SCREENSHOTS, `database-${width}.png`) });
+      await page.locator('.reader-example-step').last().scrollIntoViewIfNeeded();
+      await page.screenshot({ path: path.join(process.env.TECHHUB_SCREENSHOTS, `database-fim-${width}.png`) });
+    }
+  }
+  await page.setViewportSize({ width: 375, height: 812 });
   // Exercícios de outras aulas mantêm o enunciado padrão e os blocos antigos.
   await page.evaluate(() => { openLesson('setup-editor'); renderLessonSection('example'); });
   await expect(page.locator('#dialog-body pre')).not.toHaveCount(0);

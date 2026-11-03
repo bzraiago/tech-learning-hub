@@ -171,6 +171,8 @@ Use este checklist depois das verificações automatizadas e antes de publicar a
 
 ## Encerramento
 
+Registro de 03/11/2026 — Banco de Dados: validação estrutural, exemplos SQLite/Python, dois projetos, migração e E2E das 28 aulas passaram; interface conferida em 375/768/1280 px com autenticação simulada. Serviços reais, leitor de tela e instalação em outros sistemas não foram testados. Ver [escopo e evidências](revisoes/database-2026-11-03.md); este registro não marca automaticamente os demais itens deste checklist.
+
 - [ ] Capturar ou descrever o resultado das verificações executadas.
 - [ ] Informar explicitamente o que não foi testado.
 - [ ] Atualizar `ROADMAP.md` e o backlog equivalente do `AGENTS.md`.

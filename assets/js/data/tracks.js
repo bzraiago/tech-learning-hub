@@ -2176,7 +2176,7 @@
               "Representar relações 1:N e N:N com referências.",
               "Guardar informações da relação na tabela associativa."
             ],
-            "exercise": "3. Construir: modele avaliações de lições. Cada estudante pode avaliar cada lição uma vez, com nota inteira de 1 a 5. Crie a tabela e registre nota 4 de Ana para SELECT.",
+            "exercise": "3. Construir: desenhe avaliações de lições em texto. Cada pessoa avalia cada lição uma vez, com nota inteira de 1 a 5. Escreva campos, identidade, referências e a avaliação 4 de Ana para SELECT; não implemente SQL ainda.",
             "code": "PRAGMA foreign_keys=ON;\nCREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT NOT NULL UNIQUE);\nCREATE TABLE estudantes(id INTEGER PRIMARY KEY,nome TEXT NOT NULL,email TEXT NOT NULL UNIQUE);\nCREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha_id INTEGER NOT NULL REFERENCES trilhas(id),titulo TEXT NOT NULL);\nCREATE TABLE matriculas(estudante_id INTEGER NOT NULL REFERENCES estudantes(id),trilha_id INTEGER NOT NULL REFERENCES trilhas(id),PRIMARY KEY(estudante_id,trilha_id));\nCREATE TABLE progresso(estudante_id INTEGER NOT NULL REFERENCES estudantes(id),licao_id INTEGER NOT NULL REFERENCES licoes(id),concluida INTEGER NOT NULL CHECK(concluida IN (0,1)),PRIMARY KEY(estudante_id,licao_id));\nINSERT INTO trilhas VALUES(1,'Dados');\nINSERT INTO estudantes VALUES(1,'Ana','ana@example.test'),(2,'Beto','beto@example.test');\nINSERT INTO licoes VALUES(10,1,'SELECT'),(11,1,'JOIN');\nINSERT INTO matriculas VALUES(1,1),(2,1);\nINSERT INTO progresso VALUES(1,10,1),(2,10,0);\nSELECT estudante_id,licao_id,concluida FROM progresso ORDER BY estudante_id,licao_id;",
             "docs": [
               {
@@ -2209,7 +2209,7 @@
               "Aplicar as três primeiras formas normais em um exemplo pequeno.",
               "Documentar o significado de ausência e os limites do modelo escolhido."
             ],
-            "exercise": "Construir: normalize uma planilha de matrículas que repete nome e email do estudante e guarda trilhas separadas por vírgula. Entregue tabelas, chaves e três linhas de exemplo.",
+            "exercise": "3. Construir: normalize no papel uma planilha que repete nome/email do estudante e guarda trilhas separadas por vírgula. Entregue nomes de tabelas, campos, chaves e três linhas fictícias; SQL ainda não é exigido.",
             "code": "PRAGMA foreign_keys=ON;\nCREATE TABLE estudantes(id INTEGER PRIMARY KEY,nome TEXT NOT NULL,email TEXT NOT NULL UNIQUE);\nCREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT NOT NULL UNIQUE);\nCREATE TABLE matriculas(estudante_id INTEGER NOT NULL REFERENCES estudantes(id),trilha_id INTEGER NOT NULL REFERENCES trilhas(id),data_matricula TEXT,PRIMARY KEY(estudante_id,trilha_id));\nINSERT INTO estudantes VALUES(1,'Ana','ana@example.test');\nINSERT INTO trilhas VALUES(10,'Dados'),(20,'Web');\nINSERT INTO matriculas VALUES(1,10,'2026-10-24'),(1,20,NULL);\nSELECT estudante_id,trilha_id,data_matricula FROM matriculas ORDER BY trilha_id;",
             "docs": [
               {
@@ -2236,7 +2236,7 @@
               "Combinar PRIMARY KEY, NOT NULL, UNIQUE, CHECK e DEFAULT.",
               "Ativar e testar referências entre tabelas no SQLite."
             ],
-            "exercise": "Construir: crie categorias e tarefas. Cada tarefa exige título não vazio, minutos inteiros positivos, categoria existente e estado pendente por padrão.",
+            "exercise": "3. Construir: crie categorias e tarefas. Cada tarefa exige título não vazio, minutos inteiros positivos, categoria existente e estado pendente por padrão. Insira uma tarefa válida e teste cada regra com uma tentativa inválida isolada.",
             "code": "PRAGMA foreign_keys=ON;\nCREATE TABLE categorias(id INTEGER PRIMARY KEY,nome TEXT NOT NULL UNIQUE);\nCREATE TABLE tarefas(\n  id INTEGER PRIMARY KEY,\n  categoria_id INTEGER NOT NULL REFERENCES categorias(id),\n  titulo TEXT NOT NULL CHECK(length(trim(titulo)) > 0),\n  minutos INTEGER NOT NULL CHECK(typeof(minutos)='integer' AND minutos > 0),\n  concluida INTEGER NOT NULL DEFAULT 0 CHECK(concluida IN (0,1))\n);\nINSERT INTO categorias(id,nome) VALUES(1,'Estudos');\nINSERT INTO tarefas(id,categoria_id,titulo,minutos) VALUES(10,1,'Revisar SQL',30);\nSELECT id,titulo,minutos,concluida FROM tarefas;",
             "docs": [
               {
@@ -2296,8 +2296,8 @@
               "Tratar NULL sem confundi-lo com zero ou texto vazio.",
               "Ordenar resultados com critérios e desempates previsíveis."
             ],
-            "exercise": "3. Construir: produza um relatório das pendências por trilha, com quantidade e total, maior total primeiro. Inclua as duas trilhas, sem HAVING.",
-            "code": "CREATE TABLE licoes (\n id INTEGER PRIMARY KEY, trilha TEXT, titulo TEXT,\n minutos INTEGER, concluida INTEGER, observacao TEXT\n);\nINSERT INTO licoes VALUES\n (1,'Dados','SELECT',30,0,NULL),\n (2,'Dados','JOIN',40,0,'Revisar'),\n (3,'Python','Listas',20,1,NULL),\n (4,'Python','Arquivos',30,0,'');\nSELECT titulo,minutos FROM licoes WHERE concluida=0\nORDER BY minutos DESC,id ASC;\nSELECT trilha,COUNT(*) AS quantidade,SUM(minutos) AS total\nFROM licoes WHERE concluida=0 GROUP BY trilha\nHAVING SUM(minutos)>=50 ORDER BY trilha;\nSELECT COUNT(*) AS linhas,COUNT(observacao) AS preenchidas FROM licoes;",
+            "exercise": "3. Construir: liste id, título e observação das aulas pendentes. Mostre 'Sem observação' somente quando o valor for NULL e coloque textos vazios por último.",
+            "code": "CREATE TABLE licoes (\n id INTEGER PRIMARY KEY, trilha TEXT, titulo TEXT,\n minutos INTEGER, concluida INTEGER, observacao TEXT\n);\nINSERT INTO licoes VALUES\n (1,'Dados','SELECT',30,0,NULL),\n (2,'Dados','JOIN',40,0,'Revisar'),\n (3,'Python','Listas',20,1,NULL),\n (4,'Python','Arquivos',30,0,'');\nSELECT titulo,minutos FROM licoes WHERE concluida=0\nORDER BY minutos DESC,id ASC;\nSELECT id,titulo,COALESCE(observacao,'Sem observação') AS observacao\nFROM licoes ORDER BY id;",
             "docs": [
               {
                 "kind": "doc",
@@ -2329,7 +2329,7 @@
               "Agrupar linhas e diferenciar filtros WHERE de HAVING.",
               "Validar relatórios agregados com contas manuais em dados pequenos."
             ],
-            "exercise": "Construir: produza um relatório das pendências por trilha, com quantidade e total, maior total primeiro, incluindo todos os grupos sem HAVING.",
+            "exercise": "3. Construir: partindo da base inicial, acrescente uma aula pendente de Git com id 5, título Histórico, 15 minutos e observação NULL. Produza o relatório de quantidade e minutos pendentes por trilha, maior total primeiro e trilha como desempate.",
             "code": "CREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha TEXT,titulo TEXT,minutos INTEGER,concluida INTEGER,observacao TEXT);\nINSERT INTO licoes VALUES\n (1,'Dados','SELECT',30,0,NULL),\n (2,'Dados','JOIN',40,0,'Revisar'),\n (3,'Python','Listas',20,1,NULL),\n (4,'Python','Arquivos',30,0,'');\nSELECT trilha,COUNT(*) AS quantidade,SUM(minutos) AS total\nFROM licoes WHERE concluida=0\nGROUP BY trilha ORDER BY total DESC,trilha;",
             "docs": [
               {
@@ -2352,12 +2352,12 @@
             "minutes": 90,
             "concept": "Separar o nome da trilha das lições evita repetição, mas o relatório precisa reunir essas informações novamente. JOIN expressa essa ligação e permite incluir até trilhas que ainda não receberam nenhuma aula.",
             "objectives": [
-              "A condição ON determina como as linhas se relacionam.",
-              "Entenda a granularidade antes de somar.",
-              "LEFT JOIN e contagem de chaves permitem representar zero corretamente."
+              "Relacionar tabelas pelas chaves corretas.",
+              "Preservar trilhas vazias usando LEFT JOIN.",
+              "Conferir a granularidade antes de contar ou somar."
             ],
-            "exercise": "3. Construir: use uma CTE para obter total de minutos de todas as trilhas e devolva somente totais iguais a zero.",
-            "code": "CREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT);\nCREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha_id INTEGER,titulo TEXT,minutos INTEGER);\nINSERT INTO trilhas VALUES(1,'Dados'),(2,'Python');\nINSERT INTO licoes VALUES(10,1,'SELECT',30),(11,1,'JOIN',40);\nSELECT t.nome,l.titulo FROM trilhas t\nLEFT JOIN licoes l ON l.trilha_id=t.id ORDER BY t.id,l.id;\nWITH resumo AS (\n SELECT t.id,t.nome,COUNT(l.id) AS quantidade,\n COALESCE(SUM(l.minutos),0) AS total\n FROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id\n GROUP BY t.id,t.nome\n)\nSELECT nome,quantidade,total FROM resumo\nWHERE total>(SELECT AVG(total) FROM resumo) ORDER BY id;",
+            "exercise": "3. Construir: liste todas as trilhas e somente suas lições com mais de 30 minutos, preservando trilhas sem correspondência.",
+            "code": "CREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT);\nCREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha_id INTEGER,titulo TEXT,minutos INTEGER);\nINSERT INTO trilhas VALUES(1,'Dados'),(2,'Python');\nINSERT INTO licoes VALUES(10,1,'SELECT',30),(11,1,'JOIN',40);\nSELECT t.nome,l.titulo FROM trilhas t\nLEFT JOIN licoes l ON l.trilha_id=t.id ORDER BY t.id,l.id;\nSELECT t.nome,COUNT(l.id) AS quantidade\nFROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id\nGROUP BY t.id,t.nome ORDER BY t.id;",
             "docs": [
               {
                 "kind": "doc",
@@ -2389,11 +2389,21 @@
               "Nomear uma etapa com WITH e inspecioná-la separadamente.",
               "Evitar multiplicação de totais agregando antes de juntar resumos."
             ],
-            "exercise": "Construir: use uma CTE para calcular o total de todas as trilhas, incluindo zero, e devolva apenas as que estão abaixo da média dos totais.",
-            "code": "CREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT);\nCREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha_id INTEGER,titulo TEXT,minutos INTEGER);\nINSERT INTO trilhas VALUES(1,'Dados'),(2,'Python');\nINSERT INTO licoes VALUES(10,1,'SELECT',30),(11,1,'JOIN',40);\nWITH resumo AS (\n SELECT t.id,t.nome,COUNT(l.id) AS quantidade,COALESCE(SUM(l.minutos),0) AS total\n FROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id\n GROUP BY t.id,t.nome\n)\nSELECT nome,quantidade,total FROM resumo\nWHERE total<(SELECT AVG(total) FROM resumo) ORDER BY id;",
+            "exercise": "3. Construir: acrescente a trilha Git, id 3, sem lições. Use uma CTE para calcular o total das três trilhas, incluindo zero, e selecione as abaixo da média. Confira o resumo antes do filtro.",
+            "code": "CREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT);\nCREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha_id INTEGER,titulo TEXT,minutos INTEGER);\nINSERT INTO trilhas VALUES(1,'Dados'),(2,'Python');\nINSERT INTO licoes VALUES(10,1,'SELECT',30),(11,1,'JOIN',40);\nWITH resumo AS (\n SELECT t.id,t.nome,COUNT(l.id) AS quantidade,COALESCE(SUM(l.minutos),0) AS total\n FROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id GROUP BY t.id,t.nome\n)\nSELECT nome,quantidade,total FROM resumo\nWHERE total<(SELECT AVG(total) FROM resumo) ORDER BY id;",
             "docs": [
-              {"kind":"doc","title":"SQLite · SELECT e WITH","url":"https://www.sqlite.org/lang_select.html","language":"EN"},
-              {"kind":"doc","title":"SQLite · cláusula WITH","url":"https://www.sqlite.org/lang_with.html","language":"EN"}
+              {
+                "kind": "doc",
+                "title": "SQLite · SELECT e WITH",
+                "url": "https://www.sqlite.org/lang_select.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "SQLite · cláusula WITH",
+                "url": "https://www.sqlite.org/lang_with.html",
+                "language": "EN"
+              }
             ]
           },
           {
@@ -2402,11 +2412,11 @@
             "minutes": 90,
             "concept": "Transferir dez créditos exige retirar dez de Ana e adicionar dez a Beto. Se apenas metade acontecer, o total muda indevidamente. Uma transação transforma essas duas alterações em uma unidade que pode ser confirmada ou desfeita.",
             "objectives": [
-              "Agrupe alterações dependentes em uma transação.",
-              "COMMIT confirma; ROLLBACK descarta o que ainda não foi confirmado.",
-              "Constraints e regras de negócio continuam necessárias."
+              "Executar e comparar COMMIT e ROLLBACK.",
+              "Verificar as duas metades de uma alteração.",
+              "Conferir saldos e quantidade de linhas afetadas antes de confirmar."
             ],
-            "exercise": "Construir: transfira 20 créditos entre duas contas, confirme os dois movimentos juntos e confira que a soma não mudou.",
+            "exercise": "3. Construir: partindo de 100 e 50, transfira 15 de Ana para Beto. Confira quantas linhas cada UPDATE alterou e reverta toda a unidade se o destino não existir.",
             "code": "CREATE TABLE contas (\n id INTEGER PRIMARY KEY, nome TEXT NOT NULL,\n saldo INTEGER NOT NULL CHECK(saldo>=0)\n);\nINSERT INTO contas VALUES(1,'Ana',100),(2,'Beto',50);\nBEGIN;\nUPDATE contas SET saldo=saldo-10 WHERE id=1;\nUPDATE contas SET saldo=saldo+10 WHERE id=2;\nSELECT nome,saldo FROM contas ORDER BY id;\nROLLBACK;\nSELECT nome,saldo FROM contas ORDER BY id;\nSELECT SUM(saldo) AS total FROM contas;",
             "docs": [
               {
@@ -2445,11 +2455,21 @@
               "Planeje repetição limitada da unidade completa diante de conflitos.",
               "Reconheça efeitos externos que não pertencem à transação do banco."
             ],
-            "exercise": "Construir: desfaça uma etapa opcional com SAVEPOINT, confirme a etapa principal e explique por que um e-mail exigiria outra estratégia.",
+            "exercise": "3. Construir: descreva um fluxo que registra no banco a publicação e uma intenção pendente de enviar aviso, sem afirmar que o e-mail pertence ao COMMIT.",
             "code": "CREATE TABLE tarefas(id INTEGER PRIMARY KEY,titulo TEXT,status TEXT);\nINSERT INTO tarefas VALUES(1,'Publicar aula','pendente');\nBEGIN;\nUPDATE tarefas SET status='publicada' WHERE id=1;\nSAVEPOINT aviso;\nUPDATE tarefas SET titulo='Publicar aula e enviar aviso' WHERE id=1;\nROLLBACK TO aviso;\nRELEASE aviso;\nCOMMIT;\nSELECT id,titulo,status FROM tarefas;",
             "docs": [
-              {"kind":"doc","title":"SQLite · transações","url":"https://www.sqlite.org/lang_transaction.html","language":"EN"},
-              {"kind":"doc","title":"SQLite · isolamento","url":"https://www.sqlite.org/isolation.html","language":"EN"}
+              {
+                "kind": "doc",
+                "title": "SQLite · transações",
+                "url": "https://www.sqlite.org/lang_transaction.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "SQLite · isolamento",
+                "url": "https://www.sqlite.org/isolation.html",
+                "language": "EN"
+              }
             ]
           }
         ]
@@ -2509,7 +2529,7 @@
               "Verificar Docker e Compose após a preparação do sistema utilizado.",
               "Diagnosticar cliente disponível com Engine parado."
             ],
-            "exercise": "Construir: escreva um README mínimo reproduzível do ambiente.",
+            "exercise": "3. Construir: escreva um README mínimo reproduzível do ambiente.",
             "code": "docker version\ndocker compose version\ndocker ps\ndocker ps -a",
             "docs": [
               {
@@ -2560,7 +2580,7 @@
               "Conectar pelo cliente interno e identificar os parâmetros do cliente externo.",
               "Verificar persistência sem remover o volume."
             ],
-            "exercise": "Construir: crie evidência de persistência com uma tabela própria.",
+            "exercise": "3. Construir: crie evidência de persistência com uma tabela própria.",
             "code": "# compose.yaml — PostgreSQL 17; não troque a major sem plano de migração.\nname: techhub-dados-lab\nservices:\n  db:\n    image: postgres:17\n    environment:\n      POSTGRES_USER: aluno\n      POSTGRES_DB: estudos\n      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}\n    ports:\n      - \"127.0.0.1:55432:5432\"\n    volumes:\n      - dados:/var/lib/postgresql/data\n    healthcheck:\n      test: [\"CMD-SHELL\", \"pg_isready -U aluno -d estudos\"]\n      interval: 5s\n      timeout: 5s\n      retries: 10\nvolumes:\n  dados:\n",
             "docs": [
               {
@@ -2611,13 +2631,33 @@
               "Gerar backup, copiá-lo para o host e restaurar em banco novo.",
               "Documentar rotina reproduzível e limites de segurança."
             ],
-            "exercise": "Construir: escreva um roteiro de recuperação com cinco evidências.",
+            "exercise": "3. Construir: escreva um roteiro de recuperação com cinco evidências.",
             "code": "# 1. Na pasta do compose.yaml, crie .env com uma senha local escolhida por você:\n# POSTGRES_PASSWORD=sua_senha_local\n# .gitignore deve conter .env e *.dump\ndocker compose config --quiet\ndocker compose up -d\ndocker compose ps\n# Espere o serviço db indicar healthy; se falhar, examine logs.\ndocker compose exec db psql -U aluno -d estudos -v ON_ERROR_STOP=1 -c \"CREATE TABLE IF NOT EXISTS marcador(id integer PRIMARY KEY, texto text NOT NULL); INSERT INTO marcador VALUES(1,'persistiu') ON CONFLICT(id) DO UPDATE SET texto=EXCLUDED.texto;\"\ndocker compose down\ndocker compose up -d\n# Espere healthy novamente antes da próxima consulta.\ndocker compose exec db psql -U aluno -d estudos -c \"SELECT * FROM marcador;\"\n# Backup em formato custom dentro do container; copie para o computador.\ndocker compose exec db pg_dump -U aluno -d estudos -Fc -f /tmp/estudos.dump\ndocker compose cp db:/tmp/estudos.dump ./estudos.dump\n# Banco restaurado novo (se já existir, escolha outro nome).\ndocker compose exec db createdb -U aluno estudos_restaurado\ndocker compose cp ./estudos.dump db:/tmp/restaurar.dump\ndocker compose exec db pg_restore -U aluno -d estudos_restaurado --exit-on-error /tmp/restaurar.dump\ndocker compose exec db psql -U aluno -d estudos_restaurado -c \"SELECT * FROM marcador;\"\n# Para parar preservando volume:\ndocker compose down\n",
             "docs": [
-              {"kind":"doc","title":"Docker · compose down e volumes","url":"https://docs.docker.com/reference/cli/docker/compose/down/","language":"EN"},
-              {"kind":"doc","title":"Docker · compose cp","url":"https://docs.docker.com/reference/cli/docker/compose/cp/","language":"EN"},
-              {"kind":"doc","title":"PostgreSQL 17 · pg_dump","url":"https://www.postgresql.org/docs/17/app-pgdump.html","language":"EN"},
-              {"kind":"doc","title":"PostgreSQL 17 · pg_restore","url":"https://www.postgresql.org/docs/17/app-pgrestore.html","language":"EN"}
+              {
+                "kind": "doc",
+                "title": "Docker · compose down e volumes",
+                "url": "https://docs.docker.com/reference/cli/docker/compose/down/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "Docker · compose cp",
+                "url": "https://docs.docker.com/reference/cli/docker/compose/cp/",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "PostgreSQL 17 · pg_dump",
+                "url": "https://www.postgresql.org/docs/17/app-pgdump.html",
+                "language": "EN"
+              },
+              {
+                "kind": "doc",
+                "title": "PostgreSQL 17 · pg_restore",
+                "url": "https://www.postgresql.org/docs/17/app-pgrestore.html",
+                "language": "EN"
+              }
             ]
           }
         ]
@@ -2710,7 +2750,7 @@
               "Executar um exemplo completo, verificar resultados e proteger as regras dos dados.",
               "Adaptar consultas ao dialeto e registrar evidências dos exercícios."
             ],
-            "exercise": "Nos dados originais, conclua Beto em uma transação confirmada e demonstre que SQL passou a ter duas conclusões.",
+            "exercise": "3. Construir: nos dados originais, conclua Beto em uma transação confirmada e demonstre que o relatório de SQL mudou, mesmo após reconectar.",
             "code": "CREATE TABLE cursos (\n  id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n  titulo TEXT NOT NULL UNIQUE,\n  carga INTEGER NOT NULL CHECK (carga > 0)\n);\nCREATE TABLE matriculas (\n  id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n  curso_id INTEGER NOT NULL REFERENCES cursos(id),\n  aluno TEXT NOT NULL,\n  concluida BOOLEAN NOT NULL DEFAULT FALSE,\n  UNIQUE(curso_id, aluno)\n);\nINSERT INTO cursos(titulo, carga) VALUES ('SQL', 20), ('Python', 30);\nINSERT INTO matriculas(curso_id, aluno, concluida)\nVALUES (1, 'Ana', TRUE), (1, 'Beto', FALSE), (2, 'Ana', FALSE);\nSELECT c.titulo, COUNT(m.id) AS inscritos,\n       COUNT(*) FILTER (WHERE m.concluida) AS concluidos\nFROM cursos c LEFT JOIN matriculas m ON m.curso_id = c.id\nGROUP BY c.id, c.titulo ORDER BY c.titulo;\nBEGIN;\nUPDATE matriculas SET concluida = TRUE WHERE id = 2;\nROLLBACK;\nSELECT aluno, concluida FROM matriculas WHERE id = 2;",
             "docs": [
               {
@@ -2756,7 +2796,7 @@
               "Executar um exemplo completo, verificar resultados e proteger as regras dos dados.",
               "Adaptar consultas ao dialeto e registrar evidências dos exercícios."
             ],
-            "exercise": "Adicione Git sem matrículas e obtenha somente cursos sem inscrições.",
+            "exercise": "3. Construir: adicione Git sem matrículas e obtenha somente cursos sem inscrições.",
             "code": "CREATE TABLE cursos (\n id INT AUTO_INCREMENT PRIMARY KEY,\n titulo VARCHAR(100) NOT NULL UNIQUE,\n carga INT NOT NULL CHECK(carga > 0)\n) ENGINE=InnoDB;\nCREATE TABLE matriculas (\n id INT AUTO_INCREMENT PRIMARY KEY,\n curso_id INT NOT NULL,\n aluno VARCHAR(80) NOT NULL,\n concluida TINYINT NOT NULL DEFAULT 0 CHECK(concluida IN (0,1)),\n CONSTRAINT fk_matriculas_curso FOREIGN KEY(curso_id) REFERENCES cursos(id),\n UNIQUE(curso_id,aluno)\n) ENGINE=InnoDB;\nINSERT INTO cursos(titulo,carga) VALUES ('SQL',20),('Python',30);\nINSERT INTO matriculas(curso_id,aluno,concluida)\nVALUES (1,'Ana',1),(1,'Beto',0),(2,'Ana',0);\nSELECT c.titulo,COUNT(m.id) AS inscritos,\n SUM(CASE WHEN m.concluida=1 THEN 1 ELSE 0 END) AS concluidos\nFROM cursos c LEFT JOIN matriculas m ON m.curso_id=c.id\nGROUP BY c.id,c.titulo ORDER BY c.titulo;\nSTART TRANSACTION;\nUPDATE matriculas SET concluida=1 WHERE id=2;\nROLLBACK;\nSELECT aluno,concluida FROM matriculas WHERE id=2;",
             "docs": [
               {
@@ -2789,7 +2829,7 @@
               "Executar um exemplo completo, verificar resultados e proteger as regras dos dados.",
               "Adaptar consultas ao dialeto e registrar evidências dos exercícios."
             ],
-            "exercise": "Crie um backup em memória do banco original e confirme que há três matrículas, sem alterar o banco de origem. Execute antes do finally e antes dos demais exercícios.",
+            "exercise": "3. Construir: crie um backup em memória do banco original e confira as matrículas, sem alterar o banco de origem. Execute antes do finally e antes dos demais exercícios.",
             "code": "import sqlite3\n\ncon = sqlite3.connect(\":memory:\")\ntry:\n    con.execute(\"PRAGMA foreign_keys = ON\")\n    assert con.execute(\"PRAGMA foreign_keys\").fetchone()[0] == 1\n    con.executescript(\"\"\"\n        CREATE TABLE cursos (\n            id INTEGER PRIMARY KEY,\n            titulo TEXT NOT NULL UNIQUE\n        );\n        CREATE TABLE matriculas (\n            id INTEGER PRIMARY KEY,\n            curso_id INTEGER NOT NULL REFERENCES cursos(id),\n            aluno TEXT NOT NULL,\n            concluida INTEGER NOT NULL DEFAULT 0 CHECK(concluida IN (0,1)),\n            UNIQUE(curso_id, aluno)\n        );\n    \"\"\")\n    with con:\n        con.executemany(\"INSERT INTO cursos VALUES (?, ?)\", [(1,\"SQL\"),(2,\"Python\")])\n        con.executemany(\"INSERT INTO matriculas VALUES (?, ?, ?, ?)\",\n                        [(1,1,\"Ana\",1),(2,1,\"Beto\",0),(3,2,\"Ana\",0)])\n    linhas = con.execute(\"\"\"\n        SELECT c.titulo, COUNT(m.id),\n               SUM(CASE WHEN m.concluida=1 THEN 1 ELSE 0 END)\n        FROM cursos c LEFT JOIN matriculas m ON m.curso_id=c.id\n        GROUP BY c.id,c.titulo ORDER BY c.titulo\n    \"\"\").fetchall()\n    print(linhas)\n    nome = \"Beto\"\n    print(con.execute(\"SELECT concluida FROM matriculas WHERE aluno=?\", (nome,)).fetchall())\n    try:\n        with con:\n            con.execute(\"UPDATE matriculas SET concluida=1 WHERE id=2\")\n            con.execute(\"INSERT INTO matriculas(curso_id,aluno) VALUES (?,?)\", (999,\"Eva\"))\n    except sqlite3.IntegrityError:\n        print(\"Transação revertida\")\n    print(con.execute(\"SELECT concluida FROM matriculas WHERE id=2\").fetchone()[0])\nfinally:\n    con.close()",
             "docs": [
               {
@@ -2835,7 +2875,7 @@
               "Executar um exemplo completo, verificar resultados e proteger as regras dos dados.",
               "Adaptar consultas ao dialeto e registrar evidências dos exercícios."
             ],
-            "exercise": "Confirme a conclusão de Beto e escreva uma consulta que prove duas conclusões em SQL.",
+            "exercise": "3. Construir: confirme a conclusão de Beto e escreva uma consulta que prove duas conclusões em SQL.",
             "code": "CREATE TABLE cursos (\n id INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,\n titulo VARCHAR(100) NOT NULL UNIQUE,\n carga INTEGER NOT NULL CHECK(carga > 0)\n);\nCREATE TABLE matriculas (\n id INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,\n curso_id INTEGER NOT NULL REFERENCES cursos(id),\n aluno VARCHAR(80) NOT NULL,\n concluida BOOLEAN DEFAULT FALSE NOT NULL,\n UNIQUE(curso_id,aluno)\n);\nCOMMIT;\nINSERT INTO cursos(titulo,carga) VALUES ('SQL',20);\nINSERT INTO cursos(titulo,carga) VALUES ('Python',30);\nINSERT INTO matriculas(curso_id,aluno,concluida) VALUES (1,'Ana',TRUE);\nINSERT INTO matriculas(curso_id,aluno,concluida) VALUES (1,'Beto',FALSE);\nINSERT INTO matriculas(curso_id,aluno,concluida) VALUES (2,'Ana',FALSE);\nCOMMIT;\nSELECT c.titulo,COUNT(m.id) AS inscritos,\n SUM(CASE WHEN m.concluida IS TRUE THEN 1 ELSE 0 END) AS concluidos\nFROM cursos c LEFT JOIN matriculas m ON m.curso_id=c.id\nGROUP BY c.id,c.titulo ORDER BY c.titulo;\nCOMMIT;\nUPDATE matriculas SET concluida=TRUE WHERE id=2;\nROLLBACK;\nSELECT aluno,concluida FROM matriculas WHERE id=2;\nCOMMIT;",
             "docs": [
               {
@@ -2915,7 +2955,7 @@
               "Distinguir fonte de verdade, cópia histórica e dado temporário.",
               "Registrar uma escolha com alternativa, custo aceito e gatilho de revisão."
             ],
-            "exercise": "Identifique a falsa promessa de sincronização automática e registre uma decisão para o app individual offline de anotações.",
+            "exercise": "3. Construir: um curso recebe um milhão de eventos de visualização. Proponha onde guardar os eventos e quais campos permitem buscar os últimos de uma pessoa.",
             "code": "DOCUMENTO: curso\n{ id: \"dados\", titulo: \"Dados\",\n  recursos: [{tipo: \"livro\", titulo: \"SQL inicial\"}] }\nPergunta: mostrar um curso com seus poucos recursos.\n\nCHAVE-VALOR: sessao:abc -> {usuario: 7, expira: \"18:00\"}\nPergunta: quem possui a sessão abc?\n\nCOLUNAS AMPLAS: partição (sensor=9, dia=2026-01-01)\n  10:00 -> 21; 10:01 -> 22\nPergunta: leituras do sensor 9 naquele dia, por horário.\n\nGRAFO: HTML -> JavaScript -> DOM\nPergunta: quais pré-requisitos indiretos levam a DOM?",
             "docs": [
               {
@@ -2967,7 +3007,7 @@
               "Verificar o resultado de atualizações e exclusões por identificador.",
               "Explicar quando incorporar um recurso e por que progresso individual pede outro modelo."
             ],
-            "exercise": "Crie uma lição temporária x9, consulte-a, remova-a e prove que a1 permanece.",
+            "exercise": "3. Construir: crie uma lição temporária x9, consulte-a, remova-a e prove que a1 permanece.",
             "code": "const lab = db.getSiblingDB(\"tech_hub_aula_crud\");\nlab.licoes.insertMany([\n { _id:\"a1\", titulo:\"SELECT\", minutos:30, concluida:false,\n   tags:[\"sql\",\"basico\"], recurso:{tipo:\"texto\",titulo:\"Primeira consulta\"} },\n { _id:\"a2\", titulo:\"JOIN\", minutos:40, concluida:false, tags:[\"sql\"] },\n { _id:\"a3\", titulo:\"Documentos\", minutos:25, concluida:true, tags:[\"nosql\"] }\n]);\nlab.licoes.find({concluida:false},{_id:0,titulo:1}).sort({titulo:1});\nlab.licoes.updateOne({_id:\"a1\"},{$set:{concluida:true}});\nlab.licoes.find({concluida:false},{_id:0,titulo:1}).sort({titulo:1});",
             "docs": [
               {
@@ -2994,7 +3034,7 @@
               "Construir e conferir um resumo por estágios de agregação.",
               "Ler o plano de uma consulta sem presumir ganho de desempenho pelo índice."
             ],
-            "exercise": "Teste separadamente duração zero e ausência de concluida. Depois confirme que a contagem continua três.",
+            "exercise": "3. Construir: produza um resumo com trilha, total e quantidade das lições pendentes; omita _id na saída.",
             "code": "const lab = db.getSiblingDB(\"tech_hub_aula_pipeline\");\nlab.createCollection(\"licoes\",{validator:{$jsonSchema:{\n bsonType:\"object\", required:[\"trilha\",\"minutos\",\"concluida\"],\n properties:{\n   trilha:{bsonType:\"string\"},\n   minutos:{bsonType:[\"int\",\"long\",\"double\",\"decimal\"],minimum:1},\n   concluida:{bsonType:\"bool\"}\n }\n}}});\nlab.licoes.insertMany([\n {_id:1,trilha:\"Dados\",minutos:Double(30),concluida:false},\n {_id:2,trilha:\"Dados\",minutos:Double(40),concluida:false},\n {_id:3,trilha:\"Python\",minutos:Double(20),concluida:true}\n]);\nlab.licoes.createIndex({concluida:1,trilha:1});\nlab.licoes.aggregate([\n {$match:{concluida:false}},\n {$group:{_id:\"$trilha\",total:{$sum:\"$minutos\"}}},\n {$sort:{total:-1,_id:1}}\n]);\nlab.licoes.find({concluida:false}).explain(\"executionStats\");",
             "docs": [
               {
@@ -3074,7 +3114,7 @@
               "Comparar a mesma consulta antes e depois de um índice composto.",
               "Conferir o resultado e relatar limites da medição sem prometer ganho universal."
             ],
-            "exercise": "Relate a comparação antes/depois com planos reais, resultado funcional e limites da medição, sem inventar tempos.",
+            "exercise": "3. Construir: crie uma consulta paginada para os cinco primeiros IDs da trilha 7 maiores que 207 e explique a ordem.",
             "code": "CREATE TABLE perf_licoes (\n id INTEGER PRIMARY KEY, trilha_id INTEGER NOT NULL, titulo TEXT NOT NULL\n);\nINSERT INTO perf_licoes(id,trilha_id,titulo)\nSELECT n,n % 100,'Licao ' || n FROM generate_series(1,10000) AS g(n);\nANALYZE perf_licoes;\nEXPLAIN (ANALYZE, BUFFERS)\nSELECT id,titulo FROM perf_licoes WHERE trilha_id=7 ORDER BY id;\nCREATE INDEX idx_perf_trilha_id ON perf_licoes(trilha_id,id);\nANALYZE perf_licoes;\nEXPLAIN (ANALYZE, BUFFERS)\nSELECT id,titulo FROM perf_licoes WHERE trilha_id=7 ORDER BY id;\nSELECT COUNT(*) AS encontrados FROM perf_licoes WHERE trilha_id=7;",
             "docs": [
               {
@@ -3107,7 +3147,7 @@
               "Aplicar identidade confiável ao escopo de leitura, contagem e alteração.",
               "Explicar onde ficam credenciais, privilégios e tratamento seguro de erros."
             ],
-            "exercise": "Corrija uma atualização sem escopo de proprietário e prove que o usuário 1 não altera o material do usuário 2.",
+            "exercise": "3. Construir: dentro da conexão do exemplo, teste um título que parece condição SQL e prove que a tabela permanece com três linhas.",
             "code": "import sqlite3\nfrom contextlib import closing\n\ndef buscar(conexao, usuario_id, titulo):\n    return conexao.execute(\n        \"SELECT id,titulo FROM materiais WHERE usuario_id=? AND titulo=? ORDER BY id\",\n        (usuario_id, titulo)\n    ).fetchall()\n\nwith closing(sqlite3.connect(\":memory:\")) as conexao:\n    with conexao:\n        conexao.execute(\"CREATE TABLE materiais(id INTEGER PRIMARY KEY,usuario_id INTEGER,titulo TEXT)\")\n        conexao.executemany(\"INSERT INTO materiais VALUES(?,?,?)\", [\n            (1,1,\"Guia d'água\"), (2,2,\"Guia d'água\"), (3,1,\"SQL\")\n        ])\n    print(buscar(conexao, 1, \"Guia d'água\"))\n    print(buscar(conexao, 1, \"Inexistente\"))\n",
             "docs": [
               {
@@ -3134,7 +3174,7 @@
               "Validar dados e constraints em uma cópia SQLite independente.",
               "Planejar uma migração por expansão com verificação e estratégia de falha."
             ],
-            "exercise": "Corrija o plano que torna resumo obrigatório imediatamente e inclua restauração, compatibilidade e verificação.",
+            "exercise": "3. Construir: depois do backup e antes da migração, confira a integridade da cópia e prove que NOT NULL foi preservado. Use somente a conexão copia do laboratório.",
             "code": "import sqlite3\nfrom contextlib import closing\n\nwith closing(sqlite3.connect(\":memory:\")) as origem, closing(sqlite3.connect(\":memory:\")) as copia:\n    with origem:\n        origem.execute(\"CREATE TABLE licoes(id INTEGER PRIMARY KEY,titulo TEXT NOT NULL)\")\n        origem.execute(\"INSERT INTO licoes VALUES(1,'SQL')\")\n    origem.backup(copia)\n    print(copia.execute(\"SELECT id,titulo FROM licoes ORDER BY id\").fetchall())\n    with copia:\n        copia.execute(\"ALTER TABLE licoes ADD COLUMN resumo TEXT\")\n        copia.execute(\"UPDATE licoes SET resumo=? WHERE id=?\", (\"Primeiras consultas\",1))\n    print(copia.execute(\"SELECT titulo,resumo FROM licoes WHERE id=1\").fetchone())\n    print([coluna[1] for coluna in origem.execute(\"PRAGMA table_info(licoes)\")])\n",
             "docs": [
               {
@@ -3167,7 +3207,7 @@
               "Identificar a regra de matrícula que as FKs iniciais não garantem e desenhar seu reforço.",
               "Justificar SQLite para o laboratório e registrar quando reavaliar a escolha."
             ],
-            "exercise": "Desenhe o reforço da matrícula por FKs compostas, indique o caso inválido e justifique a escolha de banco para o laboratório.",
+            "exercise": "3. Construir: na base original do exemplo, desmarque apenas SELECT para Ana. Reexecute o relatório e explique por que o WHERE precisa das duas identidades.",
             "code": "PRAGMA foreign_keys=ON;\nCREATE TABLE estudantes(id INTEGER PRIMARY KEY,nome TEXT NOT NULL);\nCREATE TABLE trilhas(id INTEGER PRIMARY KEY,nome TEXT NOT NULL);\nCREATE TABLE licoes(id INTEGER PRIMARY KEY,trilha_id INTEGER NOT NULL REFERENCES trilhas(id),titulo TEXT NOT NULL);\nCREATE TABLE matriculas(estudante_id INTEGER NOT NULL REFERENCES estudantes(id),trilha_id INTEGER NOT NULL REFERENCES trilhas(id),\n PRIMARY KEY(estudante_id,trilha_id));\nCREATE TABLE progresso(estudante_id INTEGER NOT NULL REFERENCES estudantes(id),licao_id INTEGER NOT NULL REFERENCES licoes(id),\n concluida INTEGER NOT NULL CHECK(concluida IN(0,1)),PRIMARY KEY(estudante_id,licao_id));\nINSERT INTO estudantes VALUES(1,'Ana'),(2,'Beto');\nINSERT INTO trilhas VALUES(1,'Dados'),(2,'Python');\nINSERT INTO licoes VALUES(10,1,'SELECT'),(11,1,'JOIN');\nINSERT INTO matriculas VALUES(1,1),(1,2),(2,1);\nINSERT INTO progresso VALUES(1,10,1),(2,10,0);\nSELECT e.nome AS estudante,t.nome AS trilha,COUNT(l.id) AS total,\n SUM(COALESCE(p.concluida,0)) AS concluidas,\n CASE WHEN COUNT(l.id)=0 THEN 0\n ELSE 100.0*SUM(COALESCE(p.concluida,0))/COUNT(l.id) END AS percentual\nFROM matriculas m\nJOIN estudantes e ON e.id=m.estudante_id\nJOIN trilhas t ON t.id=m.trilha_id\nLEFT JOIN licoes l ON l.trilha_id=t.id\nLEFT JOIN progresso p ON p.licao_id=l.id AND p.estudante_id=e.id\nGROUP BY e.id,e.nome,t.id,t.nome ORDER BY e.id,t.id;",
             "docs": [
               {
