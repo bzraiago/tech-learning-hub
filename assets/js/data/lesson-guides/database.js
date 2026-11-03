@@ -10,10 +10,32 @@ Object.assign(LESSON_GUIDES, {
     "why": "Imagine que Ana e Beto estudam SQL. Se você guardar a conclusão na própria aula, marcar a aula como concluída para Ana também mudará o estado visto por Beto. Nesta aula o foco é reconhecer as coisas do domínio, identificá-las e representar as relações entre elas; normalização e ausência ficam na aula seguinte.",
     "sections": [
       {
+        "title": "Banco, SQL e o laboratório que você vai usar",
+        "paragraphs": [
+          "Banco de dados é um conjunto organizado de informações. O sistema gerenciador de banco de dados (SGBD) é o programa que guarda, consulta e verifica essas informações. Aqui usamos SQLite, incorporado ao Python; não há servidor separado. SQL (Structured Query Language, linguagem de consulta estruturada) é a linguagem que enviamos ao SQLite.",
+          "Uma conexão é a sessão pela qual o programa conversa com o banco. Nosso executor é o arquivo Python fornecido que lê aula.sql e abre o prompt sql>, área que espera comandos SQL. A base fica em memória: os dados desaparecem ao encerrar, mas os arquivos de código permanecem. Salvar um arquivo não é o mesmo que executar uma consulta.",
+          "Antes de seguir, explique em uma frase a diferença entre o arquivo aula.sql, o programa executar.py e os dados que existem durante a execução. Na aba Exemplo você verá os lugares separados para cada ação."
+        ]
+      },
+      {
         "title": "Entidades, atributos e linhas",
         "paragraphs": [
           "Uma entidade é um tipo de coisa que o sistema precisa distinguir: estudante, trilha ou lição. Uma tabela reúne ocorrências dessa entidade. Uma linha de ESTUDANTES pode representar Ana; as colunas nome e email são atributos. O nome da tabela descreve o conjunto, e cada linha descreve uma ocorrência concreta.",
           "Uma chave primária identifica uma linha sem ambiguidade. Dois estudantes podem chamar-se Ana, por isso nome é uma identificação ruim. Usaremos números id diferentes. Uma chave primária deve ser única e não nula. NULL significa informação ausente ou desconhecida; não significa zero nem uma cadeia de texto vazia."
+        ],
+        "terms": [
+          {
+            "term": "Registro e campo",
+            "meaning": "Registro é uma linha; campo é uma informação dessa linha, localizada em uma coluna."
+          },
+          {
+            "term": "ID",
+            "meaning": "Abreviação de identificador. id 1 em ESTUDANTES identifica Ana; id 1 em TRILHAS identifica Dados. O número só tem sentido junto à tabela."
+          },
+          {
+            "term": "Texto (string)",
+            "meaning": "Sequência de caracteres, como Ana. Texto vazio não contém caracteres; não é NULL."
+          }
         ]
       },
       {
@@ -21,6 +43,24 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "Uma trilha pode possuir várias lições, mas cada lição pertence a uma trilha neste projeto: relacionamento um para muitos, escrito 1:N. Colocamos trilha_id em LICOES, o lado muitos. A chave estrangeira exige que seu valor corresponda a uma trilha existente; ela não copia o nome da trilha.",
           "Um estudante pode frequentar várias trilhas, e uma trilha pode ter vários estudantes. Essa relação muitos para muitos, N:N, precisa de MATRICULAS. Cada linha associa dois identificadores. A chave composta estudante_id + trilha_id impede que a mesma pessoa seja matriculada duas vezes na mesma trilha, sem impedir outras matrículas."
+        ],
+        "terms": [
+          {
+            "term": "PK e FK",
+            "meaning": "Primary key é chave primária; foreign key é chave estrangeira. A FK aponta para a chave referenciada."
+          },
+          {
+            "term": "Cardinalidade",
+            "meaning": "Quantas ocorrências podem se relacionar: 1:N significa uma para muitas; N:N, muitas para muitas."
+          },
+          {
+            "term": "Chave composta",
+            "meaning": "Identidade formada pela combinação de colunas. O sinal + na explicação significa combinar o par, não somar números."
+          },
+          {
+            "term": "Tabela associativa",
+            "meaning": "Tabela que registra cada ligação entre entidades, como MATRICULAS."
+          }
         ]
       },
       {
@@ -35,7 +75,8 @@ Object.assign(LESSON_GUIDES, {
         "title": "Do desenho à primeira leitura SQL",
         "paragraphs": [
           "Nesta primeira aula, o SQL completo é uma demonstração fornecida: você ainda não precisa escrever CREATE TABLE, INSERT ou CHECK sozinho. CREATE TABLE cria a estrutura, INSERT acrescenta linhas e SELECT lê o que foi guardado. As duas aulas seguintes trabalham o desenho e depois ensinam a sintaxe de criação.",
-          "Primeiro desenhe as entidades em papel; depois, na aba Exemplo, salve o executor e o SQL nos arquivos identificados. A consulta já fornecida deve mostrar Ana e Beto com estados diferentes. As práticas desta aula cobram o modelo e as relações em texto; a implementação de novas restrições começa em Tabelas, tipos e restrições."
+          "Primeiro desenhe as entidades em papel; depois, na aba Exemplo, salve o executor e o SQL nos arquivos identificados. A consulta já fornecida deve mostrar Ana e Beto com estados diferentes. As práticas desta aula cobram o modelo e as relações em texto; a implementação de novas restrições começa em Tabelas, tipos e restrições.",
+          "No exemplo, concluida=0 significa pendente e concluida=1 significa concluída. SELECT e JOIN entre aspas são títulos fictícios das lições, embora também sejam nomes de comandos SQL. As matrículas indicam participação; PROGRESSO registra o estado de cada par pessoa/lição. A ausência de uma linha de progresso não é uma conclusão."
         ]
       }
     ],
@@ -68,7 +109,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Salve a demonstração antes de executar",
           "paragraphs": [
-            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo."
+            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo.",
+            "Se o terminal ainda mostra sql>, encerre a execução anterior com .sair antes de iniciar outra. Alterar aula.sql no editor não muda uma base que já está aberta. Digite um comando completo por vez no prompt; não cole duas instruções na mesma linha. Uma instrução pode ocupar várias linhas, até o ponto e vírgula final."
           ],
           "blocks": [
             {
@@ -81,7 +123,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Execute e confira a primeira saída",
           "paragraphs": [
-            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado."
+            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado.",
+            "O executor também imprime OK: instrucao executada para comandos sem tabela de resultado. As linhas com | separam colunas; | não é algo a digitar. Se não houver linhas abaixo do cabeçalho, a consulta retornou um conjunto vazio. Compare as tabelas com a saída esperada e espere sql> antes de praticar."
           ],
           "blocks": [
             {
@@ -110,7 +153,9 @@ Object.assign(LESSON_GUIDES, {
           "paragraphs": [
             "sql> pertence ao executor SQLite; não é PowerShell. Digite uma instrução SQL por vez, terminando com ponto e vírgula. ...> significa que ela ainda não terminou. Não copie sql> nem ...> como código.",
             "Nas aulas iniciais, responda as atividades de desenho no rascunho. Nas atividades SQL, use o estado final da demonstração. Execute cada tentativa inválida separadamente: o executor imprime a mensagem e mantém a conexão para você consultar o estado. Se uma transação ficou aberta, escolha ROLLBACK antes de repetir. O laboratório não decide regras de negócio por você.",
-            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão."
+            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão.",
+            "Para alterar apenas uma consulta, copie a consulta inteira, incluindo SELECT e o ponto e vírgula; WHERE ou ORDER BY sozinhos são fragmentos, não comandos. Para mudar CREATE TABLE ou repetir do início, saia com .sair, edite e salve aula.sql e execute novamente. Para construir tabelas próprias, substitua aula.sql pela sua construção antes de executar: não cole CREATE TABLE de uma tabela já existente no prompt. Guarde uma cópia do exemplo em outro arquivo se desejar recuperá-lo.",
+            "Se você modificou aula.sql em um passo guiado, recoloque o bloco original desta aula antes de iniciar um exercício que pede a base inicial. Reiniciar repete o arquivo que está salvo; não desfaz edições no arquivo. Cada exercício começa de forma independente, salvo quando o enunciado disser para continuar."
           ],
           "blocks": [
             {
@@ -124,15 +169,15 @@ Object.assign(LESSON_GUIDES, {
     },
     "guided": [
       {
-        "instruction": "Circule os atributos que identificam entidades e sublinhe os que apenas descrevem informações.",
+        "instruction": "No desenho em papel ou no rascunho: Circule os atributos que identificam entidades e sublinhe os que apenas descrevem informações.",
         "result": "id identifica; nome, email e titulo descrevem. email também recebe uma regra de unicidade."
       },
       {
-        "instruction": "Trace uma seta de cada lição para a trilha usando o número armazenado.",
+        "instruction": "No desenho em papel ou no rascunho: Trace uma seta de cada lição para a trilha usando o número armazenado.",
         "result": "SELECT e JOIN apontam para Dados, pois ambos têm trilha_id 1."
       },
       {
-        "instruction": "Troque o nome Dados por Bancos e conte quantas linhas precisam mudar.",
+        "instruction": "No desenho em papel ou no rascunho: Troque o nome Dados por Bancos e conte quantas linhas precisam mudar.",
         "result": "Apenas uma linha de TRILHAS muda; as referências numéricas continuam válidas."
       }
     ],
@@ -197,7 +242,9 @@ Object.assign(LESSON_GUIDES, {
     "mistakes": [
       "Usar nome como chave: pessoas homônimas colidem; use um identificador estável.",
       "Guardar IDs separados por vírgulas em uma célula: dificulta relacionamentos; crie a tabela associativa.",
-      "Achar que uma FK garante matrícula na trilha da lição: ela garante apenas a referência declarada; essa regra adicional exige modelagem ou validação específica."
+      "Achar que uma FK garante matrícula na trilha da lição: ela garante apenas a referência declarada; essa regra adicional exige modelagem ou validação específica.",
+      "Se aparecer table ... already exists, você repetiu CREATE TABLE na mesma sessão: saia com .sair e execute novamente o arquivo salvo. Se aparecer no such table, confira a aula carregada e a primeira mensagem de erro; reiniciar cria somente as tabelas do aula.sql atual.",
+      "Em ...> o comando está incompleto: confira aspas, parênteses e ponto e vírgula. Para abandonar um comando confuso, Ctrl+C encerra o laboratório; execute novamente para restaurar a base inicial. Em erro de arquivo ou SyntaxError, copie a mensagem completa, confira pasta/extensão e se um comando de terminal foi colocado no arquivo errado."
     ],
     "quiz": [
       {
@@ -263,27 +310,40 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "Se cada matrícula repetir nome e email, corrigir um email exige encontrar todas as cópias. Esquecer uma delas cria uma anomalia de atualização. Se só for possível cadastrar uma trilha inventando uma matrícula, há anomalia de inserção. Se apagar a última matrícula também apagar a única descrição da trilha, há anomalia de remoção.",
           "Repetição nem sempre é um erro: relatórios e caches podem duplicar dados deliberadamente. Antes disso, construa um modelo principal coerente e documente qualquer cópia, sua origem e como será atualizada."
+        ],
+        "terms": [
+          {
+            "term": "Anomalia",
+            "meaning": "Problema ao cadastrar, atualizar ou apagar dados por causa de como as informações foram organizadas."
+          },
+          {
+            "term": "Cache",
+            "meaning": "Cópia temporária para consultar mais rapidamente; não é necessário implementar cache nesta aula."
+          }
         ]
       },
       {
         "title": "As três primeiras formas normais",
         "paragraphs": [
+          "Domínio é o conjunto de valores permitidos para um dado. Dependência funcional significa que um valor identifica uma única informação: estudante_id determina o nome registrado daquele estudante. Atributo não chave é um campo que não faz parte das chaves candidatas (combinações mínimas capazes de identificar uma linha). Normalizar é organizar essas dependências para evitar contradições.",
           "Na primeira forma normal, cada posição guarda um valor do domínio escolhido e cada linha pode ser identificada. Em vez de trilhas_texto='10,20', use duas linhas em MATRICULAS. O que conta como valor individual depende das consultas: um endereço pode permanecer texto até o sistema precisar filtrar suas partes.",
-          "Na segunda forma normal, atributos não chave dependem da chave composta inteira. Em MATRICULAS(estudante_id,trilha_id), nome_estudante depende apenas de estudante_id e fica em ESTUDANTES; data_matricula descreve o par. Na terceira, evite dependência transitiva indevida: se cidade_id determina nome_cidade, centralize o nome em CIDADES quando o domínio exigir esse cadastro."
+          "Na segunda forma normal, atributos não chave dependem da chave composta inteira. Em MATRICULAS(estudante_id,trilha_id), nome_estudante depende apenas de estudante_id e fica em ESTUDANTES; data_matricula descreve o par. Na terceira, evite dependência transitiva indevida: se cidade_id determina nome_cidade, centralize o nome em CIDADES quando o domínio exigir esse cadastro.",
+          "As formas são cumulativas: a segunda exige a primeira, e a terceira exige a segunda. Dependência parcial usa só parte de uma chave composta; dependência transitiva passa por outro atributo. Exemplo: em ESTUDANTES(id,cidade_id,nome_cidade), id determina cidade_id, e cidade_id determina nome_cidade. Guardar CIDADES(id,nome) separadamente evita repetir o nome da cidade a cada estudante. Esta é uma introdução prática, não a definição formal completa de todas as formas normais."
         ]
       },
       {
         "title": "Ausência, identidade e limites",
         "paragraphs": [
           "Defina NULL coluna por coluna. Uma data de matrícula ausente pode significar não registrada; zero não representa a mesma coisa. Uma linha ausente em PROGRESSO também pode significar ainda não iniciado, mas essa convenção pertence ao contrato da aplicação e precisa ser escrita.",
-          "Uma chave estrangeira garante a existência do registro referenciado, não toda regra de negócio imaginável. Referenciar estudante e lição em PROGRESSO não garante sozinho que a pessoa esteja matriculada na trilha daquela lição. Registre o limite e decida em qual camada a regra será aplicada."
+          "Uma chave estrangeira garante a existência do registro referenciado, não toda regra de negócio imaginável. Referenciar estudante e lição em PROGRESSO não garante sozinho que a pessoa esteja matriculada na trilha daquela lição. Registre o limite e decida em qual camada a regra será aplicada.",
+          "Regra de negócio é uma condição do problema, como exigir matrícula antes de concluir uma lição. Camada é uma parte do programa com uma responsabilidade; aqui basta registrar a regra em português, sem implementar uma API. No exemplo, data_matricula é TEXT no formato ano-mês-dia: esse tipo sozinho não valida o calendário."
         ]
       },
       {
         "title": "Modelo verificável, não modelo universal",
         "paragraphs": [
           "Comece por ações e perguntas: uma pessoa se matricula, uma trilha contém lições, uma pessoa conclui uma lição. Use dois ou três exemplos e tente representar casos válidos e proibir os inválidos. Duas pessoas podem ter o mesmo nome? Uma trilha pode existir vazia? Uma matrícula pode repetir?",
-          "Mudanças de requisito podem alterar o desenho. Se uma lição puder pertencer a várias trilhas, trilha_id deixa de bastar e surge outra associação. Normalização não elimina decisões: torna as dependências e os trade-offs mais explícitos."
+          "Mudanças de requisito podem alterar o desenho. Se uma lição puder pertencer a várias trilhas, trilha_id deixa de bastar e surge outra associação. Normalização não elimina decisões: torna as dependências e os compromissos entre benefícios e custos mais explícitos."
         ]
       }
     ],
@@ -301,7 +361,7 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Abra a pasta e prepare os dois arquivos",
           "paragraphs": [
-            "No Explorador de Arquivos, crie Documentos/dados-sql. No VS Code use Arquivo > Abrir Pasta e escolha dados-sql. No Explorer lateral, use Novo Arquivo para criar executar.py e aula.sql. Salve com Arquivo > Salvar; confira as extensões.",
+            "No VS Code, use Arquivo > Abrir Pasta e escolha a pasta dados-sql criada na primeira aula. Abra os arquivos existentes executar.py e aula.sql pelo Explorer lateral. Não crie arquivos com o mesmo nome novamente. Se a pasta ainda não existe, siga primeiro o Exemplo de Entidades, relacionamentos e chaves.",
             "Reutilize executar.py da aula Entidades, relacionamentos e chaves. Se não o tiver, volte pelo atalho dessa aula; não use o arquivo sqlite_alternativa.py, que tem outra finalidade."
           ],
           "blocks": [],
@@ -310,7 +370,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Salve a demonstração antes de executar",
           "paragraphs": [
-            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo."
+            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo.",
+            "Se o terminal ainda mostra sql>, encerre a execução anterior com .sair antes de iniciar outra. Alterar aula.sql no editor não muda uma base que já está aberta. Digite um comando completo por vez no prompt; não cole duas instruções na mesma linha. Uma instrução pode ocupar várias linhas, até o ponto e vírgula final."
           ],
           "blocks": [
             {
@@ -323,7 +384,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Execute e confira a primeira saída",
           "paragraphs": [
-            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado."
+            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado.",
+            "O executor também imprime OK: instrucao executada para comandos sem tabela de resultado. As linhas com | separam colunas; | não é algo a digitar. Se não houver linhas abaixo do cabeçalho, a consulta retornou um conjunto vazio. Compare as tabelas com a saída esperada e espere sql> antes de praticar."
           ],
           "blocks": [
             {
@@ -352,7 +414,9 @@ Object.assign(LESSON_GUIDES, {
           "paragraphs": [
             "sql> pertence ao executor SQLite; não é PowerShell. Digite uma instrução SQL por vez, terminando com ponto e vírgula. ...> significa que ela ainda não terminou. Não copie sql> nem ...> como código.",
             "Nas aulas iniciais, responda as atividades de desenho no rascunho. Nas atividades SQL, use o estado final da demonstração. Execute cada tentativa inválida separadamente: o executor imprime a mensagem e mantém a conexão para você consultar o estado. Se uma transação ficou aberta, escolha ROLLBACK antes de repetir. O laboratório não decide regras de negócio por você.",
-            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão."
+            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão.",
+            "Para alterar apenas uma consulta, copie a consulta inteira, incluindo SELECT e o ponto e vírgula; WHERE ou ORDER BY sozinhos são fragmentos, não comandos. Para mudar CREATE TABLE ou repetir do início, saia com .sair, edite e salve aula.sql e execute novamente. Para construir tabelas próprias, substitua aula.sql pela sua construção antes de executar: não cole CREATE TABLE de uma tabela já existente no prompt. Guarde uma cópia do exemplo em outro arquivo se desejar recuperá-lo.",
+            "Se você modificou aula.sql em um passo guiado, recoloque o bloco original desta aula antes de iniciar um exercício que pede a base inicial. Reiniciar repete o arquivo que está salvo; não desfaz edições no arquivo. Cada exercício começa de forma independente, salvo quando o enunciado disser para continuar."
           ],
           "blocks": [
             {
@@ -380,7 +444,7 @@ Object.assign(LESSON_GUIDES, {
     ],
     "exercises": [
       {
-        "prompt": "Prever: uma tabela matriculas(estudante_id,trilha_id,nome_estudante) usa chave composta. Se Ana mudar de nome, quantas linhas podem precisar de alteração? Qual dependência está errada?",
+        "prompt": "Prever: uma tabela matriculas(estudante_id,trilha_id,nome_estudante) usa chave composta. Se Ana mudar de nome, quantas linhas podem precisar de alteração? Qual dependência está errada? Use duas matrículas da mesma Ana, nas trilhas Dados e Web, para tornar sua previsão concreta.",
         "hints": [
           "Pergunte de qual parte da chave o nome depende."
         ],
@@ -415,7 +479,7 @@ Object.assign(LESSON_GUIDES, {
         ],
         "solution": "ESTUDANTES(id,nome,email): 1,Ana,ana@example.test. TRILHAS(id,nome): 10,Dados. MATRICULAS(estudante_id,trilha_id): 1,10. Chave da associação: o par; referências para as entidades. A implementação SQL é estudada na próxima aula.",
         "explanation": "Cada entidade é registrada uma vez e cada associação ocupa uma linha verificável.",
-        "expected": "As consultas mostram entidades e matrículas em registros verificáveis, sem lista de identificadores em texto.",
+        "expected": "O desenho mostra entidades e matrículas em registros verificáveis, sem lista de identificadores em texto.",
         "criteria": [
           "Separa atributos das entidades e da associação.",
           "Identifica chaves e referências no desenho.",
@@ -441,7 +505,9 @@ Object.assign(LESSON_GUIDES, {
       "Dividir todo texto automaticamente sem considerar as consultas do domínio.",
       "Repetir atributo de uma entidade em cada associação e criar cópias divergentes.",
       "Substituir ausência por zero ou data fictícia sem declarar essa semântica.",
-      "Acreditar que uma chave estrangeira implementa regras que não foram declaradas."
+      "Acreditar que uma chave estrangeira implementa regras que não foram declaradas.",
+      "Se aparecer table ... already exists, você repetiu CREATE TABLE na mesma sessão: saia com .sair e execute novamente o arquivo salvo. Se aparecer no such table, confira a aula carregada e a primeira mensagem de erro; reiniciar cria somente as tabelas do aula.sql atual.",
+      "Em ...> o comando está incompleto: confira aspas, parênteses e ponto e vírgula. Para abandonar um comando confuso, Ctrl+C encerra o laboratório; execute novamente para restaurar a base inicial. Em erro de arquivo ou SyntaxError, copie a mensagem completa, confira pasta/extensão e se um comando de terminal foi colocado no arquivo errado."
     ],
     "quiz": [
       {
@@ -506,20 +572,50 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "CREATE TABLE pertence à linguagem de definição de dados, DDL. Dentro dos parênteses, cada item declara uma coluna ou uma restrição; vírgulas separam itens e o ponto e vírgula encerra a instrução. INTEGER, REAL, TEXT e BLOB atendem aos casos comuns deste laboratório SQLite.",
           "SQLite tradicional trabalha com afinidade de tipos. Declarar INTEGER não reproduz toda a rigidez de outros motores. Quando a regra exigir inteiro, combine typeof(valor)='integer' com CHECK. Tabelas STRICT existem, mas ficam fora deste primeiro exercício."
+        ],
+        "terms": [
+          {
+            "term": "Schema (esquema)",
+            "meaning": "Descrição das tabelas, colunas e regras; não é o conjunto de linhas cadastradas."
+          },
+          {
+            "term": "Tipo",
+            "meaning": "Categoria de valor: INTEGER representa inteiro; REAL, número com parte fracionária; TEXT, texto; BLOB, bytes como um arquivo. NULL representa ausência."
+          },
+          {
+            "term": "Afinidade",
+            "meaning": "Preferência de conversão da coluna no SQLite. Um texto numérico pode ser convertido em número antes da restrição ser verificada."
+          },
+          {
+            "term": "Restrição (constraint)",
+            "meaning": "Regra que o banco verifica, como presença, unicidade e intervalo permitido."
+          }
+        ]
+      },
+      {
+        "title": "Leia a sintaxe antes de testar as regras",
+        "paragraphs": [
+          "CREATE TABLE notas (id INTEGER PRIMARY KEY, valor INTEGER NOT NULL); cria notas com duas colunas. Cada coluna começa pelo nome, depois vem o tipo e suas regras. Não deixe vírgula depois do último item. Uma quebra de linha é espaço de organização; somente o ponto e vírgula encerra a instrução.",
+          "INSERT INTO notas(id,valor) VALUES(1,4); cadastra uma linha: 1 corresponde a id e 4 a valor, na ordem indicada. SELECT id,valor FROM notas; lê essas colunas. SELECT * FROM notas; lê todas. SELECT COUNT(*) FROM notas; conta linhas. São os comandos mínimos para testar DDL; a próxima aula aprofunda alterações.",
+          "Textos usam aspas simples, como 'Estudos'; números como 30 não precisam de aspas. Use 1.5, com ponto, para um número fracionário; vírgula separa itens. NULL é escrito sem aspas. Para uma aspa dentro de texto, duplique-a: 'Guia d''água'. -- inicia comentário até o fim da linha; comentário explica, mas não executa uma decisão.",
+          "Uma expressão combina valores e operadores. = compara igualdade; > e < comparam maior e menor; >= e <= incluem o limite; <> significa diferente. AND exige as duas condições, OR aceita ao menos uma. IN (0,1) aceita um dos valores listados; BETWEEN 1 AND 3 inclui 1 e 3. Em CHECK, a expressão fica entre parênteses."
         ]
       },
       {
         "title": "Restrições formam um contrato",
         "paragraphs": [
           "PRIMARY KEY identifica uma linha. NOT NULL exige presença. UNIQUE evita repetição dos valores cobertos. CHECK testa uma expressão e DEFAULT fornece valor quando a coluna é omitida. Uma regra pode precisar de mais de uma restrição: CHECK pode aceitar resultado NULL no SQLite, então duração obrigatória também precisa de NOT NULL.",
-          "NOT NULL não impede texto vazio. Para um título significativo, CHECK(length(trim(titulo)) > 0) recusa vazio e espaços. DEFAULT 0 atua quando concluida é omitida; enviar NULL explicitamente continua sujeito a NOT NULL."
+          "NOT NULL não impede texto vazio. Para um título significativo, CHECK(length(trim(titulo)) > 0) recusa vazio e espaços. DEFAULT 0 atua quando concluida é omitida; enviar NULL explicitamente continua sujeito a NOT NULL.",
+          "Uma função recebe valores entre parênteses e devolve um resultado. trim(titulo) remove espaços das extremidades; length(...) conta os caracteres restantes; typeof(minutos) informa o tipo efetivamente armazenado. typeof(minutos)='integer' testa inteiro depois das conversões da coluna: 1.5 é recusado, mas '30' pode ser convertido e aceito como 30. Não confunda isso com validar o formato digitado em um formulário.",
+          "Nesta tabela SQLite, id INTEGER PRIMARY KEY pode gerar um identificador se ele for omitido ou receber NULL; o id armazenado será um inteiro. Já uma chave composta precisa de NOT NULL nas colunas, como nos exemplos de matrículas. UNIQUE em uma coluna opcional pode aceitar vários NULL; para email obrigatório e único, combine NOT NULL e UNIQUE."
         ]
       },
       {
         "title": "Referências exigem ativação e teste",
         "paragraphs": [
           "Uma chave estrangeira exige que o valor referenciado exista. No SQLite, habilite PRAGMA foreign_keys=ON logo após abrir cada conexão e antes de iniciar transação. Consulte PRAGMA foreign_keys e espere 1; não presuma a configuração.",
-          "A ação padrão recusa excluir uma categoria ainda referenciada. ON DELETE CASCADE teria outro significado e apagaria também os filhos. Escolha conforme a regra de negócio, em vez de usar cascata apenas para eliminar uma mensagem de erro."
+          "A ação padrão recusa excluir uma categoria ainda referenciada. ON DELETE CASCADE teria outro significado e apagaria também os filhos. Escolha conforme a regra de negócio, em vez de usar cascata apenas para eliminar uma mensagem de erro.",
+          "PRAGMA é um comando de configuração ou inspeção específico do SQLite. ON ativa a verificação; o resultado 1 confirma que está ativa. REFERENCES categorias(id) indica a tabela e coluna de destino. Categoria é o registro pai, tarefa é o filho que a referencia; esses nomes descrevem a relação, não uma hierarquia universal."
         ]
       },
       {
@@ -545,7 +641,7 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Abra a pasta e prepare os dois arquivos",
           "paragraphs": [
-            "No Explorador de Arquivos, crie Documentos/dados-sql. No VS Code use Arquivo > Abrir Pasta e escolha dados-sql. No Explorer lateral, use Novo Arquivo para criar executar.py e aula.sql. Salve com Arquivo > Salvar; confira as extensões.",
+            "No VS Code, use Arquivo > Abrir Pasta e escolha a pasta dados-sql criada na primeira aula. Abra os arquivos existentes executar.py e aula.sql pelo Explorer lateral. Não crie arquivos com o mesmo nome novamente. Se a pasta ainda não existe, siga primeiro o Exemplo de Entidades, relacionamentos e chaves.",
             "Reutilize executar.py da aula Entidades, relacionamentos e chaves. Se não o tiver, volte pelo atalho dessa aula; não use o arquivo sqlite_alternativa.py, que tem outra finalidade."
           ],
           "blocks": [],
@@ -554,7 +650,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Salve a demonstração antes de executar",
           "paragraphs": [
-            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo."
+            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo.",
+            "Se o terminal ainda mostra sql>, encerre a execução anterior com .sair antes de iniciar outra. Alterar aula.sql no editor não muda uma base que já está aberta. Digite um comando completo por vez no prompt; não cole duas instruções na mesma linha. Uma instrução pode ocupar várias linhas, até o ponto e vírgula final."
           ],
           "blocks": [
             {
@@ -567,7 +664,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Execute e confira a primeira saída",
           "paragraphs": [
-            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado."
+            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado.",
+            "O executor também imprime OK: instrucao executada para comandos sem tabela de resultado. As linhas com | separam colunas; | não é algo a digitar. Se não houver linhas abaixo do cabeçalho, a consulta retornou um conjunto vazio. Compare as tabelas com a saída esperada e espere sql> antes de praticar."
           ],
           "blocks": [
             {
@@ -596,7 +694,9 @@ Object.assign(LESSON_GUIDES, {
           "paragraphs": [
             "sql> pertence ao executor SQLite; não é PowerShell. Digite uma instrução SQL por vez, terminando com ponto e vírgula. ...> significa que ela ainda não terminou. Não copie sql> nem ...> como código.",
             "Nas aulas iniciais, responda as atividades de desenho no rascunho. Nas atividades SQL, use o estado final da demonstração. Execute cada tentativa inválida separadamente: o executor imprime a mensagem e mantém a conexão para você consultar o estado. Se uma transação ficou aberta, escolha ROLLBACK antes de repetir. O laboratório não decide regras de negócio por você.",
-            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão."
+            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão.",
+            "Para alterar apenas uma consulta, copie a consulta inteira, incluindo SELECT e o ponto e vírgula; WHERE ou ORDER BY sozinhos são fragmentos, não comandos. Para mudar CREATE TABLE ou repetir do início, saia com .sair, edite e salve aula.sql e execute novamente. Para construir tabelas próprias, substitua aula.sql pela sua construção antes de executar: não cole CREATE TABLE de uma tabela já existente no prompt. Guarde uma cópia do exemplo em outro arquivo se desejar recuperá-lo.",
+            "Se você modificou aula.sql em um passo guiado, recoloque o bloco original desta aula antes de iniciar um exercício que pede a base inicial. Reiniciar repete o arquivo que está salvo; não desfaz edições no arquivo. Cada exercício começa de forma independente, salvo quando o enunciado disser para continuar."
           ],
           "blocks": [
             {
@@ -610,21 +710,21 @@ Object.assign(LESSON_GUIDES, {
     },
     "guided": [
       {
-        "instruction": "Consulte PRAGMA foreign_keys antes de criar os dados.",
+        "instruction": "Depois que o arquivo carregou e apareceu sql>, digite PRAGMA foreign_keys; para conferir esta conexão.",
         "result": "O resultado é 1 nesta conexão."
       },
       {
-        "instruction": "Tente uma tarefa com categoria_id 99 em comando separado.",
+        "instruction": "No prompt, digite INSERT INTO tarefas(id,categoria_id,titulo,minutos) VALUES(11,99,'Teste',20);. Depois confira SELECT COUNT(*) FROM tarefas;.",
         "result": "A inserção é recusada por chave estrangeira e a tarefa 10 permanece sozinha."
       },
       {
-        "instruction": "Tente minutos 0 e depois um título com somente espaços.",
+        "instruction": "No prompt, repita a tentativa anterior com categoria 1 e minutos 0. Depois use categoria 1, minutos 20 e título '   '. Mude uma regra por tentativa e confira a contagem após cada recusa.",
         "result": "Cada tentativa é recusada pelo CHECK correspondente."
       }
     ],
     "exercises": [
       {
-        "prompt": "Prever: o que acontece se concluida for omitida, se receber NULL e se receber 2? Explique antes de executar.",
+        "prompt": "Prever: o que acontece se concluida for omitida, se receber NULL e se receber 2? Explique antes de executar. Use id 11, categoria 1, título Teste e 20 minutos em cada tentativa, reiniciando o exemplo entre elas. Inclua a coluna concluida somente nas duas tentativas com valor explícito.",
         "hints": [
           "DEFAULT, NOT NULL e CHECK respondem perguntas diferentes."
         ],
@@ -638,7 +738,7 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "prompt": "Alterar: acrescente prioridade inteira de 1 a 3, obrigatória e com padrão 2, em uma tabela tarefas recriada do zero. Teste um valor aceito e valores fora da regra.",
+        "prompt": "Alterar: acrescente prioridade inteira de 1 a 3, obrigatória e com padrão 2, em uma tabela tarefas recriada do zero. Teste um valor aceito e valores fora da regra. Encerre com .sair; acrescente a declaração da coluna dentro do CREATE TABLE de aula.sql, separada por vírgula, salve e execute novamente. Não é necessário ALTER TABLE.",
         "hints": [
           "Combine INTEGER, NOT NULL, DEFAULT e CHECK."
         ],
@@ -652,7 +752,7 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "prompt": "Construir: crie categorias e tarefas. Cada tarefa exige título não vazio, minutos inteiros positivos, categoria existente e estado pendente por padrão. Insira uma tarefa válida e teste cada regra com uma tentativa inválida isolada.",
+        "prompt": "Construir: crie categorias e tarefas. Cada tarefa exige título não vazio, minutos inteiros positivos, categoria existente e estado pendente por padrão. Insira uma tarefa válida e teste cada regra com uma tentativa inválida isolada. Escreva sua versão em aula.sql e execute em nova sessão. Inclua categoria 1/Estudos e tarefa 10/Revisar SQL/30 minutos. Os casos inválidos são comandos separados no prompt, após a carga válida.",
         "hints": [
           "Crie a tabela referenciada primeiro.",
           "Teste pelo menos uma entrada inválida."
@@ -687,7 +787,10 @@ Object.assign(LESSON_GUIDES, {
       "Confiar somente no tipo declarado em uma tabela SQLite flexível.",
       "Usar CHECK sem NOT NULL para um campo obrigatório.",
       "Declarar chave estrangeira e esquecer de ativá-la e verificá-la na conexão.",
-      "Adicionar CASCADE sem decidir se os registros filhos realmente devem ser apagados."
+      "Adicionar CASCADE sem decidir se os registros filhos realmente devem ser apagados.",
+      "Se aparecer table ... already exists, você repetiu CREATE TABLE na mesma sessão: saia com .sair e execute novamente o arquivo salvo. Se aparecer no such table, confira a aula carregada e a primeira mensagem de erro; reiniciar cria somente as tabelas do aula.sql atual.",
+      "Em ...> o comando está incompleto: confira aspas, parênteses e ponto e vírgula. Para abandonar um comando confuso, Ctrl+C encerra o laboratório; execute novamente para restaurar a base inicial. Em erro de arquivo ou SyntaxError, copie a mensagem completa, confira pasta/extensão e se um comando de terminal foi colocado no arquivo errado.",
+      "IntegrityError: CHECK constraint failed indica recusa de uma regra; NOT NULL constraint failed indica ausência obrigatória; UNIQUE constraint failed indica repetição; FOREIGN KEY constraint failed indica referência inválida. OperationalError: near ... syntax error é erro de escrita do comando, não prova de que a regra funcionou."
     ],
     "quiz": [
       {
@@ -752,7 +855,8 @@ Object.assign(LESSON_GUIDES, {
         "title": "Criar, ler, alterar e remover",
         "paragraphs": [
           "CRUD reúne quatro ações: Create corresponde a INSERT, Read a SELECT, Update a UPDATE e Delete a DELETE. INSERT INTO informa a tabela e as colunas, seguidas dos VALUES na mesma ordem. Textos SQL ficam entre aspas simples; identificadores e números do exemplo não precisam delas.",
-          "UPDATE define novos valores com SET e escolhe linhas com WHERE. Sem WHERE, todas as linhas da tabela são candidatas. DELETE funciona da mesma maneira para remoção. Antes de mudar dados, execute um SELECT usando exatamente o filtro planejado. Conferir a seleção reduz erros de abrangência."
+          "UPDATE define novos valores com SET e escolhe linhas com WHERE. Sem WHERE, todas as linhas da tabela são candidatas. DELETE funciona da mesma maneira para remoção. Antes de mudar dados, execute um SELECT usando exatamente o filtro planejado. Conferir a seleção reduz erros de abrangência.",
+          "Na escrita UPDATE licoes SET minutos=minutos+5 WHERE id=10;, o lado direito lê o valor atual e soma 5; SET atribui esse novo valor à linha selecionada. DELETE FROM licoes WHERE id=12; remove a linha inteira, não somente um campo. Os textos fixos do laboratório são dados fictícios; entrada fornecida por outra pessoa exige parâmetros."
         ]
       },
       {
@@ -766,7 +870,7 @@ Object.assign(LESSON_GUIDES, {
         "title": "Alterações seguras e entradas da aplicação",
         "paragraphs": [
           "Antes de um UPDATE ou DELETE, escreva o SELECT correspondente, confira identificadores e conte linhas. SELECT * FROM licoes WHERE id=10 deve mostrar exatamente o alvo esperado. Só então altere com o mesmo filtro. Um filtro incorreto continua perigoso mesmo tendo WHERE; WHERE id>0 pode selecionar tudo. Durante experimentos, use uma base descartável e uma transação que possa ser revertida. UPDATE que encontra zero linhas não é necessariamente erro SQL: a aplicação precisa decidir se o item não existe, já mudou ou não atende à condição. Essa distinção será essencial para atualizar estoque e saldo com segurança.",
-          "Nunca monte comandos concatenando entrada de usuário. Com Python sqlite3, execute con.execute(\"UPDATE licoes SET titulo=? WHERE id=?\", (novo_titulo, 10)). Os pontos de interrogação são parâmetros para valores; o driver os envia sem transformá-los em sintaxe SQL. Não coloque aspas ao redor do ?. Nomes de tabelas e colunas não são valores parametrizáveis dessa maneira: se houver ordenação escolhida pelo usuário, use uma lista fechada de nomes permitidos. Um título contendo aspas ou texto parecido com SQL deve continuar sendo apenas um título. Não use executescript com texto externo, porque esse método recebe comandos completos.",
+          "Nunca monte comandos concatenando entrada de usuário. Com Python sqlite3, execute con.execute(\"UPDATE licoes SET titulo=? WHERE id=?\", (novo_titulo, 10)). Os pontos de interrogação são parâmetros para valores; o driver os envia sem transformá-los em sintaxe SQL. Não coloque aspas ao redor do ?. Nomes de tabelas e colunas não são valores parametrizáveis dessa maneira: se houver ordenação escolhida pelo usuário, use uma lista fechada de nomes permitidos. Um título contendo aspas ou texto parecido com SQL deve continuar sendo apenas um título. Não use executescript com texto externo, porque esse método recebe comandos completos. Este trecho é uma antecipação conceitual para reconhecer a resposta do quiz, não um comando para colar em sql>. Driver é a biblioteca que faz a comunicação com o banco; con representa a conexão Python; a tupla (novo_titulo, 10) é o conjunto ordenado dos dois valores que substituem os dois marcadores ?. A execução em Python será ensinada em SQLite na aplicação; aqui você pratica SQL com valores fictícios fixos.",
           "Repetibilidade faz parte do aprendizado. O exemplo cria tabelas e dados desde o começo; rode-o em uma base vazia para obter a mesma saída. Para experimentar uma restrição, execute o comando inválido isoladamente e confira que a contagem não mudou. Anote o comando, o motivo esperado da recusa e o estado posterior. Depois faça uma alteração válida e compare. Isso prova que a regra está funcionando e que o problema não é simplesmente uma ferramenta sem conexão. Ao finalizar, explique a diferença entre DELETE, que remove linhas, e DROP TABLE, que remove a própria estrutura."
         ]
       }
@@ -786,7 +890,7 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Abra a pasta e prepare os dois arquivos",
           "paragraphs": [
-            "No Explorador de Arquivos, crie Documentos/dados-sql. No VS Code use Arquivo > Abrir Pasta e escolha dados-sql. No Explorer lateral, use Novo Arquivo para criar executar.py e aula.sql. Salve com Arquivo > Salvar; confira as extensões.",
+            "No VS Code, use Arquivo > Abrir Pasta e escolha a pasta dados-sql criada na primeira aula. Abra os arquivos existentes executar.py e aula.sql pelo Explorer lateral. Não crie arquivos com o mesmo nome novamente. Se a pasta ainda não existe, siga primeiro o Exemplo de Entidades, relacionamentos e chaves.",
             "Reutilize executar.py da aula Entidades, relacionamentos e chaves. Se não o tiver, volte pelo atalho dessa aula; não use o arquivo sqlite_alternativa.py, que tem outra finalidade."
           ],
           "blocks": [],
@@ -795,7 +899,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Salve a demonstração antes de executar",
           "paragraphs": [
-            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo."
+            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo.",
+            "Se o terminal ainda mostra sql>, encerre a execução anterior com .sair antes de iniciar outra. Alterar aula.sql no editor não muda uma base que já está aberta. Digite um comando completo por vez no prompt; não cole duas instruções na mesma linha. Uma instrução pode ocupar várias linhas, até o ponto e vírgula final."
           ],
           "blocks": [
             {
@@ -808,7 +913,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Execute e confira a primeira saída",
           "paragraphs": [
-            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado."
+            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado.",
+            "O executor também imprime OK: instrucao executada para comandos sem tabela de resultado. As linhas com | separam colunas; | não é algo a digitar. Se não houver linhas abaixo do cabeçalho, a consulta retornou um conjunto vazio. Compare as tabelas com a saída esperada e espere sql> antes de praticar."
           ],
           "blocks": [
             {
@@ -837,7 +943,9 @@ Object.assign(LESSON_GUIDES, {
           "paragraphs": [
             "sql> pertence ao executor SQLite; não é PowerShell. Digite uma instrução SQL por vez, terminando com ponto e vírgula. ...> significa que ela ainda não terminou. Não copie sql> nem ...> como código.",
             "Nas aulas iniciais, responda as atividades de desenho no rascunho. Nas atividades SQL, use o estado final da demonstração. Execute cada tentativa inválida separadamente: o executor imprime a mensagem e mantém a conexão para você consultar o estado. Se uma transação ficou aberta, escolha ROLLBACK antes de repetir. O laboratório não decide regras de negócio por você.",
-            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão."
+            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão.",
+            "Para alterar apenas uma consulta, copie a consulta inteira, incluindo SELECT e o ponto e vírgula; WHERE ou ORDER BY sozinhos são fragmentos, não comandos. Para mudar CREATE TABLE ou repetir do início, saia com .sair, edite e salve aula.sql e execute novamente. Para construir tabelas próprias, substitua aula.sql pela sua construção antes de executar: não cole CREATE TABLE de uma tabela já existente no prompt. Guarde uma cópia do exemplo em outro arquivo se desejar recuperá-lo.",
+            "Se você modificou aula.sql em um passo guiado, recoloque o bloco original desta aula antes de iniciar um exercício que pede a base inicial. Reiniciar repete o arquivo que está salvo; não desfaz edições no arquivo. Cada exercício começa de forma independente, salvo quando o enunciado disser para continuar."
           ],
           "blocks": [
             {
@@ -851,11 +959,11 @@ Object.assign(LESSON_GUIDES, {
     },
     "guided": [
       {
-        "instruction": "Execute a criação e os INSERT antes do UPDATE. Consulte ambas as lições.",
+        "instruction": "Para observar a etapa anterior ao UPDATE, saia com .sair. Em aula.sql, insira SELECT id,titulo,concluida FROM licoes ORDER BY id; imediatamente antes do UPDATE, salve e execute novamente. Leia essa primeira tabela de resultados.",
         "result": "As duas começam com concluida 0 porque DEFAULT foi aplicado."
       },
       {
-        "instruction": "Execute o SELECT filtrado e depois o UPDATE.",
+        "instruction": "Na mesma saída, compare a primeira tabela com a consulta final após o UPDATE do arquivo.",
         "result": "Somente SELECT passa para concluida 1; JOIN permanece em 0."
       },
       {
@@ -928,7 +1036,9 @@ Object.assign(LESSON_GUIDES, {
     "mistakes": [
       "Esquecer WHERE: confira os registros com SELECT antes de UPDATE ou DELETE.",
       "Confiar apenas em CHECK para impedir NULL: acrescente NOT NULL quando o valor é obrigatório.",
-      "Reexecutar CREATE TABLE no mesmo banco: use um banco novo para repetir o laboratório, preservando o anterior se necessário."
+      "Reexecutar CREATE TABLE no mesmo banco: use um banco novo para repetir o laboratório, preservando o anterior se necessário.",
+      "Se aparecer table ... already exists, você repetiu CREATE TABLE na mesma sessão: saia com .sair e execute novamente o arquivo salvo. Se aparecer no such table, confira a aula carregada e a primeira mensagem de erro; reiniciar cria somente as tabelas do aula.sql atual.",
+      "Em ...> o comando está incompleto: confira aspas, parênteses e ponto e vírgula. Para abandonar um comando confuso, Ctrl+C encerra o laboratório; execute novamente para restaurar a base inicial. Em erro de arquivo ou SyntaxError, copie a mensagem completa, confira pasta/extensão e se um comando de terminal foi colocado no arquivo errado."
     ],
     "quiz": [
       {
@@ -994,13 +1104,28 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "SELECT escolhe as colunas devolvidas; FROM informa a tabela de origem. WHERE conserva apenas as linhas para as quais a condição é verdadeira. A expressão concluida = 0 seleciona pendências. AND exige que duas condições sejam verdadeiras; OR aceita pelo menos uma delas. Parênteses deixam combinações explícitas.",
           "ORDER BY define a ordem de apresentação. DESC significa decrescente e ASC significa crescente. Duas lições podem ter a mesma duração; acrescentar id como desempate produz uma sequência previsível. Não presuma que a ordem de inserção será mantida quando nenhum ORDER BY foi escrito."
+        ],
+        "terms": [
+          {
+            "term": "Alias / AS",
+            "meaning": "Apelido local no resultado. COALESCE(observacao,'Sem observação') AS observacao_exibida dá nome à coluna calculada; não renomeia a coluna armazenada."
+          },
+          {
+            "term": "Cláusula",
+            "meaning": "Parte de uma instrução SQL, como WHERE ou ORDER BY. Execute a consulta completa, não a cláusula isolada."
+          },
+          {
+            "term": "ASC implícito",
+            "meaning": "Quando ASC/DESC é omitido, a ordenação daquele campo é crescente. Em ORDER BY minutos DESC,id, só minutos é decrescente."
+          }
         ]
       },
       {
         "title": "Ausência não é zero",
         "paragraphs": [
           "NULL representa um valor desconhecido ou ausente. Comparações comuns com NULL não resultam em verdadeiro, por isso WHERE observacao = NULL não encontra os campos ausentes. Use IS NULL ou IS NOT NULL. Uma observação vazia, escrita como duas aspas simples, continua sendo um texto conhecido.",
-          "COUNT(*) conta linhas. COUNT(observacao) conta valores não nulos nessa coluna. SUM e AVG ignoram os valores nulos recebidos. Essa diferença importa em relatórios: não confunda quantidade de estudantes com quantidade de estudantes que informaram uma observação. COALESCE(valor, alternativa) substitui uma ausência no resultado quando isso fizer sentido."
+          "COUNT(*) conta linhas. COUNT(observacao) conta valores não nulos nessa coluna. SUM e AVG ignoram os valores nulos recebidos. Essa diferença importa em relatórios: não confunda quantidade de estudantes com quantidade de estudantes que informaram uma observação. COALESCE(valor, alternativa) substitui uma ausência no resultado quando isso fizer sentido.",
+          "SUM soma e AVG calcula a média dos valores conhecidos. DISTINCT significa distintos: COUNT(DISTINCT trilha) conta os nomes diferentes, e não cada ocorrência. Na próxima aula você separará esses cálculos por grupo. Aqui use-os apenas para comparar presença e ausência."
         ]
       },
       {
@@ -1008,6 +1133,16 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "Antes de escrever SQL, reformule o pedido em uma frase que inclua população, condição, colunas e ordem: quero títulos de aulas pendentes com pelo menos trinta minutos, da maior duração para a menor, com id como desempate. Traduzindo, a população vem de FROM licoes, a condição de WHERE concluida=0 AND minutos>=30, as colunas de SELECT e a ordem de ORDER BY minutos DESC,id. Esse pequeno planejamento evita responder uma pergunta diferente. Teste sempre o limite: pelo menos trinta inclui trinta, portanto usa >=; mais de trinta usa >.",
           "AND tem precedência sobre OR. Por isso, escreva parênteses quando misturar condições: concluida=0 AND (trilha='Dados' OR trilha='Python') exige pendência nas duas trilhas. IN ('Dados','Python') expressa essa mesma escolha de forma compacta. BETWEEN 20 AND 30 inclui os dois limites. LIKE 'Arq%' procura um prefixo, onde % representa uma sequência; _ representa um caractere. Regras de maiúsculas e acentos variam conforme collation e motor, então não assuma que todos os bancos farão buscas textuais idênticas. Uma comparação numérica, por sua vez, deve comparar números, não durações escritas como texto livre."
+        ],
+        "terms": [
+          {
+            "term": "Precedência",
+            "meaning": "Ordem de avaliação dos operadores. Parênteses explicitam o grupo que deve ser avaliado junto."
+          },
+          {
+            "term": "Collation",
+            "meaning": "Regras de comparação e ordenação de texto, incluindo tratamento de letras e acentos."
+          }
         ]
       },
       {
@@ -1034,7 +1169,7 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Abra a pasta e prepare os dois arquivos",
           "paragraphs": [
-            "No Explorador de Arquivos, crie Documentos/dados-sql. No VS Code use Arquivo > Abrir Pasta e escolha dados-sql. No Explorer lateral, use Novo Arquivo para criar executar.py e aula.sql. Salve com Arquivo > Salvar; confira as extensões.",
+            "No VS Code, use Arquivo > Abrir Pasta e escolha a pasta dados-sql criada na primeira aula. Abra os arquivos existentes executar.py e aula.sql pelo Explorer lateral. Não crie arquivos com o mesmo nome novamente. Se a pasta ainda não existe, siga primeiro o Exemplo de Entidades, relacionamentos e chaves.",
             "Reutilize executar.py da aula Entidades, relacionamentos e chaves. Se não o tiver, volte pelo atalho dessa aula; não use o arquivo sqlite_alternativa.py, que tem outra finalidade."
           ],
           "blocks": [],
@@ -1043,7 +1178,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Salve a demonstração antes de executar",
           "paragraphs": [
-            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo."
+            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo.",
+            "Se o terminal ainda mostra sql>, encerre a execução anterior com .sair antes de iniciar outra. Alterar aula.sql no editor não muda uma base que já está aberta. Digite um comando completo por vez no prompt; não cole duas instruções na mesma linha. Uma instrução pode ocupar várias linhas, até o ponto e vírgula final."
           ],
           "blocks": [
             {
@@ -1056,7 +1192,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Execute e confira a primeira saída",
           "paragraphs": [
-            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado."
+            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado.",
+            "O executor também imprime OK: instrucao executada para comandos sem tabela de resultado. As linhas com | separam colunas; | não é algo a digitar. Se não houver linhas abaixo do cabeçalho, a consulta retornou um conjunto vazio. Compare as tabelas com a saída esperada e espere sql> antes de praticar."
           ],
           "blocks": [
             {
@@ -1085,7 +1222,9 @@ Object.assign(LESSON_GUIDES, {
           "paragraphs": [
             "sql> pertence ao executor SQLite; não é PowerShell. Digite uma instrução SQL por vez, terminando com ponto e vírgula. ...> significa que ela ainda não terminou. Não copie sql> nem ...> como código.",
             "Nas aulas iniciais, responda as atividades de desenho no rascunho. Nas atividades SQL, use o estado final da demonstração. Execute cada tentativa inválida separadamente: o executor imprime a mensagem e mantém a conexão para você consultar o estado. Se uma transação ficou aberta, escolha ROLLBACK antes de repetir. O laboratório não decide regras de negócio por você.",
-            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão."
+            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão.",
+            "Para alterar apenas uma consulta, copie a consulta inteira, incluindo SELECT e o ponto e vírgula; WHERE ou ORDER BY sozinhos são fragmentos, não comandos. Para mudar CREATE TABLE ou repetir do início, saia com .sair, edite e salve aula.sql e execute novamente. Para construir tabelas próprias, substitua aula.sql pela sua construção antes de executar: não cole CREATE TABLE de uma tabela já existente no prompt. Guarde uma cópia do exemplo em outro arquivo se desejar recuperá-lo.",
+            "Se você modificou aula.sql em um passo guiado, recoloque o bloco original desta aula antes de iniciar um exercício que pede a base inicial. Reiniciar repete o arquivo que está salvo; não desfaz edições no arquivo. Cada exercício começa de forma independente, salvo quando o enunciado disser para continuar."
           ],
           "blocks": [
             {
@@ -1176,7 +1315,9 @@ Object.assign(LESSON_GUIDES, {
     "mistakes": [
       "Comparar com = NULL: substitua por IS NULL.",
       "Confundir texto vazio com NULL: teste cada estado conforme a regra do domínio.",
-      "Esperar ordem fixa sem ORDER BY: declare a ordem e um desempate quando necessário."
+      "Esperar ordem fixa sem ORDER BY: declare a ordem e um desempate quando necessário.",
+      "Se aparecer table ... already exists, você repetiu CREATE TABLE na mesma sessão: saia com .sair e execute novamente o arquivo salvo. Se aparecer no such table, confira a aula carregada e a primeira mensagem de erro; reiniciar cria somente as tabelas do aula.sql atual.",
+      "Em ...> o comando está incompleto: confira aspas, parênteses e ponto e vírgula. Para abandonar um comando confuso, Ctrl+C encerra o laboratório; execute novamente para restaurar a base inicial. Em erro de arquivo ou SyntaxError, copie a mensagem completa, confira pasta/extensão e se um comando de terminal foi colocado no arquivo errado."
     ],
     "quiz": [
       {
@@ -1225,7 +1366,7 @@ Object.assign(LESSON_GUIDES, {
       "db-modeling"
     ],
     "requirementChange": {
-      "prompt": "O relatório agora exige pendências com pelo menos 30 minutos. Preserve o desempate por id e a diferença entre NULL e vazio.",
+      "prompt": "Partindo da base original, liste id, título e observação das pendências com pelo menos 30 minutos; mostre Sem observação apenas para NULL. Ordene por minutos decrescentes e id crescente no empate. Teste uma nova linha com id 5, trilha Dados, título Teste, 29 minutos, concluida 0 e observacao NULL; depois altere somente sua duração para 30.",
       "criteria": [
         "A ordenação das durações iguais permanece previsível.",
         "Uma pendência de 29 minutos fica fora e uma de 30 fica dentro."
@@ -1237,6 +1378,13 @@ Object.assign(LESSON_GUIDES, {
     "setup": "Lugar: VS Code e terminal integrado na pasta dados-sql, dentro de Documentos. Use Python 3 já verificado na preparação. Na aba Exemplo, salve aula.sql e executar.py; o código e os comandos estão nos passos. O laboratório abre uma base SQLite apenas em memória: cada nova execução começa vazia. No prompt sql> você pode executar uma instrução de cada vez, observar erros e consultar o mesmo estado. Para reiniciar entre exercícios, digite .sair e execute o programa de novo. Não é preciso Docker nem instalar pacote. Rascunhos no site não executam SQL.",
     "why": "Um dashboard raramente mostra todas as linhas: ele responde quantas tarefas existem, quanto tempo está pendente e qual grupo exige atenção. Agregações transformam conjuntos de linhas em medidas, mas um filtro na etapa errada pode responder outra pergunta.",
     "sections": [
+      {
+        "title": "Monte e leia um resumo pequeno",
+        "paragraphs": [
+          "Agregar é transformar várias linhas em uma medida. Em SELECT trilha, SUM(minutos) AS total FROM licoes GROUP BY trilha;, GROUP BY separa as linhas por trilha, SUM calcula uma soma para cada conjunto e AS total dá nome à coluna calculada. A ordem escrita é SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY; a ordem lógica explicada adiante descreve o raciocínio, não a ordem de digitação.",
+          "Antes de executar, escreva no rascunho os grupos Dados e Python, distribua as quatro lições entre eles e some as durações. Depois retire as concluídas e compare os novos totais. Na aba Exemplo, o WHERE faz essa retirada antes do agrupamento."
+        ]
+      },
       {
         "title": "Funções agregadas resumem conjuntos",
         "paragraphs": [
@@ -1280,7 +1428,7 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Abra a pasta e prepare os dois arquivos",
           "paragraphs": [
-            "No Explorador de Arquivos, crie Documentos/dados-sql. No VS Code use Arquivo > Abrir Pasta e escolha dados-sql. No Explorer lateral, use Novo Arquivo para criar executar.py e aula.sql. Salve com Arquivo > Salvar; confira as extensões.",
+            "No VS Code, use Arquivo > Abrir Pasta e escolha a pasta dados-sql criada na primeira aula. Abra os arquivos existentes executar.py e aula.sql pelo Explorer lateral. Não crie arquivos com o mesmo nome novamente. Se a pasta ainda não existe, siga primeiro o Exemplo de Entidades, relacionamentos e chaves.",
             "Reutilize executar.py da aula Entidades, relacionamentos e chaves. Se não o tiver, volte pelo atalho dessa aula; não use o arquivo sqlite_alternativa.py, que tem outra finalidade."
           ],
           "blocks": [],
@@ -1289,7 +1437,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Salve a demonstração antes de executar",
           "paragraphs": [
-            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo."
+            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo.",
+            "Se o terminal ainda mostra sql>, encerre a execução anterior com .sair antes de iniciar outra. Alterar aula.sql no editor não muda uma base que já está aberta. Digite um comando completo por vez no prompt; não cole duas instruções na mesma linha. Uma instrução pode ocupar várias linhas, até o ponto e vírgula final."
           ],
           "blocks": [
             {
@@ -1302,7 +1451,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Execute e confira a primeira saída",
           "paragraphs": [
-            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado."
+            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado.",
+            "O executor também imprime OK: instrucao executada para comandos sem tabela de resultado. As linhas com | separam colunas; | não é algo a digitar. Se não houver linhas abaixo do cabeçalho, a consulta retornou um conjunto vazio. Compare as tabelas com a saída esperada e espere sql> antes de praticar."
           ],
           "blocks": [
             {
@@ -1331,7 +1481,9 @@ Object.assign(LESSON_GUIDES, {
           "paragraphs": [
             "sql> pertence ao executor SQLite; não é PowerShell. Digite uma instrução SQL por vez, terminando com ponto e vírgula. ...> significa que ela ainda não terminou. Não copie sql> nem ...> como código.",
             "Nas aulas iniciais, responda as atividades de desenho no rascunho. Nas atividades SQL, use o estado final da demonstração. Execute cada tentativa inválida separadamente: o executor imprime a mensagem e mantém a conexão para você consultar o estado. Se uma transação ficou aberta, escolha ROLLBACK antes de repetir. O laboratório não decide regras de negócio por você.",
-            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão."
+            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão.",
+            "Para alterar apenas uma consulta, copie a consulta inteira, incluindo SELECT e o ponto e vírgula; WHERE ou ORDER BY sozinhos são fragmentos, não comandos. Para mudar CREATE TABLE ou repetir do início, saia com .sair, edite e salve aula.sql e execute novamente. Para construir tabelas próprias, substitua aula.sql pela sua construção antes de executar: não cole CREATE TABLE de uma tabela já existente no prompt. Guarde uma cópia do exemplo em outro arquivo se desejar recuperá-lo.",
+            "Se você modificou aula.sql em um passo guiado, recoloque o bloco original desta aula antes de iniciar um exercício que pede a base inicial. Reiniciar repete o arquivo que está salvo; não desfaz edições no arquivo. Cada exercício começa de forma independente, salvo quando o enunciado disser para continuar."
           ],
           "blocks": [
             {
@@ -1421,7 +1573,9 @@ Object.assign(LESSON_GUIDES, {
       "Colocar condição agregada em WHERE antes de a medida existir.",
       "Exibir coluna sem significado definido para o grupo.",
       "Confundir COUNT(*) com COUNT(coluna) quando há NULL.",
-      "Aceitar um total sem conferir manualmente um conjunto pequeno."
+      "Aceitar um total sem conferir manualmente um conjunto pequeno.",
+      "Se aparecer table ... already exists, você repetiu CREATE TABLE na mesma sessão: saia com .sair e execute novamente o arquivo salvo. Se aparecer no such table, confira a aula carregada e a primeira mensagem de erro; reiniciar cria somente as tabelas do aula.sql atual.",
+      "Em ...> o comando está incompleto: confira aspas, parênteses e ponto e vírgula. Para abandonar um comando confuso, Ctrl+C encerra o laboratório; execute novamente para restaurar a base inicial. Em erro de arquivo ou SyntaxError, copie a mensagem completa, confira pasta/extensão e se um comando de terminal foi colocado no arquivo errado."
     ],
     "quiz": [
       {
@@ -1470,7 +1624,7 @@ Object.assign(LESSON_GUIDES, {
       "db-modeling"
     ],
     "requirementChange": {
-      "prompt": "O painel passa a mostrar apenas trilhas com ao menos duas pendências. Use os dados originais e depois acrescente uma pendência de 10 minutos em Python.",
+      "prompt": "O painel passa a mostrar apenas trilhas com ao menos duas pendências. Use os dados originais e depois acrescente uma pendência de 10 minutos em Python. Para o novo registro use id 5, trilha Python, título Funções, minutos 10, concluida 0 e observacao NULL. Mantenha a mesma consulta antes e depois da inserção.",
       "criteria": [
         "Totais continuam somando somente pendências.",
         "Python passa a aparecer quando atinge duas pendências; Dados permanece."
@@ -1486,7 +1640,8 @@ Object.assign(LESSON_GUIDES, {
         "title": "Combinar pela chave correta",
         "paragraphs": [
           "JOIN compara linhas de duas tabelas usando a condição ON. No exemplo, l.trilha_id = t.id liga cada lição à sua trilha. t e l são aliases, nomes curtos locais à consulta. INNER JOIN só devolve pares que correspondem, portanto a trilha Python desaparece se ainda não tiver lições.",
-          "Uma relação 1:N produz uma linha por combinação, não uma linha por trilha. Dados aparece duas vezes quando ligado a SELECT e JOIN. Isso não é duplicação acidental: é a granularidade do resultado. Antes de somar, pergunte o que cada linha representa e se outra junção poderia multiplicá-la novamente."
+          "Uma relação 1:N produz uma linha por combinação, não uma linha por trilha. Dados aparece duas vezes quando ligado a SELECT e JOIN. Isso não é duplicação acidental: é a granularidade do resultado. Antes de somar, pergunte o que cada linha representa e se outra junção poderia multiplicá-la novamente.",
+          "FROM trilhas t é uma forma curta de FROM trilhas AS t. l.trilha_id significa a coluna trilha_id da tabela apelidada l; o ponto separa tabela e coluna. Escrever apenas id seria ambíguo quando as duas tabelas possuem id. A tabela à esquerda é a escrita antes de LEFT JOIN; não depende da posição das caixas em um desenho."
         ]
       },
       {
@@ -1500,7 +1655,7 @@ Object.assign(LESSON_GUIDES, {
         "title": "A unidade de cada linha vem antes da soma",
         "paragraphs": [
           "Uma junção não busca simplesmente um nome: ela produz todas as combinações que satisfazem ON. Dados possui duas lições, então contribui com duas linhas. Se você juntar também três matrículas diretamente pela trilha, poderá produzir seis linhas para Dados, porque cada lição combina com cada matrícula. Somar os minutos nesse resultado triplicaria o total. Antes de escrever SUM, anote o que uma linha representa: uma lição, uma matrícula ou um par lição-matrícula? Essa pergunta detecta o erro de multiplicação sem depender de memorizar sintaxe.",
-          "Quando precisar de dois totais independentes, agregue cada conjunto primeiro e só depois junte os resumos por trilha. Uma CTE pode somar lições por trilha; outra pode contar matrículas por trilha; a consulta final reúne uma linha de cada resumo. DISTINCT não é uma correção universal: SUM(DISTINCT minutos) removeria durações iguais de lições diferentes e poderia subestimar o total. A correção é preservar a granularidade adequada. Em bases grandes, esse raciocínio também ajuda a interpretar planos de execução e evitar resultados intermediários desnecessários."
+          "Quando precisar de dois totais independentes, agregue cada conjunto primeiro e só depois junte os resumos por trilha. Uma CTE pode somar lições por trilha; outra pode contar matrículas por trilha; a consulta final reúne uma linha de cada resumo. DISTINCT não é uma correção universal: SUM(DISTINCT minutos) removeria durações iguais de lições diferentes e poderia subestimar o total. A correção é preservar a granularidade adequada. Em bases grandes, esse raciocínio também ajuda a interpretar planos de execução e evitar resultados intermediários desnecessários. CTE significa expressão de tabela comum: uma etapa de consulta com nome, ensinada na próxima aula. Por enquanto, basta reconhecer a multiplicação e propor resumos separados; não é necessário escrever WITH nesta aula."
         ]
       },
       {
@@ -1508,7 +1663,8 @@ Object.assign(LESSON_GUIDES, {
         "paragraphs": [
           "Escreva as duas linhas de TRILHAS e as duas de LICOES em papel. Para cada trilha, compare t.id com l.trilha_id. Dados combina com as duas; Python não combina com nenhuma. INNER JOIN mantém apenas combinações encontradas. LEFT JOIN produz essas combinações e acrescenta uma linha de ausência para Python. A coluna l.id nessa linha é NULL, enquanto t.id continua sendo 2. Os aliases são nomes locais que deixam explícito de qual tabela vem cada campo e evitam ambiguidade quando ambas têm coluna id.",
           "O lado esquerdo deve ser o conjunto que o relatório precisa preservar. Se o pedido é listar toda trilha, comece por trilhas. Se o pedido é listar toda lição e seu nome de trilha, comece pelas lições e reflita sobre a integridade referencial. Uma FK obrigatória corretamente aplicada evita lições órfãs, mas consultas de diagnóstico podem lidar com importações antigas ou relações opcionais. Não confunda uma junção que encontrou correspondência com uma FK que impede dados inválidos: a consulta lê o estado atual; a restrição protege futuras escritas.",
-          "Pausa de previsão: antes de olhar o mapa, desenhe as duas tabelas do exemplo e anote quantas linhas INNER JOIN e LEFT JOIN devolvem. Depois compare suas linhas com o mapa e execute as consultas."
+          "Pausa de previsão: antes de olhar o mapa, desenhe as duas tabelas do exemplo e anote quantas linhas INNER JOIN e LEFT JOIN devolvem. Depois compare suas linhas com o mapa e execute as consultas.",
+          "As tabelas reduzidas deste exemplo isolam a leitura de JOIN e não declaram todas as restrições de um cadastro real. Isso não substitui o ensino anterior de NOT NULL e REFERENCES. A ausência de lições de Python é intencional e é diferente de uma lição apontando para uma trilha inexistente."
         ],
         "diagramTitle": "Da condição ON às linhas e à contagem",
         "diagram": "TRILHAS t                 LICOES l\nid  nome                  id  trilha_id  titulo\n1   Dados ─────────────→  10  1          SELECT\n         └─────────────→  11  1          JOIN\n2   Python ─────────────→  sem lição correspondente\n\nON l.trilha_id = t.id\nINNER JOIN → Dados | SELECT\n             Dados | JOIN\nLEFT JOIN  → Dados | SELECT | l.id 10\n             Dados | JOIN   | l.id 11\n             Python | NULL | l.id NULL\n\nGROUP BY t.id, t.nome; COUNT(l.id)\nDados → 2 lições     Python → 0 lições\nCOUNT(*) contaria a linha preservada de Python como 1."
@@ -1529,7 +1685,7 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Abra a pasta e prepare os dois arquivos",
           "paragraphs": [
-            "No Explorador de Arquivos, crie Documentos/dados-sql. No VS Code use Arquivo > Abrir Pasta e escolha dados-sql. No Explorer lateral, use Novo Arquivo para criar executar.py e aula.sql. Salve com Arquivo > Salvar; confira as extensões.",
+            "No VS Code, use Arquivo > Abrir Pasta e escolha a pasta dados-sql criada na primeira aula. Abra os arquivos existentes executar.py e aula.sql pelo Explorer lateral. Não crie arquivos com o mesmo nome novamente. Se a pasta ainda não existe, siga primeiro o Exemplo de Entidades, relacionamentos e chaves.",
             "Reutilize executar.py da aula Entidades, relacionamentos e chaves. Se não o tiver, volte pelo atalho dessa aula; não use o arquivo sqlite_alternativa.py, que tem outra finalidade."
           ],
           "blocks": [],
@@ -1538,7 +1694,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Salve a demonstração antes de executar",
           "paragraphs": [
-            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo."
+            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo.",
+            "Se o terminal ainda mostra sql>, encerre a execução anterior com .sair antes de iniciar outra. Alterar aula.sql no editor não muda uma base que já está aberta. Digite um comando completo por vez no prompt; não cole duas instruções na mesma linha. Uma instrução pode ocupar várias linhas, até o ponto e vírgula final."
           ],
           "blocks": [
             {
@@ -1551,7 +1708,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Execute e confira a primeira saída",
           "paragraphs": [
-            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado."
+            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado.",
+            "O executor também imprime OK: instrucao executada para comandos sem tabela de resultado. As linhas com | separam colunas; | não é algo a digitar. Se não houver linhas abaixo do cabeçalho, a consulta retornou um conjunto vazio. Compare as tabelas com a saída esperada e espere sql> antes de praticar."
           ],
           "blocks": [
             {
@@ -1580,7 +1738,9 @@ Object.assign(LESSON_GUIDES, {
           "paragraphs": [
             "sql> pertence ao executor SQLite; não é PowerShell. Digite uma instrução SQL por vez, terminando com ponto e vírgula. ...> significa que ela ainda não terminou. Não copie sql> nem ...> como código.",
             "Nas aulas iniciais, responda as atividades de desenho no rascunho. Nas atividades SQL, use o estado final da demonstração. Execute cada tentativa inválida separadamente: o executor imprime a mensagem e mantém a conexão para você consultar o estado. Se uma transação ficou aberta, escolha ROLLBACK antes de repetir. O laboratório não decide regras de negócio por você.",
-            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão."
+            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão.",
+            "Para alterar apenas uma consulta, copie a consulta inteira, incluindo SELECT e o ponto e vírgula; WHERE ou ORDER BY sozinhos são fragmentos, não comandos. Para mudar CREATE TABLE ou repetir do início, saia com .sair, edite e salve aula.sql e execute novamente. Para construir tabelas próprias, substitua aula.sql pela sua construção antes de executar: não cole CREATE TABLE de uma tabela já existente no prompt. Guarde uma cópia do exemplo em outro arquivo se desejar recuperá-lo.",
+            "Se você modificou aula.sql em um passo guiado, recoloque o bloco original desta aula antes de iniciar um exercício que pede a base inicial. Reiniciar repete o arquivo que está salvo; não desfaz edições no arquivo. Cada exercício começa de forma independente, salvo quando o enunciado disser para continuar."
           ],
           "blocks": [
             {
@@ -1671,7 +1831,9 @@ Object.assign(LESSON_GUIDES, {
     "mistakes": [
       "Juntar por nomes: nomes podem mudar; use as chaves correspondentes.",
       "Usar COUNT(*) para contar filhos no LEFT JOIN: conte a chave do filho.",
-      "Acrescentar filtros do lado direito em WHERE sem pensar: mova-os para ON quando quiser preservar pais sem correspondência."
+      "Acrescentar filtros do lado direito em WHERE sem pensar: mova-os para ON quando quiser preservar pais sem correspondência.",
+      "Se aparecer table ... already exists, você repetiu CREATE TABLE na mesma sessão: saia com .sair e execute novamente o arquivo salvo. Se aparecer no such table, confira a aula carregada e a primeira mensagem de erro; reiniciar cria somente as tabelas do aula.sql atual.",
+      "Em ...> o comando está incompleto: confira aspas, parênteses e ponto e vírgula. Para abandonar um comando confuso, Ctrl+C encerra o laboratório; execute novamente para restaurar a base inicial. Em erro de arquivo ou SyntaxError, copie a mensagem completa, confira pasta/extensão e se um comando de terminal foi colocado no arquivo errado."
     ],
     "quiz": [
       {
@@ -1735,17 +1897,21 @@ Object.assign(LESSON_GUIDES, {
       {
         "title": "Subconsulta escalar e EXISTS",
         "paragraphs": [
+          "Subconsulta é um SELECT dentro de outro comando. A consulta externa usa o resultado da interna. Escalar significa um único valor: uma coluna e, no máximo, uma linha. No SQLite, nenhuma linha produz NULL e várias linhas fazem usar a primeira; isso pode esconder um erro, portanto garanta uma linha quando precisar de uma média única.",
           "Uma subconsulta escalar deve devolver um valor, como AVG(total), para participar de uma comparação. EXISTS responde apenas se ao menos uma linha corresponde e evita multiplicar a linha externa.",
           "NOT EXISTS expressa ausência. Não troque automaticamente por NOT IN quando o conjunto puder conter NULL, pois a lógica de desconhecido pode mudar o resultado.",
-          "Exemplo completo de presença, para usar depois da carga no prompt sql>: SELECT t.nome FROM trilhas t WHERE EXISTS (SELECT 1 FROM licoes l WHERE l.trilha_id=t.id) ORDER BY t.id;. A consulta interna procura uma lição da trilha externa t; Dados aparece uma vez, Python não aparece. Trocar EXISTS por NOT EXISTS seleciona Python."
+          "Exemplo completo de presença, para usar depois da carga no prompt sql>: SELECT t.nome FROM trilhas t WHERE EXISTS (SELECT 1 FROM licoes l WHERE l.trilha_id=t.id) ORDER BY t.id;. A consulta interna procura uma lição da trilha externa t; Dados aparece uma vez, Python não aparece. Trocar EXISTS por NOT EXISTS seleciona Python.",
+          "Em EXISTS (SELECT 1 FROM licoes l WHERE l.trilha_id=t.id), SELECT 1 produz o número 1 para cada linha encontrada; não é id 1 nem limite de uma linha. EXISTS considera somente se houve correspondência. O uso de t.id da consulta externa torna essa subconsulta correlacionada: a procura depende da trilha examinada."
         ]
       },
       {
         "title": "CTE nomeia uma etapa",
         "paragraphs": [
+          "CTE abrevia Common Table Expression (expressão de tabela comum). WITH resumo AS (...) dá o nome resumo ao SELECT entre parênteses. Não coloque ponto e vírgula entre o fechamento desse parêntese e o SELECT externo: ambos fazem parte da mesma instrução. Após o ponto e vírgula final, o nome resumo deixa de existir.",
           "WITH resumo AS (...) cria uma expressão nomeada válida durante a instrução, não uma tabela permanente. Seu primeiro benefício é permitir ler e testar uma etapa por vez.",
           "Execute o corpo da CTE isoladamente. Se o resumo já estiver errado, corrija-o antes de investigar o filtro externo.",
-          "Uma view guarda uma consulta nomeada para reutilização posterior, diferente da CTE que vale somente naquela instrução. Depois da carga, execute CREATE VIEW totais AS SELECT trilha_id,SUM(minutos) AS minutos FROM licoes GROUP BY trilha_id; e depois SELECT * FROM totais;. Espere trilha_id 1 e minutos 70. A view não guarda uma cópia separada desses registros; alterações nas tabelas aparecem nas próximas consultas. Isso prepara a view pedida no projeto do módulo."
+          "Uma view guarda uma consulta nomeada para reutilização posterior, diferente da CTE que vale somente naquela instrução. Depois da carga, execute CREATE VIEW totais AS SELECT trilha_id,SUM(minutos) AS minutos FROM licoes GROUP BY trilha_id; e depois SELECT * FROM totais;. Espere trilha_id 1 e minutos 70. A view não guarda uma cópia separada desses registros; alterações nas tabelas aparecem nas próximas consultas. Isso prepara a view pedida no projeto do módulo.",
+          "Para conferir a média, mantenha WITH resumo AS (...) inteiro e substitua somente o SELECT externo por SELECT AVG(total) AS media FROM resumo;. Não execute SELECT AVG(total) FROM resumo sozinho depois da consulta anterior: receberia no such table: resumo. Para duas CTEs, a forma é WITH primeira AS (...), segunda AS (...) SELECT ...; — um único WITH e vírgula entre as etapas."
         ]
       },
       {
@@ -1776,7 +1942,7 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Abra a pasta e prepare os dois arquivos",
           "paragraphs": [
-            "No Explorador de Arquivos, crie Documentos/dados-sql. No VS Code use Arquivo > Abrir Pasta e escolha dados-sql. No Explorer lateral, use Novo Arquivo para criar executar.py e aula.sql. Salve com Arquivo > Salvar; confira as extensões.",
+            "No VS Code, use Arquivo > Abrir Pasta e escolha a pasta dados-sql criada na primeira aula. Abra os arquivos existentes executar.py e aula.sql pelo Explorer lateral. Não crie arquivos com o mesmo nome novamente. Se a pasta ainda não existe, siga primeiro o Exemplo de Entidades, relacionamentos e chaves.",
             "Reutilize executar.py da aula Entidades, relacionamentos e chaves. Se não o tiver, volte pelo atalho dessa aula; não use o arquivo sqlite_alternativa.py, que tem outra finalidade."
           ],
           "blocks": [],
@@ -1785,7 +1951,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Salve a demonstração antes de executar",
           "paragraphs": [
-            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo."
+            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo.",
+            "Se o terminal ainda mostra sql>, encerre a execução anterior com .sair antes de iniciar outra. Alterar aula.sql no editor não muda uma base que já está aberta. Digite um comando completo por vez no prompt; não cole duas instruções na mesma linha. Uma instrução pode ocupar várias linhas, até o ponto e vírgula final."
           ],
           "blocks": [
             {
@@ -1798,7 +1965,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Execute e confira a primeira saída",
           "paragraphs": [
-            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado."
+            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado.",
+            "O executor também imprime OK: instrucao executada para comandos sem tabela de resultado. As linhas com | separam colunas; | não é algo a digitar. Se não houver linhas abaixo do cabeçalho, a consulta retornou um conjunto vazio. Compare as tabelas com a saída esperada e espere sql> antes de praticar."
           ],
           "blocks": [
             {
@@ -1823,11 +1991,42 @@ Object.assign(LESSON_GUIDES, {
           ]
         },
         {
+          "title": "Confira a etapa interna e uma consulta reutilizável",
+          "paragraphs": [
+            "Depois da carga, no prompt sql>, execute os comandos abaixo um por vez. O primeiro é o SELECT interno isolado, com uma linha por trilha. O segundo usa EXISTS. O terceiro cria uma view chamada totais; somente depois consulte essa view. Não é necessário recriar as tabelas.",
+            "A CTE resumo existiu apenas na instrução do arquivo. A view totais permanece nesta sessão e pode ser consultada novamente. Cada comando do bloco é completo e termina com ponto e vírgula."
+          ],
+          "blocks": [
+            {
+              "label": "PROMPT sql> — uma instrução completa por vez",
+              "code": "SELECT t.id,t.nome,COUNT(l.id) AS quantidade,COALESCE(SUM(l.minutos),0) AS total\nFROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id\nGROUP BY t.id,t.nome ORDER BY t.id;\nSELECT t.nome FROM trilhas t WHERE EXISTS (SELECT 1 FROM licoes l WHERE l.trilha_id=t.id) ORDER BY t.id;\nCREATE VIEW totais AS SELECT trilha_id,SUM(minutos) AS minutos FROM licoes GROUP BY trilha_id;\nSELECT * FROM totais;"
+            }
+          ],
+          "expected": "Resumo: 1 | Dados | 2 | 70 e 2 | Python | 0 | 0. EXISTS: Dados. View: trilha_id 1, minutos 70. Python não tem grupo nessa view; o projeto precisará preservar estudantes sem conclusões com LEFT JOIN.",
+          "alternatives": [
+            {
+              "title": "Como duas CTEs evitam multiplicar totais",
+              "paragraphs": [
+                "Ainda nesta base, execute o bloco uma única vez. Os números de estudante são fictícios; esta tabela reduzida serve apenas para contar associações e não é um modelo completo de cadastro. A vírgula após a primeira CTE introduz a segunda; o SELECT final combina resumos, não linhas individuais.",
+                "Resultado esperado: Dados | 70 | 3 e Python | 0 | 0. A duração não vira 210, e a quantidade não vira 6. Reinicie com o exemplo original para repetir."
+              ],
+              "blocks": [
+                {
+                  "label": "PROMPT sql> — comandos completos em sequência",
+                  "code": "CREATE TABLE matriculas(estudante_id INTEGER, trilha_id INTEGER);\nINSERT INTO matriculas VALUES(1,1),(2,1),(3,1);\nWITH duracoes AS (\n SELECT trilha_id,SUM(minutos) AS total FROM licoes GROUP BY trilha_id\n), inscricoes AS (\n SELECT trilha_id,COUNT(*) AS pessoas FROM matriculas GROUP BY trilha_id\n)\nSELECT t.nome,COALESCE(d.total,0) AS total,COALESCE(i.pessoas,0) AS pessoas\nFROM trilhas t LEFT JOIN duracoes d ON d.trilha_id=t.id\nLEFT JOIN inscricoes i ON i.trilha_id=t.id ORDER BY t.id;"
+                }
+              ]
+            }
+          ]
+        },
+        {
           "title": "Pratique no prompt e retome do estado inicial",
           "paragraphs": [
             "sql> pertence ao executor SQLite; não é PowerShell. Digite uma instrução SQL por vez, terminando com ponto e vírgula. ...> significa que ela ainda não terminou. Não copie sql> nem ...> como código.",
             "Nas aulas iniciais, responda as atividades de desenho no rascunho. Nas atividades SQL, use o estado final da demonstração. Execute cada tentativa inválida separadamente: o executor imprime a mensagem e mantém a conexão para você consultar o estado. Se uma transação ficou aberta, escolha ROLLBACK antes de repetir. O laboratório não decide regras de negócio por você.",
-            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão."
+            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão.",
+            "Para alterar apenas uma consulta, copie a consulta inteira, incluindo SELECT e o ponto e vírgula; WHERE ou ORDER BY sozinhos são fragmentos, não comandos. Para mudar CREATE TABLE ou repetir do início, saia com .sair, edite e salve aula.sql e execute novamente. Para construir tabelas próprias, substitua aula.sql pela sua construção antes de executar: não cole CREATE TABLE de uma tabela já existente no prompt. Guarde uma cópia do exemplo em outro arquivo se desejar recuperá-lo.",
+            "Se você modificou aula.sql em um passo guiado, recoloque o bloco original desta aula antes de iniciar um exercício que pede a base inicial. Reiniciar repete o arquivo que está salvo; não desfaz edições no arquivo. Cada exercício começa de forma independente, salvo quando o enunciado disser para continuar."
           ],
           "blocks": [
             {
@@ -1841,8 +2040,8 @@ Object.assign(LESSON_GUIDES, {
     },
     "guided": [
       {
-        "instruction": "Execute apenas o SELECT interno da CTE.",
-        "result": "Dados | 2 | 70 e Python | 0 | 0."
+        "instruction": "No prompt após a carga, copie apenas o SELECT entre os parênteses da CTE, de SELECT t.id até GROUP BY t.id,t.nome, acrescente ORDER BY t.id; e execute. Não inclua WITH nem o parêntese externo.",
+        "result": "id | nome | quantidade | total: 1 | Dados | 2 | 70 e 2 | Python | 0 | 0."
       },
       {
         "instruction": "Troque < por > na comparação externa.",
@@ -1869,7 +2068,7 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "prompt": "Alterar: troque a consulta externa para devolver trilhas com total igual ou acima da média.",
+        "prompt": "Alterar: troque a consulta externa para devolver trilhas com total igual ou acima da média. Em aula.sql altere somente < para >= na consulta final e reinicie, ou cole no prompt a instrução inteira começando em WITH. A linha WHERE da solução é apenas o trecho a substituir.",
         "hints": [
           "Altere apenas o operador da condição externa."
         ],
@@ -1889,7 +2088,7 @@ Object.assign(LESSON_GUIDES, {
           "COALESCE representa ausência de soma como zero neste relatório."
         ],
         "solution": "INSERT INTO trilhas VALUES(3,'Git');\nWITH resumo AS (SELECT t.id,t.nome,COALESCE(SUM(l.minutos),0) AS total FROM trilhas t LEFT JOIN licoes l ON l.trilha_id=t.id GROUP BY t.id,t.nome) SELECT nome,total FROM resumo WHERE total<(SELECT AVG(total) FROM resumo) ORDER BY id;",
-        "explanation": "Cada etapa conserva uma linha por trilha e a média usa os dois totais.",
+        "explanation": "Cada etapa conserva uma linha por trilha; a média usa três totais: 70, 0 e 0. Python e Git ficam abaixo dela.",
         "expected": "O resultado contém apenas trilhas abaixo da média, calculada sobre todas as trilhas, inclusive as sem lições.",
         "criteria": [
           "Produz na CTE uma linha por trilha com LEFT JOIN e total definido para ausência de lições.",
@@ -1917,7 +2116,10 @@ Object.assign(LESSON_GUIDES, {
       "Usar uma subconsulta escalar que devolve várias linhas.",
       "Não executar a etapa interna antes de compor a externa.",
       "Somar após uma junção que multiplicou a granularidade.",
-      "Tratar CTE como garantia automática de desempenho."
+      "Tratar CTE como garantia automática de desempenho.",
+      "Se aparecer table ... already exists, você repetiu CREATE TABLE na mesma sessão: saia com .sair e execute novamente o arquivo salvo. Se aparecer no such table, confira a aula carregada e a primeira mensagem de erro; reiniciar cria somente as tabelas do aula.sql atual.",
+      "Em ...> o comando está incompleto: confira aspas, parênteses e ponto e vírgula. Para abandonar um comando confuso, Ctrl+C encerra o laboratório; execute novamente para restaurar a base inicial. Em erro de arquivo ou SyntaxError, copie a mensagem completa, confira pasta/extensão e se um comando de terminal foi colocado no arquivo errado.",
+      "view ... already exists: crie a view uma vez por sessão. Depois de recriar a base em memória, ela precisa ser criada novamente. SELECT consulta a view; CREATE VIEW define a consulta nomeada."
     ],
     "quiz": [
       {
@@ -1966,10 +2168,10 @@ Object.assign(LESSON_GUIDES, {
       "db-modeling"
     ],
     "requirementChange": {
-      "prompt": "O relatório deve comparar com a média somente das trilhas que têm lições. Preserve no resumo inicial as trilhas vazias.",
+      "prompt": "No exemplo original, altere apenas a subconsulta da média para considerar quantidade>0, ou seja, trilhas com lições. Mantenha o filtro externo total<media e todas as trilhas no resumo. Antes de executar, compare a média anterior (35) com a nova; a condição é pela quantidade, não por total>0.",
       "criteria": [
         "Resumo inicial mantém Dados e Python.",
-        "A média exclui os zeros de trilhas vazias por condição explícita, sem apagar dados."
+        "A nova média é 70; Python continua abaixo dela e Dados não. O resumo mantém os zeros sem apagar dados."
       ]
     }
   },
@@ -1982,7 +2184,8 @@ Object.assign(LESSON_GUIDES, {
         "title": "Começar, observar, confirmar",
         "paragraphs": [
           "BEGIN inicia a transação. Alterações feitas depois dele podem ser vistas pela própria conexão antes de serem confirmadas. COMMIT encerra a transação confirmando o conjunto; ROLLBACK encerra descartando mudanças ainda não confirmadas. Uma consulta dentro da transação mostra o estado provisório, não uma promessa de persistência.",
-          "No exemplo, Ana possui 100 créditos e Beto 50. Durante a transferência, os valores tornam-se 90 e 60. ROLLBACK recupera 100 e 50. Repetir as mesmas operações e finalizar com COMMIT preservaria 90 e 60. Não é possível usar ROLLBACK depois do COMMIT para desfazer aquela transação já encerrada."
+          "No exemplo, Ana possui 100 créditos e Beto 50. Durante a transferência, os valores tornam-se 90 e 60. ROLLBACK recupera 100 e 50. Repetir as mesmas operações e finalizar com COMMIT preservaria 90 e 60. Não é possível usar ROLLBACK depois do COMMIT para desfazer aquela transação já encerrada.",
+          "No executor desta trilha, comandos fora de BEGIN são confirmados individualmente. Por isso as contas iniciais já existem antes da transferência. Mesmo após COMMIT, a base em memória desaparece ao encerrar executar.py: durabilidade em arquivo não está sendo demonstrada aqui. Um segundo terminal executando o laboratório cria outro banco em memória, não outra conexão ao mesmo banco."
         ]
       },
       {
@@ -1998,6 +2201,20 @@ Object.assign(LESSON_GUIDES, {
           "Escrever BEGIN e COMMIT não garante que a lógica esteja correta. A unidade de transferência tem pré-condições: valor positivo, origem diferente do destino, existência das duas contas e saldo suficiente. Também tem pós-condições: o débito e o crédito ocorreram exatamente uma vez, nenhum saldo ficou negativo e a soma foi preservada. No exemplo controlado, as contas são conhecidas; numa aplicação, verifique essas condições dentro da unidade de trabalho quando puderem mudar por concorrência. Se uma delas falhar, execute ROLLBACK e informe uma falha de negócio compreensível.",
           "Uma estratégia para o débito é UPDATE contas SET saldo=saldo-? WHERE id=? AND saldo>=?. Se o driver informa zero linhas afetadas, não prossiga automaticamente para o crédito: pode faltar a conta ou o saldo. Depois, credite no destino e exija uma linha afetada também. Em Python sqlite3, o cursor retornado por execute fornece rowcount para esses UPDATE. O débito e o crédito devem pertencer à mesma transação. Essa condição reduz uma corrida comum, mas toda a operação ainda exige tratamento de erros, verificação do destino e política de repetição adequada ao motor.",
           "No prompt sql> do laboratório, execute SELECT changes(); imediatamente depois de cada UPDATE para ler quantas linhas a instrução anterior alterou. O valor esperado em cada metade é 1. Só depois escolha manualmente COMMIT; ou ROLLBACK;. Este prompt permite observar a saída antes da decisão; não cole um comentário como se ele tomasse a decisão."
+        ],
+        "terms": [
+          {
+            "term": "Pré-condição e pós-condição",
+            "meaning": "O que deve ser verdadeiro antes e depois da operação. Exemplo: saldo suficiente antes; soma preservada depois."
+          },
+          {
+            "term": "Linhas afetadas",
+            "meaning": "Quantidade de registros alcançados pela alteração. Zero pode indicar que nenhum registro satisfez o filtro, sem ser erro de sintaxe."
+          },
+          {
+            "term": "Parâmetro e driver",
+            "meaning": "? é um marcador preenchido pela biblioteca de acesso ao banco. No prompt desta aula use valores fixos; não cole ? sem fornecer parâmetros por uma linguagem."
+          }
         ]
       },
       {
@@ -2023,7 +2240,7 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Abra a pasta e prepare os dois arquivos",
           "paragraphs": [
-            "No Explorador de Arquivos, crie Documentos/dados-sql. No VS Code use Arquivo > Abrir Pasta e escolha dados-sql. No Explorer lateral, use Novo Arquivo para criar executar.py e aula.sql. Salve com Arquivo > Salvar; confira as extensões.",
+            "No VS Code, use Arquivo > Abrir Pasta e escolha a pasta dados-sql criada na primeira aula. Abra os arquivos existentes executar.py e aula.sql pelo Explorer lateral. Não crie arquivos com o mesmo nome novamente. Se a pasta ainda não existe, siga primeiro o Exemplo de Entidades, relacionamentos e chaves.",
             "Reutilize executar.py da aula Entidades, relacionamentos e chaves. Se não o tiver, volte pelo atalho dessa aula; não use o arquivo sqlite_alternativa.py, que tem outra finalidade."
           ],
           "blocks": [],
@@ -2032,7 +2249,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Salve a demonstração antes de executar",
           "paragraphs": [
-            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo."
+            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo.",
+            "Se o terminal ainda mostra sql>, encerre a execução anterior com .sair antes de iniciar outra. Alterar aula.sql no editor não muda uma base que já está aberta. Digite um comando completo por vez no prompt; não cole duas instruções na mesma linha. Uma instrução pode ocupar várias linhas, até o ponto e vírgula final."
           ],
           "blocks": [
             {
@@ -2045,7 +2263,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Execute e confira a primeira saída",
           "paragraphs": [
-            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado."
+            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado.",
+            "O executor também imprime OK: instrucao executada para comandos sem tabela de resultado. As linhas com | separam colunas; | não é algo a digitar. Se não houver linhas abaixo do cabeçalho, a consulta retornou um conjunto vazio. Compare as tabelas com a saída esperada e espere sql> antes de praticar."
           ],
           "blocks": [
             {
@@ -2074,7 +2293,9 @@ Object.assign(LESSON_GUIDES, {
           "paragraphs": [
             "sql> pertence ao executor SQLite; não é PowerShell. Digite uma instrução SQL por vez, terminando com ponto e vírgula. ...> significa que ela ainda não terminou. Não copie sql> nem ...> como código.",
             "Nas aulas iniciais, responda as atividades de desenho no rascunho. Nas atividades SQL, use o estado final da demonstração. Execute cada tentativa inválida separadamente: o executor imprime a mensagem e mantém a conexão para você consultar o estado. Se uma transação ficou aberta, escolha ROLLBACK antes de repetir. O laboratório não decide regras de negócio por você.",
-            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão."
+            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão.",
+            "Para alterar apenas uma consulta, copie a consulta inteira, incluindo SELECT e o ponto e vírgula; WHERE ou ORDER BY sozinhos são fragmentos, não comandos. Para mudar CREATE TABLE ou repetir do início, saia com .sair, edite e salve aula.sql e execute novamente. Para construir tabelas próprias, substitua aula.sql pela sua construção antes de executar: não cole CREATE TABLE de uma tabela já existente no prompt. Guarde uma cópia do exemplo em outro arquivo se desejar recuperá-lo.",
+            "Se você modificou aula.sql em um passo guiado, recoloque o bloco original desta aula antes de iniciar um exercício que pede a base inicial. Reiniciar repete o arquivo que está salvo; não desfaz edições no arquivo. Cada exercício começa de forma independente, salvo quando o enunciado disser para continuar."
           ],
           "blocks": [
             {
@@ -2088,15 +2309,15 @@ Object.assign(LESSON_GUIDES, {
     },
     "guided": [
       {
-        "instruction": "Execute até a consulta anterior ao ROLLBACK e anote os saldos.",
+        "instruction": "Para observar manualmente, saia com .sair e salve em aula.sql apenas CREATE TABLE e INSERT do exemplo. Execute esse arquivo. No prompt, digite BEGIN;, os dois UPDATE e a primeira consulta, um comando por vez; pare antes de ROLLBACK.",
         "result": "A conexão vê seus próprios valores provisórios: 90 e 60."
       },
       {
-        "instruction": "Execute ROLLBACK e consulte novamente.",
+        "instruction": "Na mesma sessão, digite ROLLBACK; e depois SELECT nome,saldo FROM contas ORDER BY id;.",
         "result": "As duas contas voltam juntas a 100 e 50."
       },
       {
-        "instruction": "Inicie outra transação, transfira 10 e finalize com COMMIT.",
+        "instruction": "Ainda no prompt, repita BEGIN;, os dois UPDATE e confira os saldos; finalize com COMMIT;. Depois restaure o exemplo completo em aula.sql e reinicie antes dos exercícios.",
         "result": "Agora 90 e 60 permanecem após o término da transação."
       }
     ],
@@ -2132,7 +2353,7 @@ Object.assign(LESSON_GUIDES, {
         ]
       },
       {
-        "prompt": "Construir: partindo de 100 e 50, transfira 15 de Ana para Beto. Confira quantas linhas cada UPDATE alterou e reverta toda a unidade se o destino não existir.",
+        "prompt": "Construir: partindo de 100 e 50, transfira 15 de Ana para Beto. Confira quantas linhas cada UPDATE alterou e reverta toda a unidade se o destino não existir. No primeiro teste use destino id 2; reinicie e use id 99 no segundo. Digite uma instrução por vez, leia changes() e escolha manualmente COMMIT ou ROLLBACK. O comentário da solução não toma essa decisão por você.",
         "hints": [
           "Os dois UPDATE pertencem à mesma unidade.",
           "Confira se cada operação afetou uma conta antes de confirmar."
@@ -2165,7 +2386,9 @@ Object.assign(LESSON_GUIDES, {
     "mistakes": [
       "Confirmar depois do débito e antes do crédito: mantenha os dois movimentos na mesma transação.",
       "Achar que qualquer erro desfaz tudo automaticamente: trate o erro e execute ROLLBACK conforme o driver e o motor.",
-      "Deixar transações abertas durante interação humana: reduza sua duração e evite bloqueios prolongados."
+      "Deixar transações abertas durante interação humana: reduza sua duração e evite bloqueios prolongados.",
+      "Se aparecer table ... already exists, você repetiu CREATE TABLE na mesma sessão: saia com .sair e execute novamente o arquivo salvo. Se aparecer no such table, confira a aula carregada e a primeira mensagem de erro; reiniciar cria somente as tabelas do aula.sql atual.",
+      "Em ...> o comando está incompleto: confira aspas, parênteses e ponto e vírgula. Para abandonar um comando confuso, Ctrl+C encerra o laboratório; execute novamente para restaurar a base inicial. Em erro de arquivo ou SyntaxError, copie a mensagem completa, confira pasta/extensão e se um comando de terminal foi colocado no arquivo errado."
     ],
     "quiz": [
       {
@@ -2214,7 +2437,7 @@ Object.assign(LESSON_GUIDES, {
       "db-modeling"
     ],
     "requirementChange": {
-      "prompt": "O destino de uma transferência passa a ser id 99, inexistente. Execute as duas verificações de changes() e decida o encerramento.",
+      "prompt": "O destino de uma transferência passa a ser id 99, inexistente. Execute as duas verificações de changes() e decida o encerramento. Parta novamente de Ana 100/Beto 50 e transfira 15. Observe 1 linha debitada e 0 creditadas antes de decidir; depois confira as duas contas e a soma.",
       "criteria": [
         "Total e saldos iniciais ficam preservados depois da falha.",
         "Destino ausente leva a ROLLBACK, nunca a confirmar só o débito."
@@ -2237,21 +2460,38 @@ Object.assign(LESSON_GUIDES, {
         "title": "Concorrência exige transações curtas",
         "paragraphs": [
           "Duas conexões podem tentar escrever ao mesmo tempo. SQLite permite um escritor por vez; BEGIN IMMEDIATE tenta reservar a escrita no início e pode falhar quando outro escritor está ativo.",
-          "Prepare dados antes de abrir a transação. Não espere interação humana com a unidade aberta. Operações relativas e condições no UPDATE reduzem conflitos, mas ainda é preciso conferir quantas linhas foram afetadas."
+          "Prepare dados antes de abrir a transação. Não espere interação humana com a unidade aberta. Operações relativas e condições no UPDATE reduzem conflitos, mas ainda é preciso conferir quantas linhas foram afetadas.",
+          "O laboratório principal usa uma conexão em memória, portanto não reproduz disputa entre conexões. A alternativa Demonstração de duas conexões, na aba Exemplo, usa um arquivo temporário compartilhado e mostra a recusa real. Não abra duas cópias de executar.py esperando conflito: elas têm bancos independentes. A espera humana nos exercícios serve para observar; não é um padrão para produção."
+        ],
+        "terms": [
+          {
+            "term": "Concorrência",
+            "meaning": "Operações de conexões diferentes que disputam acesso no mesmo período."
+          },
+          {
+            "term": "Bloqueio de escrita",
+            "meaning": "Reserva que impede outro escritor de alterar o mesmo banco enquanto a primeira escrita está aberta."
+          },
+          {
+            "term": "Conflito transitório",
+            "meaning": "Impedimento temporário, como outro escritor ativo; pode desaparecer depois, mas repetir sem limite não é solução."
+          }
         ]
       },
       {
         "title": "Repetir a unidade inteira",
         "paragraphs": [
           "Um conflito transitório pode permitir nova tentativa com espera e limite. Repita a unidade completa após reler o estado; não repita apenas o crédito ou outra metade cujo par ficou incerto.",
-          "A operação também precisa tolerar uma solicitação duplicada quando o domínio exigir. Identificadores únicos e registro do resultado ajudam a impedir o mesmo comando de negócio duas vezes."
+          "A operação também precisa tolerar uma solicitação duplicada quando o domínio exigir. Identificadores únicos e registro do resultado ajudam a impedir o mesmo comando de negócio duas vezes.",
+          "Tolerar repetição (idempotência) significa que pedir novamente a mesma operação não produz outro efeito de negócio. Use um identificador estável do pedido, como publicacao-1, com unicidade e resultado registrado na mesma transação. Se esse pedido já foi confirmado, consulte o resultado; se foi desfeito, uma nova tentativa pode refazer a unidade. Resultado desconhecido exige consulta antes de repetir, não um COMMIT escolhido ao acaso."
         ]
       },
       {
         "title": "Efeitos externos ficam fora do ROLLBACK",
         "paragraphs": [
           "A transação do banco não desfaz e-mail, chamada de API ou gravação em outro serviço. Registre no banco a intenção de executar o efeito e processe-a separadamente, com rastreamento e proteção contra duplicidade.",
-          "COMMIT também não substitui backup. Transações protegem uma unidade de alteração; backup e restauração protegem recuperação histórica."
+          "COMMIT também não substitui backup. Transações protegem uma unidade de alteração; backup e restauração protegem recuperação histórica.",
+          "API é uma interface para pedir uma ação a outro programa. Processo separado é um programa que continua o trabalho depois, como ler avisos pendentes e solicitar envio. Um registro único no banco evita duplicar a intenção, mas não garante sozinho envio único: se o serviço enviou e a resposta se perdeu, reenviar pode duplicar. Quando disponível, use a mesma chave de idempotência no serviço; sem esse recurso, declare o risco e investigue o resultado antes de reenviar. Nesta aula você descreve o fluxo, sem configurar email nem API."
         ]
       }
     ],
@@ -2268,7 +2508,7 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Abra a pasta e prepare os dois arquivos",
           "paragraphs": [
-            "No Explorador de Arquivos, crie Documentos/dados-sql. No VS Code use Arquivo > Abrir Pasta e escolha dados-sql. No Explorer lateral, use Novo Arquivo para criar executar.py e aula.sql. Salve com Arquivo > Salvar; confira as extensões.",
+            "No VS Code, use Arquivo > Abrir Pasta e escolha a pasta dados-sql criada na primeira aula. Abra os arquivos existentes executar.py e aula.sql pelo Explorer lateral. Não crie arquivos com o mesmo nome novamente. Se a pasta ainda não existe, siga primeiro o Exemplo de Entidades, relacionamentos e chaves.",
             "Reutilize executar.py da aula Entidades, relacionamentos e chaves. Se não o tiver, volte pelo atalho dessa aula; não use o arquivo sqlite_alternativa.py, que tem outra finalidade."
           ],
           "blocks": [],
@@ -2277,7 +2517,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Salve a demonstração antes de executar",
           "paragraphs": [
-            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo."
+            "No editor, substitua somente o conteúdo de aula.sql pelo bloco abaixo e salve. Mantenha uma instrução encerrada por linha; instruções longas podem ocupar várias linhas. Não cole comandos de terminal dentro do arquivo.",
+            "Se o terminal ainda mostra sql>, encerre a execução anterior com .sair antes de iniciar outra. Alterar aula.sql no editor não muda uma base que já está aberta. Digite um comando completo por vez no prompt; não cole duas instruções na mesma linha. Uma instrução pode ocupar várias linhas, até o ponto e vírgula final."
           ],
           "blocks": [
             {
@@ -2290,7 +2531,8 @@ Object.assign(LESSON_GUIDES, {
         {
           "title": "Execute e confira a primeira saída",
           "paragraphs": [
-            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado."
+            "No VS Code, abra Terminal > Novo Terminal. Confirme que o caminho termina em dados-sql. No Windows/PowerShell, execute o primeiro comando. Espere as consultas e depois sql>. Se python não for reconhecido, volte à preparação Python ou use py executar.py quando py foi o comando verificado.",
+            "O executor também imprime OK: instrucao executada para comandos sem tabela de resultado. As linhas com | separam colunas; | não é algo a digitar. Se não houver linhas abaixo do cabeçalho, a consulta retornou um conjunto vazio. Compare as tabelas com a saída esperada e espere sql> antes de praticar."
           ],
           "blocks": [
             {
@@ -2311,6 +2553,27 @@ Object.assign(LESSON_GUIDES, {
                   "code": "python3 executar.py"
                 }
               ]
+            },
+            {
+              "title": "Demonstração de duas conexões",
+              "paragraphs": [
+                "Saia de sql> com .sair. No VS Code, crie concorrencia.py na pasta dados-sql e copie o bloco Python completo. Salve e execute python concorrencia.py no PowerShell da mesma pasta (ou o comando py/python3 já verificado no seu sistema). Não cole Python em aula.sql.",
+                "Esta ferramenta fornecida abre duas conexões a um único arquivo temporário; não é necessário programá-la sozinho. timeout=0 pede que B informe imediatamente o bloqueio, sem esperar. Observe a ordem dos eventos; repetir o comando cria outro arquivo temporário limpo."
+              ],
+              "blocks": [
+                {
+                  "label": "ARQUIVO — concorrencia.py",
+                  "code": "from pathlib import Path\nfrom tempfile import TemporaryDirectory\nimport sqlite3\n\n# Ferramenta fornecida: as duas conexoes usam o MESMO arquivo temporario.\nwith TemporaryDirectory(prefix=\"sql-concorrencia-\") as pasta:\n    arquivo = Path(pasta) / \"laboratorio.db\"\n    a = sqlite3.connect(arquivo, isolation_level=None, timeout=0)\n    b = sqlite3.connect(arquivo, isolation_level=None, timeout=0)\n    try:\n        a.execute(\"CREATE TABLE teste(id INTEGER PRIMARY KEY)\")\n        a.execute(\"BEGIN IMMEDIATE\")\n        print(\"A: escrita reservada\")\n        try:\n            b.execute(\"BEGIN IMMEDIATE\")\n        except sqlite3.OperationalError as erro:\n            print(\"B:\", erro)\n        else:\n            raise AssertionError(\"Era esperado bloqueio em B\")\n        a.execute(\"ROLLBACK\")\n        b.execute(\"BEGIN IMMEDIATE\")\n        print(\"B: escrita liberada apos ROLLBACK de A\")\n        b.execute(\"ROLLBACK\")\n    finally:\n        a.close()\n        b.close()\nprint(\"Conexoes encerradas; arquivo temporario removido\")"
+                },
+                {
+                  "label": "POWERSHELL — pasta dados-sql",
+                  "code": "python concorrencia.py"
+                },
+                {
+                  "label": "SAÍDA ESPERADA",
+                  "code": "A: escrita reservada\nB: database is locked\nB: escrita liberada apos ROLLBACK de A\nConexoes encerradas; arquivo temporario removido"
+                }
+              ]
             }
           ]
         },
@@ -2319,7 +2582,9 @@ Object.assign(LESSON_GUIDES, {
           "paragraphs": [
             "sql> pertence ao executor SQLite; não é PowerShell. Digite uma instrução SQL por vez, terminando com ponto e vírgula. ...> significa que ela ainda não terminou. Não copie sql> nem ...> como código.",
             "Nas aulas iniciais, responda as atividades de desenho no rascunho. Nas atividades SQL, use o estado final da demonstração. Execute cada tentativa inválida separadamente: o executor imprime a mensagem e mantém a conexão para você consultar o estado. Se uma transação ficou aberta, escolha ROLLBACK antes de repetir. O laboratório não decide regras de negócio por você.",
-            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão."
+            "Ao encerrar, digite .sair sozinho no prompt vazio; Ctrl+C também encerra. Alterações ainda não confirmadas são revertidas, e toda a base em memória desaparece, mesmo após COMMIT. Para o exercício seguinte, execute python executar.py novamente: os dados iniciais são recriados. Guarde SQL e observações no rascunho; não recrie tabelas dentro da mesma sessão.",
+            "Para alterar apenas uma consulta, copie a consulta inteira, incluindo SELECT e o ponto e vírgula; WHERE ou ORDER BY sozinhos são fragmentos, não comandos. Para mudar CREATE TABLE ou repetir do início, saia com .sair, edite e salve aula.sql e execute novamente. Para construir tabelas próprias, substitua aula.sql pela sua construção antes de executar: não cole CREATE TABLE de uma tabela já existente no prompt. Guarde uma cópia do exemplo em outro arquivo se desejar recuperá-lo.",
+            "Se você modificou aula.sql em um passo guiado, recoloque o bloco original desta aula antes de iniciar um exercício que pede a base inicial. Reiniciar repete o arquivo que está salvo; não desfaz edições no arquivo. Cada exercício começa de forma independente, salvo quando o enunciado disser para continuar."
           ],
           "blocks": [
             {
@@ -2333,16 +2598,16 @@ Object.assign(LESSON_GUIDES, {
     },
     "guided": [
       {
-        "instruction": "Execute até ROLLBACK TO aviso e consulte a tarefa.",
+        "instruction": "Saia com .sair e salve temporariamente em aula.sql somente CREATE TABLE e INSERT do exemplo. Execute. No prompt, envie BEGIN;, os UPDATE, SAVEPOINT aviso; e ROLLBACK TO aviso;, na ordem do exemplo, um por vez. Consulte SELECT id,titulo,status FROM tarefas; antes de RELEASE/COMMIT; depois encerre com ROLLBACK;.",
         "result": "O status continua publicada, mas o título volta a Publicar aula."
       },
       {
-        "instruction": "Troque ROLLBACK TO por RELEASE e consulte antes de COMMIT.",
+        "instruction": "Restaure o exemplo completo em aula.sql, remova somente ROLLBACK TO aviso; e mantenha uma única linha RELEASE aviso;. Execute em nova sessão. Para observar antes de COMMIT, coloque uma consulta também imediatamente antes dele.",
         "result": "O título alterado continua visível; RELEASE não desfaz nem confirma a transação inteira."
       },
       {
-        "instruction": "Em duas conexões ao mesmo arquivo, mantenha uma escrita aberta e tente BEGIN IMMEDIATE na outra.",
-        "result": "A segunda conexão não obtém a escrita enquanto a primeira a mantém; a mensagem exata depende do cliente e da configuração de espera."
+        "instruction": "Abra a alternativa Demonstração de duas conexões no passo Execute e confira a primeira saída. Salve o arquivo Python fornecido, execute no terminal e compare bloqueio e liberação. Não altere executar.py.",
+        "result": "A primeira conexão reserva a escrita; B mostra database is locked. Após A executar ROLLBACK, B consegue iniciar. O arquivo temporário é removido ao encerrar."
       }
     ],
     "exercises": [
@@ -2380,13 +2645,13 @@ Object.assign(LESSON_GUIDES, {
           "Use duas tabelas alteradas na mesma transação.",
           "O envio real ocorre depois e registra sucesso ou falha."
         ],
-        "solution": "Na mesma transação, atualize tarefas e insira um registro único em avisos_pendentes; confirme. Depois, um processo lê o registro, envia o aviso e marca o resultado, tolerando repetição.",
+        "solution": "Na mesma transação, atualize tarefas e insira uma intenção em avisos_pendentes com identificador único publicacao-1; confirme. Um processo posterior solicita o envio com essa mesma identidade e registra sucesso ou falha. Se perder a resposta, consulte o resultado no serviço antes de reenviar; deduplicação externa depende de suporte do serviço.",
         "explanation": "O banco confirma o estado e a intenção juntos, mas o efeito externo possui ciclo próprio.",
         "expected": "O fluxo deixa observáveis a publicação, a intenção pendente e o resultado posterior da tentativa de envio.",
         "criteria": [
           "Registra publicação e intenção única de aviso na mesma transação do banco.",
           "Executa o envio externo apenas após a confirmação, com estado de sucesso ou falha consultável.",
-          "Descreve como uma repetição da tentativa evita duplicar o aviso e não atribui o envio ao ROLLBACK."
+          "Distingue impedir intenção duplicada no banco de impedir envio duplicado no serviço; propõe identidade estável e declara o risco se o serviço não permitir conferir ou deduplicar."
         ]
       },
       {
@@ -2395,7 +2660,7 @@ Object.assign(LESSON_GUIDES, {
           "O débito e o crédito formam uma unidade.",
           "Uma nova tentativa precisa reler o estado."
         ],
-        "solution": "A repetição parcial quebrou a unidade. Reverta ou confirme explicitamente a tentativa anterior e repita a transação inteira com limite, nova leitura e proteção contra solicitação duplicada.",
+        "solution": "Verifique o resultado do pedido por sua identidade. Se a tentativa falhou e continua aberta, reverta-a; se já foi confirmada, devolva o resultado sem repetir. Só quando for seguro tentar novamente, releia o estado e repita débito e crédito na mesma transação com limite. Não confirme uma unidade incompleta.",
         "explanation": "Repetir somente uma metade não conserva a regra do domínio.",
         "expected": "O fluxo corrigido resolve o estado da tentativa anterior e confere a unidade completa antes de repetir.",
         "criteria": [
@@ -2409,7 +2674,9 @@ Object.assign(LESSON_GUIDES, {
       "Usar SAVEPOINT para aceitar metade de uma operação indivisível.",
       "Repetir somente a instrução que falhou sem conhecer o estado da unidade.",
       "Manter transação aberta enquanto espera o usuário.",
-      "Afirmar que ROLLBACK desfaz efeitos em outro serviço."
+      "Afirmar que ROLLBACK desfaz efeitos em outro serviço.",
+      "Se aparecer table ... already exists, você repetiu CREATE TABLE na mesma sessão: saia com .sair e execute novamente o arquivo salvo. Se aparecer no such table, confira a aula carregada e a primeira mensagem de erro; reiniciar cria somente as tabelas do aula.sql atual.",
+      "Em ...> o comando está incompleto: confira aspas, parênteses e ponto e vírgula. Para abandonar um comando confuso, Ctrl+C encerra o laboratório; execute novamente para restaurar a base inicial. Em erro de arquivo ou SyntaxError, copie a mensagem completa, confira pasta/extensão e se um comando de terminal foi colocado no arquivo errado."
     ],
     "quiz": [
       {
@@ -2458,7 +2725,7 @@ Object.assign(LESSON_GUIDES, {
       "db-modeling"
     ],
     "requirementChange": {
-      "prompt": "O título opcional passa a ser obrigatório para publicar. Simule uma falha nessa etapa e escolha qual limite reverter.",
+      "prompt": "O título opcional passa a ser obrigatório para publicar. Simule uma falha nessa etapa e escolha qual limite reverter. Para simular, em nova execução do arquivo original troque COMMIT; por ROLLBACK; após a etapa opcional, representando uma falha detectada pela aplicação; espere título Publicar aula e status pendente. O schema simples não rejeita o título automaticamente. Compare com uma execução sem falha, removendo ROLLBACK TO aviso; e mantendo COMMIT;.",
       "criteria": [
         "Sem falha, título e estado são confirmados juntos.",
         "Com falha, a publicação também é desfeita por ROLLBACK completo."

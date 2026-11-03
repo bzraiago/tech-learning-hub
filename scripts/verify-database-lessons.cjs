@@ -65,6 +65,55 @@ try {
   assert.match(view, /trilha_id \| minutos\n1 \| 70/);
   const build = sql('db-aggregation', guides['db-aggregation'].exercises[2].solution + '\n.sair\n');
   assert.match(build, /Dados \| 2 \| 70\nPython \| 1 \| 30\nGit \| 1 \| 15/);
+  // Soluções SQL realmente exibidas: cada exercício parte de uma base nova.
+  const exerciseCases = [
+    ['db-ddl-crud', 0, ['0']],
+    ['db-ddl-crud', 1, ['10 | SELECT\n11 | JOIN']],
+    ['db-ddl-crud', 2, ['13 | 0', '13 | 1']],
+    ['db-ddl-crud', 3, ['10 | 30\n11 | 25']],
+    ['db-select', 0, ['SELECT\nJOIN\nArquivos']],
+    ['db-select', 1, ['JOIN | 40', 'SELECT | 30']],
+    ['db-select', 2, ['1 | SELECT | Sem observação', '2 | JOIN | Revisar', '4 | Arquivos | ']],
+    ['db-select', 3, ['1\n3']],
+    ['db-aggregation', 0, ['Dados | 2 | 35.0\nPython | 2 | 25.0']],
+    ['db-aggregation', 1, ['Dados | 2 | 70']],
+    ['db-aggregation', 2, ['Dados | 2 | 70\nPython | 1 | 30\nGit | 1 | 15']],
+    ['db-aggregation', 3, ['Dados | 2 | 70\nPython | 2 | 50']],
+    ['db-joins', 0, ['Dados | 2\nPython | 0']],
+    ['db-joins', 1, ['Python']],
+    ['db-joins', 2, ['Dados | JOIN\nPython | NULL']],
+    ['db-joins', 3, ['Dados | JOIN\nPython | NULL']],
+    ['db-subqueries-ctes', 2, ['Python | 0\nGit | 0']],
+    ['db-transactions', 0, ['105', '100']],
+    ['db-transactions', 1, ['Ana | 80\nBeto | 70', '150']],
+    ['db-transactions', 3, ['Ana | 90\nBeto | 60', '150']]
+  ];
+  for (const [id, index, expected] of exerciseCases) {
+    const output = sql(id, guides[id].exercises[index].solution + '\n.sair\n').split('sql> ').slice(1).join('sql> ');
+    assert.doesNotMatch(output, /(?:Operational|Integrity|Programming)Error/);
+    for (const value of expected) assert.ok(output.includes(value), `${id}:${index}: ${output}`);
+  }
+  const cteSteps = guides['db-subqueries-ctes'].example.steps.find(step => step.title === 'Confira a etapa interna e uma consulta reutilizável');
+  const cteOutput = sql('db-subqueries-ctes', cteSteps.blocks[0].code + '\n' + cteSteps.alternatives[0].blocks[0].code + '\n.sair\n');
+  assert.doesNotMatch(cteOutput, /(?:Operational|Integrity|Programming)Error/);
+  assert.match(cteOutput, /Dados \| 70 \| 3\nPython \| 0 \| 0/);
+  const concurrency = guides['db-concurrency-boundaries'].example.steps[2].alternatives.find(item => item.title === 'Demonstração de duas conexões');
+  fs.writeFileSync(path.join(directory, 'concorrencia.py'), concurrency.blocks[0].code);
+  assert.equal(run('concorrencia.py').trim(), concurrency.blocks[2].code);
+  assert.equal(run('concorrencia.py').trim(), concurrency.blocks[2].code);
+  // Coluna adicional: conversão de afinidade, ausência, fração e limites.
+  const ddlOriginal = guides['db-ddl-constraints'].example.code;
+  guides['db-ddl-constraints'].example.code = ddlOriginal.replace('CREATE TABLE tarefas(\n', 'CREATE TABLE tarefas(\n' + guides['db-ddl-constraints'].exercises[1].solution + ',\n');
+  const priority = sql('db-ddl-constraints', "SELECT prioridade FROM tarefas;\nINSERT INTO tarefas(id,categoria_id,titulo,minutos,prioridade) VALUES(11,1,'Teste',20,1.5);\nINSERT INTO tarefas(id,categoria_id,titulo,minutos,prioridade) VALUES(11,1,'Teste',20,NULL);\nINSERT INTO tarefas(id,categoria_id,titulo,minutos,prioridade) VALUES(11,1,'Teste',20,0);\nINSERT INTO tarefas(id,categoria_id,titulo,minutos,prioridade) VALUES(11,1,'Teste',20,4);\nINSERT INTO tarefas(id,categoria_id,titulo,minutos,prioridade) VALUES(11,1,'Teste',20,3);\nSELECT id,prioridade FROM tarefas ORDER BY id;\n.sair\n");
+  assert.equal((priority.match(/IntegrityError:/g) || []).length, 4);
+  assert.match(priority, /10 \| 2\n11 \| 3/);
+  guides['db-ddl-constraints'].example.code = ddlOriginal;
+  const affinity = sql('db-ddl-constraints', "INSERT INTO tarefas(id,categoria_id,titulo,minutos) VALUES(11,1,'Teste','30');\nSELECT typeof(minutos),minutos FROM tarefas WHERE id=11;\n.sair\n");
+  assert.match(affinity, /integer \| 30/);
+  // Uma falha que torna a etapa obrigatória exige reverter também a publicação.
+  guides['db-concurrency-boundaries'].example.code = old.replace('COMMIT;', 'ROLLBACK;');
+  assert.match(sql('db-concurrency-boundaries'), /1 \| Publicar aula \| pendente/);
+  guides['db-concurrency-boundaries'].example.code = old;
   for (const [id, expected] of [
     ['db-sqlite', ["[('Python', 1, 0), ('SQL', 2, 1)]", 'Transação revertida\n0']],
     ['db-security', ['Guia d\'água', '[]']],
@@ -106,6 +155,7 @@ try {
   }
   console.log('PASS: 11 exemplos SQL e retomada; 3 exemplos Python; FK recusada com estado preservado; rollback após destino ausente; SAVEPOINT corrigido; view; transferência de agregação; 2 projetos; migração idempotente de rascunhos e 28 aulas com etapas/desafios.');
   console.log('Não executa PostgreSQL, Docker, MariaDB, Firebird ou MongoDB.');
+  console.log('Fundamentos: 20 soluções SQL adicionais, duas CTEs, view/EXISTS, prioridade com 4 recusas, afinidade, rollback completo e duas conexões com bloqueio real/retomada passaram.');
 } finally {
   fs.rmSync(directory, {recursive: true, force: true});
 }

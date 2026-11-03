@@ -183,6 +183,26 @@ test('sumário, salvamento automático e retomada de leitura ficam isolados por 
       await page.locator('.reader-example-step').last().scrollIntoViewIfNeeded();
       await page.screenshot({ path: path.join(process.env.TECHHUB_SCREENSHOTS, `database-fim-${width}.png`) });
     }
+    await page.evaluate(() => { openLesson('db-ddl-constraints'); renderLessonSection('learn'); });
+    const termos = page.getByRole('heading', {name: 'Termos no contexto'}).first();
+    await termos.scrollIntoViewIfNeeded();
+    await expect(page.locator('#dialog-body')).toContainText('Afinidade');
+    if (process.env.TECHHUB_SCREENSHOTS) await page.screenshot({path: path.join(process.env.TECHHUB_SCREENSHOTS, `fundamentos-termos-${width}.png`)});
+    await page.evaluate(() => { openLesson('db-subqueries-ctes'); renderLessonSection('example'); });
+    const ctes = page.getByText('Como duas CTEs evitam multiplicar totais', {exact:true});
+    await ctes.focus();
+    await page.keyboard.press('Enter');
+    await expect(ctes.locator('..')).toHaveAttribute('open', '');
+    await expect(ctes.locator('..')).toContainText('Dados | 70 | 3');
+    await page.evaluate(() => { openLesson('db-concurrency-boundaries'); renderLessonSection('example'); });
+    const concorrencia = page.getByText('Demonstração de duas conexões', {exact:true});
+    await concorrencia.focus();
+    await page.keyboard.press('Enter');
+    await expect(concorrencia.locator('..')).toHaveAttribute('open', '');
+    await expect(concorrencia.locator('..')).toContainText('database is locked');
+    await concorrencia.scrollIntoViewIfNeeded();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
+    if (process.env.TECHHUB_SCREENSHOTS) await page.screenshot({path: path.join(process.env.TECHHUB_SCREENSHOTS, `fundamentos-concorrencia-${width}.png`)});
   }
   await page.setViewportSize({ width: 375, height: 812 });
   // Exercícios de outras aulas mantêm o enunciado padrão e os blocos antigos.

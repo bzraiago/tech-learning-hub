@@ -2169,9 +2169,10 @@
           {
             "id": "db-modeling",
             "title": "Entidades, relacionamentos e chaves",
-            "minutes": 85,
+            "minutes": 95,
             "concept": "Imagine que Ana e Beto estudam SQL. Se você guardar a conclusão na própria aula, marcar a aula como concluída para Ana também mudará o estado visto por Beto. Modelar significa decidir a qual coisa cada informação pertence antes de escrever comandos.",
             "objectives": [
+              "Distinguir banco, SQL, conexão e arquivos do laboratório.",
               "Distinguir entidade, atributo, linha e identidade.",
               "Representar relações 1:N e N:N com referências.",
               "Guardar informações da relação na tabela associativa."
@@ -2229,14 +2230,14 @@
           {
             "id": "db-ddl-constraints",
             "title": "Tabelas, tipos e restrições",
-            "minutes": 85,
+            "minutes": 120,
             "concept": "Transforme regras do modelo em uma estrutura que o banco consegue verificar antes de aceitar dados.",
             "objectives": [
               "Criar tabelas com colunas e tipos adequados ao laboratório.",
               "Combinar PRIMARY KEY, NOT NULL, UNIQUE, CHECK e DEFAULT.",
               "Ativar e testar referências entre tabelas no SQLite."
             ],
-            "exercise": "3. Construir: crie categorias e tarefas. Cada tarefa exige título não vazio, minutos inteiros positivos, categoria existente e estado pendente por padrão. Insira uma tarefa válida e teste cada regra com uma tentativa inválida isolada.",
+            "exercise": "3. Construir: crie categorias e tarefas. Cada tarefa exige título não vazio, minutos inteiros positivos, categoria existente e estado pendente por padrão. Insira uma tarefa válida e teste cada regra com uma tentativa inválida isolada. Escreva sua versão em aula.sql e execute em nova sessão. Inclua categoria 1/Estudos e tarefa 10/Revisar SQL/30 minutos. Os casos inválidos são comandos separados no prompt, após a carga válida.",
             "code": "PRAGMA foreign_keys=ON;\nCREATE TABLE categorias(id INTEGER PRIMARY KEY,nome TEXT NOT NULL UNIQUE);\nCREATE TABLE tarefas(\n  id INTEGER PRIMARY KEY,\n  categoria_id INTEGER NOT NULL REFERENCES categorias(id),\n  titulo TEXT NOT NULL CHECK(length(trim(titulo)) > 0),\n  minutos INTEGER NOT NULL CHECK(typeof(minutos)='integer' AND minutos > 0),\n  concluida INTEGER NOT NULL DEFAULT 0 CHECK(concluida IN (0,1))\n);\nINSERT INTO categorias(id,nome) VALUES(1,'Estudos');\nINSERT INTO tarefas(id,categoria_id,titulo,minutos) VALUES(10,1,'Revisar SQL',30);\nSELECT id,titulo,minutos,concluida FROM tarefas;",
             "docs": [
               {
@@ -2382,7 +2383,7 @@
           {
             "id": "db-subqueries-ctes",
             "title": "Subconsultas e CTEs",
-            "minutes": 85,
+            "minutes": 110,
             "concept": "Divida consultas complexas em resultados intermediários verificáveis e compare valores sem esconder a unidade de cada linha.",
             "objectives": [
               "Usar subconsulta escalar e EXISTS conforme o resultado necessário.",
@@ -2416,7 +2417,7 @@
               "Verificar as duas metades de uma alteração.",
               "Conferir saldos e quantidade de linhas afetadas antes de confirmar."
             ],
-            "exercise": "3. Construir: partindo de 100 e 50, transfira 15 de Ana para Beto. Confira quantas linhas cada UPDATE alterou e reverta toda a unidade se o destino não existir.",
+            "exercise": "3. Construir: partindo de 100 e 50, transfira 15 de Ana para Beto. Confira quantas linhas cada UPDATE alterou e reverta toda a unidade se o destino não existir. No primeiro teste use destino id 2; reinicie e use id 99 no segundo. Digite uma instrução por vez, leia changes() e escolha manualmente COMMIT ou ROLLBACK. O comentário da solução não toma essa decisão por você.",
             "code": "CREATE TABLE contas (\n id INTEGER PRIMARY KEY, nome TEXT NOT NULL,\n saldo INTEGER NOT NULL CHECK(saldo>=0)\n);\nINSERT INTO contas VALUES(1,'Ana',100),(2,'Beto',50);\nBEGIN;\nUPDATE contas SET saldo=saldo-10 WHERE id=1;\nUPDATE contas SET saldo=saldo+10 WHERE id=2;\nSELECT nome,saldo FROM contas ORDER BY id;\nROLLBACK;\nSELECT nome,saldo FROM contas ORDER BY id;\nSELECT SUM(saldo) AS total FROM contas;",
             "docs": [
               {
@@ -2448,7 +2449,7 @@
           {
             "id": "db-concurrency-boundaries",
             "title": "Concorrência, repetição e limites da transação",
-            "minutes": 95,
+            "minutes": 100,
             "concept": "Uma transação protege alterações no mesmo banco, mas operações concorrentes podem disputar recursos e efeitos externos não voltam com ROLLBACK.",
             "objectives": [
               "Use SAVEPOINT apenas quando uma etapa puder ser desfeita separadamente.",

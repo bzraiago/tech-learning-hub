@@ -309,6 +309,7 @@ Vem da análise em `contexto/ANALISE_TECH_LEARNING_HUB.md`. Trabalhe de cima par
 7. [ ] Atividades gerais de conclusão (prova básica disponível no curso; intermediária pendente) — ver seção 9.
    - [x] Associar os sete critérios atuais de prontidão a quatro projetos de fechamento, exibindo o estado da entrega separadamente da evidência externa e preservando o caráter de autoavaliação.
 8. [x] Corrigir a inconsistência da porta do PostgreSQL (55432) entre laboratório Docker e projeto relacional.
+   - [x] Revisão focal de `db-foundations` em 03/11/2026: termos, sintaxe antes da prática, arquivo versus prompt, CTE/view e duas conexões SQLite corrigidos e testados; ver `docs/revisoes/db-foundations-2026-11-03.md`. Observação com aluno permanece pendente.
    - [x] Revisão de Banco de Dados em 03/11/2026: corrigidos executor visível, progressão inicial, SAVEPOINT, preparação de views, continuidade dos projetos e rascunhos reordenados. Validação local e E2E passaram; motores servidores e aprofundamento avançado permanecem pendentes. Evidências em `docs/revisoes/database-2026-11-03.md`.
 9. [~] Dividir aulas com excesso de conceitos (a aula de funções em JavaScript já foi dividida; mapear e revisar as demais).
    - [x] Aprofundar js-callbacks-closures: diferenciar callback imediato e posterior, explicar a ligação da closure, mostrar execução de ambientes independentes e avisar que closure não protege segredos no navegador; Chromium a 375 px confirmou rolagem da tabela por teclado.
